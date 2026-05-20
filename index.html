@@ -84,41 +84,6 @@
         <section id="dashboard" class="page-section active">
             <h2 class="text-3xl font-bold mb-6" data-i18n="nav_dashboard">Dashboard</h2>
 
-            <!-- Summary cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="summary-card bg-white p-6 rounded-xl shadow border-l-4 border-green-700">
-                    <p class="text-sm uppercase tracking-wide text-green-600" data-i18n="dash_total_items">Total Item Types</p>
-                    <p id="dashTotalItems" class="text-4xl font-bold mt-2">0</p>
-                </div>
-                <div class="summary-card bg-white p-6 rounded-xl shadow border-l-4 border-red-500">
-                    <p class="text-sm uppercase tracking-wide text-red-600" data-i18n="dash_low_stock">Low Stock Alerts (Chemicals)</p>
-                    <p id="dashLowStock" class="text-4xl font-bold mt-2 text-red-600">0</p>
-                </div>
-                <div class="summary-card bg-white p-6 rounded-xl shadow border-l-4 border-yellow-500">
-                    <p class="text-sm uppercase tracking-wide text-yellow-700" data-i18n="dash_monthly_usage">Monthly Usage (Out)</p>
-                    <p id="dashMonthlyUsage" class="text-4xl font-bold mt-2">0</p>
-                </div>
-            </div>
-
-            <!-- Recent transactions -->
-            <div class="bg-white p-6 rounded-xl shadow mb-8">
-                <h3 class="text-xl font-bold mb-4" data-i18n="dash_recent_txn">Recent Transactions</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm">
-                        <thead class="bg-green-100 text-green-800">
-                            <tr>
-                                <th class="px-3 py-2 text-left" data-i18n="col_date">Date</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_item">Item</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_type">Type</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_qty">Qty</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_location">Location</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dashRecentBody"></tbody>
-                    </table>
-                </div>
-            </div>
-
             <!-- Live Stock Listing -->
             <div class="bg-white p-6 rounded-xl shadow mb-8">
                 <h3 class="text-xl font-bold mb-4" data-i18n="nav_livestock">Live Stock Listing</h3>
@@ -250,6 +215,15 @@
                 <h3 class="text-xl font-bold mb-4" data-i18n="txn_form_title">Record Stock Movement</h3>
                 <form id="txnForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="col_category">Category</label>
+                        <select id="txnCategory" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600" onchange="filterTxnItemsByCategory()">
+                            <option value="" data-i18n="select_category">-- Select Category --</option>
+                            <option value="Fertilizer" data-i18n="cat_fertilizer">Fertilizer</option>
+                            <option value="Chemical" data-i18n="cat_chemical">Chemical</option>
+                            <option value="Oil Palm Seedling" data-i18n="cat_seedling">Oil Palm Seedling</option>
+                        </select>
+                    </div>
+                    <div>
                         <label class="block text-sm font-semibold mb-1" data-i18n="col_item">Item</label>
                         <select id="txnItem" required class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
                             <option value="" data-i18n="select_item">-- Select Item --</option>
@@ -335,7 +309,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
                     <div>
                         <label class="block text-xs font-semibold mb-1" data-i18n="col_category">Category</label>
-                        <select id="filterCategory" class="w-full border border-green-300 rounded p-2 bg-white">
+                        <select id="filterCategory" class="w-full border border-green-300 rounded p-2 bg-white" onchange="filterSummaryItemsByCategory()">
                             <option value="" data-i18n="opt_all">All</option>
                             <option value="Fertilizer" data-i18n="cat_fertilizer">Fertilizer</option>
                             <option value="Chemical" data-i18n="cat_chemical">Chemical</option>
@@ -1266,21 +1240,41 @@ function renderRoundProgress() {
    DROPDOWN POPULATORS - run whenever master data changes
    ----------------------------------------------------------------- */
 function populateItemDropdowns() {
-    // Transaction page dropdown
-    const txnSel = document.getElementById('txnItem');
-    txnSel.innerHTML = '<option value="">-- Select Item --</option>' +
-        items.map(i => `<option value="${i.id}">${i.name} (${i.category})</option>`).join('');
+    // Transaction page: reset category first, then show all items
+    document.getElementById('txnCategory').value = '';
+    filterTxnItemsByCategory();
 
-    // Stock summary filter dropdown
-    const filterSel = document.getElementById('filterItem');
-    filterSel.innerHTML = '<option value="">All</option>' +
-        items.map(i => `<option value="${i.name}">${i.name}</option>`).join('');
+    // Stock summary filter dropdown — populate via shared filter function
+    filterSummaryItemsByCategory();
 
     // Manuring program: only Fertilizer items
     const mrSel = document.getElementById('mrFertilizer');
     const fertilizers = items.filter(i => i.category === 'Fertilizer');
     mrSel.innerHTML = '<option value="">-- Select Fertilizer --</option>' +
         fertilizers.map(i => `<option value="${i.id}">${i.name} (${i.unit})</option>`).join('');
+}
+
+/**
+ * Filters the Item dropdown on the Stock Transaction form
+ * based on the selected Category. If no category is selected,
+ * all items are shown.
+ */
+function filterTxnItemsByCategory() {
+    const selectedCat = document.getElementById('txnCategory').value;
+    const txnSel      = document.getElementById('txnItem');
+
+    // Filter items — show all if no category chosen
+    const filtered = selectedCat
+        ? items.filter(i => i.category === selectedCat)
+        : items;
+
+    txnSel.innerHTML = '<option value="">-- Select Item --</option>' +
+        filtered.map(i => `<option value="${i.id}">${i.name}</option>`).join('');
+
+    // Reset item selection whenever category changes
+    txnSel.value = '';
+    // Re-evaluate conditional UI (manuring round picker, etc.)
+    updateManuringVisibility();
 }
 
 function populateLocationDropdowns() {
@@ -1403,11 +1397,33 @@ function renderSummary() {
     });
 }
 
+/**
+ * Filters the Item Name dropdown in the Stock Summary filter bar
+ * based on the selected Category. If no category is selected,
+ * all items are shown. Resets the item selection on category change.
+ */
+function filterSummaryItemsByCategory() {
+    const selectedCat = document.getElementById('filterCategory').value;
+    const filterSel   = document.getElementById('filterItem');
+
+    const filtered = selectedCat
+        ? items.filter(i => i.category === selectedCat)
+        : items;
+
+    filterSel.innerHTML = '<option value="">All</option>' +
+        filtered.map(i => `<option value="${i.name}">${i.name}</option>`).join('');
+
+    // Reset item selection when category changes
+    filterSel.value = '';
+}
+
 document.getElementById('applyFilterBtn').addEventListener('click', renderSummary);
 document.getElementById('clearFilterBtn').addEventListener('click', () => {
-    ['filterCategory','filterItem','filterType','filterFrom','filterTo'].forEach(id => {
+    ['filterCategory', 'filterType', 'filterFrom', 'filterTo'].forEach(id => {
         document.getElementById(id).value = '';
     });
+    // Reset item dropdown to show all items, then clear its value
+    filterSummaryItemsByCategory();
     renderSummary();
 });
 
