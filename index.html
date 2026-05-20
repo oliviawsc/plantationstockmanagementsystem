@@ -1,0 +1,2148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Oil Palm Plantation - Stock Management System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS CDN for Excel exports -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Chart.js for dashboard graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Supabase JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Plantation theme colours */
+        body {
+            background-color: #F0FFF4; /* Honeydew */
+            color: #166534;            /* Dark green text */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        /* Sidebar nav active state */
+        .nav-item.active {
+            background-color: #166534;
+            color: #F0FFF4;
+        }
+        .nav-item:hover:not(.active) {
+            background-color: #DCFCE7;
+        }
+        /* Section transition */
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+        /* Card hover */
+        .summary-card { transition: transform 0.15s ease-in-out; }
+        .summary-card:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="min-h-screen">
+
+<!-- =================================================================
+     APP LAYOUT - Sidebar (left) + Main Content (right)
+     ================================================================= -->
+<div class="flex min-h-screen">
+
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-white border-r-2 border-green-700 shadow-lg flex-shrink-0">
+        <div class="p-5 border-b-2 border-green-700">
+            <h1 class="text-xl font-bold text-green-800">🌴 OilPalm Stock</h1>
+            <p class="text-xs text-green-600 mt-1" data-i18n="app_subtitle">Plantation Inventory System</p>
+        </div>
+        <nav class="p-3 space-y-1">
+            <button data-target="dashboard"    class="nav-item active w-full text-left px-4 py-2 rounded-lg font-medium" data-i18n="nav_dashboard">📊 Dashboard</button>
+            <button data-target="items"        class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium" data-i18n="nav_items">📦 Item File</button>
+            <button data-target="transactions" class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium" data-i18n="nav_transactions">🔄 Stock Transaction</button>
+            <button data-target="summary"      class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium" data-i18n="nav_summary">📑 Stock Summary</button>
+            <button data-target="locations"    class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium" data-i18n="nav_locations">📍 Location Area</button>
+            <button data-target="manuring"     class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium" data-i18n="nav_manuring">🌱 Manuring Program</button>
+            <button data-target="roundprogress" class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium" data-i18n="nav_roundprogress">📈 Manuring Progress</button>
+        </nav>
+        <!-- Language switcher -->
+        <div class="px-4 pt-4 mt-6 border-t border-green-200">
+            <p class="text-xs text-green-600 mb-2 font-semibold" data-i18n="lang_label">Language / Bahasa</p>
+            <div class="flex rounded-lg overflow-hidden border border-green-300">
+                <button id="langEN" onclick="setLang('en')"
+                    class="flex-1 py-1.5 text-xs font-bold bg-green-800 text-white transition-colors">
+                    🇬🇧 EN
+                </button>
+                <button id="langMS" onclick="setLang('ms')"
+                    class="flex-1 py-1.5 text-xs font-bold bg-white text-green-700 transition-colors">
+                    🇲🇾 BM
+                </button>
+            </div>
+        </div>
+        <div class="p-4 text-xs text-green-700">
+            <span data-i18n="logged_in_as">Logged in as:</span><br/>
+            <span class="font-semibold">Tester_Admin</span>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 p-8 overflow-y-auto">
+
+        <!-- ============ PAGE 1: DASHBOARD ============ -->
+        <section id="dashboard" class="page-section active">
+            <h2 class="text-3xl font-bold mb-6" data-i18n="nav_dashboard">Dashboard</h2>
+
+            <!-- Summary cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="summary-card bg-white p-6 rounded-xl shadow border-l-4 border-green-700">
+                    <p class="text-sm uppercase tracking-wide text-green-600" data-i18n="dash_total_items">Total Item Types</p>
+                    <p id="dashTotalItems" class="text-4xl font-bold mt-2">0</p>
+                </div>
+                <div class="summary-card bg-white p-6 rounded-xl shadow border-l-4 border-red-500">
+                    <p class="text-sm uppercase tracking-wide text-red-600" data-i18n="dash_low_stock">Low Stock Alerts (Chemicals)</p>
+                    <p id="dashLowStock" class="text-4xl font-bold mt-2 text-red-600">0</p>
+                </div>
+                <div class="summary-card bg-white p-6 rounded-xl shadow border-l-4 border-yellow-500">
+                    <p class="text-sm uppercase tracking-wide text-yellow-700" data-i18n="dash_monthly_usage">Monthly Usage (Out)</p>
+                    <p id="dashMonthlyUsage" class="text-4xl font-bold mt-2">0</p>
+                </div>
+            </div>
+
+            <!-- Recent transactions -->
+            <div class="bg-white p-6 rounded-xl shadow mb-8">
+                <h3 class="text-xl font-bold mb-4" data-i18n="dash_recent_txn">Recent Transactions</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-green-100 text-green-800">
+                            <tr>
+                                <th class="px-3 py-2 text-left" data-i18n="col_date">Date</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_item">Item</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_type">Type</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_qty">Qty</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_location">Location</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashRecentBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Live Stock Listing -->
+            <div class="bg-white p-6 rounded-xl shadow mb-8">
+                <h3 class="text-xl font-bold mb-4" data-i18n="nav_livestock">Live Stock Listing</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-green-100 text-green-800">
+                            <tr>
+                                <th class="px-3 py-2 text-left" data-i18n="col_item_name">Item Name</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_category">Category</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_on_hand">On Hand</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_unit">Unit</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_status">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="liveStockBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Stock Level Charts — one card per category -->
+            <div class="grid grid-cols-1 gap-6">
+
+                <!-- Chart 1: Fertilizer -->
+                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-600">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="inline-block w-3 h-3 rounded-sm flex-shrink-0" style="background:#16a34a"></span>
+                        <h3 class="text-lg font-bold text-green-800" data-i18n="cat_fertilizer">Fertilizer</h3>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-4" data-i18n="chart_sub_fertilizer">On Hand quantity for all fertilizer items</p>
+                    <div id="chartFertilizerWrap" style="min-height:100px;">
+                        <canvas id="chartFertilizer"></canvas>
+                    </div>
+                    <p id="chartFertilizerEmpty" class="hidden text-center text-gray-400 py-6 text-sm" data-i18n="chart_empty">No stock data to display yet.</p>
+                </div>
+
+                <!-- Chart 2: Chemical -->
+                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-600">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="inline-block w-3 h-3 rounded-sm flex-shrink-0" style="background:#2563eb"></span>
+                        <h3 class="text-lg font-bold text-blue-800" data-i18n="cat_chemical">Chemical</h3>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-1" data-i18n="chart_sub_chemical">On Hand quantity for all chemical items — red bars indicate low stock</p>
+                    <!-- Chemical legend -->
+                    <div class="flex flex-wrap gap-3 mb-4 text-xs font-medium">
+                        <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-sm" style="background:#2563eb"></span> <span data-i18n="chart_ok">OK</span></span>
+                        <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-sm" style="background:#dc2626"></span> <span data-i18n="chart_legend_low">⚠️ Low Stock</span></span>
+                        <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-sm" style="background:#f59e0b"></span> <span data-i18n="col_min_threshold">Min Threshold</span></span>
+                    </div>
+                    <div id="chartChemicalWrap" style="min-height:100px;">
+                        <canvas id="chartChemical"></canvas>
+                    </div>
+                    <p id="chartChemicalEmpty" class="hidden text-center text-gray-400 py-6 text-sm" data-i18n="chart_empty">No stock data to display yet.</p>
+                </div>
+
+                <!-- Chart 3: Oil Palm Seedling -->
+                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-pink-600">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="inline-block w-3 h-3 rounded-sm flex-shrink-0" style="background:#db2777"></span>
+                        <h3 class="text-lg font-bold text-pink-800" data-i18n="cat_seedling">Oil Palm Seedling</h3>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-4" data-i18n="chart_sub_seedling">On Hand quantity for all oil palm seedling items</p>
+                    <div id="chartSeedlingWrap" style="min-height:100px;">
+                        <canvas id="chartSeedling"></canvas>
+                    </div>
+                    <p id="chartSeedlingEmpty" class="hidden text-center text-gray-400 py-6 text-sm" data-i18n="chart_empty">No stock data to display yet.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ============ PAGE 2: ITEM FILE ============ -->
+        <section id="items" class="page-section">
+            <h2 class="text-3xl font-bold mb-6" data-i18n="nav_items">Item File (Master Data)</h2>
+            <div class="bg-white p-6 rounded-xl shadow mb-8">
+                <h3 class="text-xl font-bold mb-4" data-i18n="items_add_title">Add New Item</h3>
+                <form id="itemForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="items_lbl_name">Item Name</label>
+                        <input id="itemName" required class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="text" placeholder="e.g. Glyphosate 41%" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="col_category">Category</label>
+                        <select id="itemCategory" required class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="" data-i18n="select_category">-- Select Category --</option>
+                            <option value="Fertilizer" data-i18n="cat_fertilizer">Fertilizer</option>
+                            <option value="Chemical" data-i18n="cat_chemical">Chemical</option>
+                            <option value="Oil Palm Seedling" data-i18n="cat_seedling">Oil Palm Seedling</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="col_unit">Unit</label>
+                        <input id="itemUnit" required class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="text" placeholder="e.g. Bag, Litre, kg" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="items_lbl_threshold">Minimum Threshold</label>
+                        <input id="itemThreshold" min="0" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="number" placeholder="0" />
+                        <p class="text-xs text-green-700 mt-1 italic" data-i18n="items_threshold_hint">⚠️ Min Threshold only applies to <b>Chemicals</b>. Fertilizers & Seedlings ignore this value.</p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <button type="submit" class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold" data-i18n="btn_save_item">Save Item</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Existing items -->
+            <div class="bg-white p-6 rounded-xl shadow">
+                <h3 class="text-xl font-bold mb-4" data-i18n="items_existing_title">Existing Items</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-green-100 text-green-800">
+                            <tr>
+                                <th class="px-3 py-2 text-left" data-i18n="col_item_name">Item Name</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_category">Category</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_unit">Unit</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_min_threshold">Min Threshold</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ PAGE 3: STOCK TRANSACTION ============ -->
+        <section id="transactions" class="page-section">
+            <h2 class="text-3xl font-bold mb-6" data-i18n="nav_transactions">Stock Transaction</h2>
+            <div class="bg-white p-6 rounded-xl shadow">
+                <h3 class="text-xl font-bold mb-4" data-i18n="txn_form_title">Record Stock Movement</h3>
+                <form id="txnForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="col_item">Item</label>
+                        <select id="txnItem" required class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="" data-i18n="select_item">-- Select Item --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="txn_lbl_type">Transaction Type</label>
+                        <select id="txnType" required class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="" data-i18n="select_type">-- Select Type --</option>
+                            <option value="In">In</option>
+                            <option value="Out">Out</option>
+                            <option value="Adj">Adj</option>
+                        </select>
+                    </div>
+                    <div id="txnQtyWrap">
+                        <label class="block text-sm font-semibold mb-1" data-i18n="col_qty">Quantity</label>
+                        <input id="txnQty" required min="0" step="0.01" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="number" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="col_ref">Ref / DO No.</label>
+                        <input id="txnRef" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="text" placeholder="e.g. DO-2026-0142" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="col_date">Date</label>
+                        <input id="txnDate" required class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="date" />
+                    </div>
+                    <div id="txnLocationWrap">
+                        <label class="block text-sm font-semibold mb-1" data-i18n="col_location">Location</label>
+                        <select id="txnLocation" required class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="None/Storage" data-i18n="opt_none_storage">None/Storage</option>
+                        </select>
+                    </div>
+                    <!-- Multi-row Application Breakdown - shown ONLY for Out transactions -->
+                    <div id="txnMultiWrap" class="md:col-span-2 hidden bg-blue-50 border-2 border-dashed border-blue-400 p-4 rounded-lg">
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="text-sm font-semibold" data-i18n="txn_breakdown_label">Application Breakdown (per Block) <span class="text-red-600">*</span></label>
+                            <button type="button" id="txnAddRowBtn" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded text-sm" data-i18n="btn_add_row">+ Add Row</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-sm">
+                                <thead class="bg-blue-100 text-blue-800">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left" data-i18n="col_qty">Quantity</th>
+                                        <th class="px-3 py-2 text-left" data-i18n="txn_col_location_block">Location (Block)</th>
+                                        <th class="px-3 py-2 text-left" data-i18n="col_action">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="txnRowsBody"></tbody>
+                            </table>
+                        </div>
+                        <p class="text-xs text-blue-700 mt-2 italic" data-i18n="txn_breakdown_hint">
+                            📝 Add a row for each block where stock was applied. Each row creates a separate transaction record sharing the same Item, Date, Ref, and Round.
+                        </p>
+                    </div>
+
+                    <!-- Manuring round picker - shown ONLY when issuing Fertilizer Out -->
+                    <div id="txnManuringWrap" class="md:col-span-2 hidden bg-green-50 border-2 border-dashed border-green-400 p-4 rounded-lg">
+                        <label class="block text-sm font-semibold mb-1" data-i18n="txn_lbl_round">Manuring Round <span class="text-red-600">*</span></label>
+                        <select id="txnManuringRound" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="" data-i18n="select_round">-- Select a Manuring Round --</option>
+                        </select>
+                        <p class="text-xs text-green-700 mt-2 italic" data-i18n="txn_round_hint">
+                            🌱 Required when issuing fertilizer for field application. Make sure the <b>Location</b> above is set to the target block (not Storage). Define rounds in the <b>Manuring Program</b> page.
+                        </p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold mb-1" data-i18n="col_remarks">Remarks</label>
+                        <textarea id="txnRemarks" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" rows="2"></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <button type="submit" class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold" data-i18n="btn_save_txn">Save Transaction</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ============ PAGE 5: STOCK SUMMARY (Audit Trail) ============ -->
+        <section id="summary" class="page-section">
+            <h2 class="text-3xl font-bold mb-6" data-i18n="nav_summary">Stock Summary (Audit Trail)</h2>
+            <!-- Filters -->
+            <div class="bg-white p-6 rounded-xl shadow mb-6">
+                <h3 class="text-lg font-bold mb-3" data-i18n="summary_filters">Filters</h3>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1" data-i18n="col_category">Category</label>
+                        <select id="filterCategory" class="w-full border border-green-300 rounded p-2 bg-white">
+                            <option value="" data-i18n="opt_all">All</option>
+                            <option value="Fertilizer" data-i18n="cat_fertilizer">Fertilizer</option>
+                            <option value="Chemical" data-i18n="cat_chemical">Chemical</option>
+                            <option value="Oil Palm Seedling" data-i18n="cat_seedling">Oil Palm Seedling</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1" data-i18n="col_item_name">Item Name</label>
+                        <select id="filterItem" class="w-full border border-green-300 rounded p-2 bg-white">
+                            <option value="" data-i18n="opt_all">All</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1" data-i18n="txn_lbl_type">Type</label>
+                        <select id="filterType" class="w-full border border-green-300 rounded p-2 bg-white">
+                            <option value="" data-i18n="opt_all">All</option>
+                            <option value="In">In</option>
+                            <option value="Out">Out</option>
+                            <option value="Adj">Adj</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1" data-i18n="filter_date_from">Date From</label>
+                        <input id="filterFrom" type="date" class="w-full border border-green-300 rounded p-2" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1" data-i18n="filter_date_to">Date To</label>
+                        <input id="filterTo" type="date" class="w-full border border-green-300 rounded p-2" />
+                    </div>
+                </div>
+                <div class="mt-4 flex gap-3">
+                    <button id="applyFilterBtn" class="bg-green-800 hover:bg-green-900 text-white px-5 py-2 rounded-lg font-semibold" data-i18n="btn_apply_filters">Apply Filters</button>
+                    <button id="clearFilterBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-lg font-semibold" data-i18n="btn_clear">Clear</button>
+                    <button id="exportExcelBtn" class="ml-auto bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-2 rounded-lg font-semibold" data-i18n="btn_export">⬇️ Export to Excel</button>
+                </div>
+            </div>
+
+            <!-- Audit table -->
+            <div class="bg-white p-6 rounded-xl shadow">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-green-100 text-green-800">
+                            <tr>
+                                <th class="px-3 py-2 text-left" data-i18n="col_date">Date</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_item">Item</th>
+                                <th class="px-3 py-2 text-right" data-i18n="col_qty_in">Quantity In</th>
+                                <th class="px-3 py-2 text-right" data-i18n="col_qty_out">Quantity Out</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_location">Location</th>
+                                <th class="px-3 py-2 text-right" data-i18n="col_balance">Balance</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_user">User</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ PAGE 6: LOCATION AREA ============ -->
+        <section id="locations" class="page-section">
+            <h2 class="text-3xl font-bold mb-6" data-i18n="nav_locations">Location Area</h2>
+            <div class="bg-white p-6 rounded-xl shadow mb-8">
+                <h3 class="text-xl font-bold mb-4" data-i18n="loc_add_title">Register New Block</h3>
+                <form id="locForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="loc_lbl_name">Block Name</label>
+                        <input id="locName" required class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="text" placeholder="e.g. Block A1" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="loc_lbl_area">Area (Ha)</label>
+                        <input id="locArea" required min="0" step="0.01" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="number" placeholder="e.g. 25.5" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="loc_lbl_palms">No. of Palm</label>
+                        <input id="locPalms" required min="0" step="1" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="number" placeholder="e.g. 3500" />
+                    </div>
+                    <div class="md:col-span-2 flex gap-3">
+                        <button id="locSubmitBtn" type="submit" class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold" data-i18n="btn_save_loc">Save Location</button>
+                        <button id="locCancelBtn" type="button" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg font-semibold" data-i18n="btn_cancel_edit">Cancel Edit</button>
+                    </div>
+                </form>
+            </div>
+            <!-- Import Locations from File -->
+            <div class="bg-white p-6 rounded-xl shadow mb-8">
+                <h3 class="text-xl font-bold mb-2" data-i18n="loc_import_title">Import Locations from File</h3>
+                <p class="text-sm text-green-700 mb-4" data-i18n="loc_import_hint">Upload a <b>CSV</b> or <b>Excel (.xlsx)</b> file with columns: <code class="bg-green-100 px-1 rounded">Block Name</code>, <code class="bg-green-100 px-1 rounded">Area (Ha)</code>, <code class="bg-green-100 px-1 rounded">No. of Palm</code>. Duplicate block names will be skipped.</p>
+                <div class="flex items-center gap-3 flex-wrap">
+                    <label class="cursor-pointer bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg font-semibold inline-block" data-i18n="btn_choose_file">
+                        📂 Choose File
+                        <input type="file" id="locImportInput" accept=".csv,.xlsx,.xls" class="hidden" />
+                    </label>
+                    <span id="locImportFileName" class="text-sm text-gray-500 italic" data-i18n="no_file_selected">No file selected</span>
+                    <button type="button" id="locDownloadTemplateBtn" class="ml-auto text-sm bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-semibold" data-i18n="btn_download_template">⬇️ Download Template</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow">
+                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <h3 class="text-xl font-bold" data-i18n="loc_registered_title">Registered Blocks</h3>
+                    <div id="locTotals" class="text-sm font-semibold text-green-800 bg-green-100 px-4 py-2 rounded-lg">
+                        <span data-i18n="loc_total_area">Total Area:</span> <span id="locTotalArea">0.00</span> Ha &nbsp;|&nbsp; <span data-i18n="loc_total_palms">Total No. of Palm:</span> <span id="locTotalPalms">0</span>
+                    </div>
+                </div>
+                <div id="locGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+            </div>
+        </section>
+
+        <!-- ============ PAGE 7: MANURING PROGRAM ============ -->
+        <section id="manuring" class="page-section">
+            <h2 class="text-3xl font-bold mb-2" data-i18n="nav_manuring">Manuring Program</h2>
+            <p class="text-sm text-green-700 mb-6" data-i18n="manuring_subtitle">Define manuring rounds (e.g. <i>Round 1 - 2 kg MOP per palm</i>). When fertilizer stock is issued (Out), the user must link it to a round + block.</p>
+
+            <!-- Define new round -->
+            <div class="bg-white p-6 rounded-xl shadow mb-8">
+                <h3 class="text-xl font-bold mb-4" data-i18n="manuring_add_title">Add Manuring Round</h3>
+                <form id="manuringForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="manuring_lbl_round_name">Round Name</label>
+                        <input id="mrName" required class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="text" placeholder="e.g. Round 1 - 2026" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="manuring_lbl_fertilizer">Fertilizer</label>
+                        <select id="mrFertilizer" required class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="" data-i18n="select_fertilizer">-- Select Fertilizer --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="manuring_lbl_kg_palm">kg per Palm</label>
+                        <input id="mrKgPerPalm" required min="0" step="0.01" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="number" placeholder="e.g. 2" />
+                        <p class="text-xs text-green-700 mt-1 italic" data-i18n="manuring_kg_hint">Used to calculate Budgeted Fertilizer Needed: <b>(Total Palms × kg/palm) ÷ 50 kg/bag</b>.</p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold mb-1" data-i18n="manuring_lbl_notes">Notes</label>
+                        <textarea id="mrNotes" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" rows="2" placeholder="e.g. Apply pre-rainy season"></textarea>
+                    </div>
+                    <div class="md:col-span-2 flex gap-3">
+                        <button id="mrSubmitBtn" type="submit" class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold" data-i18n="btn_save_round">Save Round</button>
+                        <button id="mrCancelBtn" type="button" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg font-semibold" data-i18n="btn_cancel_edit">Cancel Edit</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Defined rounds list -->
+            <div class="bg-white p-6 rounded-xl shadow mb-8">
+                <h3 class="text-xl font-bold mb-4" data-i18n="manuring_defined_title">Defined Manuring Rounds</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-green-100 text-green-800">
+                            <tr>
+                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
+                                <th class="px-3 py-2 text-left" data-i18n="manuring_lbl_fertilizer">Fertilizer</th>
+                                <th class="px-3 py-2 text-right" data-i18n="col_budgeted">Budgeted Fertilizer Needed</th>
+                                <th class="px-3 py-2 text-left" data-i18n="manuring_lbl_notes">Notes</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manuringRoundsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Manuring history (actual applications recorded via transactions) -->
+            <div class="bg-white p-6 rounded-xl shadow">
+                <h3 class="text-xl font-bold mb-4" data-i18n="manuring_history_title">Manuring Application History</h3>
+                <p class="text-xs text-green-700 mb-3" data-i18n="manuring_history_hint">Auto-generated from fertilizer "Out" transactions linked to a round.</p>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-green-100 text-green-800">
+                            <tr>
+                                <th class="px-3 py-2 text-left" data-i18n="col_date">Date</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_block">Block</th>
+                                <th class="px-3 py-2 text-left" data-i18n="manuring_lbl_fertilizer">Fertilizer</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_qty_applied">Qty Applied</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_ref">Ref</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manuringHistoryBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ PAGE 8: MANURING PROGRESS SUMMARY ============ -->
+        <section id="roundprogress" class="page-section">
+            <h2 class="text-3xl font-bold mb-2" data-i18n="nav_roundprogress">Manuring Progress Summary</h2>
+            <p class="text-sm text-green-700 mb-6" data-i18n="progress_subtitle">% Applied = Total Quantity Applied (all blocks) ÷ Total Budgeted Fertilizer Needed</p>
+
+            <!-- Round progress summary - one % per round, aggregated across ALL blocks -->
+            <div class="bg-white p-6 rounded-xl shadow mb-8">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-green-100 text-green-800">
+                            <tr>
+                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
+                                <th class="px-3 py-2 text-left" data-i18n="manuring_lbl_fertilizer">Fertilizer</th>
+                                <th class="px-3 py-2 text-right" data-i18n="col_total_applied">Total Applied</th>
+                                <th class="px-3 py-2 text-right" data-i18n="col_budgeted">Budgeted</th>
+                                <th class="px-3 py-2 text-right" data-i18n="col_pct_applied">% Applied</th>
+                            </tr>
+                        </thead>
+                        <tbody id="roundProgressBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- =================================================================
+     EDIT TRANSACTION MODAL
+     ================================================================= -->
+<div id="editTxnModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center flex">
+    <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg mx-4 max-h-screen overflow-y-auto">
+        <h3 class="text-xl font-bold mb-4 text-green-800" data-i18n="modal_edit_title">✏️ Edit Transaction</h3>
+        <form id="editTxnForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="hidden" id="editTxnId" />
+            <input type="hidden" id="editTxnCategory" />
+            <div>
+                <label class="block text-sm font-semibold mb-1" data-i18n="col_item">Item</label>
+                <input id="editTxnItemName" readonly class="w-full border border-gray-300 rounded p-2 bg-gray-100 text-gray-600" type="text" />
+            </div>
+            <div>
+                <label class="block text-sm font-semibold mb-1" data-i18n="txn_lbl_type">Transaction Type</label>
+                <select id="editTxnType" required class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                    <option value="In">In</option>
+                    <option value="Out">Out</option>
+                    <option value="Adj">Adj</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold mb-1" data-i18n="col_qty">Quantity</label>
+                <input id="editTxnQty" required min="0" step="0.01" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="number" />
+            </div>
+            <div>
+                <label class="block text-sm font-semibold mb-1" data-i18n="col_date">Date</label>
+                <input id="editTxnDate" required class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="date" />
+            </div>
+            <div>
+                <label class="block text-sm font-semibold mb-1" data-i18n="col_location">Location</label>
+                <select id="editTxnLocation" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                    <option value="None/Storage" data-i18n="opt_none_storage">None/Storage</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold mb-1" data-i18n="col_ref">Ref / DO No.</label>
+                <input id="editTxnRef" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="text" />
+            </div>
+            <div id="editTxnManuringWrap" class="md:col-span-2 hidden bg-green-50 border border-green-300 rounded p-3">
+                <label class="block text-sm font-semibold mb-1" data-i18n="txn_lbl_round">Manuring Round <span class="text-red-600">*</span></label>
+                <select id="editTxnManuringRound" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                    <option value="" data-i18n="select_round">-- Select a Manuring Round --</option>
+                </select>
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-sm font-semibold mb-1" data-i18n="col_remarks">Remarks</label>
+                <textarea id="editTxnRemarks" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" rows="2"></textarea>
+            </div>
+            <div class="md:col-span-2 flex gap-3">
+                <button type="submit" class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold" data-i18n="btn_save_changes">Save Changes</button>
+                <button type="button" onclick="closeEditTxnModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg font-semibold" data-i18n="btn_cancel">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- =================================================================
+     APPLICATION JAVASCRIPT
+     ================================================================= -->
+<script>
+/* -----------------------------------------------------------------
+   SUPABASE CLIENT - connection to the cloud database
+   ----------------------------------------------------------------- */
+const SUPABASE_URL = 'https://eukvdlyzhyjohkjqbqjb.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_fsL8W-BA5l6lEkYajn2zgA_lQexiLhP';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+/* -----------------------------------------------------------------
+   GLOBAL STATE - Loaded from / persisted to localStorage
+   (localStorage is kept as an instant-render cache; Supabase is the
+   source of truth and gets synced on every save.)
+   ----------------------------------------------------------------- */
+const STORAGE_KEYS = {
+    items: 'opp_items',
+    locations: 'opp_locations',
+    transactions: 'opp_transactions',
+    manuringRounds: 'opp_manuring_rounds'
+};
+
+// Load arrays from localStorage (or initialise as empty)
+let items          = JSON.parse(localStorage.getItem(STORAGE_KEYS.items))          || [];
+let locations      = JSON.parse(localStorage.getItem(STORAGE_KEYS.locations))      || [];
+let transactions   = JSON.parse(localStorage.getItem(STORAGE_KEYS.transactions))   || [];
+let manuringRounds = JSON.parse(localStorage.getItem(STORAGE_KEYS.manuringRounds)) || [];
+
+// Snapshot of the last known set of ids per table, used to figure out
+// which rows were removed locally so we can mirror those deletes to Supabase.
+const lastKnownIds = {
+    opp_items:           new Set(items.map(r => r.id)),
+    opp_locations:       new Set(locations.map(r => r.id)),
+    opp_transactions:    new Set(transactions.map(r => r.id)),
+    opp_manuring_rounds: new Set(manuringRounds.map(r => r.id))
+};
+
+// Persist a key back to localStorage AND sync to Supabase.
+// Existing call sites do not await this; sync runs in the background.
+function save(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+    syncToSupabase(key, data);
+}
+
+// Push the current array for `key` into the matching Supabase table:
+//   - upsert every row currently in `data`
+//   - delete rows whose ids existed before but are no longer in `data`
+async function syncToSupabase(key, data) {
+    const table = key; // STORAGE_KEYS values are identical to the table names
+    try {
+        const currentIds  = new Set(data.map(r => r.id));
+        const previousIds = lastKnownIds[table] || new Set();
+        const removedIds  = [...previousIds].filter(id => !currentIds.has(id));
+
+        if (removedIds.length > 0) {
+            const { error: delErr } = await supabaseClient
+                .from(table).delete().in('id', removedIds);
+            if (delErr) console.error(`[Supabase] delete ${table}`, delErr);
+        }
+
+        if (data.length > 0) {
+            const { error: upErr } = await supabaseClient
+                .from(table).upsert(data, { onConflict: 'id' });
+            if (upErr) console.error(`[Supabase] upsert ${table}`, upErr);
+        }
+
+        lastKnownIds[table] = currentIds;
+    } catch (err) {
+        console.error(`[Supabase] sync error for ${table}`, err);
+    }
+}
+
+// Pull the full dataset down from Supabase on boot, replacing in-memory
+// arrays and refreshing the UI.  localStorage cache is left in place so
+// the app shows something instantly while this runs.
+async function loadFromSupabase() {
+    try {
+        const [itemsRes, locsRes, txnsRes, roundsRes] = await Promise.all([
+            supabaseClient.from('opp_items').select('*'),
+            supabaseClient.from('opp_locations').select('*'),
+            supabaseClient.from('opp_transactions').select('*'),
+            supabaseClient.from('opp_manuring_rounds').select('*')
+        ]);
+
+        if (itemsRes.error)  console.error('[Supabase] load items',  itemsRes.error);
+        if (locsRes.error)   console.error('[Supabase] load locs',   locsRes.error);
+        if (txnsRes.error)   console.error('[Supabase] load txns',   txnsRes.error);
+        if (roundsRes.error) console.error('[Supabase] load rounds', roundsRes.error);
+
+        if (itemsRes.data)  items          = itemsRes.data;
+        if (locsRes.data)   locations      = locsRes.data;
+        if (txnsRes.data)   transactions   = txnsRes.data;
+        if (roundsRes.data) manuringRounds = roundsRes.data;
+
+        // Update the cache + last-known-id snapshot from what the server returned.
+        localStorage.setItem(STORAGE_KEYS.items,          JSON.stringify(items));
+        localStorage.setItem(STORAGE_KEYS.locations,      JSON.stringify(locations));
+        localStorage.setItem(STORAGE_KEYS.transactions,   JSON.stringify(transactions));
+        localStorage.setItem(STORAGE_KEYS.manuringRounds, JSON.stringify(manuringRounds));
+        lastKnownIds.opp_items           = new Set(items.map(r => r.id));
+        lastKnownIds.opp_locations       = new Set(locations.map(r => r.id));
+        lastKnownIds.opp_transactions    = new Set(transactions.map(r => r.id));
+        lastKnownIds.opp_manuring_rounds = new Set(manuringRounds.map(r => r.id));
+
+        refreshAll();
+    } catch (err) {
+        console.error('[Supabase] loadFromSupabase failed', err);
+    }
+}
+
+/* -----------------------------------------------------------------
+   NAVIGATION - Show/hide sections without reload
+   ----------------------------------------------------------------- */
+const navButtons   = document.querySelectorAll('.nav-item');
+const pageSections = document.querySelectorAll('.page-section');
+
+navButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-target');
+        // toggle nav active class
+        navButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        // toggle visible section
+        pageSections.forEach(sec => sec.classList.toggle('active', sec.id === target));
+        // refresh the section being shown so data is up-to-date
+        refreshAll();
+    });
+});
+
+/* -----------------------------------------------------------------
+   ITEM FILE - create + list
+   ----------------------------------------------------------------- */
+document.getElementById('itemForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const newItem = {
+        id: Date.now(),
+        name: document.getElementById('itemName').value.trim(),
+        category: document.getElementById('itemCategory').value,
+        unit: document.getElementById('itemUnit').value.trim(),
+        threshold: parseFloat(document.getElementById('itemThreshold').value) || 0
+    };
+    // Block duplicate names (case-insensitive)
+    if (items.some(i => i.name.toLowerCase() === newItem.name.toLowerCase())) {
+        alert('An item with that name already exists.');
+        return;
+    }
+    items.push(newItem);
+    save(STORAGE_KEYS.items, items);
+    e.target.reset();
+    refreshAll();
+});
+
+// Render existing items table
+function renderItemsTable() {
+    const body = document.getElementById('itemsTableBody');
+    body.innerHTML = '';
+    if (items.length === 0) {
+        body.innerHTML = '<tr><td colspan="5" class="px-3 py-4 text-center text-gray-500">No items yet.</td></tr>';
+        return;
+    }
+    items.forEach(it => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-green-100 hover:bg-green-50';
+        tr.innerHTML = `
+            <td class="px-3 py-2">${it.name}</td>
+            <td class="px-3 py-2">${it.category}</td>
+            <td class="px-3 py-2">${it.unit}</td>
+            <td class="px-3 py-2">${it.category === 'Chemical' ? it.threshold : '<span class="text-gray-400">N/A</span>'}</td>
+            <td class="px-3 py-2">
+                <button class="text-red-600 hover:underline" onclick="deleteItem(${it.id})">Delete</button>
+            </td>`;
+        body.appendChild(tr);
+    });
+}
+
+// Delete an item (and any transactions linked to it)
+function deleteItem(id) {
+    const it = items.find(i => i.id === id);
+    if (!it) return;
+    if (!confirm(`Delete item "${it.name}"? This will also remove its transactions.`)) return;
+    items = items.filter(i => i.id !== id);
+    transactions = transactions.filter(t => t.itemId !== id);
+    save(STORAGE_KEYS.items, items);
+    save(STORAGE_KEYS.transactions, transactions);
+    refreshAll();
+}
+
+/* -----------------------------------------------------------------
+   LOCATION AREA - create + list
+   ----------------------------------------------------------------- */
+// Track which location (if any) is being edited
+let editingLocId = null;
+
+function startEditLocation(id) {
+    const l = locations.find(x => x.id === id);
+    if (!l) return;
+    document.getElementById('locName').value = l.name;
+    document.getElementById('locArea').value = l.area;
+    document.getElementById('locPalms').value = l.numPalms || 0;
+    editingLocId = id;
+    document.getElementById('locSubmitBtn').textContent = 'Update Location';
+    document.getElementById('locCancelBtn').classList.remove('hidden');
+    document.getElementById('locForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function cancelEditLocation() {
+    editingLocId = null;
+    document.getElementById('locForm').reset();
+    document.getElementById('locSubmitBtn').textContent = 'Save Location';
+    document.getElementById('locCancelBtn').classList.add('hidden');
+}
+document.getElementById('locCancelBtn').addEventListener('click', cancelEditLocation);
+
+document.getElementById('locForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const formLoc = {
+        name: document.getElementById('locName').value.trim(),
+        area: parseFloat(document.getElementById('locArea').value) || 0,
+        numPalms: parseInt(document.getElementById('locPalms').value, 10) || 0
+    };
+
+    if (editingLocId) {
+        // ===== UPDATE EXISTING =====
+        const idx = locations.findIndex(x => x.id === editingLocId);
+        if (idx < 0) { editingLocId = null; return; }
+        // Block name collision with OTHER locations
+        if (locations.some(l => l.id !== editingLocId && l.name.toLowerCase() === formLoc.name.toLowerCase())) {
+            alert('Another location with that name already exists.');
+            return;
+        }
+        const oldName = locations[idx].name;
+        locations[idx] = { id: editingLocId, ...formLoc };
+        // Propagate name change to existing transactions
+        if (oldName !== formLoc.name) {
+            transactions.forEach(t => { if (t.location === oldName) t.location = formLoc.name; });
+            save(STORAGE_KEYS.transactions, transactions);
+        }
+        cancelEditLocation();
+    } else {
+        // ===== CREATE NEW (existing logic) =====
+        if (locations.some(l => l.name.toLowerCase() === formLoc.name.toLowerCase())) {
+            alert('A location with that name already exists.');
+            return;
+        }
+        locations.push({ id: Date.now(), ...formLoc });
+        e.target.reset();
+    }
+    save(STORAGE_KEYS.locations, locations);
+    refreshAll();
+});
+
+// Render location grid
+function renderLocationGrid() {
+    const grid = document.getElementById('locGrid');
+    grid.innerHTML = '';
+
+    // Totals (always recompute, even when empty)
+    const totalArea  = locations.reduce((s, l) => s + (parseFloat(l.area) || 0), 0);
+    const totalPalms = locations.reduce((s, l) => s + (parseInt(l.numPalms, 10) || 0), 0);
+    document.getElementById('locTotalArea').textContent  = totalArea.toFixed(2);
+    document.getElementById('locTotalPalms').textContent = totalPalms.toLocaleString();
+
+    if (locations.length === 0) {
+        grid.innerHTML = '<p class="text-gray-500 col-span-full">No locations registered yet.</p>';
+        return;
+    }
+    locations.forEach(l => {
+        const card = document.createElement('div');
+        card.className = 'border-2 border-green-200 rounded-lg p-4 bg-green-50 relative';
+        card.innerHTML = `
+            <button onclick="deleteLocation(${l.id})" class="absolute top-2 right-2 text-red-500 hover:text-red-700 text-sm" title="Delete">✕</button>
+            <h4 class="font-bold text-lg">📍 ${l.name}</h4>
+            <p class="text-sm text-green-700 mt-1">Area: <b>${l.area.toFixed(2)} Ha</b></p>
+            <p class="text-sm text-green-700">No. of Palm: <b>${(l.numPalms || 0).toLocaleString()}</b></p>
+            <button onclick="startEditLocation(${l.id})" class="mt-3 text-xs bg-green-700 hover:bg-green-800 text-white px-3 py-1 rounded">✏️ Edit</button>`;
+        grid.appendChild(card);
+    });
+}
+
+function deleteLocation(id) {
+    const l = locations.find(x => x.id === id);
+    if (!l) return;
+    if (!confirm(`Delete location "${l.name}"?`)) return;
+    locations = locations.filter(x => x.id !== id);
+    save(STORAGE_KEYS.locations, locations);
+    refreshAll();
+}
+
+/* -----------------------------------------------------------------
+   STOCK TRANSACTIONS - create
+   ----------------------------------------------------------------- */
+/* -----------------------------------------------------------------
+   MULTI-ROW BREAKDOWN BUILDER (Out transactions only)
+   Each row holds an independent Quantity + Location, so a single
+   submission can split one item across multiple blocks in a day.
+   ----------------------------------------------------------------- */
+function buildLocationOptionsHtml() {
+    return '<option value="None/Storage">None/Storage</option>' +
+        locations.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
+}
+
+function addTxnRow() {
+    const tbody = document.getElementById('txnRowsBody');
+    const tr = document.createElement('tr');
+    tr.className = 'border-b border-blue-100';
+    tr.innerHTML = `
+        <td class="px-3 py-2"><input type="number" min="0" step="0.01" class="txn-row-qty w-32 border border-blue-300 rounded p-1" /></td>
+        <td class="px-3 py-2"><select class="txn-row-loc border border-blue-300 rounded p-1 bg-white">${buildLocationOptionsHtml()}</select></td>
+        <td class="px-3 py-2"><button type="button" class="text-red-600 hover:underline text-sm" onclick="this.closest('tr').remove()">Remove</button></td>`;
+    tbody.appendChild(tr);
+}
+document.getElementById('txnAddRowBtn').addEventListener('click', addTxnRow);
+
+document.getElementById('txnForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const itemId = parseInt(document.getElementById('txnItem').value, 10);
+    const item   = items.find(i => i.id === itemId);
+    if (!item) { alert('Please select a valid item.'); return; }
+
+    const txnType  = document.getElementById('txnType').value;
+
+    /* ============ NEW: MULTI-ROW PATH FOR OUT TRANSACTIONS ============ */
+    if (txnType === 'Out') {
+        const rows = Array.from(document.querySelectorAll('#txnRowsBody tr'));
+        if (rows.length === 0) {
+            alert('Please add at least one Application Breakdown row.');
+            return;
+        }
+
+        // Manuring round capture (only relevant for fertilizer Out)
+        let manuringRoundId   = null;
+        let manuringRoundName = null;
+        if (item.category === 'Fertilizer') {
+            const roundId = document.getElementById('txnManuringRound').value;
+            if (!roundId) {
+                alert('Please select a Manuring Round for this fertilizer issue.');
+                return;
+            }
+            const round = manuringRounds.find(r => r.id === parseInt(roundId, 10));
+            if (round) {
+                manuringRoundId   = round.id;
+                manuringRoundName = round.name;
+            }
+        }
+
+        // Validate every row first (don't half-write the DB)
+        const parsedRows = [];
+        for (const row of rows) {
+            const qty = parseFloat(row.querySelector('.txn-row-qty').value) || 0;
+            const loc = row.querySelector('.txn-row-loc').value;
+            if (qty <= 0) { alert('Each row must have a Quantity greater than 0.'); return; }
+            if (item.category === 'Fertilizer' && loc === 'None/Storage') {
+                alert('Each row must have a target Block selected (not Storage) for fertilizer Out.');
+                return;
+            }
+            parsedRows.push({ qty, loc });
+        }
+
+        // Persist one transaction per row
+        const baseDate    = document.getElementById('txnDate').value;
+        const baseRef     = document.getElementById('txnRef').value.trim();
+        const baseRemarks = document.getElementById('txnRemarks').value.trim();
+        const baseId      = Date.now();
+        parsedRows.forEach((r, idx) => {
+            transactions.push({
+                id: baseId + idx,
+                date: baseDate,
+                itemId: item.id,
+                itemName: item.name,
+                category: item.category,
+                unit: item.unit,
+                type: 'Out',
+                qty: r.qty,
+                location: r.loc,
+                ref: baseRef,
+                remarks: baseRemarks,
+                manuringRoundId: manuringRoundId,
+                manuringRoundName: manuringRoundName,
+                user: 'Tester_Admin'
+            });
+        });
+        save(STORAGE_KEYS.transactions, transactions);
+        e.target.reset();
+        document.getElementById('txnDate').valueAsDate = new Date();
+        document.getElementById('txnRowsBody').innerHTML = '';
+        document.getElementById('txnManuringWrap').classList.add('hidden');
+        document.getElementById('txnMultiWrap').classList.add('hidden');
+        document.getElementById('txnQtyWrap').classList.remove('hidden');
+        document.getElementById('txnLocationWrap').classList.remove('hidden');
+        document.getElementById('txnQty').required = true;
+        document.getElementById('txnLocation').required = true;
+        alert(`${parsedRows.length} transaction row(s) recorded successfully.`);
+        refreshAll();
+        return;
+    }
+
+    /* ============ EXISTING SINGLE-ROW PATH FOR IN / ADJ ============ */
+    const location = document.getElementById('txnLocation').value;
+
+    const newTxn = {
+        id: Date.now(),
+        date: document.getElementById('txnDate').value,
+        itemId: item.id,
+        itemName: item.name,
+        category: item.category,
+        unit: item.unit,
+        type: txnType,
+        qty: parseFloat(document.getElementById('txnQty').value) || 0,
+        location: location,
+        ref: document.getElementById('txnRef').value.trim(),
+        remarks: document.getElementById('txnRemarks').value.trim(),
+        manuringRoundId: null,
+        manuringRoundName: null,
+        user: 'Tester_Admin'
+    };
+    transactions.push(newTxn);
+    save(STORAGE_KEYS.transactions, transactions);
+    e.target.reset();
+    // re-default date to today after reset
+    document.getElementById('txnDate').valueAsDate = new Date();
+    document.getElementById('txnManuringWrap').classList.add('hidden');
+    alert('Transaction recorded successfully.');
+    refreshAll();
+});
+
+/* -----------------------------------------------------------------
+   TRANSACTION FORM - dynamic Manuring Round visibility
+   Show round picker only when Fertilizer + Out is selected.
+   Filter rounds to those defined for the selected fertilizer.
+   ----------------------------------------------------------------- */
+function updateManuringVisibility() {
+    const itemId  = parseInt(document.getElementById('txnItem').value, 10);
+    const txnType = document.getElementById('txnType').value;
+    const item    = items.find(i => i.id === itemId);
+    const wrap    = document.getElementById('txnManuringWrap');
+    const sel     = document.getElementById('txnManuringRound');
+
+    if (item && item.category === 'Fertilizer' && txnType === 'Out') {
+        wrap.classList.remove('hidden');
+        // Populate dropdown filtered to this fertilizer
+        const matchingRounds = manuringRounds.filter(r => r.fertilizerItemId === item.id);
+        if (matchingRounds.length === 0) {
+            sel.innerHTML = '<option value="">⚠️ No rounds defined for this fertilizer - add one in Manuring Program</option>';
+        } else {
+            sel.innerHTML = '<option value="">-- Select a Manuring Round --</option>' +
+                matchingRounds.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+        }
+    } else {
+        wrap.classList.add('hidden');
+        sel.value = '';
+    }
+
+    /* Toggle multi-row breakdown vs single Qty/Location depending on Out vs In/Adj */
+    const multiWrap   = document.getElementById('txnMultiWrap');
+    const qtyWrap     = document.getElementById('txnQtyWrap');
+    const locWrap     = document.getElementById('txnLocationWrap');
+    const qtyInput    = document.getElementById('txnQty');
+    const locSelect   = document.getElementById('txnLocation');
+    if (txnType === 'Out') {
+        multiWrap.classList.remove('hidden');
+        qtyWrap.classList.add('hidden');
+        locWrap.classList.add('hidden');
+        qtyInput.required = false;
+        locSelect.required = false;
+        // seed first row if empty
+        if (document.getElementById('txnRowsBody').children.length === 0) {
+            addTxnRow();
+        }
+    } else {
+        multiWrap.classList.add('hidden');
+        qtyWrap.classList.remove('hidden');
+        locWrap.classList.remove('hidden');
+        qtyInput.required = true;
+        locSelect.required = true;
+    }
+}
+document.getElementById('txnItem').addEventListener('change', updateManuringVisibility);
+document.getElementById('txnType').addEventListener('change', updateManuringVisibility);
+
+/* -----------------------------------------------------------------
+   MANURING PROGRAM - create rounds + render history
+   ----------------------------------------------------------------- */
+// Track which round (if any) is being edited
+let editingRoundId = null;
+
+function startEditRound(id) {
+    const r = manuringRounds.find(x => x.id === id);
+    if (!r) return;
+    document.getElementById('mrName').value = r.name;
+    document.getElementById('mrFertilizer').value = r.fertilizerItemId;
+    document.getElementById('mrKgPerPalm').value = r.kgPerPalm || 0;
+    document.getElementById('mrNotes').value = r.notes || '';
+    editingRoundId = id;
+    document.getElementById('mrSubmitBtn').textContent = 'Update Round';
+    document.getElementById('mrCancelBtn').classList.remove('hidden');
+    document.getElementById('manuringForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function cancelEditRound() {
+    editingRoundId = null;
+    document.getElementById('manuringForm').reset();
+    document.getElementById('mrSubmitBtn').textContent = 'Save Round';
+    document.getElementById('mrCancelBtn').classList.add('hidden');
+}
+document.getElementById('mrCancelBtn').addEventListener('click', cancelEditRound);
+
+// Save / update round
+document.getElementById('manuringForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const fertId = parseInt(document.getElementById('mrFertilizer').value, 10);
+    const fert   = items.find(i => i.id === fertId);
+    if (!fert) { alert('Please select a fertilizer.'); return; }
+
+    const formRound = {
+        name: document.getElementById('mrName').value.trim(),
+        fertilizerItemId: fert.id,
+        fertilizerName: fert.name,
+        unit: fert.unit,
+        kgPerPalm: parseFloat(document.getElementById('mrKgPerPalm').value) || 0,
+        notes: document.getElementById('mrNotes').value.trim()
+    };
+
+    if (editingRoundId) {
+        // ===== UPDATE EXISTING =====
+        const idx = manuringRounds.findIndex(x => x.id === editingRoundId);
+        if (idx < 0) { editingRoundId = null; return; }
+        const oldName = manuringRounds[idx].name;
+        manuringRounds[idx] = { id: editingRoundId, ...formRound };
+        // Propagate updated round name to past transactions
+        if (oldName !== formRound.name) {
+            transactions.forEach(t => {
+                if (t.manuringRoundId === editingRoundId) t.manuringRoundName = formRound.name;
+            });
+            save(STORAGE_KEYS.transactions, transactions);
+        }
+        cancelEditRound();
+    } else {
+        // ===== CREATE NEW (existing logic) =====
+        manuringRounds.push({ id: Date.now(), ...formRound });
+        e.target.reset();
+    }
+    save(STORAGE_KEYS.manuringRounds, manuringRounds);
+    refreshAll();
+});
+
+// Total palms across every registered block (used for budget calc)
+function getTotalPalms() {
+    return locations.reduce((s, l) => s + (parseInt(l.numPalms, 10) || 0), 0);
+}
+
+// Budgeted Fertilizer Needed = (Total Palms × kg per palm) ÷ 50 kg/bag
+function calcRoundBudget(round) {
+    const kg = parseFloat(round.kgPerPalm) || 0;
+    return (getTotalPalms() * kg) / 50;
+}
+
+// Total qty applied for a round across ALL blocks (used by % Applied)
+function calcRoundTotalApplied(roundId) {
+    return transactions
+        .filter(t => t.manuringRoundId === roundId && t.type === 'Out')
+        .reduce((s, t) => s + (parseFloat(t.qty) || 0), 0);
+}
+
+// Render the rounds master table
+function renderManuringRounds() {
+    const body = document.getElementById('manuringRoundsBody');
+    body.innerHTML = '';
+    if (manuringRounds.length === 0) {
+        body.innerHTML = '<tr><td colspan="5" class="px-3 py-4 text-center text-gray-500">No manuring rounds defined yet.</td></tr>';
+        return;
+    }
+    manuringRounds.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-green-100 hover:bg-green-50';
+        const budget = calcRoundBudget(r);
+        const kgLabel = `<span class="text-xs text-gray-500">(${(r.kgPerPalm || 0)} kg/palm × ${getTotalPalms().toLocaleString()} palms ÷ 50 kg/bag)</span>`;
+        tr.innerHTML = `
+            <td class="px-3 py-2 font-semibold">🌱 ${r.name}</td>
+            <td class="px-3 py-2">${r.fertilizerName}</td>
+            <td class="px-3 py-2 text-right"><b>${budget.toFixed(2)}</b> bags (50 kg/bag)<br/>${kgLabel}</td>
+            <td class="px-3 py-2 text-gray-600 italic">${r.notes || '-'}</td>
+            <td class="px-3 py-2 space-x-3">
+                <button class="text-green-700 hover:underline" onclick="startEditRound(${r.id})">Edit</button>
+                <button class="text-red-600 hover:underline" onclick="deleteRound(${r.id})">Delete</button>
+            </td>`;
+        body.appendChild(tr);
+    });
+}
+
+function deleteRound(id) {
+    const r = manuringRounds.find(x => x.id === id);
+    if (!r) return;
+    // Check if any transactions reference this round
+    const linked = transactions.filter(t => t.manuringRoundId === id).length;
+    const msg = linked > 0
+        ? `Delete round "${r.name}"?\n${linked} transaction(s) reference this round - they will keep the round name as text but lose the link.`
+        : `Delete round "${r.name}"?`;
+    if (!confirm(msg)) return;
+    manuringRounds = manuringRounds.filter(x => x.id !== id);
+    save(STORAGE_KEYS.manuringRounds, manuringRounds);
+    refreshAll();
+}
+
+// Render the application history (fertilizer Out transactions linked to a round)
+function renderManuringHistory() {
+    const body = document.getElementById('manuringHistoryBody');
+    body.innerHTML = '';
+    const history = transactions
+        .filter(t => t.category === 'Fertilizer' && t.type === 'Out' && t.manuringRoundName)
+        .sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
+    if (history.length === 0) {
+        body.innerHTML = '<tr><td colspan="6" class="px-3 py-4 text-center text-gray-500">No manuring applications recorded yet.</td></tr>';
+        return;
+    }
+    history.forEach(t => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-green-100 hover:bg-green-50';
+        tr.innerHTML = `
+            <td class="px-3 py-2">${t.date}</td>
+            <td class="px-3 py-2 font-semibold">${t.manuringRoundName}</td>
+            <td class="px-3 py-2">${t.location}</td>
+            <td class="px-3 py-2">${t.itemName}</td>
+            <td class="px-3 py-2 font-bold">${t.qty} ${t.unit}</td>
+            <td class="px-3 py-2">${t.ref || '-'}</td>`;
+        body.appendChild(tr);
+    });
+}
+
+// Round Progress Summary - one row per round with overall % Applied
+function renderRoundProgress() {
+    const body = document.getElementById('roundProgressBody');
+    body.innerHTML = '';
+    if (manuringRounds.length === 0) {
+        body.innerHTML = '<tr><td colspan="5" class="px-3 py-4 text-center text-gray-500">No manuring rounds defined yet.</td></tr>';
+        return;
+    }
+    manuringRounds.forEach(r => {
+        const totalApplied = calcRoundTotalApplied(r.id);
+        const budget       = calcRoundBudget(r);
+        let pctCell        = '<span class="text-gray-400">N/A</span>';
+        if (budget > 0) {
+            const pct    = (totalApplied / budget) * 100;
+            const colour = pct >= 100 ? 'text-green-700' : pct >= 50 ? 'text-yellow-700' : 'text-red-600';
+            pctCell      = `<span class="${colour} font-bold">${pct.toFixed(2)}%</span>`;
+        }
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-green-100 hover:bg-green-50';
+        tr.innerHTML = `
+            <td class="px-3 py-2 font-semibold">🌱 ${r.name}</td>
+            <td class="px-3 py-2">${r.fertilizerName}</td>
+            <td class="px-3 py-2 text-right">${totalApplied}</td>
+            <td class="px-3 py-2 text-right">${budget.toFixed(2)} bags</td>
+            <td class="px-3 py-2 text-right">${pctCell}</td>`;
+        body.appendChild(tr);
+    });
+}
+
+/* -----------------------------------------------------------------
+   DROPDOWN POPULATORS - run whenever master data changes
+   ----------------------------------------------------------------- */
+function populateItemDropdowns() {
+    // Transaction page dropdown
+    const txnSel = document.getElementById('txnItem');
+    txnSel.innerHTML = '<option value="">-- Select Item --</option>' +
+        items.map(i => `<option value="${i.id}">${i.name} (${i.category})</option>`).join('');
+
+    // Stock summary filter dropdown
+    const filterSel = document.getElementById('filterItem');
+    filterSel.innerHTML = '<option value="">All</option>' +
+        items.map(i => `<option value="${i.name}">${i.name}</option>`).join('');
+
+    // Manuring program: only Fertilizer items
+    const mrSel = document.getElementById('mrFertilizer');
+    const fertilizers = items.filter(i => i.category === 'Fertilizer');
+    mrSel.innerHTML = '<option value="">-- Select Fertilizer --</option>' +
+        fertilizers.map(i => `<option value="${i.id}">${i.name} (${i.unit})</option>`).join('');
+}
+
+function populateLocationDropdowns() {
+    const sel = document.getElementById('txnLocation');
+    sel.innerHTML = '<option value="None/Storage">None/Storage</option>' +
+        locations.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
+}
+
+/* -----------------------------------------------------------------
+   LIVE STOCK CALCULATION
+   On Hand = sum(In) - sum(Out) + sum(Adj as signed value)
+   For simplicity: In and Adj add to stock, Out subtracts.
+   ----------------------------------------------------------------- */
+function calcOnHand(itemId) {
+    return transactions
+        .filter(t => t.itemId === itemId)
+        .reduce((total, t) => {
+            if (t.type === 'In' || t.type === 'Adj') return total + t.qty;
+            if (t.type === 'Out')                    return total - t.qty;
+            return total;
+        }, 0);
+}
+
+function renderLiveStock() {
+    const body = document.getElementById('liveStockBody');
+    body.innerHTML = '';
+    if (items.length === 0) {
+        body.innerHTML = '<tr><td colspan="5" class="px-3 py-4 text-center text-gray-500">No items defined yet.</td></tr>';
+        return;
+    }
+    items.forEach(it => {
+        const onHand = calcOnHand(it.id);
+        // Status logic: Low Stock alert ONLY for Chemicals at/below threshold
+        let statusHtml = '';
+        if (it.category === 'Chemical') {
+            if (onHand <= it.threshold) {
+                statusHtml = '<span class="text-red-600 font-bold">⚠️ Low Stock</span>';
+            } else {
+                statusHtml = '<span class="text-green-700 font-semibold">✅ OK</span>';
+            }
+        } else {
+            statusHtml = '<span class="text-gray-500">➖ N/A</span>';
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-green-100 hover:bg-green-50';
+        tr.innerHTML = `
+            <td class="px-3 py-2">${it.name}</td>
+            <td class="px-3 py-2">${it.category}</td>
+            <td class="px-3 py-2 font-bold">${onHand}</td>
+            <td class="px-3 py-2">${it.unit}</td>
+            <td class="px-3 py-2">${statusHtml}</td>`;
+        body.appendChild(tr);
+    });
+}
+
+/* -----------------------------------------------------------------
+   STOCK SUMMARY (AUDIT TRAIL) - filtering + render + export
+   ----------------------------------------------------------------- */
+let currentFilteredTxns = []; // tracks what's visible for the export button
+
+function getFilteredTransactions() {
+    const cat   = document.getElementById('filterCategory').value;
+    const itm   = document.getElementById('filterItem').value;
+    const typ   = document.getElementById('filterType').value;
+    const from  = document.getElementById('filterFrom').value;
+    const to    = document.getElementById('filterTo').value;
+
+    return transactions.filter(t => {
+        if (cat && t.category !== cat) return false;
+        if (itm && t.itemName !== itm) return false;
+        if (typ && t.type !== typ)     return false;
+        if (from && t.date < from)     return false;
+        if (to   && t.date > to)       return false;
+        return true;
+    }).sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
+}
+
+// Running balance for an item up to and including the given transaction
+function calcBalanceUpTo(itemId, refTxn) {
+    return transactions
+        .filter(t => t.itemId === itemId &&
+                    (t.date < refTxn.date || (t.date === refTxn.date && t.id <= refTxn.id)))
+        .reduce((total, t) => {
+            if (t.type === 'In' || t.type === 'Adj') return total + t.qty;
+            if (t.type === 'Out')                    return total - t.qty;
+            return total;
+        }, 0);
+}
+
+function renderSummary() {
+    currentFilteredTxns = getFilteredTransactions();
+    const body = document.getElementById('summaryBody');
+    body.innerHTML = '';
+    if (currentFilteredTxns.length === 0) {
+        body.innerHTML = '<tr><td colspan="7" class="px-3 py-4 text-center text-gray-500">No transactions match the current filters.</td></tr>';
+        return;
+    }
+    currentFilteredTxns.forEach(t => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-green-100 hover:bg-green-50';
+        // Map type -> In / Out columns (Adj is treated as additive, like calcOnHand)
+        const qtyIn  = (t.type === 'In' || t.type === 'Adj') ? t.qty : '';
+        const qtyOut = (t.type === 'Out') ? t.qty : '';
+        const roundBadge = t.manuringRoundName
+            ? `<div class="text-xs text-green-700 mt-1">🌱 ${t.manuringRoundName}</div>` : '';
+        const balance = calcBalanceUpTo(t.itemId, t);
+        tr.innerHTML = `
+            <td class="px-3 py-2">${t.date}</td>
+            <td class="px-3 py-2">${t.itemName}${roundBadge}</td>
+            <td class="px-3 py-2 text-right text-green-700 font-semibold">${qtyIn}</td>
+            <td class="px-3 py-2 text-right text-red-600 font-semibold">${qtyOut}</td>
+            <td class="px-3 py-2">${t.location}</td>
+            <td class="px-3 py-2 text-right font-bold">${balance}</td>
+            <td class="px-3 py-2">${t.user}</td>
+            <td class="px-3 py-2">
+                <button class="text-blue-600 hover:underline text-sm font-medium" onclick="openEditTxnModal(${t.id})">✏️ Edit</button>
+            </td>`;
+        body.appendChild(tr);
+    });
+}
+
+document.getElementById('applyFilterBtn').addEventListener('click', renderSummary);
+document.getElementById('clearFilterBtn').addEventListener('click', () => {
+    ['filterCategory','filterItem','filterType','filterFrom','filterTo'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    renderSummary();
+});
+
+// Export currently filtered rows to Excel via SheetJS
+document.getElementById('exportExcelBtn').addEventListener('click', () => {
+    if (currentFilteredTxns.length === 0) {
+        alert('No data to export.');
+        return;
+    }
+    const rows = currentFilteredTxns.map(t => ({
+        Date: t.date,
+        Item: t.itemName,
+        Category: t.category,
+        Type: t.type,
+        Quantity: t.qty,
+        Unit: t.unit,
+        Reference: t.ref,
+        Location: t.location,
+        'Manuring Round': t.manuringRoundName || '',
+        Remarks: t.remarks,
+        User: t.user
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Stock Summary');
+    const stamp = new Date().toISOString().slice(0,10);
+    XLSX.writeFile(wb, `stock_summary_${stamp}.xlsx`);
+});
+
+/* -----------------------------------------------------------------
+   DASHBOARD RENDER
+   ----------------------------------------------------------------- */
+function renderDashboard() {
+    // Total item types
+    document.getElementById('dashTotalItems').textContent = items.length;
+
+    // Low stock alerts (Chemicals only)
+    const lowStockCount = items.filter(it =>
+        it.category === 'Chemical' && calcOnHand(it.id) <= it.threshold
+    ).length;
+    document.getElementById('dashLowStock').textContent = lowStockCount;
+
+    // Monthly usage (sum of "Out" qty within current month)
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm   = String(now.getMonth() + 1).padStart(2, '0');
+    const monthPrefix = `${yyyy}-${mm}`;
+    const monthlyUsage = transactions
+        .filter(t => t.type === 'Out' && t.date && t.date.startsWith(monthPrefix))
+        .reduce((sum, t) => sum + t.qty, 0);
+    document.getElementById('dashMonthlyUsage').textContent = monthlyUsage;
+
+    // Recent 5 transactions
+    const body = document.getElementById('dashRecentBody');
+    body.innerHTML = '';
+    const recent = [...transactions]
+        .sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id)
+        .slice(0, 5);
+    if (recent.length === 0) {
+        body.innerHTML = '<tr><td colspan="5" class="px-3 py-4 text-center text-gray-500">No transactions yet.</td></tr>';
+        return;
+    }
+    recent.forEach(t => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-green-100 hover:bg-green-50';
+        const typeColour = t.type === 'In'  ? 'text-green-700'
+                        : t.type === 'Out' ? 'text-red-600'
+                        : 'text-yellow-700';
+        tr.innerHTML = `
+            <td class="px-3 py-2">${t.date}</td>
+            <td class="px-3 py-2">${t.itemName}</td>
+            <td class="px-3 py-2 font-semibold ${typeColour}">${t.type}</td>
+            <td class="px-3 py-2">${t.qty} ${t.unit}</td>
+            <td class="px-3 py-2">${t.location}</td>`;
+        body.appendChild(tr);
+    });
+}
+
+/* -----------------------------------------------------------------
+   LIVE STOCK CHART - horizontal bar chart on the Dashboard
+   Uses Chart.js. Re-rendered on every refreshAll().
+   ----------------------------------------------------------------- */
+/* -----------------------------------------------------------------
+   LIVE STOCK CHARTS - one horizontal bar chart per category
+   Uses Chart.js. All three are re-rendered on every refreshAll().
+   ----------------------------------------------------------------- */
+
+// One Chart.js instance per category — destroyed & rebuilt on each refresh
+const stockChartInstances = { Fertilizer: null, Chemical: null, 'Oil Palm Seedling': null };
+
+/**
+ * Build or rebuild one horizontal bar chart for the given category.
+ * @param {string} category  - 'Fertilizer' | 'Chemical' | 'Oil Palm Seedling'
+ * @param {string} canvasId  - id of the <canvas> element
+ * @param {string} wrapId    - id of the wrapping <div>
+ * @param {string} emptyId   - id of the empty-state <p>
+ * @param {string} barColour - default bar hex colour
+ */
+function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour) {
+    const canvas   = document.getElementById(canvasId);
+    const wrap     = document.getElementById(wrapId);
+    const emptyMsg = document.getElementById(emptyId);
+
+    // Filter items to this category only
+    const filtered = items.filter(it => it.category === category);
+
+    // Destroy previous instance so canvas can be reused
+    if (stockChartInstances[category]) {
+        stockChartInstances[category].destroy();
+        stockChartInstances[category] = null;
+    }
+
+    if (filtered.length === 0) {
+        emptyMsg.classList.remove('hidden');
+        wrap.style.display = 'none';
+        return;
+    }
+    emptyMsg.classList.add('hidden');
+    wrap.style.display = 'block';
+
+    const LOW_STOCK_COLOUR = '#dc2626'; // red — chemicals at/below threshold
+    const THRESH_COLOUR    = '#f59e0b'; // amber — threshold marker
+
+    const labels     = [];
+    const values     = [];
+    const colours    = [];
+    const thresholds = []; // null for non-chemicals, numeric for chemicals
+
+    filtered.forEach(it => {
+        const onHand = Math.max(0, calcOnHand(it.id)); // clamp negatives to 0
+        const isLow  = category === 'Chemical' && onHand <= (it.threshold || 0);
+        labels.push(it.name);
+        values.push(onHand);
+        colours.push(isLow ? LOW_STOCK_COLOUR : barColour);
+        thresholds.push(category === 'Chemical' ? (it.threshold || 0) : null);
+    });
+
+    // Size the canvas to fit all bars — 48 px per bar, min 100 px
+    const chartHeight = Math.max(100, filtered.length * 48);
+    canvas.style.height = chartHeight + 'px';
+    canvas.height = chartHeight;
+
+    // Datasets array — threshold scatter only added for Chemicals
+    const datasets = [
+        {
+            label: currentLang === 'ms' ? 'Stok Semasa' : 'On Hand',
+            data: values,
+            backgroundColor: colours,
+            borderColor: colours,
+            borderWidth: 1,
+            borderRadius: 4,
+            barThickness: 22,
+        }
+    ];
+
+    if (category === 'Chemical') {
+        datasets.push({
+            label: currentLang === 'ms' ? 'Had Minimum' : 'Min Threshold',
+            data: thresholds,
+            type: 'scatter',
+            pointStyle: 'line',
+            pointRadius: 10,
+            pointBorderWidth: 2.5,
+            pointBorderColor: THRESH_COLOUR,
+            backgroundColor: 'transparent',
+            borderColor: 'transparent',
+            showLine: false,
+            order: 0,
+        });
+    }
+
+    stockChartInstances[category] = new Chart(canvas, {
+        type: 'bar',
+        data: { labels, datasets },
+        options: {
+            indexAxis: 'y',            // horizontal bars
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }, // legends handled in HTML
+                tooltip: {
+                    callbacks: {
+                        label(ctx) {
+                            // Threshold scatter tooltip
+                            if (ctx.datasetIndex === 1) {
+                                const thresh = ctx.raw;
+                                if (thresh === null || thresh === undefined) return null;
+                                return (currentLang === 'ms' ? 'Had Minimum: ' : 'Min Threshold: ') + thresh;
+                            }
+                            // Bar tooltip
+                            const it = filtered[ctx.dataIndex];
+                            const lines = [
+                                (currentLang === 'ms' ? 'Stok Semasa: ' : 'On Hand: ') + ctx.raw + ' ' + it.unit,
+                            ];
+                            if (category === 'Chemical') {
+                                const isLow = ctx.raw <= (it.threshold || 0);
+                                lines.push((currentLang === 'ms' ? 'Had Minimum: ' : 'Min Threshold: ') + (it.threshold || 0));
+                                lines.push(isLow
+                                    ? (currentLang === 'ms' ? '⚠️ Stok Rendah' : '⚠️ Low Stock')
+                                    : (currentLang === 'ms' ? '✅ OK' : '✅ OK'));
+                            }
+                            return lines;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: { color: '#d1fae5' },
+                    ticks: { color: '#374151', font: { size: 11 } },
+                    title: {
+                        display: true,
+                        text: currentLang === 'ms' ? 'Kuantiti (Stok Semasa)' : 'Quantity (On Hand)',
+                        color: '#166534',
+                        font: { size: 11, weight: 'bold' }
+                    }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: {
+                        color: '#374151',
+                        font: { size: 11 },
+                        // Truncate long item names on the axis
+                        callback(val) {
+                            const lbl = this.getLabelForValue(val);
+                            return lbl.length > 24 ? lbl.slice(0, 22) + '…' : lbl;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+/** Re-renders all three category charts. Called from refreshAll(). */
+function renderLiveStockChart() {
+    buildCategoryChart('Fertilizer',        'chartFertilizer', 'chartFertilizerWrap', 'chartFertilizerEmpty', '#16a34a');
+    buildCategoryChart('Chemical',          'chartChemical',   'chartChemicalWrap',   'chartChemicalEmpty',   '#2563eb');
+    buildCategoryChart('Oil Palm Seedling', 'chartSeedling',   'chartSeedlingWrap',   'chartSeedlingEmpty',   '#db2777');
+}
+
+/* -----------------------------------------------------------------
+   MASTER REFRESH - re-renders everything dynamically
+   Called after any create/update/delete or page change.
+   ----------------------------------------------------------------- */
+function refreshAll() {
+    populateItemDropdowns();
+    populateLocationDropdowns();
+    renderItemsTable();
+    renderLocationGrid();
+    renderLiveStock();
+    renderLiveStockChart();
+    renderSummary();
+    renderDashboard();
+    renderManuringRounds();
+    renderManuringHistory();
+    renderRoundProgress();
+    updateManuringVisibility(); // re-evaluate the conditional round picker
+}
+
+/* -----------------------------------------------------------------
+   EDIT TRANSACTION MODAL - open, populate, save
+   ----------------------------------------------------------------- */
+function openEditTxnModal(id) {
+    const t = transactions.find(x => x.id === id);
+    if (!t) return;
+
+    document.getElementById('editTxnId').value       = t.id;
+    document.getElementById('editTxnCategory').value = t.category;
+    document.getElementById('editTxnItemName').value = t.itemName;
+    document.getElementById('editTxnType').value     = t.type;
+    document.getElementById('editTxnQty').value      = t.qty;
+    document.getElementById('editTxnDate').value     = t.date;
+    document.getElementById('editTxnRef').value      = t.ref || '';
+    document.getElementById('editTxnRemarks').value  = t.remarks || '';
+
+    // Populate location dropdown and pre-select current value
+    const locSel = document.getElementById('editTxnLocation');
+    locSel.innerHTML = '<option value="None/Storage">None/Storage</option>' +
+        locations.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
+    locSel.value = t.location;
+
+    // Show manuring round picker only for Fertilizer Out
+    toggleEditManuringWrap(t);
+
+    document.getElementById('editTxnModal').classList.remove('hidden');
+}
+
+function toggleEditManuringWrap(t) {
+    const txnType = document.getElementById('editTxnType').value;
+    const category = document.getElementById('editTxnCategory').value;
+    const wrap    = document.getElementById('editTxnManuringWrap');
+    const sel     = document.getElementById('editTxnManuringRound');
+
+    if (category === 'Fertilizer' && txnType === 'Out') {
+        wrap.classList.remove('hidden');
+        const matchingRounds = manuringRounds.filter(r => r.fertilizerItemId === (t ? t.itemId : parseInt(document.getElementById('editTxnId').value, 10)));
+        sel.innerHTML = '<option value="">-- Select a Manuring Round --</option>' +
+            matchingRounds.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+        if (t && t.manuringRoundId) sel.value = t.manuringRoundId;
+    } else {
+        wrap.classList.add('hidden');
+        sel.value = '';
+    }
+}
+
+function closeEditTxnModal() {
+    document.getElementById('editTxnModal').classList.add('hidden');
+    document.getElementById('editTxnForm').reset();
+}
+
+// Re-evaluate manuring wrap when type changes inside the edit modal
+document.getElementById('editTxnType').addEventListener('change', () => toggleEditManuringWrap(null));
+
+document.getElementById('editTxnForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const id  = parseInt(document.getElementById('editTxnId').value, 10);
+    const idx = transactions.findIndex(x => x.id === id);
+    if (idx < 0) { closeEditTxnModal(); return; }
+
+    const txnType  = document.getElementById('editTxnType').value;
+    const category = document.getElementById('editTxnCategory').value;
+    const t        = transactions[idx];
+
+    let manuringRoundId   = null;
+    let manuringRoundName = null;
+    if (category === 'Fertilizer' && txnType === 'Out') {
+        const roundId = parseInt(document.getElementById('editTxnManuringRound').value, 10);
+        if (!roundId) { alert('Please select a Manuring Round for this fertilizer issue.'); return; }
+        const round = manuringRounds.find(r => r.id === roundId);
+        if (round) { manuringRoundId = round.id; manuringRoundName = round.name; }
+    }
+
+    transactions[idx] = {
+        ...t,
+        date:              document.getElementById('editTxnDate').value,
+        type:              txnType,
+        qty:               parseFloat(document.getElementById('editTxnQty').value) || 0,
+        location:          document.getElementById('editTxnLocation').value,
+        ref:               document.getElementById('editTxnRef').value.trim(),
+        remarks:           document.getElementById('editTxnRemarks').value.trim(),
+        manuringRoundId,
+        manuringRoundName
+    };
+
+    save(STORAGE_KEYS.transactions, transactions);
+    closeEditTxnModal();
+    alert('Transaction updated successfully.');
+    refreshAll();
+});
+
+// Close modal when clicking the backdrop
+document.getElementById('editTxnModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('editTxnModal')) closeEditTxnModal();
+});
+
+/* -----------------------------------------------------------------
+   LOCATION AREA - import from file (CSV / Excel)
+   Expected columns: Block Name | Area (Ha) | No. of Palm
+   ----------------------------------------------------------------- */
+document.getElementById('locImportInput').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    document.getElementById('locImportFileName').textContent = file.name;
+
+    const ext    = file.name.split('.').pop().toLowerCase();
+    const reader = new FileReader();
+
+    reader.onload = ev => {
+        let rows = [];
+        try {
+            const data = ext === 'csv' ? ev.target.result : new Uint8Array(ev.target.result);
+            const wb   = XLSX.read(data, { type: ext === 'csv' ? 'string' : 'array' });
+            const ws   = wb.Sheets[wb.SheetNames[0]];
+            rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+        } catch (err) {
+            alert('Failed to parse file: ' + err.message);
+            e.target.value = '';
+            return;
+        }
+
+        if (rows.length === 0) { alert('No data rows found in the file.'); e.target.value = ''; return; }
+
+        // Flexible column matching - strips non-alpha chars and lowercases
+        const norm = s => String(s).toLowerCase().replace(/[^a-z]/g, '');
+        const findVal = (row, ...keys) => {
+            const match = Object.keys(row).find(k => keys.some(key => norm(k) === norm(key)));
+            return match !== undefined ? row[match] : undefined;
+        };
+
+        let added = 0, skipped = 0;
+        const errors = [];
+        rows.forEach((row, idx) => {
+            const name     = String(findVal(row, 'Block Name', 'BlockName', 'Name') || '').trim();
+            const area     = parseFloat(findVal(row, 'Area (Ha)', 'Area Ha', 'Area', 'Ha') || 0) || 0;
+            const numPalms = parseInt(findVal(row, 'No. of Palm', 'No of Palm', 'NumPalms', 'Palms', 'Palm') || 0, 10) || 0;
+
+            if (!name) { errors.push(`Row ${idx + 2}: Block Name is missing.`); return; }
+            if (locations.some(l => l.name.toLowerCase() === name.toLowerCase())) { skipped++; return; }
+
+            locations.push({ id: Date.now() + idx, name, area, numPalms });
+            added++;
+        });
+
+        save(STORAGE_KEYS.locations, locations);
+        refreshAll();
+
+        const summary = `Import complete.\nAdded: ${added}  |  Skipped (duplicate): ${skipped}` +
+            (errors.length ? `\n\nIssues:\n${errors.join('\n')}` : '');
+        alert(summary);
+        e.target.value = '';
+        document.getElementById('locImportFileName').textContent = 'No file selected';
+    };
+
+    ext === 'csv' ? reader.readAsText(file) : reader.readAsArrayBuffer(file);
+});
+
+// Download a blank CSV template for location import
+document.getElementById('locDownloadTemplateBtn').addEventListener('click', () => {
+    const ws = XLSX.utils.aoa_to_sheet([
+        ['Block Name', 'Area (Ha)', 'No. of Palm'],
+        ['Block A1', 25.5, 3500],
+        ['Block B2', 18.0, 2400]
+    ]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Locations');
+    XLSX.writeFile(wb, 'location_import_template.xlsx');
+});
+
+/* -----------------------------------------------------------------
+   INITIALISATION
+   ----------------------------------------------------------------- */
+document.addEventListener('DOMContentLoaded', () => {
+    // default the transaction date input to today
+    document.getElementById('txnDate').valueAsDate = new Date();
+    // render instantly from cached localStorage, then pull fresh data from Supabase
+    refreshAll();
+    loadFromSupabase();
+    // Apply saved language preference
+    setLang(localStorage.getItem('opp_lang') || 'en');
+});
+
+/* =================================================================
+   INTERNATIONALISATION (i18n)
+   Supported languages: English (en) | Bahasa Melayu (ms)
+   Every element with data-i18n="key" gets its textContent replaced.
+   ================================================================= */
+const I18N = {
+    en: {
+        /* Sidebar */
+        app_subtitle:        'Plantation Inventory System',
+        nav_dashboard:       '📊 Dashboard',
+        nav_items:           '📦 Item File',
+        nav_transactions:    '🔄 Stock Transaction',
+        nav_summary:         '📑 Stock Summary',
+        nav_locations:       '📍 Location Area',
+        nav_manuring:        '🌱 Manuring Program',
+        nav_roundprogress:   '📈 Manuring Progress',
+        nav_livestock:       'Live Stock Listing',
+        lang_label:          'Language / Bahasa',
+        logged_in_as:        'Logged in as:',
+        /* Dashboard */
+        dash_total_items:    'Total Item Types',
+        dash_low_stock:      'Low Stock Alerts (Chemicals)',
+        dash_monthly_usage:  'Monthly Usage (Out)',
+        dash_recent_txn:     'Recent Transactions',
+        /* Shared column headers */
+        col_date:            'Date',
+        col_item:            'Item',
+        col_item_name:       'Item Name',
+        col_category:        'Category',
+        col_type:            'Type',
+        col_qty:             'Quantity',
+        col_qty_in:          'Quantity In',
+        col_qty_out:         'Quantity Out',
+        col_on_hand:         'On Hand',
+        col_unit:            'Unit',
+        col_status:          'Status',
+        col_location:        'Location',
+        col_ref:             'Ref / DO No.',
+        col_remarks:         'Remarks',
+        col_balance:         'Balance',
+        col_user:            'User',
+        col_action:          'Action',
+        col_min_threshold:   'Min Threshold',
+        col_round:           'Round',
+        col_block:           'Block',
+        col_budgeted:        'Budgeted Fertilizer Needed',
+        col_total_applied:   'Total Applied',
+        col_pct_applied:     '% Applied',
+        col_qty_applied:     'Qty Applied',
+        /* Item File */
+        items_add_title:     'Add New Item',
+        items_lbl_name:      'Item Name',
+        items_lbl_threshold: 'Minimum Threshold',
+        items_threshold_hint:'⚠️ Min Threshold only applies to <b>Chemicals</b>. Fertilizers & Seedlings ignore this value.',
+        items_existing_title:'Existing Items',
+        btn_save_item:       'Save Item',
+        /* Categories / options */
+        select_category:     '-- Select Category --',
+        select_item:         '-- Select Item --',
+        select_type:         '-- Select Type --',
+        select_round:        '-- Select a Manuring Round --',
+        select_fertilizer:   '-- Select Fertilizer --',
+        opt_all:             'All',
+        opt_none_storage:    'None/Storage',
+        cat_fertilizer:      'Fertilizer',
+        cat_chemical:        'Chemical',
+        cat_seedling:        'Oil Palm Seedling',
+        /* Stock Transaction */
+        txn_form_title:      'Record Stock Movement',
+        txn_lbl_type:        'Transaction Type',
+        txn_lbl_round:       'Manuring Round',
+        txn_breakdown_label: 'Application Breakdown (per Block)',
+        txn_col_location_block: 'Location (Block)',
+        txn_breakdown_hint:  '📝 Add a row for each block where stock was applied. Each row creates a separate transaction record sharing the same Item, Date, Ref, and Round.',
+        txn_round_hint:      '🌱 Required when issuing fertilizer for field application. Make sure the <b>Location</b> above is set to the target block (not Storage). Define rounds in the <b>Manuring Program</b> page.',
+        btn_save_txn:        'Save Transaction',
+        btn_add_row:         '+ Add Row',
+        /* Stock Summary */
+        nav_summary:         '📑 Stock Summary',
+        summary_filters:     'Filters',
+        filter_date_from:    'Date From',
+        filter_date_to:      'Date To',
+        btn_apply_filters:   'Apply Filters',
+        btn_clear:           'Clear',
+        btn_export:          '⬇️ Export to Excel',
+        /* Location Area */
+        loc_add_title:       'Register New Block',
+        loc_lbl_name:        'Block Name',
+        loc_lbl_area:        'Area (Ha)',
+        loc_lbl_palms:       'No. of Palm',
+        btn_save_loc:        'Save Location',
+        btn_cancel_edit:     'Cancel Edit',
+        loc_import_title:    'Import Locations from File',
+        loc_import_hint:     'Upload a <b>CSV</b> or <b>Excel (.xlsx)</b> file with columns: <code class="bg-green-100 px-1 rounded">Block Name</code>, <code class="bg-green-100 px-1 rounded">Area (Ha)</code>, <code class="bg-green-100 px-1 rounded">No. of Palm</code>. Duplicate block names will be skipped.',
+        btn_choose_file:     '📂 Choose File',
+        no_file_selected:    'No file selected',
+        btn_download_template: '⬇️ Download Template',
+        loc_registered_title:'Registered Blocks',
+        loc_total_area:      'Total Area:',
+        loc_total_palms:     'Total No. of Palm:',
+        /* Manuring Program */
+        manuring_subtitle:   'Define manuring rounds (e.g. <i>Round 1 - 2 kg MOP per palm</i>). When fertilizer stock is issued (Out), the user must link it to a round + block.',
+        manuring_add_title:  'Add Manuring Round',
+        manuring_lbl_round_name: 'Round Name',
+        manuring_lbl_fertilizer: 'Fertilizer',
+        manuring_lbl_kg_palm:'kg per Palm',
+        manuring_kg_hint:    'Used to calculate Budgeted Fertilizer Needed: <b>(Total Palms × kg/palm) ÷ 50 kg/bag</b>.',
+        manuring_lbl_notes:  'Notes',
+        btn_save_round:      'Save Round',
+        manuring_defined_title: 'Defined Manuring Rounds',
+        manuring_history_title: 'Manuring Application History',
+        manuring_history_hint:  'Auto-generated from fertilizer "Out" transactions linked to a round.',
+        /* Manuring Progress */
+        progress_subtitle:   '% Applied = Total Quantity Applied (all blocks) ÷ Total Budgeted Fertilizer Needed',
+        /* Edit Modal */
+        modal_edit_title:    '✏️ Edit Transaction',
+        btn_save_changes:    'Save Changes',
+        btn_cancel:          'Cancel',
+        /* Dashboard Chart */
+        dash_chart_title:    'Stock Level Chart',
+        chart_legend_low:    '⚠️ Low Stock',
+        chart_empty:         'No stock data to display yet.',
+        chart_ok:            'OK',
+        chart_sub_fertilizer:'On Hand quantity for all fertilizer items',
+        chart_sub_chemical:  'On Hand quantity for all chemical items — red bars indicate low stock',
+        chart_sub_seedling:  'On Hand quantity for all oil palm seedling items',
+    },
+
+    ms: {
+        /* Sidebar */
+        app_subtitle:        'Sistem Inventori Ladang',
+        nav_dashboard:       '📊 Papan Pemuka',
+        nav_items:           '📦 Fail Item',
+        nav_transactions:    '🔄 Transaksi Stok',
+        nav_summary:         '📑 Ringkasan Stok',
+        nav_locations:       '📍 Kawasan Lokasi',
+        nav_manuring:        '🌱 Program Pembajaan',
+        nav_roundprogress:   '📈 Kemajuan Pembajaan',
+        nav_livestock:       'Senarai Stok Semasa',
+        lang_label:          'Bahasa / Language',
+        logged_in_as:        'Log masuk sebagai:',
+        /* Dashboard */
+        dash_total_items:    'Jumlah Jenis Item',
+        dash_low_stock:      'Amaran Stok Rendah (Bahan Kimia)',
+        dash_monthly_usage:  'Penggunaan Bulanan (Keluar)',
+        dash_recent_txn:     'Transaksi Terkini',
+        /* Shared column headers */
+        col_date:            'Tarikh',
+        col_item:            'Item',
+        col_item_name:       'Nama Item',
+        col_category:        'Kategori',
+        col_type:            'Jenis',
+        col_qty:             'Kuantiti',
+        col_qty_in:          'Kuantiti Masuk',
+        col_qty_out:         'Kuantiti Keluar',
+        col_on_hand:         'Stok Semasa',
+        col_unit:            'Unit',
+        col_status:          'Status',
+        col_location:        'Lokasi',
+        col_ref:             'Ref / No. DO',
+        col_remarks:         'Catatan',
+        col_balance:         'Baki',
+        col_user:            'Pengguna',
+        col_action:          'Tindakan',
+        col_min_threshold:   'Had Minimum',
+        col_round:           'Pusingan',
+        col_block:           'Blok',
+        col_budgeted:        'Keperluan Baja (Bajet)',
+        col_total_applied:   'Jumlah Digunakan',
+        col_pct_applied:     '% Digunakan',
+        col_qty_applied:     'Kuantiti Digunakan',
+        /* Item File */
+        items_add_title:     'Tambah Item Baru',
+        items_lbl_name:      'Nama Item',
+        items_lbl_threshold: 'Had Minimum',
+        items_threshold_hint:'⚠️ Had Minimum hanya terpakai untuk <b>Bahan Kimia</b>. Baja & Anak Pokok mengabaikan nilai ini.',
+        items_existing_title:'Item Sedia Ada',
+        btn_save_item:       'Simpan Item',
+        /* Categories / options */
+        select_category:     '-- Pilih Kategori --',
+        select_item:         '-- Pilih Item --',
+        select_type:         '-- Pilih Jenis --',
+        select_round:        '-- Pilih Pusingan Pembajaan --',
+        select_fertilizer:   '-- Pilih Baja --',
+        opt_all:             'Semua',
+        opt_none_storage:    'Tiada/Stor',
+        cat_fertilizer:      'Baja',
+        cat_chemical:        'Bahan Kimia',
+        cat_seedling:        'Anak Pokok Sawit',
+        /* Stock Transaction */
+        txn_form_title:      'Rekod Pergerakan Stok',
+        txn_lbl_type:        'Jenis Transaksi',
+        txn_lbl_round:       'Pusingan Pembajaan',
+        txn_breakdown_label: 'Pecahan Penggunaan (mengikut Blok)',
+        txn_col_location_block: 'Lokasi (Blok)',
+        txn_breakdown_hint:  '📝 Tambah baris untuk setiap blok yang menerima stok. Setiap baris mencipta rekod transaksi berasingan dengan Item, Tarikh, Ref, dan Pusingan yang sama.',
+        txn_round_hint:      '🌱 Diperlukan semasa mengeluarkan baja untuk kerja lapangan. Pastikan <b>Lokasi</b> di atas ditetapkan kepada blok sasaran (bukan Stor). Tentukan pusingan di halaman <b>Program Pembajaan</b>.',
+        btn_save_txn:        'Simpan Transaksi',
+        btn_add_row:         '+ Tambah Baris',
+        /* Stock Summary */
+        summary_filters:     'Penapis',
+        filter_date_from:    'Tarikh Dari',
+        filter_date_to:      'Tarikh Hingga',
+        btn_apply_filters:   'Guna Penapis',
+        btn_clear:           'Kosongkan',
+        btn_export:          '⬇️ Eksport ke Excel',
+        /* Location Area */
+        loc_add_title:       'Daftar Blok Baru',
+        loc_lbl_name:        'Nama Blok',
+        loc_lbl_area:        'Keluasan (Ha)',
+        loc_lbl_palms:       'Bilangan Pokok Sawit',
+        btn_save_loc:        'Simpan Lokasi',
+        btn_cancel_edit:     'Batal Edit',
+        loc_import_title:    'Import Lokasi dari Fail',
+        loc_import_hint:     'Muat naik fail <b>CSV</b> atau <b>Excel (.xlsx)</b> dengan lajur: <code class="bg-green-100 px-1 rounded">Block Name</code>, <code class="bg-green-100 px-1 rounded">Area (Ha)</code>, <code class="bg-green-100 px-1 rounded">No. of Palm</code>. Nama blok yang sama akan dilangkau.',
+        btn_choose_file:     '📂 Pilih Fail',
+        no_file_selected:    'Tiada fail dipilih',
+        btn_download_template: '⬇️ Muat Turun Templat',
+        loc_registered_title:'Blok Berdaftar',
+        loc_total_area:      'Jumlah Keluasan:',
+        loc_total_palms:     'Jumlah Bilangan Pokok:',
+        /* Manuring Program */
+        manuring_subtitle:   'Tentukan pusingan pembajaan (cth. <i>Pusingan 1 - 2 kg MOP setiap pokok</i>). Apabila stok baja dikeluarkan (Keluar), pengguna mesti menghubungkannya kepada pusingan + blok.',
+        manuring_add_title:  'Tambah Pusingan Pembajaan',
+        manuring_lbl_round_name: 'Nama Pusingan',
+        manuring_lbl_fertilizer: 'Baja',
+        manuring_lbl_kg_palm:'kg setiap Pokok',
+        manuring_kg_hint:    'Digunakan untuk mengira Keperluan Baja (Bajet): <b>(Jumlah Pokok × kg/pokok) ÷ 50 kg/beg</b>.',
+        manuring_lbl_notes:  'Nota',
+        btn_save_round:      'Simpan Pusingan',
+        manuring_defined_title: 'Pusingan Pembajaan Ditetapkan',
+        manuring_history_title: 'Sejarah Penggunaan Baja',
+        manuring_history_hint:  'Jana automatik daripada transaksi "Keluar" baja yang dikaitkan dengan pusingan.',
+        /* Manuring Progress */
+        progress_subtitle:   '% Digunakan = Jumlah Kuantiti Digunakan (semua blok) ÷ Jumlah Keperluan Baja (Bajet)',
+        /* Edit Modal */
+        modal_edit_title:    '✏️ Edit Transaksi',
+        btn_save_changes:    'Simpan Perubahan',
+        btn_cancel:          'Batal',
+        /* Dashboard Chart */
+        dash_chart_title:    'Carta Tahap Stok',
+        chart_legend_low:    '⚠️ Stok Rendah',
+        chart_empty:         'Tiada data stok untuk dipaparkan.',
+        chart_ok:            'OK',
+        chart_sub_fertilizer:'Kuantiti stok semasa untuk semua item baja',
+        chart_sub_chemical:  'Kuantiti stok semasa untuk semua item bahan kimia — bar merah menunjukkan stok rendah',
+        chart_sub_seedling:  'Kuantiti stok semasa untuk semua item anak pokok sawit',
+    }
+};
+
+// Current active language (default English)
+let currentLang = 'en';
+
+/**
+ * Switch UI language to `lang` ('en' or 'ms').
+ * Walks every [data-i18n] element and replaces its innerHTML with the
+ * matching translation. Also updates the toggle button styles and the
+ * page <title>. Persists the preference to localStorage.
+ */
+function setLang(lang) {
+    if (!I18N[lang]) return;
+    currentLang = lang;
+    localStorage.setItem('opp_lang', lang);
+
+    const dict = I18N[lang];
+
+    // Translate every tagged element
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key] !== undefined) {
+            // Use innerHTML so tags like <b> and <i> render correctly
+            el.innerHTML = dict[key];
+        }
+    });
+
+    // Update page title
+    document.title = lang === 'ms'
+        ? 'Ladang Sawit - Sistem Pengurusan Stok'
+        : 'Oil Palm Plantation - Stock Management System';
+
+    // Highlight the active language button
+    document.getElementById('langEN').classList.toggle('bg-green-800', lang === 'en');
+    document.getElementById('langEN').classList.toggle('text-white',   lang === 'en');
+    document.getElementById('langEN').classList.toggle('bg-white',     lang !== 'en');
+    document.getElementById('langEN').classList.toggle('text-green-700', lang !== 'en');
+
+    document.getElementById('langMS').classList.toggle('bg-green-800', lang === 'ms');
+    document.getElementById('langMS').classList.toggle('text-white',   lang === 'ms');
+    document.getElementById('langMS').classList.toggle('bg-white',     lang !== 'ms');
+    document.getElementById('langMS').classList.toggle('text-green-700', lang !== 'ms');
+}
+</script>
+</body>
+</html>
