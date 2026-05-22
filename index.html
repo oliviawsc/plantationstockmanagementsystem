@@ -38,9 +38,60 @@
 <body class="min-h-screen">
 
 <!-- =================================================================
-     APP LAYOUT - Sidebar (left) + Main Content (right)
+     AUTH LAYER — Login screen (shown before the app)
+     Hidden once the user is authenticated.
      ================================================================= -->
-<div class="flex min-h-screen">
+<div id="authOverlay" class="fixed inset-0 z-[9999] flex items-center justify-center"
+     style="background: linear-gradient(135deg, #052e16 0%, #14532d 50%, #166534 100%);">
+
+    <!-- Login Card -->
+    <div id="loginCard" class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-green-800 to-green-600 px-8 py-6 text-center">
+            <div class="text-4xl mb-2">🌴</div>
+            <h1 class="text-2xl font-bold text-white">OilPalm Stock</h1>
+            <p class="text-green-200 text-sm mt-1">Plantation Inventory System</p>
+        </div>
+        <!-- Form -->
+        <div class="px-8 py-7">
+            <h2 class="text-lg font-bold text-green-800 mb-5 text-center">Sign in to your account</h2>
+
+            <!-- Email -->
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+                <input id="loginEmail" type="email" placeholder="you@example.com"
+                    class="w-full border border-green-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm" />
+            </div>
+
+            <!-- Password -->
+            <div class="mb-5">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+                <input id="loginPassword" type="password" placeholder="••••••••"
+                    class="w-full border border-green-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm" />
+            </div>
+
+            <!-- Error message -->
+            <p id="loginError" class="hidden text-red-600 text-sm text-center mb-3 font-medium"></p>
+
+            <!-- Submit -->
+            <button onclick="attemptLogin()"
+                class="w-full bg-green-800 hover:bg-green-900 text-white font-bold py-2.5 rounded-lg transition-colors text-sm">
+                Sign In
+            </button>
+
+            <p class="text-center text-xs text-gray-400 mt-5">
+                Contact your Super Admin to register or reset your account.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- =================================================================
+     APP LAYOUT - Sidebar (left) + Main Content (right)
+     Hidden until user logs in. The id="appLayout" is new; the inner
+     div structure is unchanged.
+     ================================================================= -->
+<div id="appLayout" class="hidden">
 
     <!-- SIDEBAR -->
     <aside class="w-64 bg-white border-r-2 border-green-700 shadow-lg flex-shrink-0">
@@ -56,6 +107,11 @@
             <button data-target="locations"    class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium" data-i18n="nav_locations">📍 Location Area</button>
             <button data-target="manuring"     class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium" data-i18n="nav_manuring">🌱 Manuring Program</button>
             <button data-target="roundprogress" class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium" data-i18n="nav_roundprogress">📈 Manuring Progress</button>
+            <!-- Super Admin only nav item — shown/hidden by auth JS -->
+            <button data-target="useradmin" id="navUserAdmin"
+                class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium hidden">
+                👤 User Management
+            </button>
         </nav>
         <!-- Language switcher -->
         <div class="px-4 pt-4 mt-6 border-t border-green-200">
@@ -72,8 +128,32 @@
             </div>
         </div>
         <div class="p-4 text-xs text-green-700">
+            <!-- Estate selector — visible after login -->
+            <label class="block font-semibold mb-1 text-green-600">🏡 Estate</label>
+            <select id="sidebarEstate"
+                class="w-full border border-green-300 rounded-lg px-2 py-1.5 bg-white text-xs text-green-800 font-semibold focus:outline-none focus:ring-2 focus:ring-green-500 mb-3"
+                onchange="onSidebarEstateChange()">
+                <option value="">-- Select Estate --</option>
+                <option value="Estate 1">Estate 1</option>
+                <option value="Estate 2">Estate 2</option>
+                <option value="Estate 3">Estate 3</option>
+                <option value="Estate 4">Estate 4</option>
+                <option value="Estate 5">Estate 5</option>
+                <option value="Estate 6">Estate 6</option>
+                <option value="Estate 7">Estate 7</option>
+                <option value="Estate 8">Estate 8</option>
+                <option value="Estate 9">Estate 9</option>
+                <option value="Estate 10">Estate 10</option>
+                <option value="Estate 11">Estate 11</option>
+            </select>
             <span data-i18n="logged_in_as">Logged in as:</span><br/>
-            <span class="font-semibold">Tester_Admin</span>
+            <span id="sidebarUserName" class="font-semibold">—</span><br/>
+            <span id="sidebarUserRole" class="inline-block mt-1 px-2 py-0.5 rounded-full text-white text-xs font-bold bg-green-700">—</span>
+            <br/>
+            <button onclick="logoutUser()"
+                class="mt-3 w-full text-center bg-red-100 hover:bg-red-200 text-red-700 font-semibold py-1 rounded-lg text-xs transition-colors">
+                🚪 Sign Out
+            </button>
         </div>
     </aside>
 
@@ -518,8 +598,79 @@
             </div>
         </section>
 
+        <!-- ============ PAGE 9: USER MANAGEMENT (Super Admin only) ============ -->
+        <section id="useradmin" class="page-section">
+            <h2 class="text-3xl font-bold mb-2">👤 User Management</h2>
+            <p class="text-sm text-green-700 mb-6">Register normal users, assign their estate, and control which sections they can access.</p>
+
+            <!-- Register new user -->
+            <div class="bg-white p-6 rounded-xl shadow mb-8">
+                <h3 class="text-xl font-bold mb-4">Register New User</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Full Name</label>
+                        <input id="regName" type="text" placeholder="e.g. Ahmad bin Ali"
+                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Email</label>
+                        <input id="regEmail" type="email" placeholder="user@estate.com"
+                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Password</label>
+                        <input id="regPassword" type="password" placeholder="Min 6 characters"
+                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Estate</label>
+                        <select id="regEstate" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="">-- Select Estate --</option>
+                            <option>Estate 1</option><option>Estate 2</option><option>Estate 3</option>
+                            <option>Estate 4</option><option>Estate 5</option><option>Estate 6</option>
+                            <option>Estate 7</option><option>Estate 8</option><option>Estate 9</option>
+                            <option>Estate 10</option><option>Estate 11</option>
+                        </select>
+                    </div>
+                    <!-- Section access checkboxes -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold mb-2">Sections Allowed to Access</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="regPermissionsGrid">
+                            <!-- Rendered by JS -->
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">Dashboard is always accessible.</p>
+                    </div>
+                    <div class="md:col-span-2 flex gap-3">
+                        <button onclick="registerUser()"
+                            class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold">
+                            ➕ Register User
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registered users list -->
+            <div class="bg-white p-6 rounded-xl shadow">
+                <h3 class="text-xl font-bold mb-4">Registered Users</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-green-100 text-green-800">
+                            <tr>
+                                <th class="px-3 py-2 text-left">Name</th>
+                                <th class="px-3 py-2 text-left">Email</th>
+                                <th class="px-3 py-2 text-left">Estate</th>
+                                <th class="px-3 py-2 text-left">Sections Allowed</th>
+                                <th class="px-3 py-2 text-left">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
     </main>
-</div>
+</div><!-- end appLayout -->
 
 <!-- =================================================================
      EDIT TRANSACTION MODAL
@@ -2158,7 +2309,378 @@ function setLang(lang) {
     document.getElementById('langMS').classList.toggle('text-white',   lang === 'ms');
     document.getElementById('langMS').classList.toggle('bg-white',     lang !== 'ms');
     document.getElementById('langMS').classList.toggle('text-green-700', lang !== 'ms');
+/* =================================================================
+   AUTH SYSTEM
+   - Super Admin: hardcoded, full access.
+   - Normal Users: stored in localStorage, restricted access per
+     sections configured by Super Admin.
+   - Session persisted in sessionStorage so refresh keeps you logged in.
+   ================================================================= */
+
+// ── Constants ──────────────────────────────────────────────────────
+const AUTH_KEYS = {
+    users:   'opp_auth_users',   // registered normal users (array)
+    session: 'opp_auth_session', // current session (object)
+};
+
+// All navigable sections (excluding dashboard which is always visible,
+// and useradmin which is super-admin-only)
+const ALL_SECTIONS = [
+    { id: 'items',        label: '📦 Item File' },
+    { id: 'transactions', label: '🔄 Stock Transaction' },
+    { id: 'summary',      label: '📑 Stock Summary' },
+    { id: 'locations',    label: '📍 Location Area' },
+    { id: 'manuring',     label: '🌱 Manuring Program' },
+    { id: 'roundprogress',label: '📈 Manuring Progress' },
+];
+
+// Super Admin credentials (hardcoded — cannot be changed by users)
+const SUPER_ADMIN = {
+    email:    'superadmin@oilpalm.com',
+    password: 'Admin@1234',
+    name:     'Super Admin',
+    estate:   'All Estates',
+    role:     'superadmin',
+};
+
+// ── Helpers ────────────────────────────────────────────────────────
+function loadUsers()         { try { return JSON.parse(localStorage.getItem(AUTH_KEYS.users)) || []; } catch { return []; } }
+function saveUsers(u)        { localStorage.setItem(AUTH_KEYS.users, JSON.stringify(u)); }
+function loadSession()       { try { return JSON.parse(sessionStorage.getItem(AUTH_KEYS.session)) || null; } catch { return null; } }
+function saveSession(s)      { sessionStorage.setItem(AUTH_KEYS.session, JSON.stringify(s)); }
+function clearSession()      { sessionStorage.removeItem(AUTH_KEYS.session); }
+
+// ── Login attempt ──────────────────────────────────────────────────
+function attemptLogin() {
+    const estate   = document.getElementById('sidebarEstate').value.trim();
+    const email    = document.getElementById('loginEmail').value.trim().toLowerCase();
+    const password = document.getElementById('loginPassword').value;
+    const errEl    = document.getElementById('loginError');
+
+    errEl.classList.add('hidden');
+    errEl.textContent = '';
+
+    if (!estate)    { showLoginError('Please select your estate from the sidebar.'); return; }
+    if (!email)     { showLoginError('Please enter your email.'); return; }
+    if (!password)  { showLoginError('Please enter your password.'); return; }
+
+    // Check Super Admin (estate not restricted for SA)
+    if (email === SUPER_ADMIN.email && password === SUPER_ADMIN.password) {
+        const session = {
+            email:       SUPER_ADMIN.email,
+            name:        SUPER_ADMIN.name,
+            estate:      estate,
+            role:        'superadmin',
+            permissions: ALL_SECTIONS.map(s => s.id), // full access
+        };
+        saveSession(session);
+        bootApp(session);
+        return;
+    }
+
+    // Check normal users
+    const users = loadUsers();
+    const user  = users.find(u => u.email === email && u.estate === estate);
+    if (!user)              { showLoginError('No account found for this email and estate.'); return; }
+    if (user.password !== password) { showLoginError('Incorrect password.'); return; }
+
+    const session = {
+        email:       user.email,
+        name:        user.name,
+        estate:      user.estate,
+        role:        'user',
+        permissions: user.permissions || [],
+    };
+    saveSession(session);
+    bootApp(session);
 }
+
+function showLoginError(msg) {
+    const errEl = document.getElementById('loginError');
+    errEl.textContent = msg;
+    errEl.classList.remove('hidden');
+}
+
+// ── Boot the app after successful login ────────────────────────────
+function bootApp(session) {
+    // Hide login overlay, show app
+    document.getElementById('authOverlay').style.display = 'none';
+    document.getElementById('appLayout').classList.remove('hidden');
+
+    // Set the sidebar estate selector to the logged-in user's estate
+    document.getElementById('sidebarEstate').value = session.estate;
+
+    // Update sidebar user info
+    document.getElementById('sidebarUserName').textContent = session.name;
+    const roleEl = document.getElementById('sidebarUserRole');
+    if (session.role === 'superadmin') {
+        roleEl.textContent = '⭐ Super Admin';
+        roleEl.style.background = '#b45309';
+    } else {
+        roleEl.textContent = '👤 User';
+        roleEl.style.background = '#166534';
+    }
+
+    // Control nav visibility based on role & permissions
+    applyNavPermissions(session);
+
+    // Initialise the app
+    document.getElementById('txnDate').valueAsDate = new Date();
+    refreshAll();
+    loadFromSupabase();
+    setLang(localStorage.getItem('opp_lang') || 'en');
+    renderUsersTable();
+}
+
+// ── Apply nav & section visibility based on session ────────────────
+function applyNavPermissions(session) {
+    const isSuperAdmin = session.role === 'superadmin';
+
+    // Show/hide User Management nav
+    document.getElementById('navUserAdmin').classList.toggle('hidden', !isSuperAdmin);
+
+    // For each non-dashboard section nav button, show/hide based on permissions
+    document.querySelectorAll('[data-target]').forEach(btn => {
+        const target = btn.getAttribute('data-target');
+        if (target === 'dashboard' || target === 'useradmin') return; // always handled separately
+
+        const allowed = isSuperAdmin || session.permissions.includes(target);
+        btn.classList.toggle('hidden', !allowed);
+    });
+}
+
+// ── Guard nav clicks so restricted sections can't be accessed directly ──
+// Wrap the existing navButtons forEach to check permissions
+const _origNavHandler = (btn) => {
+    btn.addEventListener('click', () => {
+        const target  = btn.getAttribute('data-target');
+        const session = loadSession();
+        if (!session) return;
+
+        // useradmin is superadmin-only
+        if (target === 'useradmin' && session.role !== 'superadmin') return;
+
+        // Non-dashboard sections: check permission for normal users
+        if (target !== 'dashboard' && target !== 'useradmin' && session.role !== 'superadmin') {
+            if (!session.permissions.includes(target)) {
+                alert('You do not have permission to access this section.');
+                return;
+            }
+        }
+    });
+};
+// Apply guard to all nav buttons (runs after DOM ready)
+document.querySelectorAll('[data-target]').forEach(_origNavHandler);
+
+// ── Logout ─────────────────────────────────────────────────────────
+function logoutUser() {
+    if (!confirm('Sign out?')) return;
+    clearSession();
+    // Reset login form fields
+    ['loginEmail', 'loginPassword'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    document.getElementById('loginError').classList.add('hidden');
+    // Reset sidebar estate selector
+    document.getElementById('sidebarEstate').value = '';
+    // Hide app, show login
+    document.getElementById('appLayout').classList.add('hidden');
+    document.getElementById('authOverlay').style.display = 'flex';
+}
+
+/**
+ * Called when the user changes the estate selector in the sidebar after login.
+ * Updates the active session so the selected estate is reflected everywhere.
+ */
+function onSidebarEstateChange() {
+    const session = loadSession();
+    if (!session) return;
+    const newEstate = document.getElementById('sidebarEstate').value;
+    if (!newEstate) return;
+    session.estate = newEstate;
+    saveSession(session);
+}
+
+// ── User Management (Super Admin) ─────────────────────────────────
+// Render permission checkboxes in the registration form
+function renderPermissionCheckboxes() {
+    const grid = document.getElementById('regPermissionsGrid');
+    if (!grid) return;
+    grid.innerHTML = ALL_SECTIONS.map(s => `
+        <label class="flex items-center gap-2 text-sm cursor-pointer select-none">
+            <input type="checkbox" class="reg-perm-cb accent-green-700 w-4 h-4" value="${s.id}" />
+            ${s.label}
+        </label>`).join('');
+}
+
+function registerUser() {
+    const name     = document.getElementById('regName').value.trim();
+    const email    = document.getElementById('regEmail').value.trim().toLowerCase();
+    const password = document.getElementById('regPassword').value;
+    const estate   = document.getElementById('regEstate').value;
+    const perms    = [...document.querySelectorAll('.reg-perm-cb:checked')].map(cb => cb.value);
+
+    if (!name || !email || !password || !estate) {
+        alert('Please fill in Name, Email, Password and Estate.'); return;
+    }
+    if (password.length < 6) {
+        alert('Password must be at least 6 characters.'); return;
+    }
+    if (email === SUPER_ADMIN.email) {
+        alert('That email is reserved.'); return;
+    }
+
+    const users = loadUsers();
+    if (users.find(u => u.email === email && u.estate === estate)) {
+        alert('A user with this email already exists for that estate.'); return;
+    }
+
+    users.push({ id: Date.now(), name, email, password, estate, permissions: perms });
+    saveUsers(users);
+
+    // Reset form
+    document.getElementById('regName').value     = '';
+    document.getElementById('regEmail').value    = '';
+    document.getElementById('regPassword').value = '';
+    document.getElementById('regEstate').value   = '';
+    document.querySelectorAll('.reg-perm-cb').forEach(cb => cb.checked = false);
+
+    renderUsersTable();
+    alert(`User "${name}" registered successfully.`);
+}
+
+function deleteUser(id) {
+    if (!confirm('Delete this user?')) return;
+    const users = loadUsers().filter(u => u.id !== id);
+    saveUsers(users);
+    renderUsersTable();
+}
+
+function renderUsersTable() {
+    const tbody = document.getElementById('usersTableBody');
+    if (!tbody) return;
+    const users = loadUsers();
+    if (users.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="px-3 py-6 text-center text-gray-400">No users registered yet.</td></tr>`;
+        return;
+    }
+    tbody.innerHTML = users.map(u => {
+        const permsHtml = u.permissions && u.permissions.length
+            ? u.permissions.map(p => {
+                const sec = ALL_SECTIONS.find(s => s.id === p);
+                return sec ? `<span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full mr-1 mb-1">${sec.label}</span>` : '';
+              }).join('')
+            : `<span class="text-gray-400 text-xs">Dashboard only</span>`;
+        return `
+        <tr class="border-b border-green-50">
+            <td class="px-3 py-2 font-semibold">${u.name}</td>
+            <td class="px-3 py-2 text-sm text-gray-600">${u.email}</td>
+            <td class="px-3 py-2 text-sm">${u.estate}</td>
+            <td class="px-3 py-2">${permsHtml}</td>
+            <td class="px-3 py-2">
+                <button onclick="openEditUserModal(${u.id})"
+                    class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded mr-1">✏️ Edit</button>
+                <button onclick="deleteUser(${u.id})"
+                    class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold px-3 py-1 rounded">🗑 Delete</button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+// ── Edit User Modal ────────────────────────────────────────────────
+function openEditUserModal(id) {
+    const users = loadUsers();
+    const user  = users.find(u => u.id === id);
+    if (!user) return;
+
+    // Build modal HTML dynamically and inject into body
+    const existing = document.getElementById('editUserModal');
+    if (existing) existing.remove();
+
+    const permsChecks = ALL_SECTIONS.map(s => `
+        <label class="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" class="edit-perm-cb accent-green-700 w-4 h-4" value="${s.id}"
+                ${user.permissions && user.permissions.includes(s.id) ? 'checked' : ''} />
+            ${s.label}
+        </label>`).join('');
+
+    const modal = document.createElement('div');
+    modal.id = 'editUserModal';
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-[9998] flex items-center justify-center';
+    modal.innerHTML = `
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg mx-4 max-h-screen overflow-y-auto">
+            <h3 class="text-xl font-bold mb-4 text-green-800">✏️ Edit User</h3>
+            <input type="hidden" id="editUserId" value="${user.id}" />
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Full Name</label>
+                    <input id="editUserName" type="text" value="${user.name}"
+                        class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">New Password <span class="text-gray-400 font-normal">(leave blank to keep current)</span></label>
+                    <input id="editUserPassword" type="password" placeholder="••••••••"
+                        class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Estate</label>
+                    <select id="editUserEstate" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                        ${['Estate 1','Estate 2','Estate 3','Estate 4','Estate 5','Estate 6',
+                           'Estate 7','Estate 8','Estate 9','Estate 10','Estate 11']
+                          .map(e => `<option ${e === user.estate ? 'selected' : ''}>${e}</option>`).join('')}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Sections Allowed</label>
+                    <div class="grid grid-cols-2 gap-2">${permsChecks}</div>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button onclick="saveEditUser()"
+                        class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold">Save Changes</button>
+                    <button onclick="document.getElementById('editUserModal').remove()"
+                        class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-semibold">Cancel</button>
+                </div>
+            </div>
+        </div>`;
+    document.body.appendChild(modal);
+}
+
+function saveEditUser() {
+    const id       = parseInt(document.getElementById('editUserId').value, 10);
+    const name     = document.getElementById('editUserName').value.trim();
+    const password = document.getElementById('editUserPassword').value;
+    const estate   = document.getElementById('editUserEstate').value;
+    const perms    = [...document.querySelectorAll('.edit-perm-cb:checked')].map(cb => cb.value);
+
+    if (!name || !estate) { alert('Name and Estate are required.'); return; }
+
+    const users = loadUsers();
+    const idx   = users.findIndex(u => u.id === id);
+    if (idx < 0) return;
+
+    users[idx].name        = name;
+    users[idx].estate      = estate;
+    users[idx].permissions = perms;
+    if (password) {
+        if (password.length < 6) { alert('Password must be at least 6 characters.'); return; }
+        users[idx].password = password;
+    }
+
+    saveUsers(users);
+    document.getElementById('editUserModal').remove();
+    renderUsersTable();
+    alert(`User "${name}" updated successfully.`);
+}
+
+// ── Auto-resume session on page load ──────────────────────────────
+(function resumeSession() {
+    const session = loadSession();
+    if (session) {
+        bootApp(session);
+    }
+    // Always render permission checkboxes in the register form
+    renderPermissionCheckboxes();
+})();
 </script>
 </body>
 </html>
