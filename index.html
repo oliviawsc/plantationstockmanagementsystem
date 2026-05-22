@@ -916,40 +916,76 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLI
    (localStorage is kept as an instant-render cache; Supabase is the
    source of truth and gets synced on every save.)
    ----------------------------------------------------------------- */
+// ── Active estate (set after login / estate switch) ───────────────
+// All data reads/writes use this to scope localStorage and Supabase.
+let activeEstate = '';
+
+/**
+ * Returns localStorage key names scoped to the active estate.
+ * e.g. "opp_items::Ulu Niah Estate"
+ */
+function getEstateKeys(estate) {
+    const e = estate || activeEstate;
+    return {
+        items:          `opp_items::${e}`,
+        locations:      `opp_locations::${e}`,
+        transactions:   `opp_transactions::${e}`,
+        manuringRounds: `opp_manuring_rounds::${e}`,
+    };
+}
+
+// Keep STORAGE_KEYS for backward-compat reference (table names used for Supabase)
 const STORAGE_KEYS = {
-    items: 'opp_items',
-    locations: 'opp_locations',
-    transactions: 'opp_transactions',
+    items:          'opp_items',
+    locations:      'opp_locations',
+    transactions:   'opp_transactions',
     manuringRounds: 'opp_manuring_rounds'
 };
 
-// Load arrays from localStorage (or initialise as empty)
-let items          = JSON.parse(localStorage.getItem(STORAGE_KEYS.items))          || [];
-let locations      = JSON.parse(localStorage.getItem(STORAGE_KEYS.locations))      || [];
-let transactions   = JSON.parse(localStorage.getItem(STORAGE_KEYS.transactions))   || [];
-let manuringRounds = JSON.parse(localStorage.getItem(STORAGE_KEYS.manuringRounds)) || [];
+// In-memory arrays — always reflect the ACTIVE estate's data
+let items          = [];
+let locations      = [];
+let transactions   = [];
+let manuringRounds = [];
 
-// Snapshot of the last known set of ids per table, used to figure out
-// which rows were removed locally so we can mirror those deletes to Supabase.
+// Snapshot of last-known ids per estate+table for Supabase delete sync
 const lastKnownIds = {
-    opp_items:           new Set(items.map(r => r.id)),
-    opp_locations:       new Set(locations.map(r => r.id)),
-    opp_transactions:    new Set(transactions.map(r => r.id)),
-    opp_manuring_rounds: new Set(manuringRounds.map(r => r.id))
+    opp_items:           new Set(),
+    opp_locations:       new Set(),
+    opp_transactions:    new Set(),
+    opp_manuring_rounds: new Set()
 };
 
+/**
+ * Load in-memory arrays from localStorage for the given estate.
+ * Falls back to [] if nothing stored yet.
+ */
+function loadEstateData(estate) {
+    const keys = getEstateKeys(estate);
+    items          = JSON.parse(localStorage.getItem(keys.items))          || [];
+    locations      = JSON.parse(localStorage.getItem(keys.locations))      || [];
+    transactions   = JSON.parse(localStorage.getItem(keys.transactions))   || [];
+    manuringRounds = JSON.parse(localStorage.getItem(keys.manuringRounds)) || [];
+    // Refresh id snapshots
+    lastKnownIds.opp_items           = new Set(items.map(r => r.id));
+    lastKnownIds.opp_locations       = new Set(locations.map(r => r.id));
+    lastKnownIds.opp_transactions    = new Set(transactions.map(r => r.id));
+    lastKnownIds.opp_manuring_rounds = new Set(manuringRounds.map(r => r.id));
+}
+
 // Persist a key back to localStorage AND sync to Supabase.
-// Existing call sites do not await this; sync runs in the background.
 function save(key, data) {
-    localStorage.setItem(key, JSON.stringify(data));
+    // key is a STORAGE_KEYS value (table name); scope it to active estate
+    const estateKey = `${key}::${activeEstate}`;
+    localStorage.setItem(estateKey, JSON.stringify(data));
     syncToSupabase(key, data);
 }
 
 // Push the current array for `key` into the matching Supabase table:
-//   - upsert every row currently in `data`
+//   - upsert every row currently in `data` (tagged with activeEstate)
 //   - delete rows whose ids existed before but are no longer in `data`
 async function syncToSupabase(key, data) {
-    const table = key; // STORAGE_KEYS values are identical to the table names
+    const table = key;
     try {
         const currentIds  = new Set(data.map(r => r.id));
         const previousIds = lastKnownIds[table] || new Set();
@@ -962,8 +998,10 @@ async function syncToSupabase(key, data) {
         }
 
         if (data.length > 0) {
+            // Tag every row with the active estate so queries can filter by it
+            const tagged = data.map(r => ({ ...r, estate: activeEstate }));
             const { error: upErr } = await supabaseClient
-                .from(table).upsert(data, { onConflict: 'id' });
+                .from(table).upsert(tagged, { onConflict: 'id' });
             if (upErr) console.error(`[Supabase] upsert ${table}`, upErr);
         }
 
@@ -977,12 +1015,13 @@ async function syncToSupabase(key, data) {
 // arrays and refreshing the UI.  localStorage cache is left in place so
 // the app shows something instantly while this runs.
 async function loadFromSupabase() {
+    if (!activeEstate) return;
     try {
         const [itemsRes, locsRes, txnsRes, roundsRes] = await Promise.all([
-            supabaseClient.from('opp_items').select('*'),
-            supabaseClient.from('opp_locations').select('*'),
-            supabaseClient.from('opp_transactions').select('*'),
-            supabaseClient.from('opp_manuring_rounds').select('*')
+            supabaseClient.from('opp_items').select('*').eq('estate', activeEstate),
+            supabaseClient.from('opp_locations').select('*').eq('estate', activeEstate),
+            supabaseClient.from('opp_transactions').select('*').eq('estate', activeEstate),
+            supabaseClient.from('opp_manuring_rounds').select('*').eq('estate', activeEstate)
         ]);
 
         if (itemsRes.error)  console.error('[Supabase] load items',  itemsRes.error);
@@ -995,11 +1034,13 @@ async function loadFromSupabase() {
         if (txnsRes.data)   transactions   = txnsRes.data;
         if (roundsRes.data) manuringRounds = roundsRes.data;
 
-        // Update the cache + last-known-id snapshot from what the server returned.
-        localStorage.setItem(STORAGE_KEYS.items,          JSON.stringify(items));
-        localStorage.setItem(STORAGE_KEYS.locations,      JSON.stringify(locations));
-        localStorage.setItem(STORAGE_KEYS.transactions,   JSON.stringify(transactions));
-        localStorage.setItem(STORAGE_KEYS.manuringRounds, JSON.stringify(manuringRounds));
+        // Cache with estate-scoped keys
+        const keys = getEstateKeys(activeEstate);
+        localStorage.setItem(keys.items,          JSON.stringify(items));
+        localStorage.setItem(keys.locations,      JSON.stringify(locations));
+        localStorage.setItem(keys.transactions,   JSON.stringify(transactions));
+        localStorage.setItem(keys.manuringRounds, JSON.stringify(manuringRounds));
+
         lastKnownIds.opp_items           = new Set(items.map(r => r.id));
         lastKnownIds.opp_locations       = new Set(locations.map(r => r.id));
         lastKnownIds.opp_transactions    = new Set(transactions.map(r => r.id));
@@ -2579,7 +2620,6 @@ function bootApp(session) {
     const estateSelect = document.getElementById('sidebarEstate');
     const isSuperAdmin = session.role === 'superadmin';
 
-    // Super Admin sees all estates; normal users see only their assigned estates
     const ALL_ESTATES = ['Mega Jutamas (Suai)','Ulu Niah Estate','MJM Plantation 1','MJM Plantation 2',
         'MJM Plantation 3','Estet Seri Mawar','Meridian Palma','Mono Gaya',
         'Sungai Mak Plantation','Gama Menang','Elewsun'];
@@ -2589,12 +2629,16 @@ function bootApp(session) {
 
     estateSelect.innerHTML = '<option value="">-- Select Estate --</option>' +
         allowedEstates.map(e => `<option value="${e}">${e}</option>`).join('');
-
-    // Set the current active estate
     estateSelect.value = session.estate || '';
 
-    // Update app title to reflect selected estate
-    updateAppTitle(session.estate || '');
+    // Set the active estate globally — all data reads/writes use this
+    activeEstate = session.estate || '';
+
+    // Load cached data for this estate from localStorage immediately
+    if (activeEstate) loadEstateData(activeEstate);
+
+    // Update app title
+    updateAppTitle(activeEstate);
 
     // Update sidebar user info
     document.getElementById('sidebarUserName').textContent = session.name;
@@ -2607,13 +2651,14 @@ function bootApp(session) {
         roleEl.style.background = '#166534';
     }
 
-    // Control nav visibility based on role & permissions
     applyNavPermissions(session);
 
-    // Initialise the app
     document.getElementById('txnDate').valueAsDate = new Date();
     refreshAll();
-    loadFromSupabase();
+
+    // Pull fresh estate data from Supabase in the background
+    if (activeEstate) loadFromSupabase();
+
     setLang(localStorage.getItem('opp_lang') || 'en');
     renderUsersTable();
 }
@@ -2694,10 +2739,19 @@ function onSidebarEstateChange() {
     if (!session) return;
     const newEstate = document.getElementById('sidebarEstate').value;
     if (!newEstate) return;
-    session.estate = newEstate;
+
+    // Update active estate globally
+    activeEstate    = newEstate;
+    session.estate  = newEstate;
     saveSession(session);
-    // Update the app title to reflect the newly selected estate
+
+    // Update the app title
     updateAppTitle(newEstate);
+
+    // Load cached data for new estate immediately, then fetch fresh from Supabase
+    loadEstateData(newEstate);
+    refreshAll();
+    loadFromSupabase();
 }
 
 // ── User Management (Super Admin) ─────────────────────────────────
