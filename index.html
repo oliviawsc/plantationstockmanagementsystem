@@ -2352,7 +2352,6 @@ function clearSession()      { sessionStorage.removeItem(AUTH_KEYS.session); }
 
 // ── Login attempt ──────────────────────────────────────────────────
 function attemptLogin() {
-    const estate   = document.getElementById('sidebarEstate').value.trim();
     const email    = document.getElementById('loginEmail').value.trim().toLowerCase();
     const password = document.getElementById('loginPassword').value;
     const errEl    = document.getElementById('loginError');
@@ -2360,16 +2359,15 @@ function attemptLogin() {
     errEl.classList.add('hidden');
     errEl.textContent = '';
 
-    if (!estate)    { showLoginError('Please select your estate from the sidebar.'); return; }
-    if (!email)     { showLoginError('Please enter your email.'); return; }
-    if (!password)  { showLoginError('Please enter your password.'); return; }
+    if (!email)    { showLoginError('Please enter your email.'); return; }
+    if (!password) { showLoginError('Please enter your password.'); return; }
 
-    // Check Super Admin (estate not restricted for SA)
+    // Check Super Admin
     if (email === SUPER_ADMIN.email && password === SUPER_ADMIN.password) {
         const session = {
             email:       SUPER_ADMIN.email,
             name:        SUPER_ADMIN.name,
-            estate:      estate,
+            estate:      SUPER_ADMIN.estate, // 'All Estates'
             role:        'superadmin',
             permissions: ALL_SECTIONS.map(s => s.id), // full access
         };
@@ -2378,10 +2376,10 @@ function attemptLogin() {
         return;
     }
 
-    // Check normal users
+    // Check normal users — estate is stored on the user record, not entered at login
     const users = loadUsers();
-    const user  = users.find(u => u.email === email && u.estate === estate);
-    if (!user)              { showLoginError('No account found for this email and estate.'); return; }
+    const user  = users.find(u => u.email === email);
+    if (!user)                      { showLoginError('No account found for this email.'); return; }
     if (user.password !== password) { showLoginError('Incorrect password.'); return; }
 
     const session = {
