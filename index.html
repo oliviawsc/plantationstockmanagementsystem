@@ -427,6 +427,12 @@
             <div class="bg-white p-6 rounded-xl shadow mb-8">
                 <h3 class="text-xl font-bold mb-4" data-i18n="items_add_title">Add New Item</h3>
                 <form id="itemForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Item ID — auto-generated, shown during edit only -->
+                    <div id="itemCodeRow" class="md:col-span-2 hidden">
+                        <label class="block text-sm font-semibold mb-1">Item ID</label>
+                        <input id="itemCodeDisplay" type="text" readonly
+                            class="w-full border border-gray-200 rounded p-2 bg-gray-100 text-gray-500 font-mono text-sm cursor-not-allowed" />
+                    </div>
                     <div>
                         <label class="block text-sm font-semibold mb-1" data-i18n="items_lbl_name">Item Name</label>
                         <input id="itemName" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="text" placeholder="e.g. Glyphosate 41%" />
@@ -447,7 +453,7 @@
                     <div>
                         <label class="block text-sm font-semibold mb-1">Qty / Unit <span class="text-gray-400 font-normal text-xs">(base qty per 1 unit)</span></label>
                         <input id="itemQtyPerUnit" min="0" step="0.01" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="number" placeholder="e.g. 50" />
-                        <p class="text-xs text-green-700 mt-1 italic">How much base quantity is in 1 unit. e.g. 1 Bag = 50 kg. Used to calculate total usage in base units.</p>
+                        <p class="text-xs text-green-700 mt-1 italic">How much base quantity (kg) is in 1 unit. e.g. 1 Bag = 25 kg. This value is used to calculate Budgeted Fertilizer Needed in the Manuring Program.</p>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold mb-1" data-i18n="items_lbl_threshold">Minimum Threshold</label>
@@ -468,6 +474,7 @@
                     <table class="min-w-full text-sm">
                         <thead class="bg-green-100 text-green-800">
                             <tr>
+                                <th class="px-3 py-2 text-left">Item ID</th>
                                 <th class="px-3 py-2 text-left" data-i18n="col_item_name">Item Name</th>
                                 <th class="px-3 py-2 text-left" data-i18n="col_category">Category</th>
                                 <th class="px-3 py-2 text-left" data-i18n="col_unit">Unit</th>
@@ -714,7 +721,7 @@
                     <div>
                         <label class="block text-sm font-semibold mb-1" data-i18n="manuring_lbl_kg_palm">kg per Palm</label>
                         <input id="mrKgPerPalm" min="0" step="0.01" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="number" placeholder="e.g. 2" />
-                        <p class="text-xs text-green-700 mt-1 italic" data-i18n="manuring_kg_hint">Used to calculate Budgeted Fertilizer Needed: <b>(Selected Blocks' Palms × kg/palm) ÷ 50 kg/bag</b>.</p>
+                        <p class="text-xs text-green-700 mt-1 italic" data-i18n="manuring_kg_hint">Used to calculate Budgeted Fertilizer Needed: <b>(Selected Blocks' Palms × kg/palm) ÷ Qty/Unit of the fertilizer</b>. Set the fertilizer's Qty/Unit in the Item File.</p>
                     </div>
                     <!-- Block selection — only blocks ticked here are included in this round -->
                     <div class="md:col-span-2">
@@ -789,25 +796,26 @@
             </div>
 
             <!-- Manuring Application History (moved from Manuring Program) -->
-            <div class="bg-white p-6 rounded-xl shadow">
-                <h3 class="text-xl font-bold mb-4" data-i18n="manuring_history_title">Manuring Application History</h3>
-                <p class="text-xs text-green-700 mb-3" data-i18n="manuring_history_hint">Auto-generated from fertilizer "Out" transactions linked to a round.</p>
+            <div class="bg-white p-6 rounded-xl shadow mb-8">
+                <h3 class="text-xl font-bold mb-2">Progress by Block</h3>
+                <p class="text-xs text-green-700 mb-4">% Applied per block = Qty Applied (that block) ÷ Budgeted Fertilizer Needed (that block)</p>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead class="bg-green-100 text-green-800">
                             <tr>
-                                <th class="px-3 py-2 text-left" data-i18n="col_date">Date</th>
                                 <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_block">Block</th>
                                 <th class="px-3 py-2 text-left" data-i18n="manuring_lbl_fertilizer">Fertilizer</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_qty_applied">Qty Applied</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_ref">Ref</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_block">Block</th>
+                                <th class="px-3 py-2 text-right">Applied (bags)</th>
+                                <th class="px-3 py-2 text-right">Budgeted (bags)</th>
+                                <th class="px-3 py-2 text-right" data-i18n="col_pct_applied">% Applied</th>
                             </tr>
                         </thead>
-                        <tbody id="manuringHistoryBody"></tbody>
+                        <tbody id="roundProgressBlockBody"></tbody>
                     </table>
                 </div>
             </div>
+
         </section>
 
         <!-- ============ PAGE 9: USER MANAGEMENT (Super Admin only) ============ -->
@@ -850,13 +858,13 @@
                             <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="reg-estate-cb accent-green-700 w-4 h-4" value="Elewsun" /> Elewsun</label>
                         </div>
                     </div>
-                    <!-- Section access checkboxes -->
+                    <!-- Section access -->
                     <div class="md:col-span-2">
                         <label class="block text-sm font-semibold mb-2">Sections Allowed to Access</label>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="regPermissionsGrid">
+                        <div class="border border-green-200 rounded-lg p-3 bg-green-50" id="regPermissionsGrid">
                             <!-- Rendered by JS -->
                         </div>
-                        <p class="text-xs text-gray-400 mt-1">Dashboard is always accessible.</p>
+                        <p class="text-xs text-gray-400 mt-1">Dashboard is always accessible. <b>View</b> = read-only. <b>Edit</b> = full access.</p>
                     </div>
                     <div class="md:col-span-2 flex gap-3">
                         <button onclick="registerUser()"
@@ -1138,6 +1146,9 @@ function startEditItem(id) {
     document.getElementById('itemUnit').value       = it.unit;
     document.getElementById('itemQtyPerUnit').value = it.qtyPerUnit || '';
     document.getElementById('itemThreshold').value  = it.threshold || 0;
+    // Show the Item ID read-only field
+    document.getElementById('itemCodeDisplay').value = it.itemCode || '—';
+    document.getElementById('itemCodeRow').classList.remove('hidden');
     editingItemId = it.id;
     document.getElementById('itemSubmitBtn').textContent = 'Update Item';
     document.getElementById('itemCancelBtn').classList.remove('hidden');
@@ -1151,8 +1162,38 @@ function cancelEditItem() {
     document.getElementById('itemUnit').value       = '';
     document.getElementById('itemQtyPerUnit').value = '';
     document.getElementById('itemThreshold').value  = '';
+    // Hide the Item ID field
+    document.getElementById('itemCodeDisplay').value = '';
+    document.getElementById('itemCodeRow').classList.add('hidden');
     document.getElementById('itemSubmitBtn').textContent = 'Save Item';
     document.getElementById('itemCancelBtn').classList.add('hidden');
+}
+
+/**
+ * Generates the next unique sequential Item ID in the format ITM-001, ITM-002, etc.
+ * Always checks ALL existing item codes to guarantee no duplicates, even if the
+ * localStorage counter drifted out of sync (e.g. after Supabase sync or item deletion).
+ */
+function generateItemCode() {
+    // Collect every code already in use (strip prefix, parse number)
+    const usedNumbers = new Set(
+        items
+            .map(i => i.itemCode)
+            .filter(c => c && String(c).startsWith('ITM-'))
+            .map(c => parseInt(String(c).replace('ITM-', ''), 10))
+            .filter(n => !isNaN(n))
+    );
+
+    // Find the next number not already taken
+    const counterKey = `opp_item_counter::${activeEstate}`;
+    let next = parseInt(localStorage.getItem(counterKey) || '0', 10) + 1;
+    while (usedNumbers.has(next)) {
+        next++;
+    }
+
+    // Persist the new counter value
+    localStorage.setItem(counterKey, String(next));
+    return 'ITM-' + String(next).padStart(3, '0');
 }
 
 function saveItem() {
@@ -1174,6 +1215,7 @@ function saveItem() {
         if (items.some((i, j) => j !== idx && i.name.toLowerCase() === name.toLowerCase())) {
             alert('Another item with that name already exists.'); return;
         }
+        // itemCode is preserved — never changes on edit
         items[idx] = { ...items[idx], name, category, unit, qtyPerUnit, threshold };
         if (oldName !== name) {
             transactions.forEach(t => { if (t.itemName === oldName) t.itemName = name; });
@@ -1185,7 +1227,8 @@ function saveItem() {
         if (items.some(i => i.name.toLowerCase() === name.toLowerCase())) {
             alert('An item with that name already exists.'); return;
         }
-        items.push({ id: Date.now(), name, category, unit, qtyPerUnit, threshold });
+        const itemCode = generateItemCode();
+        items.push({ id: Date.now(), itemCode, name, category, unit, qtyPerUnit, threshold });
         save(STORAGE_KEYS.items, items);
         document.getElementById('itemName').value       = '';
         document.getElementById('itemCategory').value   = '';
@@ -1201,16 +1244,25 @@ function renderItemsTable() {
     const body = document.getElementById('itemsTableBody');
     body.innerHTML = '';
     if (items.length === 0) {
-        body.innerHTML = '<tr><td colspan="6" class="px-3 py-4 text-center text-gray-500">No items yet.</td></tr>';
+        body.innerHTML = '<tr><td colspan="7" class="px-3 py-4 text-center text-gray-500">No items yet.</td></tr>';
         return;
     }
-    items.forEach(it => {
+    items.forEach((it, idx) => {
         const tr = document.createElement('tr');
         tr.className = 'border-b border-green-100 hover:bg-green-50';
         const qtyLabel = it.qtyPerUnit
             ? `${it.qtyPerUnit} / ${it.unit}`
             : '<span class="text-gray-400">—</span>';
+        // Normalise itemCode: if it's a number or missing the ITM- prefix, format it properly
+        let displayCode = it.itemCode;
+        if (!displayCode || typeof displayCode === 'number' || !String(displayCode).startsWith('ITM-')) {
+            displayCode = `ITM-${String(idx + 1).padStart(3, '0')}`;
+            // Persist the corrected code back so it's fixed going forward
+            it.itemCode = displayCode;
+        }
+        const codeLabel = `<span class="font-mono text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">${displayCode}</span>`;
         tr.innerHTML = `
+            <td class="px-3 py-2">${codeLabel}</td>
             <td class="px-3 py-2 font-medium">${it.name}</td>
             <td class="px-3 py-2">${it.category}</td>
             <td class="px-3 py-2">${it.unit}</td>
@@ -1598,6 +1650,7 @@ function saveManuringRound() {
         fertilizerItemId: fert.id,
         fertilizerName:   fert.name,
         unit:             fert.unit,
+        kgPerUnit:        parseFloat(fert.qtyPerUnit) || 0,  // kg per bag from Item File
         kgPerPalm:        parseFloat(kgPerPalm) || 0,
         blocks:           blocks,
         notes:            notes
@@ -1659,13 +1712,24 @@ function getPalmsForBlocks(blockNames) {
         .reduce((s, l) => s + (parseInt(l.numPalms, 10) || 0), 0);
 }
 
-// Budgeted Fertilizer Needed = (Selected Blocks' Palms × kg per palm) ÷ 50 kg/bag
+// Returns kg per unit for a round, sourced from the round's stored kgPerUnit
+// (set when saving) or by looking up the fertilizer item's qtyPerUnit live.
+// Falls back to 1 to avoid division by zero.
+function getKgPerUnit(round) {
+    if (round.kgPerUnit && parseFloat(round.kgPerUnit) > 0) return parseFloat(round.kgPerUnit);
+    const item = items.find(i => String(i.id) === String(round.fertilizerItemId));
+    return (item && parseFloat(item.qtyPerUnit) > 0) ? parseFloat(item.qtyPerUnit) : 1;
+}
+
+// Budgeted Fertilizer Needed = (Selected Blocks' Palms × kg/palm) ÷ kg per unit
+// kg per unit comes from the fertilizer item's Qty/Unit field in Item File
 function calcRoundBudget(round) {
-    const kg    = parseFloat(round.kgPerPalm) || 0;
-    const palms = round.blocks && round.blocks.length > 0
+    const kg       = parseFloat(round.kgPerPalm) || 0;
+    const kgPerUnit = getKgPerUnit(round);
+    const palms    = round.blocks && round.blocks.length > 0
         ? getPalmsForBlocks(round.blocks)
         : getTotalPalms();
-    return (palms * kg) / 50;
+    return (palms * kg) / kgPerUnit;
 }
 
 // Render the block checkboxes inside the manuring form
@@ -1726,7 +1790,7 @@ function renderManuringRounds() {
         const palmsUsed = r.blocks && r.blocks.length > 0
             ? getPalmsForBlocks(r.blocks).toLocaleString()
             : getTotalPalms().toLocaleString();
-        const kgLabel = `<span class="text-xs text-gray-400">(${r.kgPerPalm || 0} kg/palm × ${palmsUsed} palms ÷ 50)</span>`;
+        const kgLabel = `<span class="text-xs text-gray-400">(${r.kgPerPalm || 0} kg/palm × ${palmsUsed} palms ÷ ${getKgPerUnit(r)} kg/${r.unit || 'unit'})</span>`;
 
         // Transactions linked to this round
         const roundTxns = transactions
@@ -1748,7 +1812,7 @@ function renderManuringRounds() {
             <td class="px-3 py-2">${r.fertilizerName || '-'}</td>
             <td class="px-3 py-2">${blocksHtml}</td>
             <td class="px-3 py-2 text-right">
-                <b>${budget.toFixed(2)}</b> bags<br/>${kgLabel}
+                <b>${Math.round(budget)}</b> bags<br/>${kgLabel}
             </td>
             <td class="px-3 py-2 text-gray-600 italic text-sm">${r.notes || '-'}</td>
             <td class="px-3 py-2 whitespace-nowrap">
@@ -1830,7 +1894,7 @@ function deleteRound(id) {
 // Render the application history (fertilizer Out transactions linked to a round)
 function renderManuringHistory() {
     const body = document.getElementById('manuringHistoryBody');
-    body.innerHTML = '';
+    if (!body) return; // element removed — exit silently
     const history = transactions
         .filter(t => t.category === 'Fertilizer' && t.type === 'Out' && t.manuringRoundName)
         .sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
@@ -1853,31 +1917,108 @@ function renderManuringHistory() {
 }
 
 // Round Progress Summary - one row per round with overall % Applied
+// Budgeted bags for a single block within a round
+function calcBlockBudget(round, blockName) {
+    const kg       = parseFloat(round.kgPerPalm) || 0;
+    const kgPerUnit = getKgPerUnit(round);
+    const loc      = locations.find(l => l.name === blockName);
+    const palms    = loc ? (parseInt(loc.numPalms, 10) || 0) : 0;
+    return (palms * kg) / kgPerUnit;
+}
+
+// Qty applied for a specific round + block combination
+function calcBlockApplied(roundId, blockName) {
+    return transactions
+        .filter(t =>
+            String(t.manuringRoundId) === String(roundId) &&
+            t.type === 'Out' &&
+            t.location === blockName
+        )
+        .reduce((s, t) => s + (parseFloat(t.qty) || 0), 0);
+}
+
 function renderRoundProgress() {
+    // ── Overall round summary ──────────────────────────────────────
     const body = document.getElementById('roundProgressBody');
     body.innerHTML = '';
     if (manuringRounds.length === 0) {
         body.innerHTML = '<tr><td colspan="5" class="px-3 py-4 text-center text-gray-500">No manuring rounds defined yet.</td></tr>';
+    } else {
+        manuringRounds.forEach(r => {
+            const totalApplied = calcRoundTotalApplied(r.id);
+            const budget       = calcRoundBudget(r);
+            let pctCell        = '<span class="text-gray-400">N/A</span>';
+            if (budget > 0) {
+                const pct    = (totalApplied / budget) * 100;
+                const colour = pct >= 100 ? 'text-green-700' : pct >= 50 ? 'text-yellow-700' : 'text-red-600';
+                pctCell      = `<span class="${colour} font-bold">${pct.toFixed(2)}%</span>`;
+            }
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-green-100 hover:bg-green-50';
+            tr.innerHTML = `
+                <td class="px-3 py-2 font-semibold">🌱 ${r.name}</td>
+                <td class="px-3 py-2">${r.fertilizerName}</td>
+                <td class="px-3 py-2 text-right">${totalApplied}</td>
+                <td class="px-3 py-2 text-right">${Math.round(budget)} bags</td>
+                <td class="px-3 py-2 text-right">${pctCell}</td>`;
+            body.appendChild(tr);
+        });
+    }
+
+    // ── Per-block breakdown ────────────────────────────────────────
+    const blockBody = document.getElementById('roundProgressBlockBody');
+    blockBody.innerHTML = '';
+
+    // Collect all round+block combinations
+    const blockRows = [];
+    manuringRounds.forEach(r => {
+        // Use the blocks defined on the round; fall back to all locations
+        const roundBlocks = r.blocks && r.blocks.length > 0
+            ? r.blocks
+            : locations.map(l => l.name);
+
+        roundBlocks.forEach(blockName => {
+            const applied  = calcBlockApplied(r.id, blockName);
+            const budget   = calcBlockBudget(r, blockName);
+            blockRows.push({ r, blockName, applied, budget });
+        });
+    });
+
+    if (blockRows.length === 0) {
+        blockBody.innerHTML = '<tr><td colspan="6" class="px-3 py-4 text-center text-gray-500">No block data available yet.</td></tr>';
         return;
     }
-    manuringRounds.forEach(r => {
-        const totalApplied = calcRoundTotalApplied(r.id);
-        const budget       = calcRoundBudget(r);
-        let pctCell        = '<span class="text-gray-400">N/A</span>';
+
+    blockRows.forEach(({ r, blockName, applied, budget }) => {
+        let pctCell = '<span class="text-gray-400">N/A</span>';
         if (budget > 0) {
-            const pct    = (totalApplied / budget) * 100;
+            const pct    = (applied / budget) * 100;
             const colour = pct >= 100 ? 'text-green-700' : pct >= 50 ? 'text-yellow-700' : 'text-red-600';
-            pctCell      = `<span class="${colour} font-bold">${pct.toFixed(2)}%</span>`;
+
+            // Progress bar
+            const barW   = Math.min(100, pct).toFixed(1);
+            const barCol = pct >= 100 ? '#166534' : pct >= 50 ? '#d97706' : '#dc2626';
+            pctCell = `
+                <div style="display:flex;align-items:center;gap:8px;min-width:120px;">
+                    <div style="flex:1;background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;">
+                        <div style="width:${barW}%;background:${barCol};height:100%;border-radius:99px;"></div>
+                    </div>
+                    <span class="${colour} font-bold" style="white-space:nowrap;">${pct.toFixed(1)}%</span>
+                </div>`;
         }
+
         const tr = document.createElement('tr');
         tr.className = 'border-b border-green-100 hover:bg-green-50';
         tr.innerHTML = `
             <td class="px-3 py-2 font-semibold">🌱 ${r.name}</td>
-            <td class="px-3 py-2">${r.fertilizerName}</td>
-            <td class="px-3 py-2 text-right">${totalApplied}</td>
-            <td class="px-3 py-2 text-right">${budget.toFixed(2)} bags</td>
-            <td class="px-3 py-2 text-right">${pctCell}</td>`;
-        body.appendChild(tr);
+            <td class="px-3 py-2">${r.fertilizerName || '-'}</td>
+            <td class="px-3 py-2">
+                <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">${blockName}</span>
+            </td>
+            <td class="px-3 py-2 text-right font-semibold">${applied.toFixed(2)}</td>
+            <td class="px-3 py-2 text-right">${Math.round(budget)}</td>
+            <td class="px-3 py-2">${pctCell}</td>`;
+        blockBody.appendChild(tr);
     });
 }
 
@@ -1955,7 +2096,17 @@ function renderLiveStock() {
         body.innerHTML = '<tr><td colspan="5" class="px-3 py-4 text-center text-gray-500">No items defined yet.</td></tr>';
         return;
     }
-    items.forEach(it => {
+
+    // Sort items by category order: Fertilizer → Chemical → Oil Palm Seedling
+    const CATEGORY_ORDER = { 'Fertilizer': 1, 'Chemical': 2, 'Oil Palm Seedling': 3 };
+    const sorted = [...items].sort((a, b) => {
+        const orderA = CATEGORY_ORDER[a.category] || 99;
+        const orderB = CATEGORY_ORDER[b.category] || 99;
+        if (orderA !== orderB) return orderA - orderB;
+        return a.name.localeCompare(b.name); // alphabetical within each category
+    });
+
+    sorted.forEach(it => {
         const onHand = calcOnHand(it.id);
         // Status logic: Low Stock alert ONLY for Chemicals at/below threshold
         let statusHtml = '';
@@ -2020,13 +2171,12 @@ function renderSummary() {
     const body = document.getElementById('summaryBody');
     body.innerHTML = '';
     if (currentFilteredTxns.length === 0) {
-        body.innerHTML = '<tr><td colspan="7" class="px-3 py-4 text-center text-gray-500">No transactions match the current filters.</td></tr>';
+        body.innerHTML = '<tr><td colspan="8" class="px-3 py-4 text-center text-gray-500">No transactions match the current filters.</td></tr>';
         return;
     }
     currentFilteredTxns.forEach(t => {
         const tr = document.createElement('tr');
         tr.className = 'border-b border-green-100 hover:bg-green-50';
-        // Map type -> In / Out columns (Adj is treated as additive, like calcOnHand)
         const qtyIn  = (t.type === 'In' || t.type === 'Adj') ? t.qty : '';
         const qtyOut = (t.type === 'Out') ? t.qty : '';
         const roundBadge = t.manuringRoundName
@@ -2040,11 +2190,24 @@ function renderSummary() {
             <td class="px-3 py-2">${t.location}</td>
             <td class="px-3 py-2 text-right font-bold">${balance}</td>
             <td class="px-3 py-2">${t.user}</td>
-            <td class="px-3 py-2">
-                <button class="text-blue-600 hover:underline text-sm font-medium" onclick="openEditTxnModal(${t.id})">✏️ Edit</button>
+            <td class="px-3 py-2 flex gap-2 flex-wrap">
+                <button class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded"
+                    onclick="openEditTxnModal(${t.id})">✏️ Edit</button>
+                <button class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold px-3 py-1 rounded"
+                    onclick="deleteSummaryTransaction(${t.id})">🗑 Delete</button>
             </td>`;
         body.appendChild(tr);
     });
+}
+
+// Delete a single transaction from the Stock Summary
+function deleteSummaryTransaction(id) {
+    const txn = transactions.find(t => String(t.id) === String(id));
+    if (!txn) return;
+    if (!confirm(`Delete this transaction?\n\nItem: ${txn.itemName}\nType: ${txn.type}  |  Qty: ${txn.qty}  |  Date: ${txn.date}\n\nThis cannot be undone.`)) return;
+    transactions = transactions.filter(t => String(t.id) !== String(id));
+    save(STORAGE_KEYS.transactions, transactions);
+    refreshAll();
 }
 
 /**
@@ -2177,10 +2340,10 @@ function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour) {
     const wrap     = document.getElementById(wrapId);
     const emptyMsg = document.getElementById(emptyId);
 
-    // Filter items to this category only
-    const filtered = items.filter(it => it.category === category);
+    const filtered = items
+        .filter(it => it.category === category)
+        .sort((a, b) => a.name.localeCompare(b.name));
 
-    // Destroy previous instance so canvas can be reused
     if (stockChartInstances[category]) {
         stockChartInstances[category].destroy();
         stockChartInstances[category] = null;
@@ -2194,29 +2357,86 @@ function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour) {
     emptyMsg.classList.add('hidden');
     wrap.style.display = 'block';
 
-    const LOW_STOCK_COLOUR = '#dc2626'; // red — chemicals at/below threshold
-    const THRESH_COLOUR    = '#f59e0b'; // amber — threshold marker
+    const LOW_STOCK_COLOUR = '#dc2626';
+    const THRESH_COLOUR    = '#f59e0b';
 
     const labels     = [];
     const values     = [];
     const colours    = [];
-    const thresholds = []; // null for non-chemicals, numeric for chemicals
+    const thresholds = [];
 
     filtered.forEach(it => {
-        const onHand = Math.max(0, calcOnHand(it.id)); // clamp negatives to 0
+        const onHand = Math.max(0, calcOnHand(it.id));
         const isLow  = category === 'Chemical' && onHand <= (it.threshold || 0);
         labels.push(it.name);
         values.push(onHand);
         colours.push(isLow ? LOW_STOCK_COLOUR : barColour);
-        thresholds.push(category === 'Chemical' ? (it.threshold || 0) : null);
+        thresholds.push(category === 'Chemical' ? (it.threshold || 0) : 0);
     });
 
-    // Size the canvas to fit all bars — 48 px per bar, min 100 px
-    const chartHeight = Math.max(100, filtered.length * 48);
+    const chartHeight = Math.max(100, filtered.length * 56);
     canvas.style.height = chartHeight + 'px';
     canvas.height = chartHeight;
 
-    // Datasets array — threshold scatter only added for Chemicals
+    // ── Inline plugin: draw value labels at the end of each bar ──────
+    const valueLabelPlugin = {
+        id: 'valueLabels_' + canvasId,
+        afterDatasetsDraw(chart) {
+            const ctx = chart.ctx;
+            chart.data.datasets.forEach((dataset, dsIdx) => {
+                // Only draw labels on the main bar dataset (index 0)
+                if (dsIdx !== 0) return;
+                const meta = chart.getDatasetMeta(dsIdx);
+                meta.data.forEach((bar, idx) => {
+                    const value = dataset.data[idx];
+                    if (value === null || value === undefined) return;
+                    const x = bar.x + 6;           // just after bar end
+                    const y = bar.y;               // bar centre
+                    ctx.save();
+                    ctx.fillStyle = '#374151';
+                    ctx.font = 'bold 11px "Segoe UI", sans-serif';
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(value, x, y);
+                    ctx.restore();
+                });
+            });
+        }
+    };
+
+    // ── Inline plugin: draw threshold vertical lines for Chemical ────
+    const thresholdLinePlugin = {
+        id: 'threshLines_' + canvasId,
+        afterDatasetsDraw(chart) {
+            if (category !== 'Chemical') return;
+            const ctx    = chart.ctx;
+            const xScale = chart.scales.x;
+            const yScale = chart.scales.y;
+            thresholds.forEach((thresh, idx) => {
+                if (!thresh || thresh <= 0) return;
+                const xPos = xScale.getPixelForValue(thresh);
+                const yTop = yScale.getPixelForValue(idx) - 18;
+                const yBot = yScale.getPixelForValue(idx) + 18;
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(xPos, yTop);
+                ctx.lineTo(xPos, yBot);
+                ctx.strokeStyle = THRESH_COLOUR;
+                ctx.lineWidth   = 2.5;
+                ctx.setLineDash([4, 2]);
+                ctx.stroke();
+                // Small label above the line
+                ctx.setLineDash([]);
+                ctx.fillStyle    = THRESH_COLOUR;
+                ctx.font         = 'bold 9px "Segoe UI", sans-serif';
+                ctx.textAlign    = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(thresh, xPos, yTop);
+                ctx.restore();
+            });
+        }
+    };
+
     const datasets = [
         {
             label: currentLang === 'ms' ? 'Stok Semasa' : 'On Hand',
@@ -2229,41 +2449,23 @@ function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour) {
         }
     ];
 
-    if (category === 'Chemical') {
-        datasets.push({
-            label: currentLang === 'ms' ? 'Had Minimum' : 'Min Threshold',
-            data: thresholds,
-            type: 'scatter',
-            pointStyle: 'line',
-            pointRadius: 10,
-            pointBorderWidth: 2.5,
-            pointBorderColor: THRESH_COLOUR,
-            backgroundColor: 'transparent',
-            borderColor: 'transparent',
-            showLine: false,
-            order: 0,
-        });
-    }
-
     stockChartInstances[category] = new Chart(canvas, {
         type: 'bar',
         data: { labels, datasets },
+        plugins: [valueLabelPlugin, thresholdLinePlugin],
         options: {
-            indexAxis: 'y',            // horizontal bars
+            indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                // Extra right padding so value labels don't get clipped
+                padding: { right: 40 }
+            },
             plugins: {
-                legend: { display: false }, // legends handled in HTML
+                legend: { display: false },
                 tooltip: {
                     callbacks: {
                         label(ctx) {
-                            // Threshold scatter tooltip
-                            if (ctx.datasetIndex === 1) {
-                                const thresh = ctx.raw;
-                                if (thresh === null || thresh === undefined) return null;
-                                return (currentLang === 'ms' ? 'Had Minimum: ' : 'Min Threshold: ') + thresh;
-                            }
-                            // Bar tooltip
                             const it = filtered[ctx.dataIndex];
                             const lines = [
                                 (currentLang === 'ms' ? 'Stok Semasa: ' : 'On Hand: ') + ctx.raw + ' ' + it.unit,
@@ -2273,7 +2475,7 @@ function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour) {
                                 lines.push((currentLang === 'ms' ? 'Had Minimum: ' : 'Min Threshold: ') + (it.threshold || 0));
                                 lines.push(isLow
                                     ? (currentLang === 'ms' ? '⚠️ Stok Rendah' : '⚠️ Low Stock')
-                                    : (currentLang === 'ms' ? '✅ OK' : '✅ OK'));
+                                    : '✅ OK');
                             }
                             return lines;
                         }
@@ -2297,7 +2499,6 @@ function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour) {
                     ticks: {
                         color: '#374151',
                         font: { size: 11 },
-                        // Truncate long item names on the axis
                         callback(val) {
                             const lbl = this.getLabelForValue(val);
                             return lbl.length > 24 ? lbl.slice(0, 22) + '…' : lbl;
@@ -2619,7 +2820,7 @@ const I18N = {
         manuring_lbl_round_name: 'Round Name',
         manuring_lbl_fertilizer: 'Fertilizer',
         manuring_lbl_kg_palm:'kg per Palm',
-        manuring_kg_hint:    'Used to calculate Budgeted Fertilizer Needed: <b>(Total Palms × kg/palm) ÷ 50 kg/bag</b>.',
+        manuring_kg_hint:    'Used to calculate Budgeted Fertilizer Needed: <b>(Selected Blocks\' Palms × kg/palm) ÷ Qty/Unit of the fertilizer</b>. Set the fertilizer\'s Qty/Unit in Item File.',
         manuring_lbl_notes:  'Notes',
         btn_save_round:      'Save Round',
         manuring_defined_title: 'Defined Manuring Rounds',
@@ -2644,7 +2845,7 @@ const I18N = {
     ms: {
         /* Sidebar */
         app_subtitle:        'Sistem Pengurusan Inventori',
-        nav_dashboard:       '📊 Papan Pemuka',
+        nav_dashboard:       '📊 Papan Hitam',
         nav_items:           '📦 Fail Item',
         nav_transactions:    '🔄 Transaksi Stok',
         nav_summary:         '📑 Ringkasan Stok',
@@ -2740,7 +2941,7 @@ const I18N = {
         manuring_lbl_round_name: 'Nama Pusingan',
         manuring_lbl_fertilizer: 'Baja',
         manuring_lbl_kg_palm:'kg setiap Pokok',
-        manuring_kg_hint:    'Digunakan untuk mengira Keperluan Baja (Bajet): <b>(Jumlah Pokok × kg/pokok) ÷ 50 kg/beg</b>.',
+        manuring_kg_hint:    'Digunakan untuk mengira Keperluan Baja (Bajet): <b>(Bilangan Pokok × kg/pokok) ÷ Kuantiti/Unit baja</b>. Tetapkan Kuantiti/Unit baja dalam Fail Item.',
         manuring_lbl_notes:  'Nota',
         btn_save_round:      'Simpan Pusingan',
         manuring_defined_title: 'Pusingan Pembajaan Ditetapkan',
@@ -2964,9 +3165,10 @@ function applyNavPermissions(session) {
     // For each non-dashboard section nav button, show/hide based on permissions
     document.querySelectorAll('[data-target]').forEach(btn => {
         const target = btn.getAttribute('data-target');
-        if (target === 'dashboard' || target === 'useradmin') return; // always handled separately
+        if (target === 'dashboard' || target === 'useradmin') return;
 
-        const allowed = isSuperAdmin || session.permissions.includes(target);
+        const access = getSectionAccess(session, target);
+        const allowed = isSuperAdmin || access === 'view' || access === 'edit';
         btn.classList.toggle('hidden', !allowed);
     });
 }
@@ -2984,7 +3186,8 @@ const _origNavHandler = (btn) => {
 
         // Non-dashboard sections: check permission for normal users
         if (target !== 'dashboard' && target !== 'useradmin' && session.role !== 'superadmin') {
-            if (!session.permissions.includes(target)) {
+            const access = getSectionAccess(session, target);
+            if (access === 'none') {
                 alert('You do not have permission to access this section.');
                 return;
             }
@@ -3061,10 +3264,39 @@ function renderPermissionCheckboxes() {
     const grid = document.getElementById('regPermissionsGrid');
     if (!grid) return;
     grid.innerHTML = ALL_SECTIONS.map(s => `
-        <label class="flex items-center gap-2 text-sm cursor-pointer select-none">
-            <input type="checkbox" class="reg-perm-cb accent-green-700 w-4 h-4" value="${s.id}" />
-            ${s.label}
-        </label>`).join('');
+        <div class="flex items-center gap-3 py-1 border-b border-green-50 last:border-0">
+            <span class="text-sm flex-1">${s.label}</span>
+            <label class="flex items-center gap-1 text-xs cursor-pointer">
+                <input type="radio" class="reg-perm-radio accent-gray-500" name="perm_reg_${s.id}" value="none" checked /> None
+            </label>
+            <label class="flex items-center gap-1 text-xs cursor-pointer">
+                <input type="radio" class="reg-perm-radio accent-blue-600" name="perm_reg_${s.id}" value="view" /> View
+            </label>
+            <label class="flex items-center gap-1 text-xs cursor-pointer">
+                <input type="radio" class="reg-perm-radio accent-green-700" name="perm_reg_${s.id}" value="edit" /> Edit
+            </label>
+        </div>`).join('');
+}
+
+function normalisePermissions(perms) {
+    if (!perms) return {};
+    if (Array.isArray(perms)) {
+        const obj = {};
+        perms.forEach(p => { obj[p] = 'edit'; });
+        return obj;
+    }
+    return perms;
+}
+
+function getSectionAccess(session, sectionId) {
+    if (!session || session.role === 'superadmin') return 'edit';
+    const perms = normalisePermissions(session.permissions);
+    return perms[sectionId] || 'none';
+}
+
+function isEditAllowed(sectionId) {
+    const session = loadSession();
+    return getSectionAccess(session, sectionId) === 'edit';
 }
 
 function registerUser() {
@@ -3072,36 +3304,30 @@ function registerUser() {
     const email    = document.getElementById('regEmail').value.trim().toLowerCase();
     const password = document.getElementById('regPassword').value;
     const estates  = [...document.querySelectorAll('.reg-estate-cb:checked')].map(cb => cb.value);
-    const perms    = [...document.querySelectorAll('.reg-perm-cb:checked')].map(cb => cb.value);
 
-    if (!name || !email || !password) {
-        alert('Please fill in Name, Email and Password.'); return;
-    }
-    if (estates.length === 0) {
-        alert('Please select at least one Estate.'); return;
-    }
-    if (password.length < 6) {
-        alert('Password must be at least 6 characters.'); return;
-    }
-    if (email === SUPER_ADMIN.email) {
-        alert('That email is reserved.'); return;
-    }
+    const perms = {};
+    ALL_SECTIONS.forEach(s => {
+        const checked = document.querySelector(`input[name="perm_reg_${s.id}"]:checked`);
+        const val = checked ? checked.value : 'none';
+        if (val !== 'none') perms[s.id] = val;
+    });
+
+    if (!name || !email || !password) { alert('Please fill in Name, Email and Password.'); return; }
+    if (estates.length === 0) { alert('Please select at least one Estate.'); return; }
+    if (password.length < 6) { alert('Password must be at least 6 characters.'); return; }
+    if (email === SUPER_ADMIN.email) { alert('That email is reserved.'); return; }
 
     const users = loadUsers();
-    if (users.find(u => u.email === email)) {
-        alert('A user with this email already exists.'); return;
-    }
+    if (users.find(u => u.email === email)) { alert('A user with this email already exists.'); return; }
 
-    // Store estates as array; estate (singular) = first selected for initial session default
     users.push({ id: Date.now(), name, email, password, estates, estate: estates[0], permissions: perms });
     saveUsers(users);
 
-    // Reset form
     document.getElementById('regName').value     = '';
     document.getElementById('regEmail').value    = '';
     document.getElementById('regPassword').value = '';
     document.querySelectorAll('.reg-estate-cb').forEach(cb => cb.checked = false);
-    document.querySelectorAll('.reg-perm-cb').forEach(cb => cb.checked = false);
+    renderPermissionCheckboxes();
 
     renderUsersTable();
     alert(`User "${name}" registered successfully.`);
@@ -3123,17 +3349,23 @@ function renderUsersTable() {
         return;
     }
     tbody.innerHTML = users.map(u => {
-        // Support both old single-estate and new multi-estate records
-        const estateList = u.estates || (u.estate ? [u.estate] : []);
+        const estateList  = u.estates || (u.estate ? [u.estate] : []);
         const estatesHtml = estateList.map(e =>
             `<span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full mr-1 mb-1">${e}</span>`
         ).join('') || '<span class="text-gray-400 text-xs">—</span>';
-        const permsHtml = u.permissions && u.permissions.length
-            ? u.permissions.map(p => {
-                const sec = ALL_SECTIONS.find(s => s.id === p);
-                return sec ? `<span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full mr-1 mb-1">${sec.label}</span>` : '';
-              }).join('')
+
+        const perms   = normalisePermissions(u.permissions);
+        const hasAny  = Object.keys(perms).length > 0;
+        const permsHtml = hasAny
+            ? ALL_SECTIONS.map(s => {
+                const level = perms[s.id];
+                if (!level || level === 'none') return '';
+                const colour = level === 'edit' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-700';
+                const badge  = level === 'edit' ? '✏️ Edit' : '👁 View';
+                return `<span class="inline-block ${colour} text-xs px-2 py-0.5 rounded-full mr-1 mb-1">${s.label} <b>${badge}</b></span>`;
+              }).filter(Boolean).join('')
             : `<span class="text-gray-400 text-xs">Dashboard only</span>`;
+
         return `
         <tr class="border-b border-green-50">
             <td class="px-3 py-2 font-semibold">${u.name}</td>
@@ -3150,7 +3382,6 @@ function renderUsersTable() {
     }).join('');
 }
 
-// ── Edit User Modal ────────────────────────────────────────────────
 function openEditUserModal(id) {
     const users = loadUsers();
     const user  = users.find(u => u.id === id);
@@ -3159,8 +3390,8 @@ function openEditUserModal(id) {
     const existing = document.getElementById('editUserModal');
     if (existing) existing.remove();
 
-    // Support both old single-estate and new multi-estate records
     const userEstates = user.estates || (user.estate ? [user.estate] : []);
+    const userPerms   = normalisePermissions(user.permissions);
 
     const ALL_ESTATES = ['Mega Jutamas (Suai)','Ulu Niah Estate','MJM Plantation 1','MJM Plantation 2',
         'MJM Plantation 3','Estet Seri Mawar','Meridian Palma','Mono Gaya',
@@ -3173,12 +3404,22 @@ function openEditUserModal(id) {
             ${e}
         </label>`).join('');
 
-    const permsChecks = ALL_SECTIONS.map(s => `
-        <label class="flex items-center gap-2 text-sm cursor-pointer">
-            <input type="checkbox" class="edit-perm-cb accent-green-700 w-4 h-4" value="${s.id}"
-                ${user.permissions && user.permissions.includes(s.id) ? 'checked' : ''} />
-            ${s.label}
-        </label>`).join('');
+    const permsRows = ALL_SECTIONS.map(s => {
+        const cur = userPerms[s.id] || 'none';
+        return `
+        <div class="flex items-center gap-3 py-1 border-b border-green-50 last:border-0">
+            <span class="text-sm flex-1">${s.label}</span>
+            <label class="flex items-center gap-1 text-xs cursor-pointer">
+                <input type="radio" name="perm_edit_${s.id}" value="none" ${cur === 'none' ? 'checked' : ''} /> None
+            </label>
+            <label class="flex items-center gap-1 text-xs cursor-pointer">
+                <input type="radio" name="perm_edit_${s.id}" value="view" ${cur === 'view' ? 'checked' : ''} /> View
+            </label>
+            <label class="flex items-center gap-1 text-xs cursor-pointer">
+                <input type="radio" name="perm_edit_${s.id}" value="edit" ${cur === 'edit' ? 'checked' : ''} /> Edit
+            </label>
+        </div>`;
+    }).join('');
 
     const modal = document.createElement('div');
     modal.id = 'editUserModal';
@@ -3204,7 +3445,8 @@ function openEditUserModal(id) {
                 </div>
                 <div>
                     <label class="block text-sm font-semibold mb-2">Sections Allowed</label>
-                    <div class="grid grid-cols-2 gap-2">${permsChecks}</div>
+                    <div class="border border-green-200 rounded-lg p-3 bg-green-50">${permsRows}</div>
+                    <p class="text-xs text-gray-400 mt-1"><b>View</b> = read-only. <b>Edit</b> = full access.</p>
                 </div>
                 <div class="flex gap-3 pt-2">
                     <button onclick="saveEditUser()"
@@ -3222,9 +3464,15 @@ function saveEditUser() {
     const name     = document.getElementById('editUserName').value.trim();
     const password = document.getElementById('editUserPassword').value;
     const estates  = [...document.querySelectorAll('.edit-estate-cb:checked')].map(cb => cb.value);
-    const perms    = [...document.querySelectorAll('.edit-perm-cb:checked')].map(cb => cb.value);
 
-    if (!name)              { alert('Name is required.'); return; }
+    const perms = {};
+    ALL_SECTIONS.forEach(s => {
+        const checked = document.querySelector(`input[name="perm_edit_${s.id}"]:checked`);
+        const val = checked ? checked.value : 'none';
+        if (val !== 'none') perms[s.id] = val;
+    });
+
+    if (!name)                { alert('Name is required.'); return; }
     if (estates.length === 0) { alert('Please select at least one Estate.'); return; }
 
     const users = loadUsers();
@@ -3233,7 +3481,7 @@ function saveEditUser() {
 
     users[idx].name        = name;
     users[idx].estates     = estates;
-    users[idx].estate      = estates[0]; // default active estate
+    users[idx].estate      = estates[0];
     users[idx].permissions = perms;
     if (password) {
         if (password.length < 6) { alert('Password must be at least 6 characters.'); return; }
