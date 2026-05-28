@@ -449,13 +449,19 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1" data-i18n="col_unit">Unit</label>
-                        <input id="itemUnit" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="text" placeholder="e.g. Bag, Litre, kg" />
+                        <label class="block text-sm font-semibold mb-1">Base Unit <span class="text-red-500">*</span></label>
+                        <input id="itemBaseUnit" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="text" placeholder="e.g. kg, litre, pcs" />
+                        <p class="text-xs text-gray-400 mt-1">The smallest unit of measurement (e.g. kg, litre, gram, pcs).</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Qty / Unit <span class="text-gray-400 font-normal text-xs">(base qty per 1 unit)</span></label>
-                        <input id="itemQtyPerUnit" min="0" step="0.01" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="number" placeholder="e.g. 50" />
-                        <p class="text-xs text-green-700 mt-1 italic">How much base quantity (kg) is in 1 unit. e.g. 1 Bag = 25 kg. This value is used to calculate Budgeted Fertilizer Needed in the Manuring Program.</p>
+                        <label class="block text-sm font-semibold mb-1">Package Unit</label>
+                        <input id="itemPackageUnit" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="text" placeholder="e.g. bag, jar, can, drum" />
+                        <p class="text-xs text-gray-400 mt-1">The packaging type used for stock transactions (e.g. bag, jar, can).</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Qty per Package</label>
+                        <input id="itemQtyPerUnit" min="0" step="0.001" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="number" placeholder="e.g. 25" />
+                        <p class="text-xs text-green-700 mt-1 italic">How many base units are in 1 package. e.g. 1 bag = 25 kg. Used to calculate Budgeted Fertilizer Needed in the Manuring Program.</p>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold mb-1" data-i18n="items_lbl_threshold">Minimum Threshold</label>
@@ -479,8 +485,9 @@
                                 <th class="px-3 py-2 text-left">Item ID</th>
                                 <th class="px-3 py-2 text-left" data-i18n="col_item_name">Item Name</th>
                                 <th class="px-3 py-2 text-left" data-i18n="col_category">Category</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_unit">Unit</th>
-                                <th class="px-3 py-2 text-left">Qty / Unit</th>
+                                <th class="px-3 py-2 text-left">Base Unit</th>
+                                <th class="px-3 py-2 text-left">Package Unit</th>
+                                <th class="px-3 py-2 text-left">Qty / Package</th>
                                 <th class="px-3 py-2 text-left" data-i18n="col_min_threshold">Min Threshold</th>
                                 <th class="px-3 py-2 text-left" data-i18n="col_action">Action</th>
                             </tr>
@@ -522,8 +529,20 @@
                         </select>
                     </div>
                     <div id="txnQtyWrap">
-                        <label class="block text-sm font-semibold mb-1" data-i18n="col_qty">Quantity</label>
-                        <input id="txnQty" min="0" step="0.01" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="number" />
+                        <label class="block text-sm font-semibold mb-1" data-i18n="col_qty">
+                            Quantity
+                            <span id="txnQtyUnitHint" class="text-gray-400 font-normal text-xs ml-1"></span>
+                        </label>
+                        <div class="flex gap-2">
+                            <input id="txnQty" min="0" step="0.001" class="flex-1 border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="number"
+                                oninput="updateTxnQtyConversion()" />
+                            <select id="txnQtyUnit" class="border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600 text-sm"
+                                onchange="updateTxnQtyConversion()">
+                                <option value="base">Base Unit</option>
+                                <option value="package">Package Unit</option>
+                            </select>
+                        </div>
+                        <p id="txnQtyConversion" class="text-xs text-green-700 mt-1 italic hidden"></p>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold mb-1" data-i18n="col_ref">Ref / DO No.</label>
@@ -550,6 +569,8 @@
                                 <thead class="bg-blue-100 text-blue-800">
                                     <tr>
                                         <th class="px-3 py-2 text-left" data-i18n="col_qty">Quantity</th>
+                                        <th class="px-3 py-2 text-left">Unit</th>
+                                        <th class="px-3 py-2 text-left">= Base Unit</th>
                                         <th class="px-3 py-2 text-left" data-i18n="txn_col_location_block">Location (Block)</th>
                                         <th class="px-3 py-2 text-left" data-i18n="col_action">Action</th>
                                     </tr>
@@ -1420,11 +1441,12 @@ let editingItemId = null;
 function startEditItem(id) {
     const it = items.find(i => String(i.id) === String(id));
     if (!it) return;
-    document.getElementById('itemName').value       = it.name;
-    document.getElementById('itemCategory').value   = it.category;
-    document.getElementById('itemUnit').value       = it.unit;
-    document.getElementById('itemQtyPerUnit').value = it.qtyPerUnit || '';
-    document.getElementById('itemThreshold').value  = it.threshold || 0;
+    document.getElementById('itemName').value        = it.name;
+    document.getElementById('itemCategory').value    = it.category;
+    document.getElementById('itemBaseUnit').value    = it.baseUnit || it.unit || '';
+    document.getElementById('itemPackageUnit').value = it.packageUnit || '';
+    document.getElementById('itemQtyPerUnit').value  = it.qtyPerUnit || '';
+    document.getElementById('itemThreshold').value   = it.threshold || 0;
     // Show the Item ID read-only field
     document.getElementById('itemCodeDisplay').value = it.itemCode || '—';
     document.getElementById('itemCodeRow').classList.remove('hidden');
@@ -1436,11 +1458,12 @@ function startEditItem(id) {
 
 function cancelEditItem() {
     editingItemId = null;
-    document.getElementById('itemName').value       = '';
-    document.getElementById('itemCategory').value   = '';
-    document.getElementById('itemUnit').value       = '';
-    document.getElementById('itemQtyPerUnit').value = '';
-    document.getElementById('itemThreshold').value  = '';
+    document.getElementById('itemName').value        = '';
+    document.getElementById('itemCategory').value    = '';
+    document.getElementById('itemBaseUnit').value    = '';
+    document.getElementById('itemPackageUnit').value = '';
+    document.getElementById('itemQtyPerUnit').value  = '';
+    document.getElementById('itemThreshold').value   = '';
     // Hide the Item ID field
     document.getElementById('itemCodeDisplay').value = '';
     document.getElementById('itemCodeRow').classList.add('hidden');
@@ -1476,16 +1499,16 @@ function generateItemCode() {
 }
 
 function saveItem() {
-    const name       = document.getElementById('itemName').value.trim();
-    const category   = document.getElementById('itemCategory').value;
-    const unit       = document.getElementById('itemUnit').value.trim();
-    const qtyPerUnit = parseFloat(document.getElementById('itemQtyPerUnit').value) || 0;
-    const threshold  = parseFloat(document.getElementById('itemThreshold').value) || 0;
+    const name        = document.getElementById('itemName').value.trim();
+    const category    = document.getElementById('itemCategory').value;
+    const baseUnit    = document.getElementById('itemBaseUnit').value.trim();
+    const packageUnit = document.getElementById('itemPackageUnit').value.trim();
+    const qtyPerUnit  = parseFloat(document.getElementById('itemQtyPerUnit').value) || 0;
+    const threshold   = parseFloat(document.getElementById('itemThreshold').value) || 0;
 
     if (!name)     { alert('Please enter an Item Name.'); return; }
     if (!category) { alert('Please select a Category.'); return; }
-    if (!unit)     { alert('Please enter a Unit.'); return; }
-    if (qtyPerUnit <= 0) { alert('Please enter a valid Qty / Unit (must be greater than 0).'); return; }
+    if (!baseUnit) { alert('Please enter a Base Unit (e.g. kg, litre, pcs).'); return; }
 
     if (editingItemId) {
         const idx = items.findIndex(i => String(i.id) === String(editingItemId));
@@ -1495,7 +1518,10 @@ function saveItem() {
             alert('Another item with that name already exists.'); return;
         }
         // itemCode is preserved — never changes on edit
-        items[idx] = { ...items[idx], name, category, unit, qtyPerUnit, threshold };
+        // unit kept = baseUnit for backward compatibility with existing code
+        items[idx] = { ...items[idx], name, category,
+                       baseUnit, packageUnit, qtyPerUnit, threshold,
+                       unit: baseUnit };
         if (oldName !== name) {
             transactions.forEach(t => { if (t.itemName === oldName) t.itemName = name; });
             save(STORAGE_KEYS.transactions, transactions);
@@ -1507,13 +1533,16 @@ function saveItem() {
             alert('An item with that name already exists.'); return;
         }
         const itemCode = generateItemCode();
-        items.push({ id: Date.now(), itemCode, name, category, unit, qtyPerUnit, threshold });
+        items.push({ id: Date.now(), itemCode, name, category,
+                     baseUnit, packageUnit, qtyPerUnit, threshold,
+                     unit: baseUnit });
         save(STORAGE_KEYS.items, items);
-        document.getElementById('itemName').value       = '';
-        document.getElementById('itemCategory').value   = '';
-        document.getElementById('itemUnit').value       = '';
-        document.getElementById('itemQtyPerUnit').value = '';
-        document.getElementById('itemThreshold').value  = '';
+        document.getElementById('itemName').value        = '';
+        document.getElementById('itemCategory').value    = '';
+        document.getElementById('itemBaseUnit').value    = '';
+        document.getElementById('itemPackageUnit').value = '';
+        document.getElementById('itemQtyPerUnit').value  = '';
+        document.getElementById('itemThreshold').value   = '';
     }
     refreshAll();
 }
@@ -1523,29 +1552,37 @@ function renderItemsTable() {
     const body = document.getElementById('itemsTableBody');
     body.innerHTML = '';
     if (items.length === 0) {
-        body.innerHTML = '<tr><td colspan="7" class="px-3 py-4 text-center text-gray-500">No items yet.</td></tr>';
+        body.innerHTML = '<tr><td colspan="8" class="px-3 py-4 text-center text-gray-500">No items yet.</td></tr>';
         return;
     }
     items.forEach((it, idx) => {
         const tr = document.createElement('tr');
         tr.className = 'border-b border-green-100 hover:bg-green-50';
-        const qtyLabel = it.qtyPerUnit
-            ? `${it.qtyPerUnit} / ${it.unit}`
+
+        // Base unit: use baseUnit if present, fall back to legacy unit field
+        const baseUnitDisplay    = it.baseUnit || it.unit || '—';
+        const packageUnitDisplay = it.packageUnit
+            ? `<span class="font-medium">${it.packageUnit}</span>`
             : '<span class="text-gray-400">—</span>';
-        // Normalise itemCode: if it's a number or missing the ITM- prefix, format it properly
+        const qtyPkgDisplay = it.qtyPerUnit
+            ? `${it.qtyPerUnit} ${baseUnitDisplay}/${it.packageUnit || 'pkg'}`
+            : '<span class="text-gray-400">—</span>';
+
+        // Normalise itemCode
         let displayCode = it.itemCode;
         if (!displayCode || typeof displayCode === 'number' || !String(displayCode).startsWith('ITM-')) {
             displayCode = `ITM-${String(idx + 1).padStart(3, '0')}`;
-            // Persist the corrected code back so it's fixed going forward
             it.itemCode = displayCode;
         }
         const codeLabel = `<span class="font-mono text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">${displayCode}</span>`;
+
         tr.innerHTML = `
             <td class="px-3 py-2">${codeLabel}</td>
             <td class="px-3 py-2 font-medium">${it.name}</td>
             <td class="px-3 py-2">${it.category}</td>
-            <td class="px-3 py-2">${it.unit}</td>
-            <td class="px-3 py-2 text-center">${qtyLabel}</td>
+            <td class="px-3 py-2">${baseUnitDisplay}</td>
+            <td class="px-3 py-2">${packageUnitDisplay}</td>
+            <td class="px-3 py-2 text-center">${qtyPkgDisplay}</td>
             <td class="px-3 py-2">${it.category === 'Chemical' ? it.threshold : '<span class="text-gray-400">N/A</span>'}</td>
             <td class="px-3 py-2 flex gap-2 flex-wrap">
                 <button class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded"
@@ -1683,11 +1720,27 @@ function buildLocationOptionsHtml() {
 }
 
 function addTxnRow() {
-    const tbody = document.getElementById('txnRowsBody');
+    const tbody  = document.getElementById('txnRowsBody');
+    const itemId = document.getElementById('txnItem').value;
+    const item   = items.find(i => String(i.id) === String(itemId));
+    const hasPackage = item && item.packageUnit;
+    const unitSelector = hasPackage
+        ? `<select class="txn-row-unit border border-blue-300 rounded p-1 bg-white text-xs" onchange="updateRowConversion(this)">
+               <option value="base">${item.baseUnit || item.unit}</option>
+               <option value="package">${item.packageUnit}</option>
+           </select>`
+        : `<span class="text-xs text-gray-500">${item ? (item.baseUnit || item.unit) : ''}</span>
+           <input type="hidden" class="txn-row-unit-val" value="base" />`;
+
     const tr = document.createElement('tr');
     tr.className = 'border-b border-blue-100';
     tr.innerHTML = `
-        <td class="px-3 py-2"><input type="number" min="0" step="0.01" class="txn-row-qty w-32 border border-blue-300 rounded p-1" /></td>
+        <td class="px-3 py-2">
+            <input type="number" min="0" step="0.001" class="txn-row-qty w-24 border border-blue-300 rounded p-1"
+                oninput="updateRowConversion(this)" />
+        </td>
+        <td class="px-3 py-2">${unitSelector}</td>
+        <td class="px-3 py-2 text-xs text-green-700 italic txn-row-conv"></td>
         <td class="px-3 py-2"><select class="txn-row-loc border border-blue-300 rounded p-1 bg-white">${buildLocationOptionsHtml()}</select></td>
         <td class="px-3 py-2"><button type="button" class="text-red-600 hover:underline text-sm" onclick="this.closest('tr').remove()">Remove</button></td>`;
     tbody.appendChild(tr);
@@ -1741,14 +1794,19 @@ function saveTransaction() {
         // Validate every row first (don't half-write the DB)
         const parsedRows = [];
         for (const row of rows) {
-            const qty = parseFloat(row.querySelector('.txn-row-qty').value) || 0;
-            const loc = row.querySelector('.txn-row-loc').value;
-            if (qty <= 0) { alert('Each row must have a Quantity greater than 0.'); return; }
+            const rawQty  = parseFloat(row.querySelector('.txn-row-qty').value) || 0;
+            const unitSel = row.querySelector('select.txn-row-unit');
+            const unitVal = unitSel ? unitSel.value : 'base';
+            const loc     = row.querySelector('.txn-row-loc').value;
+            if (rawQty <= 0) { alert('Each row must have a Quantity greater than 0.'); return; }
             if (item.category === 'Fertilizer' && loc === 'None/Storage') {
                 alert('Each row must have a target Block selected (not Storage) for fertilizer Out.');
                 return;
             }
-            parsedRows.push({ qty, loc });
+            // Convert to base unit
+            const baseQty    = convertToBase(rawQty, unitVal, item);
+            const inputUnit  = unitVal === 'package' ? (item.packageUnit || item.unit) : (item.baseUnit || item.unit);
+            parsedRows.push({ qty: baseQty, inputQty: rawQty, inputUnit, loc });
         }
 
         // Persist one transaction per row
@@ -1763,9 +1821,11 @@ function saveTransaction() {
                 itemId: item.id,
                 itemName: item.name,
                 category: item.category,
-                unit: item.unit,
+                unit: item.baseUnit || item.unit,
                 type: 'Out',
-                qty: r.qty,
+                qty: r.qty,           // always stored in base unit
+                inputQty: r.inputQty, // original entered qty
+                inputUnit: r.inputUnit, // unit as entered
                 location: r.loc,
                 ref: baseRef,
                 remarks: baseRemarks,
@@ -1793,7 +1853,11 @@ function saveTransaction() {
     }
 
     /* ============ EXISTING SINGLE-ROW PATH FOR IN / ADJ ============ */
-    const location = document.getElementById('txnLocation').value;
+    const location  = document.getElementById('txnLocation').value;
+    const rawQty    = parseFloat(document.getElementById('txnQty').value) || 0;
+    const qtyUnitSel= document.getElementById('txnQtyUnit').value; // 'base' or 'package'
+    const baseQty   = convertToBase(rawQty, qtyUnitSel, item);
+    const enteredUnit = qtyUnitSel === 'package' ? (item.packageUnit || item.unit) : (item.baseUnit || item.unit);
 
     const newTxn = {
         id: Date.now(),
@@ -1801,9 +1865,11 @@ function saveTransaction() {
         itemId: item.id,
         itemName: item.name,
         category: item.category,
-        unit: item.unit,
+        unit: item.baseUnit || item.unit,
         type: txnType,
-        qty: parseFloat(document.getElementById('txnQty').value) || 0,
+        qty: baseQty,               // always stored in base unit
+        inputQty: rawQty,           // original entered qty
+        inputUnit: enteredUnit,     // unit as entered
         location: location,
         ref: document.getElementById('txnRef').value.trim(),
         remarks: document.getElementById('txnRemarks').value.trim(),
@@ -2487,8 +2553,16 @@ function renderSummary() {
     currentFilteredTxns.forEach(t => {
         const tr = document.createElement('tr');
         tr.className = 'border-b border-green-100 hover:bg-green-50';
-        const qtyIn  = (t.type === 'In' || t.type === 'Adj') ? t.qty : '';
-        const qtyOut = (t.type === 'Out') ? t.qty : '';
+        const qtyIn  = (t.type === 'In' || t.type === 'Adj')
+            ? (t.inputQty && t.inputUnit && t.inputUnit !== t.unit
+                ? `${t.qty} ${t.unit} <span class="text-gray-400 text-xs">(${t.inputQty} ${t.inputUnit})</span>`
+                : `${t.qty} ${t.unit || ''}`)
+            : '';
+        const qtyOut = (t.type === 'Out')
+            ? (t.inputQty && t.inputUnit && t.inputUnit !== t.unit
+                ? `${t.qty} ${t.unit} <span class="text-gray-400 text-xs">(${t.inputQty} ${t.inputUnit})</span>`
+                : `${t.qty} ${t.unit || ''}`)
+            : '';
 
         // Build round badges — Manuring Round and/or Maintenance Round
         let roundHtml = '<span class="text-gray-300 text-xs">—</span>';
@@ -2864,8 +2938,136 @@ function refreshAll() {
 }
 
 /* -----------------------------------------------------------------
-   EDIT TRANSACTION MODAL - open, populate, save
+   UNIT CONVERSION HELPERS
+   All stored qty values are in base unit.
+   convertToBase converts package qty → base qty using item.qtyPerUnit.
    ----------------------------------------------------------------- */
+
+/**
+ * Convert a quantity from a given unit type to the item's base unit.
+ * @param {number} qty       - quantity entered by user
+ * @param {string} unitType  - 'base' or 'package'
+ * @param {object} item      - item object with qtyPerUnit, baseUnit, packageUnit
+ * @returns {number}         - quantity in base unit
+ */
+function convertToBase(qty, unitType, item) {
+    if (unitType === 'package') {
+        const factor = parseFloat(item.qtyPerUnit) || 1;
+        return qty * factor;
+    }
+    return qty; // already base unit
+}
+
+/**
+ * Convert base unit qty back to package qty for display purposes.
+ */
+function convertFromBase(baseQty, item) {
+    const factor = parseFloat(item.qtyPerUnit) || 1;
+    return factor > 0 ? baseQty / factor : baseQty;
+}
+
+/** Update the unit selector options and conversion hint for the single-row Qty field */
+function updateTxnQtyLabel() {
+    const itemId   = document.getElementById('txnItem').value;
+    const item     = items.find(i => String(i.id) === String(itemId));
+    const unitSel  = document.getElementById('txnQtyUnit');
+    const hintEl   = document.getElementById('txnQtyUnitHint');
+
+    if (!item) {
+        if (unitSel)  { unitSel.innerHTML = '<option value="base">Unit</option>'; }
+        if (hintEl)   { hintEl.textContent = ''; }
+        return;
+    }
+
+    const baseUnit    = item.baseUnit || item.unit || '';
+    const packageUnit = item.packageUnit || '';
+
+    // Rebuild unit selector
+    if (unitSel) {
+        const prevVal = unitSel.value;
+        if (packageUnit) {
+            unitSel.innerHTML =
+                `<option value="base">${baseUnit}</option>` +
+                `<option value="package">${packageUnit}</option>`;
+        } else {
+            unitSel.innerHTML = `<option value="base">${baseUnit}</option>`;
+        }
+        unitSel.value = prevVal && (prevVal === 'base' || prevVal === 'package') ? prevVal : 'base';
+    }
+
+    // Update label hint
+    if (hintEl) {
+        hintEl.textContent = packageUnit ? `(${baseUnit} or ${packageUnit})` : `(${baseUnit})`;
+    }
+
+    updateTxnQtyConversion();
+}
+
+/** Show live conversion hint beneath the Qty input */
+function updateTxnQtyConversion() {
+    const itemId   = document.getElementById('txnItem').value;
+    const item     = items.find(i => String(i.id) === String(itemId));
+    const convEl   = document.getElementById('txnQtyConversion');
+    if (!convEl) return;
+
+    if (!item || !item.packageUnit || !item.qtyPerUnit) {
+        convEl.classList.add('hidden');
+        return;
+    }
+
+    const rawQty   = parseFloat(document.getElementById('txnQty').value) || 0;
+    const unitSel  = document.getElementById('txnQtyUnit');
+    const unitType = unitSel ? unitSel.value : 'base';
+
+    if (rawQty <= 0) { convEl.classList.add('hidden'); return; }
+
+    const baseUnit    = item.baseUnit || item.unit;
+    const packageUnit = item.packageUnit;
+    const factor      = parseFloat(item.qtyPerUnit) || 1;
+
+    if (unitType === 'package') {
+        const baseQty = rawQty * factor;
+        convEl.textContent = `= ${baseQty.toFixed(3)} ${baseUnit} (${rawQty} ${packageUnit} × ${factor} ${baseUnit}/${packageUnit})`;
+    } else {
+        const pkgQty = factor > 0 ? rawQty / factor : 0;
+        convEl.textContent = `= ${pkgQty.toFixed(3)} ${packageUnit}`;
+    }
+    convEl.classList.remove('hidden');
+}
+
+/** Show live conversion hint on a multi-row breakdown row */
+function updateRowConversion(inputOrSelect) {
+    const row     = inputOrSelect.closest('tr');
+    if (!row) return;
+    const convEl  = row.querySelector('.txn-row-conv');
+    if (!convEl) return;
+
+    const itemId  = document.getElementById('txnItem').value;
+    const item    = items.find(i => String(i.id) === String(itemId));
+    if (!item || !item.packageUnit || !item.qtyPerUnit) { convEl.textContent = ''; return; }
+
+    const rawQty  = parseFloat(row.querySelector('.txn-row-qty').value) || 0;
+    const unitSel = row.querySelector('select.txn-row-unit');
+    const unitType = unitSel ? unitSel.value : 'base';
+    const factor  = parseFloat(item.qtyPerUnit) || 1;
+    const baseUnit = item.baseUnit || item.unit;
+    const pkgUnit  = item.packageUnit;
+
+    if (rawQty <= 0) { convEl.textContent = ''; return; }
+
+    if (unitType === 'package') {
+        convEl.textContent = `= ${(rawQty * factor).toFixed(3)} ${baseUnit}`;
+    } else {
+        convEl.textContent = factor > 0 ? `= ${(rawQty / factor).toFixed(3)} ${pkgUnit}` : '';
+    }
+}
+
+/* -----------------------------------------------------------------
+   ITEM CHANGE → update qty unit label
+   ----------------------------------------------------------------- */
+document.getElementById('txnItem').addEventListener('change', updateTxnQtyLabel);
+
+
 function openEditTxnModal(id) {
     const t = transactions.find(x => x.id === id);
     if (!t) return;
