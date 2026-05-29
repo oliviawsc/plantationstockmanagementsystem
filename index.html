@@ -932,94 +932,6 @@
             <h2 class="text-3xl font-bold mb-2">📊 Maintenance Progress &amp; Chemical Usage</h2>
             <p class="text-sm text-green-700 mb-6">Record claimed maintenance area per block/round, set chemical ingredient dosage rates, and view progress &amp; chemical usage per HA.</p>
 
-            <!-- ── Claim Entry Form ── -->
-            <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <h3 class="text-xl font-bold mb-4">➕ Add Maintenance Claim</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Maintenance Round <span class="text-red-500">*</span></label>
-                        <select id="mpRound" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600"
-                            onchange="updateMpBlocksByRound()">
-                            <option value="">-- Select Round --</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Block <span class="text-red-500">*</span></label>
-                        <select id="mpBlock" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
-                            <option value="">-- Select Block --</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Claimed Maintenance Area (Ha) <span class="text-red-500">*</span></label>
-                        <input id="mpClaimedArea" type="number" min="0" step="0.01" placeholder="e.g. 12.5"
-                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Month of Claim <span class="text-red-500">*</span></label>
-                        <input id="mpMonth" type="month"
-                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
-                    </div>
-                    <div class="flex items-end">
-                        <button type="button" onclick="saveMaintClaim()"
-                            class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold w-full">
-                            Save Claim
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── Chemical Ingredient Setup ── -->
-            <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <h3 class="text-xl font-bold mb-4">🧪 Chemical Ingredient Setup</h3>
-                <p class="text-xs text-green-700 mb-4">Define active ingredients and link them to chemical items. Set the maximum dosage rate per HA for monitoring over-application.</p>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Ingredient Name <span class="text-red-500">*</span></label>
-                        <input id="ciName" type="text" placeholder="e.g. Glyphosate"
-                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Linked Chemical Item <span class="text-red-500">*</span></label>
-                        <select id="ciItem" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
-                            <option value="">-- Select Chemical --</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Unit</label>
-                        <select id="ciUnit" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
-                            <option value="litre">Litre / Ha</option>
-                            <option value="gram">Gram / Ha</option>
-                            <option value="ml">ml / Ha</option>
-                            <option value="kg">kg / Ha</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Max Dosage Rate <span class="text-red-500">*</span></label>
-                        <input id="ciMaxDosage" type="number" min="0" step="0.001" placeholder="e.g. 3.0"
-                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
-                    </div>
-                </div>
-                <button type="button" onclick="saveChemIngredient()"
-                    class="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg font-semibold">
-                    Save Ingredient
-                </button>
-                <!-- Ingredient list -->
-                <div class="overflow-x-auto mt-4">
-                    <table class="min-w-full text-sm">
-                        <thead class="bg-blue-50 text-blue-800">
-                            <tr>
-                                <th class="px-3 py-2 text-left">Ingredient</th>
-                                <th class="px-3 py-2 text-left">Linked Chemical</th>
-                                <th class="px-3 py-2 text-left">Unit</th>
-                                <th class="px-3 py-2 text-right">Max Dosage / Ha</th>
-                                <th class="px-3 py-2 text-left">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ciTableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-
             <!-- ── a) Maintenance Progress by Round ── -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
                 <h3 class="text-xl font-bold mb-2">a) Maintenance Progress by Round</h3>
@@ -1087,7 +999,7 @@
             </div>
 
             <!-- ── d) Chemical Usage per HA by Block ── -->
-            <div class="bg-white p-6 rounded-xl shadow">
+            <div class="bg-white p-6 rounded-xl shadow mb-6">
                 <h3 class="text-xl font-bold mb-2">d) Chemical Usage per HA by Block</h3>
                 <p class="text-xs text-green-700 mb-4">Usage / Ha = Total Qty Used (that block) ÷ Claimed Area (Ha) for that block. Highlighted red if exceeding max dosage.</p>
                 <div class="overflow-x-auto">
@@ -1107,6 +1019,110 @@
                             </tr>
                         </thead>
                         <tbody id="chemByBlockBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ── Claim Entry Form (below Progress by Block table) ── -->
+            <div class="bg-white p-6 rounded-xl shadow mb-6">
+                <h3 class="text-xl font-bold mb-4" id="mpFormTitle">➕ Add Maintenance Claim</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input type="hidden" id="mpEditId" value="" />
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Maintenance Round <span class="text-red-500">*</span></label>
+                        <select id="mpRound" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600"
+                            onchange="updateMpBlocksByRound()">
+                            <option value="">-- Select Round --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Block <span class="text-red-500">*</span></label>
+                        <select id="mpBlock" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="">-- Select Block --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Claimed Maintenance Area (Ha) <span class="text-red-500">*</span></label>
+                        <input id="mpClaimedArea" type="number" min="0" step="0.01" placeholder="e.g. 12.5"
+                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Month of Claim <span class="text-red-500">*</span></label>
+                        <input id="mpMonth" type="month"
+                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <button type="button" onclick="saveMaintClaim()"
+                            id="mpSaveBtn"
+                            class="flex-1 bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold">
+                            Save Claim
+                        </button>
+                        <button type="button" onclick="cancelEditMaintClaim()"
+                            id="mpCancelBtn"
+                            class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg font-semibold">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Chemical Ingredient Setup ── -->
+            <div class="bg-white p-6 rounded-xl shadow mb-6">
+                <h3 class="text-xl font-bold mb-4" id="ciFormTitle">🧪 Chemical Ingredient Setup</h3>
+                <p class="text-xs text-green-700 mb-4">Define active ingredients and link them to chemical items. Set the maximum dosage rate per HA for monitoring over-application.</p>
+                <input type="hidden" id="ciEditId" value="" />
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Ingredient Name <span class="text-red-500">*</span></label>
+                        <input id="ciName" type="text" placeholder="e.g. Glyphosate"
+                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Linked Chemical Item <span class="text-red-500">*</span></label>
+                        <select id="ciItem" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="">-- Select Chemical --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Unit</label>
+                        <select id="ciUnit" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="litre">Litre / Ha</option>
+                            <option value="gram">Gram / Ha</option>
+                            <option value="ml">ml / Ha</option>
+                            <option value="kg">kg / Ha</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Max Dosage Rate <span class="text-red-500">*</span></label>
+                        <input id="ciMaxDosage" type="number" min="0" step="0.001" placeholder="e.g. 3.0"
+                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" onclick="saveChemIngredient()"
+                        id="ciSaveBtn"
+                        class="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg font-semibold">
+                        Save Ingredient
+                    </button>
+                    <button type="button" onclick="cancelEditChemIngredient()"
+                        id="ciCancelBtn"
+                        class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg font-semibold">
+                        Cancel
+                    </button>
+                </div>
+                <!-- Ingredient list -->
+                <div class="overflow-x-auto mt-4">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-blue-50 text-blue-800">
+                            <tr>
+                                <th class="px-3 py-2 text-left">Ingredient</th>
+                                <th class="px-3 py-2 text-left">Linked Chemical</th>
+                                <th class="px-3 py-2 text-left">Unit</th>
+                                <th class="px-3 py-2 text-right">Max Dosage / Ha</th>
+                                <th class="px-3 py-2 text-left">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ciTableBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -1391,38 +1407,53 @@ async function syncToSupabase(key, data) {
 async function loadFromSupabase() {
     if (!activeEstate) return;
     try {
-        const [itemsRes, locsRes, txnsRes, roundsRes] = await Promise.all([
+        const [itemsRes, locsRes, txnsRes, roundsRes,
+               fmRoundsRes, claimsRes, chemRes] = await Promise.all([
             supabaseClient.from('opp_items').select('*').eq('estate', activeEstate),
             supabaseClient.from('opp_locations').select('*').eq('estate', activeEstate),
             supabaseClient.from('opp_transactions').select('*').eq('estate', activeEstate),
-            supabaseClient.from('opp_manuring_rounds').select('*').eq('estate', activeEstate)
+            supabaseClient.from('opp_manuring_rounds').select('*').eq('estate', activeEstate),
+            supabaseClient.from('opp_fieldmaint_rounds').select('*').eq('estate', activeEstate),
+            supabaseClient.from('opp_maint_claims').select('*').eq('estate', activeEstate),
+            supabaseClient.from('opp_chem_ingredients').select('*').eq('estate', activeEstate)
         ]);
 
-        if (itemsRes.error)  console.error('[Supabase] load items',  itemsRes.error);
-        if (locsRes.error)   console.error('[Supabase] load locs',   locsRes.error);
-        if (txnsRes.error)   console.error('[Supabase] load txns',   txnsRes.error);
-        if (roundsRes.error) console.error('[Supabase] load rounds', roundsRes.error);
+        if (itemsRes.error)    console.error('[Supabase] load items',          itemsRes.error);
+        if (locsRes.error)     console.error('[Supabase] load locations',      locsRes.error);
+        if (txnsRes.error)     console.error('[Supabase] load transactions',   txnsRes.error);
+        if (roundsRes.error)   console.error('[Supabase] load manuring_rounds',roundsRes.error);
+        if (fmRoundsRes.error) console.error('[Supabase] load fm_rounds',      fmRoundsRes.error);
+        if (claimsRes.error)   console.error('[Supabase] load maint_claims',   claimsRes.error);
+        if (chemRes.error)     console.error('[Supabase] load chem_ingr',      chemRes.error);
 
-        if (itemsRes.data)  items          = itemsRes.data;
-        if (locsRes.data)   locations      = locsRes.data;
-        if (txnsRes.data)   transactions   = txnsRes.data;
-        if (roundsRes.data) manuringRounds = roundsRes.data;
+        if (itemsRes.data)    items            = itemsRes.data;
+        if (locsRes.data)     locations        = locsRes.data;
+        if (txnsRes.data)     transactions     = txnsRes.data;
+        if (roundsRes.data)   manuringRounds   = roundsRes.data;
+        if (fmRoundsRes.data) fieldMaintRounds = fmRoundsRes.data;
+        if (claimsRes.data)   maintClaims      = claimsRes.data;
+        if (chemRes.data)     chemIngredients  = chemRes.data;
 
-        // Cache with estate-scoped keys
+        // Cache all tables with estate-scoped localStorage keys
         const keys = getEstateKeys(activeEstate);
-        localStorage.setItem(keys.items,          JSON.stringify(items));
-        localStorage.setItem(keys.locations,      JSON.stringify(locations));
-        localStorage.setItem(keys.transactions,   JSON.stringify(transactions));
-        localStorage.setItem(keys.manuringRounds, JSON.stringify(manuringRounds));
+        localStorage.setItem(keys.items,            JSON.stringify(items));
+        localStorage.setItem(keys.locations,        JSON.stringify(locations));
+        localStorage.setItem(keys.transactions,     JSON.stringify(transactions));
+        localStorage.setItem(keys.manuringRounds,   JSON.stringify(manuringRounds));
+        localStorage.setItem(keys.fieldMaintRounds, JSON.stringify(fieldMaintRounds));
+        localStorage.setItem(keys.maintClaims,      JSON.stringify(maintClaims));
+        localStorage.setItem(keys.chemIngredients,  JSON.stringify(chemIngredients));
 
-        lastKnownIds.opp_items           = new Set(items.map(r => r.id));
-        lastKnownIds.opp_locations       = new Set(locations.map(r => r.id));
-        lastKnownIds.opp_transactions    = new Set(transactions.map(r => r.id));
-        lastKnownIds.opp_manuring_rounds = new Set(manuringRounds.map(r => r.id));
+        // Refresh lastKnownIds snapshots for all tables
+        lastKnownIds.opp_items              = new Set(items.map(r => r.id));
+        lastKnownIds.opp_locations          = new Set(locations.map(r => r.id));
+        lastKnownIds.opp_transactions       = new Set(transactions.map(r => r.id));
+        lastKnownIds.opp_manuring_rounds    = new Set(manuringRounds.map(r => r.id));
+        lastKnownIds.opp_fieldmaint_rounds  = new Set(fieldMaintRounds.map(r => r.id));
+        lastKnownIds.opp_maint_claims       = new Set(maintClaims.map(r => r.id));
+        lastKnownIds.opp_chem_ingredients   = new Set(chemIngredients.map(r => r.id));
 
         refreshAll();
-        // Explicitly re-render manuring sections after Supabase data arrives
-        // so they show correctly even if the user is already on those pages
         renderManuringRounds();
         renderManuringHistory();
         renderRoundProgress();
@@ -4453,40 +4484,55 @@ function updateMpBlocksByRound() {
 }
 
 /** Save a new maintenance area claim */
+/** Save (create or update) a maintenance area claim */
 function saveMaintClaim() {
+    const editId      = document.getElementById('mpEditId').value;
     const roundId     = document.getElementById('mpRound').value;
     const blockName   = document.getElementById('mpBlock').value;
     const claimedArea = parseFloat(document.getElementById('mpClaimedArea').value);
     const month       = document.getElementById('mpMonth').value;
 
-    if (!roundId)           { alert('Please select a Maintenance Round.'); return; }
-    if (!blockName)         { alert('Please select a Block.'); return; }
-    if (!claimedArea || claimedArea <= 0) { alert('Please enter a valid Claimed Area (> 0).'); return; }
-    if (!month)             { alert('Please select a Month of Claim.'); return; }
+    if (!roundId)                          { alert('Please select a Maintenance Round.'); return; }
+    if (!blockName)                        { alert('Please select a Block.'); return; }
+    if (!claimedArea || claimedArea <= 0)  { alert('Please enter a valid Claimed Area (> 0).'); return; }
+    if (!month)                            { alert('Please select a Month of Claim.'); return; }
 
     const round = fieldMaintRounds.find(r => String(r.id) === String(roundId));
-    if (!round)             { alert('Selected round not found.'); return; }
+    if (!round) { alert('Selected round not found.'); return; }
 
-    // Upsert — if claim for same round + block + month exists, update it
-    const existing = maintClaims.findIndex(c =>
-        String(c.roundId) === String(roundId) &&
-        c.blockName === blockName &&
-        c.month === month
-    );
-    if (existing >= 0) {
-        if (!confirm(`A claim for "${round.name}" / "${blockName}" in ${month} already exists. Update it?`)) return;
-        maintClaims[existing].claimedArea = claimedArea;
+    if (editId) {
+        // ── UPDATE existing claim ──
+        const idx = maintClaims.findIndex(c => String(c.id) === String(editId));
+        if (idx < 0) { cancelEditMaintClaim(); return; }
+        maintClaims[idx] = {
+            ...maintClaims[idx],
+            roundId: round.id, roundName: round.name,
+            blockName, claimedArea, month
+        };
+        cancelEditMaintClaim();
     } else {
-        maintClaims.push({ id: Date.now(), roundId: round.id, roundName: round.name,
-                           blockName, claimedArea, month });
+        // ── CREATE new claim (check for duplicate round+block+month) ──
+        const existing = maintClaims.findIndex(c =>
+            String(c.roundId) === String(roundId) &&
+            c.blockName === blockName && c.month === month
+        );
+        if (existing >= 0) {
+            if (!confirm(`A claim for "${round.name}" / "${blockName}" in ${month} already exists. Update it?`)) return;
+            maintClaims[existing].claimedArea = claimedArea;
+        } else {
+            maintClaims.push({ id: Date.now(), roundId: round.id, roundName: round.name,
+                               blockName, claimedArea, month });
+        }
+        document.getElementById('mpClaimedArea').value = '';
+        document.getElementById('mpRound').value  = '';
+        document.getElementById('mpBlock').value  = '';
+        document.getElementById('mpMonth').value  = '';
     }
 
     save(STORAGE_KEYS.maintClaims, maintClaims);
-    document.getElementById('mpClaimedArea').value = '';
     renderMaintProgressTables();
 
-    // Button feedback
-    const btn = document.querySelector('button[onclick="saveMaintClaim()"]');
+    const btn = document.getElementById('mpSaveBtn');
     if (btn) {
         const orig = btn.textContent;
         btn.textContent = '✅ Saved!'; btn.style.background = '#15803d';
@@ -4494,18 +4540,49 @@ function saveMaintClaim() {
     }
 }
 
+/** Pre-fill the claim form for editing */
+function startEditMaintClaim(id) {
+    const c = maintClaims.find(x => String(x.id) === String(id));
+    if (!c) return;
+    renderMaintProgressDropdowns(); // ensure dropdowns are populated
+    document.getElementById('mpEditId').value          = c.id;
+    document.getElementById('mpRound').value           = String(c.roundId);
+    updateMpBlocksByRound();
+    document.getElementById('mpBlock').value           = c.blockName;
+    document.getElementById('mpClaimedArea').value     = c.claimedArea;
+    document.getElementById('mpMonth').value           = c.month;
+    document.getElementById('mpFormTitle').textContent = '✏️ Edit Maintenance Claim';
+    document.getElementById('mpSaveBtn').textContent   = 'Update Claim';
+    document.getElementById('mpCancelBtn').classList.remove('hidden');
+    document.getElementById('mpFormTitle').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/** Reset the claim form back to Add mode */
+function cancelEditMaintClaim() {
+    document.getElementById('mpEditId').value          = '';
+    document.getElementById('mpRound').value           = '';
+    document.getElementById('mpBlock').value           = '';
+    document.getElementById('mpClaimedArea').value     = '';
+    document.getElementById('mpMonth').value           = '';
+    document.getElementById('mpFormTitle').textContent = '➕ Add Maintenance Claim';
+    document.getElementById('mpSaveBtn').textContent   = 'Save Claim';
+    document.getElementById('mpCancelBtn').classList.add('hidden');
+}
+
 /** Delete a maintenance claim */
 function deleteMaintClaim(id) {
-    if (!confirm('Delete this claim?')) return;
-    maintClaims = maintClaims.filter(c => String(c.id) !== String(id));
+    const c = maintClaims.find(x => String(x.id) === String(id));
+    if (!c || !confirm(`Delete claim for "${c.roundName}" / "${c.blockName}" (${c.month})?`)) return;
+    maintClaims = maintClaims.filter(x => String(x.id) !== String(id));
     save(STORAGE_KEYS.maintClaims, maintClaims);
     renderMaintProgressTables();
 }
 
-// ── Chemical Ingredient ────────────────────────────────────────────
+// ── Chemical Ingredient ──────────────────────────────────────────
 
-/** Save a chemical ingredient definition */
+/** Save (create or update) a chemical ingredient definition */
 function saveChemIngredient() {
+    const editId    = document.getElementById('ciEditId').value;
     const name      = document.getElementById('ciName').value.trim();
     const itemId    = document.getElementById('ciItem').value;
     const unit      = document.getElementById('ciUnit').value;
@@ -4518,21 +4595,59 @@ function saveChemIngredient() {
     const item = items.find(i => String(i.id) === String(itemId));
     if (!item) { alert('Selected chemical not found.'); return; }
 
-    chemIngredients.push({ id: Date.now(), name, itemId: item.id, itemName: item.name,
-                           unit, maxDosage });
+    if (editId) {
+        // ── UPDATE existing ingredient ──
+        const idx = chemIngredients.findIndex(c => String(c.id) === String(editId));
+        if (idx < 0) { cancelEditChemIngredient(); return; }
+        chemIngredients[idx] = {
+            ...chemIngredients[idx],
+            name, itemId: item.id, itemName: item.name, unit, maxDosage
+        };
+        cancelEditChemIngredient();
+    } else {
+        // ── CREATE new ingredient ──
+        chemIngredients.push({ id: Date.now(), name, itemId: item.id, itemName: item.name,
+                               unit, maxDosage });
+        document.getElementById('ciName').value      = '';
+        document.getElementById('ciItem').value      = '';
+        document.getElementById('ciMaxDosage').value = '';
+    }
+
     save(STORAGE_KEYS.chemIngredients, chemIngredients);
-
-    document.getElementById('ciName').value     = '';
-    document.getElementById('ciItem').value     = '';
-    document.getElementById('ciMaxDosage').value = '';
-
     renderCiTable();
     renderMaintProgressTables();
 }
 
+/** Pre-fill the chemical ingredient form for editing */
+function startEditChemIngredient(id) {
+    const ci = chemIngredients.find(x => String(x.id) === String(id));
+    if (!ci) return;
+    document.getElementById('ciEditId').value          = ci.id;
+    document.getElementById('ciName').value            = ci.name;
+    document.getElementById('ciItem').value            = String(ci.itemId);
+    document.getElementById('ciUnit').value            = ci.unit;
+    document.getElementById('ciMaxDosage').value       = ci.maxDosage;
+    document.getElementById('ciFormTitle').textContent = '✏️ Edit Chemical Ingredient';
+    document.getElementById('ciSaveBtn').textContent   = 'Update Ingredient';
+    document.getElementById('ciCancelBtn').classList.remove('hidden');
+    document.getElementById('ciFormTitle').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/** Reset the chemical ingredient form back to Add mode */
+function cancelEditChemIngredient() {
+    document.getElementById('ciEditId').value          = '';
+    document.getElementById('ciName').value            = '';
+    document.getElementById('ciItem').value            = '';
+    document.getElementById('ciMaxDosage').value       = '';
+    document.getElementById('ciFormTitle').textContent = '🧪 Chemical Ingredient Setup';
+    document.getElementById('ciSaveBtn').textContent   = 'Save Ingredient';
+    document.getElementById('ciCancelBtn').classList.add('hidden');
+}
+
 /** Delete a chemical ingredient */
 function deleteChemIngredient(id) {
-    if (!confirm('Delete this ingredient?')) return;
+    const ci = chemIngredients.find(x => String(x.id) === String(id));
+    if (!ci || !confirm(`Delete ingredient "${ci.name}"?`)) return;
     chemIngredients = chemIngredients.filter(c => String(c.id) !== String(id));
     save(STORAGE_KEYS.chemIngredients, chemIngredients);
     renderCiTable();
@@ -4556,7 +4671,9 @@ function renderCiTable() {
             <td class="px-3 py-2">${ci.itemName}</td>
             <td class="px-3 py-2">${ci.unit}</td>
             <td class="px-3 py-2 text-right font-bold">${ci.maxDosage}</td>
-            <td class="px-3 py-2">
+            <td class="px-3 py-2 whitespace-nowrap">
+                <button class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded mr-1"
+                    onclick="startEditChemIngredient('${ci.id}')">✏️ Edit</button>
                 <button class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold px-3 py-1 rounded"
                     onclick="deleteChemIngredient('${ci.id}')">🗑 Delete</button>
             </td>`;
@@ -4659,9 +4776,11 @@ function renderMpByBlock() {
             <td class="px-3 py-2 text-right">${blockArea.toFixed(2)}</td>
             <td class="px-3 py-2 text-right font-bold text-green-700">${claimed.toFixed(2)}</td>
             <td class="px-3 py-2">${progressBar(pct)}</td>
-            <td class="px-3 py-2">
+            <td class="px-3 py-2 whitespace-nowrap">
+                <button class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded mr-1"
+                    onclick="startEditMaintClaim('${c.id}')">✏️ Edit</button>
                 <button class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold px-3 py-1 rounded"
-                    onclick="deleteMaintClaim('${c.id}')">🗑</button>
+                    onclick="deleteMaintClaim('${c.id}')">🗑 Delete</button>
             </td>`;
         body.appendChild(tr);
     });
