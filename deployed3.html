@@ -1400,11 +1400,6 @@ function loadEstateData(estate) {
 
 // Persist a key back to localStorage AND sync to Supabase.
 function save(key, data) {
-    // Guard: never write to a key scoped to an empty estate
-    if (!activeEstate) {
-        alert('Please select an Estate before saving data.');
-        return;
-    }
     // key is a STORAGE_KEYS value (table name); scope it to active estate
     const estateKey = `${key}::${activeEstate}`;
     localStorage.setItem(estateKey, JSON.stringify(data));
@@ -1415,7 +1410,6 @@ function save(key, data) {
 //   - upsert every row currently in `data` (tagged with activeEstate)
 //   - delete rows whose ids existed before but are no longer in `data`
 async function syncToSupabase(key, data) {
-    if (!activeEstate) return; // never sync without an estate
     const table = key;
     try {
         const currentIds  = new Set(data.map(r => r.id));
@@ -1523,7 +1517,6 @@ async function loadFromSupabase() {
         renderManuringRounds();
         renderManuringHistory();
         renderRoundProgress();
-        renderFieldMaintRounds();
         renderMaintProgressDropdowns();
         renderCiTable();
         renderMaintProgressTables();

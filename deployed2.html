@@ -1400,11 +1400,6 @@ function loadEstateData(estate) {
 
 // Persist a key back to localStorage AND sync to Supabase.
 function save(key, data) {
-    // Guard: never write to a key scoped to an empty estate
-    if (!activeEstate) {
-        alert('Please select an Estate before saving data.');
-        return;
-    }
     // key is a STORAGE_KEYS value (table name); scope it to active estate
     const estateKey = `${key}::${activeEstate}`;
     localStorage.setItem(estateKey, JSON.stringify(data));
@@ -1415,7 +1410,6 @@ function save(key, data) {
 //   - upsert every row currently in `data` (tagged with activeEstate)
 //   - delete rows whose ids existed before but are no longer in `data`
 async function syncToSupabase(key, data) {
-    if (!activeEstate) return; // never sync without an estate
     const table = key;
     try {
         const currentIds  = new Set(data.map(r => r.id));
@@ -1492,13 +1486,13 @@ async function loadFromSupabase() {
         if (claimsRes.error)   console.error('[Supabase] load maint_claims',   claimsRes.error);
         if (chemRes.error)     console.error('[Supabase] load chem_ingr',      chemRes.error);
 
-        if (!itemsRes.error  && itemsRes.data  !== null) items            = itemsRes.data;
-        if (!locsRes.error   && locsRes.data   !== null) locations        = locsRes.data;
-        if (!txnsRes.error   && txnsRes.data   !== null) transactions     = txnsRes.data;
-        if (!roundsRes.error && roundsRes.data !== null) manuringRounds   = roundsRes.data;
-        if (!fmRoundsRes.error && fmRoundsRes.data !== null) fieldMaintRounds = fmRoundsRes.data;
-        if (!claimsRes.error && claimsRes.data !== null) maintClaims      = claimsRes.data;
-        if (!chemRes.error   && chemRes.data   !== null) chemIngredients  = chemRes.data;
+        if (itemsRes.data)    items            = itemsRes.data;
+        if (locsRes.data)     locations        = locsRes.data;
+        if (txnsRes.data)     transactions     = txnsRes.data;
+        if (roundsRes.data)   manuringRounds   = roundsRes.data;
+        if (fmRoundsRes.data) fieldMaintRounds = fmRoundsRes.data;
+        if (claimsRes.data)   maintClaims      = claimsRes.data;
+        if (chemRes.data)     chemIngredients  = chemRes.data;
 
         // Cache all tables with estate-scoped localStorage keys
         const keys = getEstateKeys(activeEstate);
@@ -1523,10 +1517,6 @@ async function loadFromSupabase() {
         renderManuringRounds();
         renderManuringHistory();
         renderRoundProgress();
-        renderFieldMaintRounds();
-        renderMaintProgressDropdowns();
-        renderCiTable();
-        renderMaintProgressTables();
     } catch (err) {
         console.error('[Supabase] loadFromSupabase failed', err);
     }
@@ -1548,10 +1538,6 @@ navButtons.forEach(btn => {
         pageSections.forEach(sec => sec.classList.toggle('active', sec.id === target));
         // refresh the section being shown so data is up-to-date
         refreshAll();
-        // For maintprogress: explicitly re-populate dropdowns after section becomes active
-        if (target === 'maintprogress') {
-            renderMaintProgressDropdowns();
-        }
     });
 });
 
@@ -4037,11 +4023,10 @@ function onSidebarEstateChange() {
     // Load cached data for new estate immediately, then fetch fresh from Supabase
     loadEstateData(newEstate);
     refreshAll();
-    // Explicitly render sections with cached data right away
+    // Explicitly render manuring sections with cached data right away
     renderManuringRounds();
     renderManuringHistory();
     renderRoundProgress();
-    renderFieldMaintRounds();
     loadFromSupabase();
 }
 
@@ -4517,25 +4502,23 @@ function renderFieldMaintRounds() {
 function renderMaintProgressDropdowns() {
     // ── Maintenance round dropdown — populated from fieldMaintRounds ──
     const mpRoundSel = document.getElementById('mpRound');
-    if (mpRoundSel) {
-        const prevRound = mpRoundSel.value;
-        mpRoundSel.innerHTML = '<option value="">-- Select Round --</option>' +
-            fieldMaintRounds.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
-        if (prevRound) mpRoundSel.value = prevRound;
-    }
+    if (!mpRoundSel) return;
+    const prevRound = mpRoundSel.value;
+    mpRoundSel.innerHTML = '<option value="">-- Select Round --</option>' +
+        fieldMaintRounds.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+    if (prevRound) mpRoundSel.value = prevRound;
 
     // ── Block dropdown — filter to the selected round's blocks ──────
     updateMpBlocksByRound();
 
     // ── Chemical item dropdown — only items with category = Chemical ─
     const ciItemSel = document.getElementById('ciItem');
-    if (ciItemSel) {
-        const prevCi = ciItemSel.value;
-        const chemicals = items.filter(i => i.category === 'Chemical');
-        ciItemSel.innerHTML = '<option value="">-- Select Chemical --</option>' +
-            chemicals.map(i => `<option value="${i.id}">${i.name} (${i.baseUnit || i.unit || ''})</option>`).join('');
-        if (prevCi) ciItemSel.value = prevCi;
-    }
+    if (!ciItemSel) return;
+    const prevCi = ciItemSel.value;
+    const chemicals = items.filter(i => i.category === 'Chemical');
+    ciItemSel.innerHTML = '<option value="">-- Select Chemical --</option>' +
+        chemicals.map(i => `<option value="${i.id}">${i.name} (${i.baseUnit || i.unit || ''})</option>`).join('');
+    if (prevCi) ciItemSel.value = prevCi;
 }
 
 /**
@@ -4548,9 +4531,8 @@ function updateMpBlocksByRound() {
     if (!mpBlockSel) return;
     const prevBlock = mpBlockSel.value;
 
-    const mpRoundEl = document.getElementById('mpRound');
-    const roundId   = mpRoundEl ? mpRoundEl.value : '';
-    const round     = fieldMaintRounds.find(r => String(r.id) === String(roundId));
+    const roundId = document.getElementById('mpRound').value;
+    const round   = fieldMaintRounds.find(r => String(r.id) === String(roundId));
 
     // Use the round's blocks array if it has entries; otherwise fall back to all locations
     const blockList = (round && round.blocks && round.blocks.length > 0)
