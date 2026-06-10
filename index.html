@@ -619,6 +619,39 @@
                         <label class="block text-sm font-semibold mb-1" data-i18n="col_remarks">Remarks</label>
                         <textarea id="txnRemarks" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" rows="2"></textarea>
                     </div>
+                    <!-- Picture upload — mandatory before saving -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold mb-1">
+                            Supporting Picture <span class="text-red-500">*</span>
+                            <span class="text-gray-400 font-normal text-xs ml-1">(Required — photo of delivery note, DO, or site)</span>
+                        </label>
+                        <div class="flex flex-wrap gap-3 items-start">
+                            <!-- Option 1: Upload from gallery / file system -->
+                            <label class="cursor-pointer">
+                                <div class="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white text-sm font-semibold px-4 py-2 rounded-lg select-none">
+                                    🖼️ Upload Photo
+                                </div>
+                                <input type="file" id="txnPicture" accept="image/*"
+                                    class="hidden" onchange="previewTxnPicture(this)" />
+                            </label>
+                            <!-- Option 2: Take photo directly with camera -->
+                            <label class="cursor-pointer">
+                                <div class="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-4 py-2 rounded-lg select-none">
+                                    📷 Take Photo
+                                </div>
+                                <input type="file" id="txnPictureCamera" accept="image/*" capture="environment"
+                                    class="hidden" onchange="previewTxnPicture(this)" />
+                            </label>
+                            <!-- Preview -->
+                            <div id="txnPicturePreviewWrap" class="hidden flex items-start gap-2">
+                                <img id="txnPicturePreview" src="" alt="Preview"
+                                    class="w-24 h-24 object-cover rounded-lg border border-green-300 shadow" />
+                                <button type="button" onclick="clearTxnPicture()"
+                                    class="text-xs text-red-500 hover:underline mt-1">✖ Remove</button>
+                            </div>
+                        </div>
+                        <p id="txnPictureFilename" class="text-xs text-green-700 mt-1 italic hidden"></p>
+                    </div>
                     <div class="md:col-span-2">
                         <button type="button" onclick="saveTransaction()" class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold" data-i18n="btn_save_txn">Save Transaction</button>
                     </div>
@@ -1280,9 +1313,9 @@
    SUPABASE CLIENT - connection to the cloud database
    ----------------------------------------------------------------- */
 const SUPABASE_URL = 'https://eukvdlyzhyjohkjqbqjb.supabase.co';
-// const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1a3ZkbHl6aHlqb2hranFicWpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTg5MzYsImV4cCI6MjA5NDI3NDkzNn0.czKzWGeiujgZ_VpOBZjFaxDjGCca-_-aZ41N5T0gjmk';
-// Supabase Dashboard → Settings → API → "anon public" key (starts with eyJ...)
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_fsL8W-BA5l6lEkYajn2zgA_lQexiLhP';
+// IMPORTANT: Only the anon/public JWT key is used in the browser.
+// The secret key (sb_secret_*) must NEVER be placed here — it is for server-side use only.
+const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1a3ZkbHl6aHlqb2hranFicWpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTg5MzYsImV4cCI6MjA5NDI3NDkzNn0.czKzWGeiujgZ_VpOBZjFaxDjGCca-_-aZ41N5T0gjmk';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 /* -----------------------------------------------------------------
@@ -1901,6 +1934,13 @@ function saveTransaction() {
             parsedRows.push({ qty: baseQty, inputQty: rawQty, inputUnit, loc });
         }
 
+        // Validate picture — mandatory
+        const pictureData = getTxnPictureBase64();
+        if (!pictureData) {
+            alert('Please attach a supporting picture before saving the transaction.');
+            return;
+        }
+
         // Persist one transaction per row
         const baseDate    = document.getElementById('txnDate').value;
         const baseRef     = document.getElementById('txnRef').value.trim();
@@ -1915,9 +1955,9 @@ function saveTransaction() {
                 category: item.category,
                 unit: item.baseUnit || item.unit,
                 type: 'Out',
-                qty: r.qty,           // always stored in base unit
-                inputQty: r.inputQty, // original entered qty
-                inputUnit: r.inputUnit, // unit as entered
+                qty: r.qty,
+                inputQty: r.inputQty,
+                inputUnit: r.inputUnit,
                 location: r.loc,
                 ref: baseRef,
                 remarks: baseRemarks,
@@ -1925,6 +1965,7 @@ function saveTransaction() {
                 manuringRoundName: manuringRoundName,
                 maintRoundId: maintRoundId,
                 maintRoundName: maintRoundName,
+                picture: pictureData,
                 user: 'Tester_Admin'
             });
         });
@@ -1939,6 +1980,7 @@ function saveTransaction() {
         document.getElementById('txnLocationWrap').classList.remove('hidden');
         document.getElementById('txnQty').required = true;
         document.getElementById('txnLocation').required = true;
+        clearTxnPicture();
         alert(`${parsedRows.length} transaction row(s) recorded successfully.`);
         refreshAll();
         return;
@@ -1947,9 +1989,16 @@ function saveTransaction() {
     /* ============ EXISTING SINGLE-ROW PATH FOR IN / ADJ ============ */
     const location  = document.getElementById('txnLocation').value;
     const rawQty    = parseFloat(document.getElementById('txnQty').value) || 0;
-    const qtyUnitSel= document.getElementById('txnQtyUnit').value; // 'base' or 'package'
+    const qtyUnitSel= document.getElementById('txnQtyUnit').value;
     const baseQty   = convertToBase(rawQty, qtyUnitSel, item);
     const enteredUnit = qtyUnitSel === 'package' ? (item.packageUnit || item.unit) : (item.baseUnit || item.unit);
+
+    // Validate picture — mandatory
+    const pictureData = getTxnPictureBase64();
+    if (!pictureData) {
+        alert('Please attach a supporting picture before saving the transaction.');
+        return;
+    }
 
     const newTxn = {
         id: Date.now(),
@@ -1959,23 +2008,24 @@ function saveTransaction() {
         category: item.category,
         unit: item.baseUnit || item.unit,
         type: txnType,
-        qty: baseQty,               // always stored in base unit
-        inputQty: rawQty,           // original entered qty
-        inputUnit: enteredUnit,     // unit as entered
+        qty: baseQty,
+        inputQty: rawQty,
+        inputUnit: enteredUnit,
         location: location,
         ref: document.getElementById('txnRef').value.trim(),
         remarks: document.getElementById('txnRemarks').value.trim(),
         manuringRoundId: null,
         manuringRoundName: null,
+        picture: pictureData,
         user: 'Tester_Admin'
     };
     transactions.push(newTxn);
     save(STORAGE_KEYS.transactions, transactions);
     document.getElementById('txnForm').reset();
-    // re-default date to today after reset
     document.getElementById('txnDate').valueAsDate = new Date();
     document.getElementById('txnManuringWrap').classList.add('hidden');
     document.getElementById('txnMaintWrap').classList.add('hidden');
+    clearTxnPicture();
     alert('Transaction recorded successfully.');
     refreshAll();
 }
@@ -4921,6 +4971,45 @@ function renderChemByBlock() {
     if (!hasRows) {
         body.innerHTML = '<tr><td colspan="10" class="px-3 py-3 text-center text-gray-400">No chemical Out transactions linked to maintenance rounds found for the claimed periods.</td></tr>';
     }
+}
+
+/* =================================================================
+   TRANSACTION PICTURE HELPERS
+   ================================================================= */
+
+/** Called when the user selects a file — shows thumbnail preview */
+function previewTxnPicture(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        document.getElementById('txnPicturePreview').src = e.target.result;
+        document.getElementById('txnPicturePreviewWrap').classList.remove('hidden');
+        const fn = document.getElementById('txnPictureFilename');
+        if (fn) { fn.textContent = '✅ ' + file.name; fn.classList.remove('hidden'); }
+    };
+    reader.readAsDataURL(file);
+}
+
+/** Returns the base64 data URL of the selected picture, or null if none */
+function getTxnPictureBase64() {
+    const preview = document.getElementById('txnPicturePreview');
+    if (!preview || !preview.src || preview.src === window.location.href) return null;
+    return preview.src.startsWith('data:') ? preview.src : null;
+}
+
+/** Clears the picture upload field and preview */
+function clearTxnPicture() {
+    const input1  = document.getElementById('txnPicture');
+    const input2  = document.getElementById('txnPictureCamera');
+    const preview = document.getElementById('txnPicturePreview');
+    const wrap    = document.getElementById('txnPicturePreviewWrap');
+    const fn      = document.getElementById('txnPictureFilename');
+    if (input1)  input1.value  = '';
+    if (input2)  input2.value  = '';
+    if (preview) preview.src   = '';
+    if (wrap)    wrap.classList.add('hidden');
+    if (fn)      { fn.textContent = ''; fn.classList.add('hidden'); }
 }
 </script>
 </body>
