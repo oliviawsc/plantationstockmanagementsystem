@@ -622,8 +622,8 @@
                     <!-- Picture upload — mandatory before saving -->
                     <div class="md:col-span-2">
                         <label class="block text-sm font-semibold mb-1">
-                            Supporting Picture <span class="text-red-500">*</span>
-                            <span class="text-gray-400 font-normal text-xs ml-1">(Required — photo of delivery note, DO, or site)</span>
+                            Supporting Picture
+                            <span class="text-gray-400 font-normal text-xs ml-1">(Optional — photo of delivery note, DO, or site)</span>
                         </label>
                         <div class="flex flex-wrap gap-3 items-start">
                             <!-- Option 1: Upload from gallery / file system -->
@@ -1934,18 +1934,12 @@ function saveTransaction() {
             parsedRows.push({ qty: baseQty, inputQty: rawQty, inputUnit, loc });
         }
 
-        // Validate picture — mandatory
-        const pictureData = getTxnPictureBase64();
-        if (!pictureData) {
-            alert('Please attach a supporting picture before saving the transaction.');
-            return;
-        }
-
         // Persist one transaction per row
         const baseDate    = document.getElementById('txnDate').value;
         const baseRef     = document.getElementById('txnRef').value.trim();
         const baseRemarks = document.getElementById('txnRemarks').value.trim();
         const baseId      = Date.now();
+        const pictureData = getTxnPictureBase64();
         parsedRows.forEach((r, idx) => {
             transactions.push({
                 id: baseId + idx,
@@ -1992,13 +1986,7 @@ function saveTransaction() {
     const qtyUnitSel= document.getElementById('txnQtyUnit').value;
     const baseQty   = convertToBase(rawQty, qtyUnitSel, item);
     const enteredUnit = qtyUnitSel === 'package' ? (item.packageUnit || item.unit) : (item.baseUnit || item.unit);
-
-    // Validate picture — mandatory
     const pictureData = getTxnPictureBase64();
-    if (!pictureData) {
-        alert('Please attach a supporting picture before saving the transaction.');
-        return;
-    }
 
     const newTxn = {
         id: Date.now(),
