@@ -858,6 +858,8 @@
 
             <!-- Round progress summary - one % per round, aggregated across ALL blocks -->
             <div class="bg-white p-6 rounded-xl shadow mb-8">
+                <h3 class="text-xl font-bold mb-2">a) Manuring Progress by Round</h3>
+                <p class="text-xs text-green-700 mb-4">% Applied per round = Qty Applied (that round) ÷ Budgeted Fertilizer Needed (that round)</p>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead class="bg-green-100 text-green-800">
@@ -876,7 +878,7 @@
 
             <!-- Manuring Application History (moved from Manuring Program) -->
             <div class="bg-white p-6 rounded-xl shadow mb-8">
-                <h3 class="text-xl font-bold mb-2">Progress by Block</h3>
+                <h3 class="text-xl font-bold mb-2">b) Manuring Progress by Block</h3>
                 <p class="text-xs text-green-700 mb-4">% Applied per block = Qty Applied (that block) ÷ Budgeted Fertilizer Needed (that block)</p>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
@@ -1016,7 +1018,6 @@
                         <thead class="bg-orange-100 text-orange-800">
                             <tr>
                                 <th class="px-3 py-2 text-left">Round</th>
-                                <th class="px-3 py-2 text-left">Month</th>
                                 <th class="px-3 py-2 text-left">Ingredient</th>
                                 <th class="px-3 py-2 text-left">Chemical Item</th>
                                 <th class="px-3 py-2 text-right">Total Qty Used</th>
@@ -1041,7 +1042,6 @@
                             <tr>
                                 <th class="px-3 py-2 text-left">Round</th>
                                 <th class="px-3 py-2 text-left">Block</th>
-                                <th class="px-3 py-2 text-left">Month</th>
                                 <th class="px-3 py-2 text-left">Ingredient</th>
                                 <th class="px-3 py-2 text-left">Chemical Item</th>
                                 <th class="px-3 py-2 text-right">Total Qty Used</th>
@@ -2388,7 +2388,7 @@ function renderManuringRounds() {
                     <tfoot>
                         <tr style="background:#f0fdf4;border-top:2px solid #86efac;">
                             <td class="px-3 py-1.5 text-xs font-bold" colspan="2">Total Applied</td>
-                            <td class="px-3 py-1.5 text-xs font-bold text-right text-green-700">${applied.toFixed(2)} bags</td>
+                            <td class="px-3 py-1.5 text-xs font-bold text-right text-green-700">${(getKgPerUnit(r) > 0 ? applied / getKgPerUnit(r) : applied).toFixed(2)} bags</td>
                             <td colspan="2"></td>
                         </tr>
                     </tfoot>
@@ -2471,18 +2471,20 @@ function renderRoundProgress() {
         manuringRounds.forEach(r => {
             const totalApplied = calcRoundTotalApplied(r.id);
             const budget       = calcRoundBudget(r);
+            const kgPerUnit    = getKgPerUnit(r);
+            const appliedBags  = kgPerUnit > 0 ? totalApplied / kgPerUnit : totalApplied;
             let pctCell        = '<span class="text-gray-400">N/A</span>';
             if (budget > 0) {
-                const pct    = (totalApplied / budget) * 100;
+                const pct    = (appliedBags / budget) * 100;
                 const colour = pct >= 100 ? 'text-green-700' : pct >= 50 ? 'text-yellow-700' : 'text-red-600';
-                pctCell      = `<span class="${colour} font-bold">${pct.toFixed(2)}%</span>`;
+                pctCell      = `<span class="${colour} font-bold">${Math.round(pct)}%</span>`;
             }
             const tr = document.createElement('tr');
             tr.className = 'border-b border-green-100 hover:bg-green-50';
             tr.innerHTML = `
                 <td class="px-3 py-2 font-semibold">🌱 ${r.name}</td>
                 <td class="px-3 py-2">${r.fertilizerName}</td>
-                <td class="px-3 py-2 text-right">${parseFloat(totalApplied).toFixed(2)}</td>
+                <td class="px-3 py-2 text-right">${Math.round(appliedBags)} bags</td>
                 <td class="px-3 py-2 text-right">${Math.round(budget)} bags</td>
                 <td class="px-3 py-2 text-right">${pctCell}</td>`;
             body.appendChild(tr);
@@ -2514,9 +2516,12 @@ function renderRoundProgress() {
     }
 
     blockRows.forEach(({ r, blockName, applied, budget }) => {
+        // Convert applied from base unit (kg) to package unit (bags)
+        const kgPerUnit   = getKgPerUnit(r);
+        const appliedBags = kgPerUnit > 0 ? applied / kgPerUnit : applied;
         let pctCell = '<span class="text-gray-400">N/A</span>';
         if (budget > 0) {
-            const pct    = (applied / budget) * 100;
+            const pct    = (appliedBags / budget) * 100;
             const colour = pct >= 100 ? 'text-green-700' : pct >= 50 ? 'text-yellow-700' : 'text-red-600';
 
             // Progress bar
@@ -2527,7 +2532,7 @@ function renderRoundProgress() {
                     <div style="flex:1;background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;">
                         <div style="width:${barW}%;background:${barCol};height:100%;border-radius:99px;"></div>
                     </div>
-                    <span class="${colour} font-bold" style="white-space:nowrap;">${pct.toFixed(1)}%</span>
+                    <span class="${colour} font-bold" style="white-space:nowrap;">${Math.round(pct)}%</span>
                 </div>`;
         }
 
@@ -2539,7 +2544,7 @@ function renderRoundProgress() {
             <td class="px-3 py-2">
                 <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">${blockName}</span>
             </td>
-            <td class="px-3 py-2 text-right font-semibold">${applied.toFixed(2)}</td>
+            <td class="px-3 py-2 text-right font-semibold">${Math.round(appliedBags)}</td>
             <td class="px-3 py-2 text-right">${Math.round(budget)}</td>
             <td class="px-3 py-2">${pctCell}</td>`;
         blockBody.appendChild(tr);
@@ -4783,7 +4788,7 @@ function progressBar(pct) {
             <div style="flex:1;background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;">
                 <div style="width:${clamped.toFixed(1)}%;background:${colour};height:100%;border-radius:99px;"></div>
             </div>
-            <span style="color:${colour};font-weight:700;white-space:nowrap;font-size:0.8rem;">${pct.toFixed(1)}%</span>
+            <span style="color:${colour};font-weight:700;white-space:nowrap;font-size:0.8rem;">${Math.round(pct)}%</span>
         </div>`;
 }
 
@@ -4886,32 +4891,31 @@ function renderChemByRound() {
     body.innerHTML = '';
 
     if (chemIngredients.length === 0 || maintClaims.length === 0) {
-        body.innerHTML = '<tr><td colspan="9" class="px-3 py-3 text-center text-gray-400">No data yet. Add ingredient definitions and maintenance claims.</td></tr>';
+        body.innerHTML = '<tr><td colspan="8" class="px-3 py-3 text-center text-gray-400">No data yet. Add ingredient definitions and maintenance claims.</td></tr>';
         return;
     }
 
-    // For each round+month+ingredient combination
-    const roundMonths = {};
+    // Group claims by round only (no month)
+    const rounds = {};
     maintClaims.forEach(c => {
-        const key = `${c.roundId}||${c.month}`;
-        if (!roundMonths[key]) roundMonths[key] = { roundId: c.roundId, roundName: c.roundName, month: c.month, totalClaimed: 0, blocks: [] };
-        roundMonths[key].totalClaimed += parseFloat(c.claimedArea) || 0;
-        roundMonths[key].blocks.push(c.blockName);
+        const key = String(c.roundId);
+        if (!rounds[key]) rounds[key] = { roundId: c.roundId, roundName: c.roundName, totalClaimed: 0, blocks: [] };
+        rounds[key].totalClaimed += parseFloat(c.claimedArea) || 0;
+        rounds[key].blocks.push(c.blockName);
     });
 
     let hasRows = false;
-    Object.values(roundMonths).forEach(rm => {
+    Object.values(rounds).forEach(rm => {
         chemIngredients.forEach(ci => {
-            // Sum Out transactions for this chemical item linked to this maintenance round in this period
+            // Sum ALL Out transactions for this chemical item linked to this maintenance round
             const totalQty = transactions.filter(t =>
                 t.type === 'Out' &&
                 String(t.itemId) === String(ci.itemId) &&
                 t.maintRoundId &&
-                fieldMaintRounds.some(r => String(r.id) === String(t.maintRoundId) && String(r.id) === String(rm.roundId)) &&
-                t.date && t.date.startsWith(rm.month)
+                fieldMaintRounds.some(r => String(r.id) === String(t.maintRoundId) && String(r.id) === String(rm.roundId))
             ).reduce((s, t) => s + (parseFloat(t.qty) || 0), 0);
 
-            if (totalQty === 0) return; // skip zero-use rows
+            if (totalQty === 0) return;
             hasRows = true;
 
             const usagePerHa = rm.totalClaimed > 0 ? totalQty / rm.totalClaimed : 0;
@@ -4919,7 +4923,6 @@ function renderChemByRound() {
             tr.className = 'border-b border-orange-50 hover:bg-orange-50';
             tr.innerHTML = `
                 <td class="px-3 py-2 font-semibold">🔧 ${rm.roundName}</td>
-                <td class="px-3 py-2">${rm.month}</td>
                 <td class="px-3 py-2 font-semibold text-blue-700">${ci.name}</td>
                 <td class="px-3 py-2">${ci.itemName}</td>
                 <td class="px-3 py-2 text-right">${totalQty.toFixed(2)} ${ci.unit}</td>
@@ -4932,7 +4935,7 @@ function renderChemByRound() {
     });
 
     if (!hasRows) {
-        body.innerHTML = '<tr><td colspan="9" class="px-3 py-3 text-center text-gray-400">No chemical Out transactions linked to maintenance rounds found for the claimed periods.</td></tr>';
+        body.innerHTML = '<tr><td colspan="8" class="px-3 py-3 text-center text-gray-400">No chemical Out transactions linked to maintenance rounds found.</td></tr>';
     }
 }
 
@@ -4943,27 +4946,37 @@ function renderChemByBlock() {
     body.innerHTML = '';
 
     if (chemIngredients.length === 0 || maintClaims.length === 0) {
-        body.innerHTML = '<tr><td colspan="10" class="px-3 py-3 text-center text-gray-400">No data yet. Add ingredient definitions and maintenance claims.</td></tr>';
+        body.innerHTML = '<tr><td colspan="9" class="px-3 py-3 text-center text-gray-400">No data yet. Add ingredient definitions and maintenance claims.</td></tr>';
         return;
     }
 
-    let hasRows = false;
+    // Group claims by round+block (aggregate across all months)
+    const claimsByRoundBlock = {};
     maintClaims.forEach(c => {
+        const key = `${c.roundId}||${c.blockName}`;
+        if (!claimsByRoundBlock[key]) {
+            claimsByRoundBlock[key] = { roundId: c.roundId, roundName: c.roundName, blockName: c.blockName, totalClaimed: 0 };
+        }
+        claimsByRoundBlock[key].totalClaimed += parseFloat(c.claimedArea) || 0;
+    });
+
+    let hasRows = false;
+    Object.values(claimsByRoundBlock).forEach(c => {
         chemIngredients.forEach(ci => {
+            // Sum ALL Out transactions for this chemical at this block linked to this round
             const totalQty = transactions.filter(t =>
                 t.type === 'Out' &&
                 String(t.itemId) === String(ci.itemId) &&
                 t.location === c.blockName &&
                 t.maintRoundId &&
-                fieldMaintRounds.some(r => String(r.id) === String(t.maintRoundId) && String(r.id) === String(c.roundId)) &&
-                t.date && t.date.startsWith(c.month)
+                fieldMaintRounds.some(r => String(r.id) === String(t.maintRoundId) && String(r.id) === String(c.roundId))
             ).reduce((s, t) => s + (parseFloat(t.qty) || 0), 0);
 
             if (totalQty === 0) return;
             hasRows = true;
 
-            const claimed     = parseFloat(c.claimedArea) || 0;
-            const usagePerHa  = claimed > 0 ? totalQty / claimed : 0;
+            const claimed    = parseFloat(c.totalClaimed) || 0;
+            const usagePerHa = claimed > 0 ? totalQty / claimed : 0;
 
             const tr = document.createElement('tr');
             tr.className = 'border-b border-orange-50 hover:bg-orange-50';
@@ -4972,7 +4985,6 @@ function renderChemByBlock() {
                 <td class="px-3 py-2">
                     <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">${c.blockName}</span>
                 </td>
-                <td class="px-3 py-2">${c.month}</td>
                 <td class="px-3 py-2 font-semibold text-blue-700">${ci.name}</td>
                 <td class="px-3 py-2">${ci.itemName}</td>
                 <td class="px-3 py-2 text-right">${totalQty.toFixed(2)} ${ci.unit}</td>
@@ -4985,7 +4997,7 @@ function renderChemByBlock() {
     });
 
     if (!hasRows) {
-        body.innerHTML = '<tr><td colspan="10" class="px-3 py-3 text-center text-gray-400">No chemical Out transactions linked to maintenance rounds found for the claimed periods.</td></tr>';
+        body.innerHTML = '<tr><td colspan="9" class="px-3 py-3 text-center text-gray-400">No chemical Out transactions linked to maintenance rounds found.</td></tr>';
     }
 }
 
