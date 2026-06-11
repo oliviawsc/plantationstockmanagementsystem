@@ -1681,6 +1681,7 @@ function saveItem() {
 // Render existing items table
 function renderItemsTable() {
     const body = document.getElementById('itemsTableBody');
+    if (!body) return;
     body.innerHTML = '';
     if (items.length === 0) {
         body.innerHTML = '<tr><td colspan="9" class="px-3 py-4 text-center text-gray-500">No items yet.</td></tr>';
@@ -1811,6 +1812,7 @@ function saveLocation() {
 // Render location grid
 function renderLocationGrid() {
     const grid = document.getElementById('locGrid');
+    if (!grid) return;
     grid.innerHTML = '';
 
     // Totals (always recompute, even when empty)
@@ -2295,6 +2297,7 @@ function toggleRoundTxns(roundId) {
 // Render the rounds master table with collapsible transaction sub-rows
 function renderManuringRounds() {
     const body = document.getElementById('manuringRoundsBody');
+    if (!body) return;
     body.innerHTML = '';
     if (manuringRounds.length === 0) {
         body.innerHTML = '<tr><td colspan="7" class="px-3 py-4 text-center text-gray-500">No manuring rounds defined yet.</td></tr>';
@@ -2460,6 +2463,7 @@ function calcBlockApplied(roundId, blockName) {
 function renderRoundProgress() {
     // ── Overall round summary ──────────────────────────────────────
     const body = document.getElementById('roundProgressBody');
+    if (!body) return;
     body.innerHTML = '';
     if (manuringRounds.length === 0) {
         body.innerHTML = '<tr><td colspan="5" class="px-3 py-4 text-center text-gray-500">No manuring rounds defined yet.</td></tr>';
@@ -2590,6 +2594,7 @@ function filterTxnItemsByCategory() {
 
 function populateLocationDropdowns() {
     const sel = document.getElementById('txnLocation');
+    if (!sel) return;
     sel.innerHTML = '<option value="None/Storage">None/Storage</option>' +
         locations.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
 }
@@ -2611,6 +2616,7 @@ function calcOnHand(itemId) {
 
 function renderLiveStock() {
     const body = document.getElementById('liveStockBody');
+    if (!body) return;
     body.innerHTML = '';
     if (items.length === 0) {
         body.innerHTML = '<tr><td colspan="5" class="px-3 py-4 text-center text-gray-500">No items defined yet.</td></tr>';
@@ -2701,6 +2707,7 @@ function calcBalanceUpTo(itemId, refTxn) {
 function renderSummary() {
     currentFilteredTxns = getFilteredTransactions();
     const body = document.getElementById('summaryBody');
+    if (!body) return;
     body.innerHTML = '';
     if (currentFilteredTxns.length === 0) {
         body.innerHTML = '<tr><td colspan="9" class="px-3 py-4 text-center text-gray-500">No transactions match the current filters.</td></tr>';
@@ -2855,13 +2862,16 @@ document.getElementById('exportExcelBtn').addEventListener('click', () => {
    ----------------------------------------------------------------- */
 function renderDashboard() {
     // Total item types
-    document.getElementById('dashTotalItems').textContent = items.length;
+    const dashTotalItems = document.getElementById('dashTotalItems');
+    if (!dashTotalItems) return;
+    dashTotalItems.textContent = items.length;
 
     // Low stock alerts (Chemicals only)
     const lowStockCount = items.filter(it =>
         it.category === 'Chemical' && calcOnHand(it.id) <= it.threshold
     ).length;
-    document.getElementById('dashLowStock').textContent = lowStockCount;
+    const dashLowStock = document.getElementById('dashLowStock');
+    if (dashLowStock) dashLowStock.textContent = lowStockCount;
 
     // Monthly usage (sum of "Out" qty within current month)
     const now = new Date();
