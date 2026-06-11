@@ -271,11 +271,11 @@
             <button data-target="locations"    class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium" data-i18n="nav_locations">📍 Location Area</button>
             <button data-target="manuring"     class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium" data-i18n="nav_manuring">🌱 Manuring Program</button>
             <button data-target="roundprogress" class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium" data-i18n="nav_roundprogress">📈 Manuring Progress</button>
-            <button data-target="fieldmaint"   class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium">🔧 Maintenance Program</button>
-            <button data-target="maintprogress" class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium">📊 Maint. Progress & Chemical</button>
+            <button data-target="fieldmaint"   class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium" data-i18n="nav_fieldmaint">🔧 Maintenance Program</button>
+            <button data-target="maintprogress" class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium" data-i18n="nav_maintprogress">📊 Maintenance Progress &amp; Chemical Usage</button>
             <!-- Super Admin only nav item — shown/hidden by auth JS -->
             <button data-target="useradmin" id="navUserAdmin"
-                class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium hidden">
+                class="nav-item w-full text-left px-4 py-2 rounded-lg font-medium hidden" data-i18n="nav_useradmin">
                 👤 User Management
             </button>
         </nav>
@@ -805,12 +805,12 @@
                     <!-- Block selection — only blocks ticked here are included in this round -->
                     <div class="md:col-span-2">
                         <div class="flex items-center justify-between mb-2">
-                            <label class="block text-sm font-semibold">Blocks Involved <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
+                            <label class="block text-sm font-semibold" data-i18n="fm_lbl_blocks">Blocks Involved <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
                             <div class="flex gap-2">
                                 <button type="button" onclick="mrSelectAllBlocks(true)"
-                                    class="text-xs bg-green-100 hover:bg-green-200 text-green-800 font-semibold px-3 py-1 rounded">✔ Select All</button>
+                                    class="text-xs bg-green-100 hover:bg-green-200 text-green-800 font-semibold px-3 py-1 rounded" data-i18n="btn_select_all">✔ Select All</button>
                                 <button type="button" onclick="mrSelectAllBlocks(false)"
-                                    class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-3 py-1 rounded">✖ Clear All</button>
+                                    class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-3 py-1 rounded" data-i18n="btn_clear_all">✖ Clear All</button>
                             </div>
                         </div>
                         <div id="mrBlocksGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 border border-green-200 rounded-lg p-3 bg-green-50">
@@ -838,10 +838,10 @@
                             <tr>
                                 <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
                                 <th class="px-3 py-2 text-left" data-i18n="manuring_lbl_fertilizer">Fertilizer</th>
-                                <th class="px-3 py-2 text-left">Blocks Involved</th>
+                                <th data-i18n="fm_col_blocks" class="px-3 py-2 text-left">Blocks Involved</th>
                                 <th class="px-3 py-2 text-right" data-i18n="col_budgeted">Budgeted Fertilizer Needed</th>
                                 <th class="px-3 py-2 text-left" data-i18n="manuring_lbl_notes">Notes</th>
-                                <th class="px-3 py-2 text-left">Transactions</th>
+                                <th data-i18n="fm_col_transactions" class="px-3 py-2 text-left">Transactions</th>
                                 <th class="px-3 py-2 text-left" data-i18n="col_action">Action</th>
                             </tr>
                         </thead>
@@ -858,7 +858,7 @@
 
             <!-- Round progress summary - one % per round, aggregated across ALL blocks -->
             <div class="bg-white p-6 rounded-xl shadow mb-8">
-                <h3 class="text-xl font-bold mb-2">a) Manuring Progress by Round</h3>
+                <h3 class="text-xl font-bold mb-2" data-i18n="rp_title_a">a) Manuring Progress by Round</h3>
                 <p class="text-xs text-green-700 mb-4">% Applied per round = Qty Applied (that round) ÷ Budgeted Fertilizer Needed (that round)</p>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
@@ -887,8 +887,8 @@
                                 <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
                                 <th class="px-3 py-2 text-left" data-i18n="manuring_lbl_fertilizer">Fertilizer</th>
                                 <th class="px-3 py-2 text-left" data-i18n="col_block">Block</th>
-                                <th class="px-3 py-2 text-right">Applied (bags)</th>
-                                <th class="px-3 py-2 text-right">Budgeted (bags)</th>
+                                <th data-i18n="rp_col_applied_bags" class="px-3 py-2 text-right">Applied (bags)</th>
+                                <th data-i18n="rp_col_budgeted_bags" class="px-3 py-2 text-right">Budgeted (bags)</th>
                                 <th class="px-3 py-2 text-right" data-i18n="col_pct_applied">% Applied</th>
                             </tr>
                         </thead>
@@ -901,32 +901,32 @@
 
         <!-- ============ PAGE 9: FIELD MAINTENANCE PROGRAM ============ -->
         <section id="fieldmaint" class="page-section">
-            <h2 class="text-3xl font-bold mb-2">🔧 Maintenance Program</h2>
-            <p class="text-sm text-green-700 mb-6">Define maintenance rounds for field activities. Each round specifies the blocks involved and relevant notes.</p>
+            <h2 class="text-3xl font-bold mb-2" data-i18n="page_fieldmaint">🔧 Maintenance Program</h2>
+            <p class="text-sm text-green-700 mb-6" data-i18n="page_fieldmaint_sub">Define maintenance rounds for field activities. Each round specifies the blocks involved and relevant notes.</p>
 
             <!-- Add / Edit Maintenance Round form -->
             <div class="bg-white p-6 rounded-xl shadow mb-8">
-                <h3 class="text-xl font-bold mb-4" id="fmFormTitle">Add Maintenance Round</h3>
+                <h3 class="text-xl font-bold mb-4" id="fmFormTitle" data-i18n="fm_form_title">Add Maintenance Round</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Round Name <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="fm_lbl_round_name">Round Name <span class="text-red-500">*</span></label>
                         <input id="fmName" type="text" placeholder="e.g. Weeding Round 1 - 2026"
                             class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Notes</label>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="fm_lbl_notes">Notes</label>
                         <textarea id="fmNotes" rows="2" placeholder="e.g. Mechanical weeding along main road"
                             class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600"></textarea>
                     </div>
                     <!-- Blocks Involved -->
                     <div class="md:col-span-2">
                         <div class="flex items-center justify-between mb-2">
-                            <label class="block text-sm font-semibold">Blocks Involved <span class="text-gray-400 font-normal text-xs">(optional — leave blank to apply to all blocks)</span></label>
+                            <label class="block text-sm font-semibold" data-i18n="fm_lbl_blocks">Blocks Involved <span class="text-gray-400 font-normal text-xs">(optional — leave blank to apply to all blocks)</span></label>
                             <div class="flex gap-2">
                                 <button type="button" onclick="fmSelectAllBlocks(true)"
-                                    class="text-xs bg-green-100 hover:bg-green-200 text-green-800 font-semibold px-3 py-1 rounded">✔ Select All</button>
+                                    class="text-xs bg-green-100 hover:bg-green-200 text-green-800 font-semibold px-3 py-1 rounded" data-i18n="btn_select_all">✔ Select All</button>
                                 <button type="button" onclick="fmSelectAllBlocks(false)"
-                                    class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-3 py-1 rounded">✖ Clear All</button>
+                                    class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-3 py-1 rounded" data-i18n="btn_clear_all">✖ Clear All</button>
                             </div>
                         </div>
                         <div id="fmBlocksGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 border border-green-200 rounded-lg p-3 bg-green-50">
@@ -944,16 +944,16 @@
 
             <!-- Defined Maintenance Rounds -->
             <div class="bg-white p-6 rounded-xl shadow">
-                <h3 class="text-xl font-bold mb-4">Defined Maintenance Rounds</h3>
+                <h3 class="text-xl font-bold mb-4" data-i18n="fm_defined_title">Defined Maintenance Rounds</h3>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead class="bg-green-100 text-green-800">
                             <tr>
-                                <th class="px-3 py-2 text-left">Round Name</th>
-                                <th class="px-3 py-2 text-left">Blocks Involved</th>
-                                <th class="px-3 py-2 text-left">Notes</th>
-                                <th class="px-3 py-2 text-left">Date Created</th>
-                                <th class="px-3 py-2 text-left">Action</th>
+                                <th data-i18n="fm_col_round_name" class="px-3 py-2 text-left">Round Name</th>
+                                <th data-i18n="fm_col_blocks" class="px-3 py-2 text-left">Blocks Involved</th>
+                                <th data-i18n="fm_col_notes" class="px-3 py-2 text-left">Notes</th>
+                                <th data-i18n="fm_col_created" class="px-3 py-2 text-left">Date Created</th>
+                                <th data-i18n="col_action" class="px-3 py-2 text-left">Action</th>
                             </tr>
                         </thead>
                         <tbody id="fmRoundsBody"></tbody>
@@ -964,22 +964,22 @@
 
         <!-- ============ PAGE 10: MAINTENANCE PROGRESS & CHEMICAL USAGE ============ -->
         <section id="maintprogress" class="page-section">
-            <h2 class="text-3xl font-bold mb-2">📊 Maintenance Progress &amp; Chemical Usage</h2>
-            <p class="text-sm text-green-700 mb-6">Record claimed maintenance area per block/round, set chemical ingredient dosage rates, and view progress &amp; chemical usage per HA.</p>
+            <h2 class="text-3xl font-bold mb-2" data-i18n="page_maintprogress">📊 Maintenance Progress &amp; Chemical Usage</h2>
+            <p class="text-sm text-green-700 mb-6" data-i18n="page_maintprogress_sub">Record claimed maintenance area per block/round, set chemical ingredient dosage rates, and view progress &amp; chemical usage per HA.</p>
 
             <!-- ── a) Maintenance Progress by Round ── -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <h3 class="text-xl font-bold mb-2">a) Maintenance Progress by Round</h3>
+                <h3 class="text-xl font-bold mb-2" data-i18n="mp_title_a">a) Maintenance Progress by Round</h3>
                 <p class="text-xs text-green-700 mb-4">% Progress = Total Claimed Area ÷ Total Block Area of selected blocks in the round</p>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead class="bg-green-100 text-green-800">
                             <tr>
-                                <th class="px-3 py-2 text-left">Round</th>
-                                <th class="px-3 py-2 text-left">Month</th>
-                                <th class="px-3 py-2 text-right">Total Block Area (Ha)</th>
-                                <th class="px-3 py-2 text-right">Total Claimed (Ha)</th>
-                                <th class="px-3 py-2 text-right">% Progress</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_date_month">Month</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_total_area">Total Block Area (Ha)</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_claimed">Total Claimed (Ha)</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_pct">% Progress</th>
                             </tr>
                         </thead>
                         <tbody id="mpByRoundBody"></tbody>
@@ -989,19 +989,19 @@
 
             <!-- ── b) Maintenance Progress by Block ── -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <h3 class="text-xl font-bold mb-2">b) Maintenance Progress by Block</h3>
+                <h3 class="text-xl font-bold mb-2" data-i18n="mp_title_b">b) Maintenance Progress by Block</h3>
                 <p class="text-xs text-green-700 mb-4">% Progress = Claimed Area ÷ Block Area × 100</p>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead class="bg-green-100 text-green-800">
                             <tr>
-                                <th class="px-3 py-2 text-left">Round</th>
-                                <th class="px-3 py-2 text-left">Block</th>
-                                <th class="px-3 py-2 text-left">Month</th>
-                                <th class="px-3 py-2 text-right">Block Area (Ha)</th>
-                                <th class="px-3 py-2 text-right">Claimed Area (Ha)</th>
-                                <th class="px-3 py-2 text-right">% Progress</th>
-                                <th class="px-3 py-2 text-left">Action</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_block">Block</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_date_month">Month</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_block_area">Block Area (Ha)</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_claimed_area">Claimed Area (Ha)</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_pct">% Progress</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_action">Action</th>
                             </tr>
                         </thead>
                         <tbody id="mpByBlockBody"></tbody>
@@ -1011,20 +1011,20 @@
 
             <!-- ── c) Chemical Usage per HA by Round ── -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <h3 class="text-xl font-bold mb-2">c) Chemical Usage per HA by Round</h3>
+                <h3 class="text-xl font-bold mb-2" data-i18n="mp_title_c">c) Chemical Usage per HA by Round</h3>
                 <p class="text-xs text-green-700 mb-4">Usage / Ha = Total Qty Used ÷ Total Claimed Area (Ha). Highlighted red if exceeding max dosage.</p>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead class="bg-orange-100 text-orange-800">
                             <tr>
-                                <th class="px-3 py-2 text-left">Round</th>
-                                <th class="px-3 py-2 text-left">Ingredient</th>
-                                <th class="px-3 py-2 text-left">Chemical Item</th>
-                                <th class="px-3 py-2 text-right">Total Qty Used</th>
-                                <th class="px-3 py-2 text-right">Claimed Area (Ha)</th>
-                                <th class="px-3 py-2 text-right">Usage / Ha</th>
-                                <th class="px-3 py-2 text-right">Max Dosage / Ha</th>
-                                <th class="px-3 py-2 text-left">Status</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
+                                <th class="px-3 py-2 text-left" data-i18n="ci_lbl_name">Ingredient</th>
+                                <th class="px-3 py-2 text-left" data-i18n="ci_col_chemical">Chemical Item</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_total_qty">Total Qty Used</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_claimed">Total Claimed (Ha)</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_usage_ha">Usage / Ha</th>
+                                <th class="px-3 py-2 text-right" data-i18n="ci_col_max_dosage">Max Dosage / Ha</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_status">Status</th>
                             </tr>
                         </thead>
                         <tbody id="chemByRoundBody"></tbody>
@@ -1034,21 +1034,21 @@
 
             <!-- ── d) Chemical Usage per HA by Block ── -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <h3 class="text-xl font-bold mb-2">d) Chemical Usage per HA by Block</h3>
+                <h3 class="text-xl font-bold mb-2" data-i18n="mp_title_d">d) Chemical Usage per HA by Block</h3>
                 <p class="text-xs text-green-700 mb-4">Usage / Ha = Total Qty Used (that block) ÷ Claimed Area (Ha) for that block. Highlighted red if exceeding max dosage.</p>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead class="bg-orange-100 text-orange-800">
                             <tr>
-                                <th class="px-3 py-2 text-left">Round</th>
-                                <th class="px-3 py-2 text-left">Block</th>
-                                <th class="px-3 py-2 text-left">Ingredient</th>
-                                <th class="px-3 py-2 text-left">Chemical Item</th>
-                                <th class="px-3 py-2 text-right">Total Qty Used</th>
-                                <th class="px-3 py-2 text-right">Claimed Area (Ha)</th>
-                                <th class="px-3 py-2 text-right">Usage / Ha</th>
-                                <th class="px-3 py-2 text-right">Max Dosage / Ha</th>
-                                <th class="px-3 py-2 text-left">Status</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_block">Block</th>
+                                <th class="px-3 py-2 text-left" data-i18n="ci_lbl_name">Ingredient</th>
+                                <th class="px-3 py-2 text-left" data-i18n="ci_col_chemical">Chemical Item</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_total_qty">Total Qty Used</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_claimed_area">Claimed Area (Ha)</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_usage_ha">Usage / Ha</th>
+                                <th class="px-3 py-2 text-right" data-i18n="ci_col_max_dosage">Max Dosage / Ha</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_status">Status</th>
                             </tr>
                         </thead>
                         <tbody id="chemByBlockBody"></tbody>
@@ -1058,40 +1058,40 @@
 
             <!-- ── Claim Entry Form (below Progress by Block table) ── -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <h3 class="text-xl font-bold mb-4" id="mpFormTitle">➕ Add Maintenance Claim</h3>
+                <h3 class="text-xl font-bold mb-4" id="mpFormTitle" data-i18n="mp_form_title">➕ Add Maintenance Claim</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <input type="hidden" id="mpEditId" value="" />
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Maintenance Round <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="mp_lbl_round">Maintenance Round <span class="text-red-500">*</span></label>
                         <select id="mpRound" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600"
                             onchange="updateMpBlocksByRound()">
                             <option value="">-- Select Round --</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Block <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="mp_lbl_block">Block <span class="text-red-500">*</span></label>
                         <select id="mpBlock" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
                             <option value="">-- Select Block --</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Claimed Maintenance Area (Ha) <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="mp_lbl_area">Claimed Maintenance Area (Ha) <span class="text-red-500">*</span></label>
                         <input id="mpClaimedArea" type="number" min="0" step="0.01" placeholder="e.g. 12.5"
                             class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Month of Claim <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="mp_lbl_month">Month of Claim <span class="text-red-500">*</span></label>
                         <input id="mpMonth" type="month"
                             class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                     </div>
                     <div class="flex items-end gap-2">
                         <button type="button" onclick="saveMaintClaim()"
-                            id="mpSaveBtn"
+                            id="mpSaveBtn" data-i18n="mp_btn_save"
                             class="flex-1 bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold">
                             Save Claim
                         </button>
                         <button type="button" onclick="cancelEditMaintClaim()"
-                            id="mpCancelBtn"
+                            id="mpCancelBtn" data-i18n="btn_cancel"
                             class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg font-semibold">
                             Cancel
                         </button>
@@ -1101,23 +1101,23 @@
 
             <!-- ── Chemical Ingredient Setup ── -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <h3 class="text-xl font-bold mb-4" id="ciFormTitle">🧪 Chemical Ingredient Setup</h3>
+                <h3 class="text-xl font-bold mb-4" id="ciFormTitle" data-i18n="ci_form_title">🧪 Chemical Ingredient Setup</h3>
                 <p class="text-xs text-green-700 mb-4">Define active ingredients and link them to chemical items. Set the maximum dosage rate per HA for monitoring over-application.</p>
                 <input type="hidden" id="ciEditId" value="" />
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Ingredient Name <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="ci_lbl_name">Ingredient Name <span class="text-red-500">*</span></label>
                         <input id="ciName" type="text" placeholder="e.g. Glyphosate"
                             class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Linked Chemical Item <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="ci_lbl_item">Linked Chemical Item <span class="text-red-500">*</span></label>
                         <select id="ciItem" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
                             <option value="">-- Select Chemical --</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Unit</label>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="ci_lbl_unit">Unit</label>
                         <select id="ciUnit" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
                             <option value="litre">Litre / Ha</option>
                             <option value="gram">Gram / Ha</option>
@@ -1126,14 +1126,14 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Max Dosage Rate <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="ci_lbl_dosage">Max Dosage Rate <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
                         <input id="ciMaxDosage" type="number" min="0" step="0.001" placeholder="e.g. 3.0"
                             class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                     </div>
                 </div>
                 <div class="flex gap-2">
                     <button type="button" onclick="saveChemIngredient()"
-                        id="ciSaveBtn"
+                        id="ciSaveBtn" data-i18n="ci_btn_save"
                         class="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg font-semibold">
                         Save Ingredient
                     </button>
@@ -1148,11 +1148,11 @@
                     <table class="min-w-full text-sm">
                         <thead class="bg-blue-50 text-blue-800">
                             <tr>
-                                <th class="px-3 py-2 text-left">Ingredient</th>
-                                <th class="px-3 py-2 text-left">Linked Chemical</th>
-                                <th class="px-3 py-2 text-left">Unit</th>
-                                <th class="px-3 py-2 text-right">Max Dosage / Ha</th>
-                                <th class="px-3 py-2 text-left">Action</th>
+                                <th class="px-3 py-2 text-left" data-i18n="ci_lbl_name">Ingredient</th>
+                                <th class="px-3 py-2 text-left" data-i18n="ci_col_chemical">Linked Chemical</th>
+                                <th class="px-3 py-2 text-left" data-i18n="ci_lbl_unit">Unit</th>
+                                <th class="px-3 py-2 text-right" data-i18n="ci_col_max_dosage">Max Dosage / Ha</th>
+                                <th data-i18n="col_action" class="px-3 py-2 text-left">Action</th>
                             </tr>
                         </thead>
                         <tbody id="ciTableBody"></tbody>
@@ -1163,7 +1163,7 @@
 
         <!-- ============ PAGE 11: USER MANAGEMENT (Super Admin only) ============ -->
         <section id="useradmin" class="page-section">
-            <h2 class="text-3xl font-bold mb-2">👤 User Management</h2>
+            <h2 class="text-3xl font-bold mb-2" data-i18n="page_useradmin">👤 User Management</h2>
             <p class="text-sm text-green-700 mb-6">Register normal users, assign their estate, and control which sections they can access.</p>
 
             <!-- Register new user -->
@@ -1229,7 +1229,7 @@
                                 <th class="px-3 py-2 text-left">Email</th>
                                 <th class="px-3 py-2 text-left">Estate</th>
                                 <th class="px-3 py-2 text-left">Sections Allowed</th>
-                                <th class="px-3 py-2 text-left">Action</th>
+                                <th data-i18n="col_action" class="px-3 py-2 text-left">Action</th>
                             </tr>
                         </thead>
                         <tbody id="usersTableBody"></tbody>
@@ -2324,8 +2324,8 @@ function renderManuringRounds() {
 
         // Transactions toggle button label
         const toggleLabel = txnCount > 0
-            ? `▼ Show (${txnCount})`
-            : `▼ Show (0)`;
+            ? `${currentLang==='ms'?'▼ Papar':'▼ Show'} (${txnCount})`
+            : `${currentLang==='ms'?'▼ Papar':'▼ Show'} (0)`;
 
         // ── Main round row ──
         const mainRow    = document.createElement('tr');
@@ -2377,17 +2377,17 @@ function renderManuringRounds() {
                 <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
                     <thead>
                         <tr style="background:#dcfce7;color:#166534;">
-                            <th class="px-3 py-1.5 text-left">Date</th>
-                            <th class="px-3 py-1.5 text-left">Block / Location</th>
-                            <th class="px-3 py-1.5 text-right">Qty Applied (bags)</th>
-                            <th class="px-3 py-1.5 text-left">Ref / DO</th>
-                            <th class="px-3 py-1.5 text-left">Remarks</th>
+                            <th class="px-3 py-1.5 text-left">${currentLang==='ms'?'Tarikh':'Date'}</th>
+                            <th class="px-3 py-1.5 text-left">${currentLang==='ms'?'Blok / Lokasi':'Block / Location'}</th>
+                            <th class="px-3 py-1.5 text-right">${currentLang==='ms'?'Kuantiti Digunakan (beg)':'Qty Applied (bags)'}</th>
+                            <th class="px-3 py-1.5 text-left">${currentLang==='ms'?'Ref / No. DO':'Ref / DO'}</th>
+                            <th class="px-3 py-1.5 text-left">${currentLang==='ms'?'Catatan':'Remarks'}</th>
                         </tr>
                     </thead>
                     <tbody>${txnRows}</tbody>
                     <tfoot>
                         <tr style="background:#f0fdf4;border-top:2px solid #86efac;">
-                            <td class="px-3 py-1.5 text-xs font-bold" colspan="2">Total Applied</td>
+                            <td class="px-3 py-1.5 text-xs font-bold" colspan="2">${currentLang==='ms'?'Jumlah Digunakan':'Total Applied'}</td>
                             <td class="px-3 py-1.5 text-xs font-bold text-right text-green-700">${(getKgPerUnit(r) > 0 ? applied / getKgPerUnit(r) : applied).toFixed(2)} bags</td>
                             <td colspan="2"></td>
                         </tr>
@@ -3639,6 +3639,66 @@ const I18N = {
         chart_sub_fertilizer:'On Hand quantity for all fertilizer items',
         chart_sub_chemical:  'On Hand quantity for all chemical items — red bars indicate low stock',
         chart_sub_seedling:  'On Hand quantity for oil palm seedling',
+
+        /* Maintenance Program (fieldmaint) */
+        nav_fieldmaint:      '🔧 Maintenance Program',
+        nav_maintprogress:   '📊 Maintenance Progress & Chemical Usage',
+        nav_useradmin:       '👤 User Management',
+        page_fieldmaint:     '🔧 Maintenance Program',
+        page_maintprogress:  '📊 Maintenance Progress &amp; Chemical Usage',
+        page_useradmin:      '👤 User Management',
+        page_fieldmaint_sub: 'Define maintenance rounds for field activities. Each round specifies the blocks involved and relevant notes.',
+        page_maintprogress_sub: 'Record claimed maintenance area per block/round, set chemical ingredient dosage rates, and view progress &amp; chemical usage per HA.',
+        fm_form_title:       'Add Maintenance Round',
+        fm_defined_title:    'Defined Maintenance Rounds',
+        fm_col_round_name:   'Round Name',
+        fm_col_blocks:       'Blocks Involved',
+        fm_col_notes:        'Notes',
+        fm_col_created:      'Date Created',
+        fm_col_transactions: 'Transactions',
+        fm_lbl_round_name:   'Round Name',
+        fm_lbl_blocks:       'Blocks Involved',
+        fm_lbl_notes:        'Notes',
+        fm_btn_save:         'Save Round',
+        btn_select_all:      '✔ Select All',
+        btn_clear_all:       '✖ Clear All',
+        /* Manuring Progress (roundprogress) */
+        rp_title_a:          'a) Manuring Progress by Round',
+        rp_title_b:          'b) Manuring Progress by Block',
+        rp_col_fertilizer:   'Fertilizer',
+        rp_col_total_applied:'Total Applied',
+        rp_col_budgeted:     'Budgeted',
+        rp_col_pct_applied:  '% Applied',
+        rp_col_applied_bags: 'Applied (bags)',
+        rp_col_budgeted_bags:'Budgeted (bags)',
+        /* Maintenance Progress & Chemical (maintprogress) */
+        mp_title_a:          'a) Maintenance Progress by Round',
+        mp_title_b:          'b) Maintenance Progress by Block',
+        mp_title_c:          'c) Chemical Usage per HA by Round',
+        mp_title_d:          'd) Chemical Usage per HA by Block',
+        mp_form_title:       '➕ Add Maintenance Claim',
+        mp_lbl_round:        'Maintenance Round',
+        mp_lbl_block:        'Block',
+        mp_lbl_area:         'Claimed Maintenance Area (Ha)',
+        mp_lbl_month:        'Month of Claim',
+        mp_btn_save:         'Save Claim',
+        mp_col_total_area:   'Total Block Area (Ha)',
+        mp_col_claimed:      'Total Claimed (Ha)',
+        mp_col_claimed_area: 'Claimed Area (Ha)',
+        mp_col_block_area:   'Block Area (Ha)',
+        mp_col_pct:          '% Progress',
+        mp_col_total_qty:    'Total Qty Used',
+        mp_col_usage_ha:     'Usage / Ha',
+        col_date_month:      'Month',
+        /* Chemical Ingredient Setup */
+        ci_form_title:       '🧪 Chemical Ingredient Setup',
+        ci_lbl_name:         'Ingredient Name',
+        ci_lbl_item:         'Linked Chemical Item',
+        ci_lbl_unit:         'Unit',
+        ci_lbl_dosage:       'Max Dosage Rate (optional)',
+        ci_btn_save:         'Save Ingredient',
+        ci_col_chemical:     'Linked Chemical',
+        ci_col_max_dosage:   'Max Dosage / Ha',
     },
 
     ms: {
@@ -3726,6 +3786,8 @@ const I18N = {
         loc_lbl_palms:       'Bilangan Pokok Sawit',
         btn_save_loc:        'Simpan Lokasi',
         btn_cancel_edit:     'Batal Edit',
+        btn_select_all:      '✔ Pilih Semua',
+        btn_clear_all:       '✖ Kosongkan Semua',
         loc_import_title:    'Import Lokasi dari Fail',
         loc_import_hint:     'Muat naik fail <b>CSV</b> atau <b>Excel (.xlsx)</b> dengan lajur: <code class="bg-green-100 px-1 rounded">Block Name</code>, <code class="bg-green-100 px-1 rounded">Area (Ha)</code>, <code class="bg-green-100 px-1 rounded">No. of Palm</code>. Nama blok yang sama akan dilangkau.',
         btn_choose_file:     '📂 Pilih Fail',
@@ -3760,6 +3822,67 @@ const I18N = {
         chart_sub_fertilizer:'Kuantiti stok semasa untuk semua item baja',
         chart_sub_chemical:  'Kuantiti stok semasa untuk semua item bahan kimia — bar merah menunjukkan stok rendah',
         chart_sub_seedling:  'Kuantiti stok semasa untuk anak pokok sawit',
+
+        /* Maintenance Program (fieldmaint) */
+        nav_fieldmaint:      '🔧 Program Penyelenggaraan',
+        nav_maintprogress:   '📊 Kemajuan Penyelenggaraan & Penggunaan Kimia',
+        nav_useradmin:       '👤 Pengurusan Pengguna',
+        page_fieldmaint:     '🔧 Program Penyelenggaraan',
+        page_maintprogress:  '📊 Kemajuan Penyelenggaraan &amp; Penggunaan Kimia',
+        page_useradmin:      '👤 Pengurusan Pengguna',
+        page_fieldmaint_sub: 'Tentukan pusingan penyelenggaraan untuk aktiviti ladang. Setiap pusingan menentukan blok terlibat dan nota berkaitan.',
+        page_maintprogress_sub: 'Rekod kawasan penyelenggaraan dituntut mengikut blok/pusingan, tetapkan kadar dos bahan aktif, dan lihat kemajuan &amp; penggunaan kimia per HA.',
+        fm_form_title:       'Tambah Pusingan Penyelenggaraan',
+        fm_defined_title:    'Pusingan Penyelenggaraan Ditetapkan',
+        fm_col_round_name:   'Nama Pusingan',
+        fm_col_blocks:       'Blok Terlibat',
+        fm_col_notes:        'Nota',
+        fm_col_created:      'Tarikh Dicipta',
+        fm_col_transactions: 'Transaksi',
+        fm_lbl_round_name:   'Nama Pusingan',
+        fm_lbl_blocks:       'Blok Terlibat',
+        fm_lbl_notes:        'Nota',
+        fm_btn_save:         'Simpan Pusingan',
+
+        /* Manuring Progress (roundprogress) */
+        rp_title_a:          'a) Kemajuan Pembajaan Mengikut Pusingan',
+        rp_title_b:          'b) Kemajuan Pembajaan Mengikut Blok',
+        rp_col_fertilizer:   'Baja',
+        rp_col_total_applied:'Jumlah Digunakan',
+        rp_col_budgeted:     'Keperluan (Bajet)',
+        rp_col_pct_applied:  '% Digunakan',
+        rp_col_applied_bags: 'Digunakan (beg)',
+        rp_col_budgeted_bags:'Keperluan (beg)',
+
+        /* Maintenance Progress & Chemical (maintprogress) */
+        mp_title_a:          'a) Kemajuan Penyelenggaraan Mengikut Pusingan',
+        mp_title_b:          'b) Kemajuan Penyelenggaraan Mengikut Blok',
+        mp_title_c:          'c) Penggunaan Kimia per HA Mengikut Pusingan',
+        mp_title_d:          'd) Penggunaan Kimia per HA Mengikut Blok',
+        mp_form_title:       '➕ Tambah Tuntutan Penyelenggaraan',
+        mp_lbl_round:        'Pusingan Penyelenggaraan',
+        mp_lbl_block:        'Blok',
+        mp_lbl_area:         'Kawasan Penyelenggaraan Dituntut (Ha)',
+        mp_lbl_month:        'Bulan Tuntutan',
+        mp_btn_save:         'Simpan Tuntutan',
+        mp_col_total_area:   'Jumlah Kawasan Blok (Ha)',
+        mp_col_claimed:      'Jumlah Dituntut (Ha)',
+        mp_col_claimed_area: 'Kawasan Dituntut (Ha)',
+        mp_col_block_area:   'Kawasan Blok (Ha)',
+        mp_col_pct:          '% Kemajuan',
+        mp_col_total_qty:    'Jumlah Kuantiti Digunakan',
+        mp_col_usage_ha:     'Penggunaan / Ha',
+        col_date_month:      'Bulan',
+
+        /* Chemical Ingredient Setup */
+        ci_form_title:       '🧪 Persediaan Bahan Aktif Kimia',
+        ci_lbl_name:         'Nama Bahan Aktif',
+        ci_lbl_item:         'Item Kimia Dikaitkan',
+        ci_lbl_unit:         'Unit',
+        ci_lbl_dosage:       'Kadar Dos Maksimum (pilihan)',
+        ci_btn_save:         'Simpan Bahan Aktif',
+        ci_col_chemical:     'Kimia Dikaitkan',
+        ci_col_max_dosage:   'Dos Maks / Ha',
     }
 };
 
@@ -3828,7 +3951,7 @@ const ALL_SECTIONS = [
     { id: 'manuring',       label: '🌱 Manuring Program' },
     { id: 'roundprogress',  label: '📈 Manuring Progress' },
     { id: 'fieldmaint',     label: '🔧 Maintenance Program' },
-    { id: 'maintprogress',  label: '📊 Maint. Progress & Chemical' },
+    { id: 'maintprogress',  label: '📊 Maintenance Progress & Chemical Usage' },
 ];
 
 // Super Admin credentials (hardcoded — cannot be changed by users)
@@ -4496,7 +4619,7 @@ function renderFieldMaintRounds() {
     body.innerHTML = '';
 
     if (fieldMaintRounds.length === 0) {
-        body.innerHTML = '<tr><td colspan="5" class="px-3 py-4 text-center text-gray-500">No maintenance rounds defined yet.</td></tr>';
+        body.innerHTML = `<tr><td colspan="5" class="px-3 py-4 text-center text-gray-500">${currentLang==='ms'?'Tiada pusingan penyelenggaraan ditetapkan lagi.':'No maintenance rounds defined yet.'}</td></tr>`;
         return;
     }
 
@@ -4505,7 +4628,7 @@ function renderFieldMaintRounds() {
             ? r.blocks.map(b =>
                 `<span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full mr-1 mb-1">${b}</span>`
               ).join('')
-            : '<span class="text-gray-400 text-xs italic">All blocks</span>';
+            : `<span class="text-gray-400 text-xs italic">${currentLang==='ms'?'Semua blok':'All blocks'}</span>`;
 
         const tr = document.createElement('tr');
         tr.className = 'border-b border-green-100 hover:bg-green-50';
@@ -4516,9 +4639,9 @@ function renderFieldMaintRounds() {
             <td class="px-3 py-2 text-xs text-gray-400">${r.createdAt || '—'}</td>
             <td class="px-3 py-2 whitespace-nowrap">
                 <button class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded mr-1"
-                    onclick="startEditFmRound('${r.id}')">✏️ Edit</button>
+                    onclick="startEditFmRound('${r.id}')">✏️ ${currentLang==='ms'?'Edit':'Edit'}</button>
                 <button class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold px-3 py-1 rounded"
-                    onclick="deleteFmRound('${r.id}')">🗑 Delete</button>
+                    onclick="deleteFmRound('${r.id}')">🗑 ${currentLang==='ms'?'Padam':'Delete'}</button>
             </td>`;
         body.appendChild(tr);
     });
@@ -4686,9 +4809,8 @@ function saveChemIngredient() {
     const unit      = document.getElementById('ciUnit').value;
     const maxDosage = parseFloat(document.getElementById('ciMaxDosage').value);
 
-    if (!name)                         { alert('Please enter an Ingredient Name.'); return; }
-    if (!itemId)                       { alert('Please select a Chemical Item.'); return; }
-    if (!maxDosage || maxDosage <= 0)  { alert('Please enter a valid Max Dosage Rate (> 0).'); return; }
+    if (!name)    { alert('Please enter an Ingredient Name.'); return; }
+    if (!itemId)  { alert('Please select a Chemical Item.'); return; }
 
     const item = items.find(i => String(i.id) === String(itemId));
     if (!item) { alert('Selected chemical not found.'); return; }
