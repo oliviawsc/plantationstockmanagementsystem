@@ -46,8 +46,20 @@
             #sidebar.open{transform:translateX(0)}
             #sidebarOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(2px);z-index:199}
             #sidebarOverlay.open{display:block}
-            #mainWrapper{padding-top:56px;flex:1;overflow-y:auto}
-            #mainContent{padding:16px}
+            #topHeaderBar{left:0!important;top:56px!important;padding:0 12px!important}
+            #mainWrapper{padding-top:112px;flex:1;overflow-y:auto}
+            #mainContent{padding:12px}
+            #estateBlankState{top:112px}
+            .stat-card{padding:14px 16px}
+            .stat-value{font-size:22px}
+            .card{padding:14px;margin-bottom:14px}
+            .bg-white.p-6{padding:14px!important}
+            .grid.grid-cols-1.md\:grid-cols-2{grid-template-columns:1fr!important}
+            .grid.grid-cols-1.md\:grid-cols-3{grid-template-columns:1fr!important}
+            .grid.grid-cols-1.md\:grid-cols-4{grid-template-columns:1fr 1fr!important}
+            .overflow-x-auto{-webkit-overflow-scrolling:touch}
+            h2{font-size:1.4rem!important}
+            h3{font-size:1.1rem!important}
         }
 
         /* Sidebar */
@@ -271,7 +283,8 @@
             <button data-target="manuring"      class="nav-item" data-i18n="nav_manuring">            <span class="nav-icon">&#127807;</span><span class="sb-label">Manuring Program</span></button>
             <button data-target="roundprogress" class="nav-item" data-i18n="nav_roundprogress">       <span class="nav-icon">&#128200;</span><span class="sb-label">Manuring Progress</span></button>
             <button data-target="fieldmaint"    class="nav-item" data-i18n="nav_fieldmaint">          <span class="nav-icon">&#128295;</span><span class="sb-label">Maintenance Program</span></button>
-            <button data-target="maintprogress" class="nav-item" data-i18n="nav_maintprogress" style="white-space:normal;height:auto;align-items:flex-start;padding-top:8px;padding-bottom:8px;overflow:visible;">       <span class="nav-icon" style="margin-top:1px;">&#128202;</span><span class="sb-label" style="white-space:normal;line-height:1.35;font-size:13px;word-break:break-word;">Maintenance Progress &amp; Chemical Usage</span></button>
+            <button data-target="maintprogress" class="nav-item" data-i18n="nav_maintprogress"><span class="nav-icon">&#128202;</span><span class="sb-label">Maintenance Progress</span></button>
+            <button data-target="chemusage"    class="nav-item" data-i18n="nav_chemusage">          <span class="nav-icon">&#9879;&#65039;</span><span class="sb-label">Chemical Usage</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;padding:8px 8px 3px;">Admin</p>
             <button data-target="useradmin" id="navUserAdmin" class="nav-item hidden" data-i18n="nav_useradmin">
                 <span class="nav-icon">&#128100;</span><span class="sb-label">User Management</span>
@@ -595,7 +608,7 @@
 
                     <!-- Manuring round picker - shown ONLY when issuing Fertilizer Out -->
                     <div id="txnManuringWrap" class="md:col-span-2 hidden bg-green-50 border-2 border-dashed border-green-400 p-4 rounded-lg">
-                        <label class="block text-sm font-semibold mb-1" data-i18n="txn_lbl_round">Manuring Round <span class="text-red-600">*</span></label>
+                        <label class="block text-sm font-semibold mb-1"><span data-i18n="txn_lbl_round">Manuring Round</span> <span class="text-gray-400 font-normal text-xs">(Optional)</span></label>
                         <select id="txnManuringRound" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
                             <option value="" data-i18n="select_round">-- Select a Manuring Round --</option>
                         </select>
@@ -853,12 +866,19 @@
         <!-- ============ PAGE 8: MANURING PROGRESS SUMMARY ============ -->
         <section id="roundprogress" class="page-section">
             <h2 class="text-3xl font-bold mb-2" data-i18n="nav_roundprogress">Manuring Progress Summary</h2>
-            <p class="text-sm text-green-700 mb-6" data-i18n="progress_subtitle">% Applied = Total Quantity Applied (all blocks) ÷ Total Budgeted Fertilizer Needed</p>
+            <p class="text-sm text-green-700 mb-6" data-i18n="progress_subtitle">Track fertilizer application progress across manuring rounds and blocks. Compare actual quantities applied against the budgeted fertilizer requirement.</p>
 
             <!-- Round progress summary - one % per round, aggregated across ALL blocks -->
             <div class="bg-white p-6 rounded-xl shadow mb-8">
                 <h3 class="text-xl font-bold mb-2" data-i18n="rp_title_a">a) Manuring Progress by Round</h3>
-                <p class="text-xs text-green-700 mb-4">% Applied per round = Qty Applied (that round) ÷ Budgeted Fertilizer Needed (that round)</p>
+                <p class="text-xs text-green-700 mb-2">% Applied per round = Qty Applied (that round) ÷ Budgeted Fertilizer Needed (that round)</p>
+                <div style="margin-bottom:12px;">
+                    <input id="filterRpRound" type="text" placeholder="🔍 Search round or fertilizer…"
+                        oninput="applyFilterRpRound()"
+                        style="width:100%;padding:7px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none;background:#F8FAFC;"
+                        onfocus="this.style.borderColor='#6366F1';this.style.background='#fff'"
+                        onblur="this.style.borderColor='#E2E8F0';this.style.background='#F8FAFC'" />
+                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead class="bg-green-100 text-green-800">
@@ -878,7 +898,14 @@
             <!-- Manuring Application History (moved from Manuring Program) -->
             <div class="bg-white p-6 rounded-xl shadow mb-8">
                 <h3 class="text-xl font-bold mb-2">b) Manuring Progress by Block</h3>
-                <p class="text-xs text-green-700 mb-4">% Applied per block = Qty Applied (that block) ÷ Budgeted Fertilizer Needed (that block)</p>
+                <p class="text-xs text-green-700 mb-2">% Applied per block = Qty Applied (that block) ÷ Budgeted Fertilizer Needed (that block)</p>
+                <div style="margin-bottom:12px;">
+                    <input id="filterRpBlock" type="text" placeholder="🔍 Search round, fertilizer or block…"
+                        oninput="applyFilterRpBlock()"
+                        style="width:100%;padding:7px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none;background:#F8FAFC;"
+                        onfocus="this.style.borderColor='#6366F1';this.style.background='#fff'"
+                        onblur="this.style.borderColor='#E2E8F0';this.style.background='#F8FAFC'" />
+                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead class="bg-green-100 text-green-800">
@@ -963,13 +990,20 @@
 
         <!-- ============ PAGE 10: MAINTENANCE PROGRESS & CHEMICAL USAGE ============ -->
         <section id="maintprogress" class="page-section">
-            <h2 class="text-3xl font-bold mb-2" data-i18n="page_maintprogress">📊 Maintenance Progress &amp; Chemical Usage</h2>
-            <p class="text-sm text-green-700 mb-6" data-i18n="page_maintprogress_sub">Record claimed maintenance area per block/round, set chemical ingredient dosage rates, and view progress &amp; chemical usage per HA.</p>
+            <h2 class="text-3xl font-bold mb-2" data-i18n="page_maintprogress">📊 Maintenance Progress</h2>
+            <p class="text-sm text-green-700 mb-6" data-i18n="page_maintprogress_sub">Track field maintenance progress by round and block. Record claimed maintenance area and monitor completion against planned block coverage.</p>
 
             <!-- ── a) Maintenance Progress by Round ── -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
                 <h3 class="text-xl font-bold mb-2" data-i18n="mp_title_a">a) Maintenance Progress by Round</h3>
-                <p class="text-xs text-green-700 mb-4">% Progress = Total Claimed Area ÷ Total Block Area of selected blocks in the round</p>
+                <p class="text-xs text-green-700 mb-2" data-i18n="mp_sub_a">% Progress = Total Claimed Area ÷ Total Block Area of selected blocks in the round</p>
+                <div style="margin-bottom:12px;">
+                    <input id="filterMpRound" type="text" placeholder="🔍 Search round…"
+                        oninput="applyFilterMpRound()"
+                        style="width:100%;padding:7px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none;background:#F8FAFC;"
+                        onfocus="this.style.borderColor='#6366F1';this.style.background='#fff'"
+                        onblur="this.style.borderColor='#E2E8F0';this.style.background='#F8FAFC'" />
+                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead class="bg-green-100 text-green-800">
@@ -989,7 +1023,14 @@
             <!-- ── b) Maintenance Progress by Block ── -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
                 <h3 class="text-xl font-bold mb-2" data-i18n="mp_title_b">b) Maintenance Progress by Block</h3>
-                <p class="text-xs text-green-700 mb-4">% Progress = Claimed Area ÷ Block Area × 100</p>
+                <p class="text-xs text-green-700 mb-2" data-i18n="mp_sub_b">% Progress = Claimed Area ÷ Block Area × 100</p>
+                <div style="margin-bottom:12px;">
+                    <input id="filterMpBlock" type="text" placeholder="🔍 Search round or block…"
+                        oninput="applyFilterMpBlock()"
+                        style="width:100%;padding:7px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none;background:#F8FAFC;"
+                        onfocus="this.style.borderColor='#6366F1';this.style.background='#fff'"
+                        onblur="this.style.borderColor='#E2E8F0';this.style.background='#F8FAFC'" />
+                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead class="bg-green-100 text-green-800">
@@ -1004,53 +1045,6 @@
                             </tr>
                         </thead>
                         <tbody id="mpByBlockBody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ── c) Chemical Usage per HA by Round ── -->
-            <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <h3 class="text-xl font-bold mb-2" data-i18n="mp_title_c">c) Chemical Usage per HA by Round</h3>
-                <p class="text-xs text-green-700 mb-4">Usage / Ha = Total Qty Used ÷ Total Claimed Area (Ha). Highlighted red if exceeding max dosage.</p>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm">
-                        <thead class="bg-orange-100 text-orange-800">
-                            <tr>
-                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
-                                <th class="px-3 py-2 text-left" data-i18n="ci_lbl_name">Ingredient</th>
-                                <th class="px-3 py-2 text-left" data-i18n="ci_col_chemical">Chemical Item</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_total_qty">Total Qty Used</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_claimed">Total Claimed (Ha)</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_usage_ha">Usage / Ha</th>
-                                <th class="px-3 py-2 text-right" data-i18n="ci_col_max_dosage">Max Dosage / Ha</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_status">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="chemByRoundBody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ── d) Chemical Usage per HA by Block ── -->
-            <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <h3 class="text-xl font-bold mb-2" data-i18n="mp_title_d">d) Chemical Usage per HA by Block</h3>
-                <p class="text-xs text-green-700 mb-4">Usage / Ha = Total Qty Used (that block) ÷ Claimed Area (Ha) for that block. Highlighted red if exceeding max dosage.</p>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm">
-                        <thead class="bg-orange-100 text-orange-800">
-                            <tr>
-                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_block">Block</th>
-                                <th class="px-3 py-2 text-left" data-i18n="ci_lbl_name">Ingredient</th>
-                                <th class="px-3 py-2 text-left" data-i18n="ci_col_chemical">Chemical Item</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_total_qty">Total Qty Used</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_claimed_area">Claimed Area (Ha)</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_usage_ha">Usage / Ha</th>
-                                <th class="px-3 py-2 text-right" data-i18n="ci_col_max_dosage">Max Dosage / Ha</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_status">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="chemByBlockBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -1098,10 +1092,78 @@
                 </div>
             </div>
 
-            <!-- ── Chemical Ingredient Setup ── -->
+            </section>
+
+        <!-- ============ PAGE: CHEMICAL USAGE ============ -->
+        <section id="chemusage" class="page-section">
+            <h2 class="text-3xl font-bold mb-2" data-i18n="page_chemusage">&#x2697;&#xFE0F; Chemical Usage</h2>
+            <p class="text-sm text-green-700 mb-6" data-i18n="page_chemusage_sub">View chemical usage per hectare by round and block. Manage active ingredient definitions and maximum dosage rates.</p>
+
+            <!-- a) Chemical Usage per HA by Round -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <h3 class="text-xl font-bold mb-4" id="ciFormTitle" data-i18n="ci_form_title">🧪 Chemical Ingredient Setup</h3>
-                <p class="text-xs text-green-700 mb-4">Define active ingredients and link them to chemical items. Set the maximum dosage rate per HA for monitoring over-application.</p>
+                <h3 class="text-xl font-bold mb-2" data-i18n="mp_title_c">a) Chemical Usage per HA by Round</h3>
+                <p class="text-xs text-green-700 mb-2" data-i18n="mp_sub_c">Usage / Ha = Total Qty Used ÷ Total Claimed Area (Ha). Highlighted red if exceeding max dosage.</p>
+                <div style="margin-bottom:12px;">
+                    <input id="filterChemRound" type="text" placeholder="🔍 Search round or ingredient…"
+                        oninput="applyFilterChemRound()"
+                        style="width:100%;padding:7px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none;background:#F8FAFC;"
+                        onfocus="this.style.borderColor='#6366F1';this.style.background='#fff'"
+                        onblur="this.style.borderColor='#E2E8F0';this.style.background='#F8FAFC'" />
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-orange-100 text-orange-800">
+                            <tr>
+                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
+                                <th class="px-3 py-2 text-left" data-i18n="ci_lbl_name">Ingredient</th>
+                                <th class="px-3 py-2 text-left" data-i18n="ci_col_chemical">Chemical Item</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_total_qty">Total Qty Used</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_claimed">Total Claimed (Ha)</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_usage_ha">Usage / Ha</th>
+                                <th class="px-3 py-2 text-right" data-i18n="ci_col_max_dosage">Max Dosage / Ha</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_status">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="chemByRoundBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- b) Chemical Usage per HA by Block -->
+            <div class="bg-white p-6 rounded-xl shadow mb-6">
+                <h3 class="text-xl font-bold mb-2" data-i18n="mp_title_d">b) Chemical Usage per HA by Block</h3>
+                <p class="text-xs text-green-700 mb-2" data-i18n="mp_sub_d">Usage / Ha = Total Qty Used (that block) ÷ Claimed Area (Ha) for that block. Highlighted red if exceeding max dosage.</p>
+                <div style="margin-bottom:12px;">
+                    <input id="filterChemBlock" type="text" placeholder="🔍 Search round, block or ingredient…"
+                        oninput="applyFilterChemBlock()"
+                        style="width:100%;padding:7px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none;background:#F8FAFC;"
+                        onfocus="this.style.borderColor='#6366F1';this.style.background='#fff'"
+                        onblur="this.style.borderColor='#E2E8F0';this.style.background='#F8FAFC'" />
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-orange-100 text-orange-800">
+                            <tr>
+                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_block">Block</th>
+                                <th class="px-3 py-2 text-left" data-i18n="ci_lbl_name">Ingredient</th>
+                                <th class="px-3 py-2 text-left" data-i18n="ci_col_chemical">Chemical Item</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_total_qty">Total Qty Used</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_claimed_area">Claimed Area (Ha)</th>
+                                <th class="px-3 py-2 text-right" data-i18n="mp_col_usage_ha">Usage / Ha</th>
+                                <th class="px-3 py-2 text-right" data-i18n="ci_col_max_dosage">Max Dosage / Ha</th>
+                                <th class="px-3 py-2 text-left" data-i18n="col_status">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="chemByBlockBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- &#x2500;&#x2500; Chemical Ingredient Setup &#x2500;&#x2500; -->
+            <div class="bg-white p-6 rounded-xl shadow mb-6">
+                <h3 class="text-xl font-bold mb-4" id="ciFormTitle" data-i18n="ci_form_title">&#x1F9EA; Chemical Ingredient Setup</h3>
+                <p class="text-xs text-green-700 mb-4" data-i18n="ci_sub">Define active ingredients and link them to chemical items. Set the maximum dosage rate per HA for monitoring over-application.</p>
                 <input type="hidden" id="ciEditId" value="" />
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                     <div>
@@ -1137,12 +1199,11 @@
                         Save Ingredient
                     </button>
                     <button type="button" onclick="cancelEditChemIngredient()"
-                        id="ciCancelBtn"
+                        id="ciCancelBtn" data-i18n="btn_cancel"
                         class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg font-semibold">
                         Cancel
                     </button>
                 </div>
-                <!-- Ingredient list -->
                 <div class="overflow-x-auto mt-4">
                     <table class="min-w-full text-sm">
                         <thead class="bg-blue-50 text-blue-800">
@@ -1288,9 +1349,15 @@
                 <input id="editTxnRef" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="text" />
             </div>
             <div id="editTxnManuringWrap" class="md:col-span-2 hidden bg-green-50 border border-green-300 rounded p-3">
-                <label class="block text-sm font-semibold mb-1" data-i18n="txn_lbl_round">Manuring Round <span class="text-red-600">*</span></label>
+                <label class="block text-sm font-semibold mb-1"><span data-i18n="txn_lbl_round">Manuring Round</span> <span class="text-gray-400 font-normal text-xs">(Optional)</span></label>
                 <select id="editTxnManuringRound" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
                     <option value="" data-i18n="select_round">-- Select a Manuring Round --</option>
+                </select>
+            </div>
+            <div id="editTxnMaintWrap" class="md:col-span-2 hidden bg-orange-50 border border-orange-300 rounded p-3">
+                <label class="block text-sm font-semibold mb-1">🔧 Maintenance Round <span class="text-gray-400 font-normal text-xs">(Optional)</span></label>
+                <select id="editTxnMaintRound" class="w-full border border-orange-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-orange-400">
+                    <option value="">-- Select a Maintenance Round --</option>
                 </select>
             </div>
             <div class="md:col-span-2">
@@ -1555,6 +1622,11 @@ navButtons.forEach(btn => {
         // For maintprogress: explicitly re-populate dropdowns after section becomes active
         if (target === 'maintprogress') {
             renderMaintProgressDropdowns();
+        }
+        if (target === 'chemusage') {
+            renderCiTable();
+            renderChemByRound();
+            renderChemByBlock();
         }
     });
 });
@@ -1913,14 +1985,12 @@ function saveTransaction() {
         let manuringRoundName = null;
         if (item.category === 'Fertilizer') {
             const roundId = document.getElementById('txnManuringRound').value;
-            if (!roundId) {
-                alert('Please select a Manuring Round for this fertilizer issue.');
-                return;
-            }
-            const round = manuringRounds.find(r => String(r.id) === String(roundId));
-            if (round) {
-                manuringRoundId   = round.id;
-                manuringRoundName = round.name;
+            if (roundId) {
+                const round = manuringRounds.find(r => String(r.id) === String(roundId));
+                if (round) {
+                    manuringRoundId   = round.id;
+                    manuringRoundName = round.name;
+                }
             }
         }
 
@@ -2481,7 +2551,14 @@ function renderRoundProgress() {
             if (budget > 0) {
                 const pct    = (appliedBags / budget) * 100;
                 const colour = pct >= 100 ? 'text-green-700' : pct >= 50 ? 'text-yellow-700' : 'text-red-600';
-                pctCell      = `<span class="${colour} font-bold">${Math.round(pct)}%</span>`;
+                const barCol = pct >= 100 ? '#166534' : pct >= 50 ? '#d97706' : '#dc2626';
+                const barW   = Math.min(100, pct).toFixed(1);
+                pctCell      = `<div style="display:flex;align-items:center;gap:8px;min-width:120px;">
+                    <div style="flex:1;background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;">
+                        <div style="width:${barW}%;background:${barCol};height:100%;border-radius:99px;"></div>
+                    </div>
+                    <span class="${colour} font-bold" style="white-space:nowrap;">${Math.round(pct)}%</span>
+                </div>`;
             }
             const tr = document.createElement('tr');
             tr.className = 'border-b border-green-100 hover:bg-green-50';
@@ -2791,6 +2868,7 @@ function renderSummary() {
             <td class="px-3 py-2 text-right font-bold">${balanceDisplay}</td>
             <td class="px-3 py-2">${t.user}</td>
             <td class="px-3 py-2 flex gap-2 flex-wrap">
+                ${t.picture ? `<button class="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-semibold px-3 py-1 rounded" onclick="viewTxnPicture(${t.id})">🖼 View</button>` : ''}
                 <button class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded"
                     onclick="openEditTxnModal(${t.id})">✏️ Edit</button>
                 <button class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold px-3 py-1 rounded"
@@ -3356,6 +3434,19 @@ function openEditTxnModal(id) {
     // Show manuring round picker only for Fertilizer Out
     toggleEditManuringWrap(t);
 
+    // Show maintenance round picker for Chemical Out
+    const editMaintWrap = document.getElementById('editTxnMaintWrap');
+    const editMaintSel  = document.getElementById('editTxnMaintRound');
+    if (t.category === 'Chemical' && t.type === 'Out') {
+        editMaintSel.innerHTML = '<option value="">-- Select a Maintenance Round --</option>' +
+            fieldMaintRounds.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+        if (t.maintRoundId) editMaintSel.value = t.maintRoundId;
+        editMaintWrap.classList.remove('hidden');
+    } else {
+        editMaintWrap.classList.add('hidden');
+        editMaintSel.value = '';
+    }
+
     document.getElementById('editTxnModal').classList.remove('hidden');
 }
 
@@ -3398,9 +3489,23 @@ function saveEditTransaction() {
     let manuringRoundName = null;
     if (category === 'Fertilizer' && txnType === 'Out') {
         const roundId = parseInt(document.getElementById('editTxnManuringRound').value, 10);
-        if (!roundId) { alert('Please select a Manuring Round for this fertilizer issue.'); return; }
-        const round = manuringRounds.find(r => r.id === roundId);
-        if (round) { manuringRoundId = round.id; manuringRoundName = round.name; }
+        if (roundId) {
+            const round = manuringRounds.find(r => r.id === roundId);
+            if (round) { manuringRoundId = round.id; manuringRoundName = round.name; }
+        }
+    }
+
+    let maintRoundId   = t.maintRoundId   || null;
+    let maintRoundName = t.maintRoundName || null;
+    if (category === 'Chemical' && txnType === 'Out') {
+        const maintRaw = document.getElementById('editTxnMaintRound').value;
+        if (maintRaw) {
+            const mr = fieldMaintRounds.find(r => String(r.id) === String(maintRaw));
+            if (mr) { maintRoundId = mr.id; maintRoundName = mr.name; }
+            else    { maintRoundId = null; maintRoundName = null; }
+        } else {
+            maintRoundId = null; maintRoundName = null;
+        }
     }
 
     // Read qty and convert back to base unit for storage
@@ -3421,7 +3526,9 @@ function saveEditTransaction() {
         ref:               document.getElementById('editTxnRef').value.trim(),
         remarks:           document.getElementById('editTxnRemarks').value.trim(),
         manuringRoundId,
-        manuringRoundName
+        manuringRoundName,
+        maintRoundId,
+        maintRoundName
     };
 
     save(STORAGE_KEYS.transactions, transactions);
@@ -3630,7 +3737,7 @@ const I18N = {
         manuring_history_title: 'Manuring Application History',
         manuring_history_hint:  'Auto-generated from fertilizer "Out" transactions linked to a round.',
         /* Manuring Progress */
-        progress_subtitle:   '% Applied = Total Quantity Applied (all blocks) ÷ Total Budgeted Fertilizer Needed',
+        progress_subtitle:   'Track fertilizer application progress across manuring rounds and blocks. Compare actual quantities applied against the budgeted fertilizer requirement.',
         /* Edit Modal */
         modal_edit_title:    '✏️ Edit Transaction',
         btn_save_changes:    'Save Changes',
@@ -3646,13 +3753,16 @@ const I18N = {
 
         /* Maintenance Program (fieldmaint) */
         nav_fieldmaint:      '🔧 Maintenance Program',
-        nav_maintprogress:   '📊 Maintenance Progress & Chemical Usage',
+        nav_maintprogress:   '📊 Maintenance Progress',
         nav_useradmin:       '👤 User Management',
+        nav_chemusage:       '⚗️ Chemical Usage',
+        page_chemusage:      '⚗️ Chemical Usage',
+        page_chemusage_sub:  'View chemical usage per hectare by round and block. Manage active ingredient definitions and maximum dosage rates.',
         page_fieldmaint:     '🔧 Maintenance Program',
-        page_maintprogress:  '📊 Maintenance Progress &amp; Chemical Usage',
+        page_maintprogress:  '📊 Maintenance Progress',
         page_useradmin:      '👤 User Management',
         page_fieldmaint_sub: 'Define maintenance rounds for field activities. Each round specifies the blocks involved and relevant notes.',
-        page_maintprogress_sub: 'Record claimed maintenance area per block/round, set chemical ingredient dosage rates, and view progress &amp; chemical usage per HA.',
+        page_maintprogress_sub: 'Track field maintenance progress by round and block. Record claimed maintenance area and monitor completion against planned block coverage.',
         fm_form_title:       'Add Maintenance Round',
         fm_defined_title:    'Defined Maintenance Rounds',
         fm_col_round_name:   'Round Name',
@@ -3678,8 +3788,8 @@ const I18N = {
         /* Maintenance Progress & Chemical (maintprogress) */
         mp_title_a:          'a) Maintenance Progress by Round',
         mp_title_b:          'b) Maintenance Progress by Block',
-        mp_title_c:          'c) Chemical Usage per HA by Round',
-        mp_title_d:          'd) Chemical Usage per HA by Block',
+        mp_title_c:          'a) Chemical Usage per HA by Round',
+        mp_title_d:          'b) Chemical Usage per HA by Block',
         mp_form_title:       '➕ Add Maintenance Claim',
         mp_lbl_round:        'Maintenance Round',
         mp_lbl_block:        'Block',
@@ -3813,7 +3923,7 @@ const I18N = {
         manuring_history_title: 'Sejarah Penggunaan Baja',
         manuring_history_hint:  'Jana automatik daripada transaksi "Keluar" baja yang dikaitkan dengan pusingan.',
         /* Manuring Progress */
-        progress_subtitle:   '% Digunakan = Jumlah Kuantiti Digunakan (semua blok) ÷ Jumlah Keperluan Baja (Bajet)',
+        progress_subtitle:   'Jejak kemajuan penggunaan baja merentas pusingan pembajaan dan blok. Bandingkan kuantiti sebenar yang digunakan berbanding keperluan baja yang dibajetkan.',
         /* Edit Modal */
         modal_edit_title:    '✏️ Edit Transaksi',
         btn_save_changes:    'Simpan Perubahan',
@@ -3829,13 +3939,16 @@ const I18N = {
 
         /* Maintenance Program (fieldmaint) */
         nav_fieldmaint:      '🔧 Program Penyelenggaraan',
-        nav_maintprogress:   '📊 Kemajuan Penyelenggaraan & Penggunaan Kimia',
+        nav_maintprogress:   '📊 Kemajuan Penyelenggaraan',
         nav_useradmin:       '👤 Pengurusan Pengguna',
+        nav_chemusage:       '⚗️ Penggunaan Kimia',
+        page_chemusage:      '⚗️ Penggunaan Kimia',
+        page_chemusage_sub:  'Lihat penggunaan kimia per hektar mengikut pusingan dan blok. Uruskan definisi bahan aktif dan kadar dos maksimum.',
         page_fieldmaint:     '🔧 Program Penyelenggaraan',
-        page_maintprogress:  '📊 Kemajuan Penyelenggaraan &amp; Penggunaan Kimia',
+        page_maintprogress:  '📊 Kemajuan Penyelenggaraan',
         page_useradmin:      '👤 Pengurusan Pengguna',
         page_fieldmaint_sub: 'Tentukan pusingan penyelenggaraan untuk aktiviti ladang. Setiap pusingan menentukan blok terlibat dan nota berkaitan.',
-        page_maintprogress_sub: 'Rekod kawasan penyelenggaraan dituntut mengikut blok/pusingan, tetapkan kadar dos bahan aktif, dan lihat kemajuan &amp; penggunaan kimia per HA.',
+        page_maintprogress_sub: 'Jejak kemajuan penyelenggaraan padang mengikut pusingan dan blok. Rekod kawasan penyelenggaraan yang dituntut dan pantau penyiapan berbanding liputan blok yang dirancang.',
         fm_form_title:       'Tambah Pusingan Penyelenggaraan',
         fm_defined_title:    'Pusingan Penyelenggaraan Ditetapkan',
         fm_col_round_name:   'Nama Pusingan',
@@ -3861,8 +3974,8 @@ const I18N = {
         /* Maintenance Progress & Chemical (maintprogress) */
         mp_title_a:          'a) Kemajuan Penyelenggaraan Mengikut Pusingan',
         mp_title_b:          'b) Kemajuan Penyelenggaraan Mengikut Blok',
-        mp_title_c:          'c) Penggunaan Kimia per HA Mengikut Pusingan',
-        mp_title_d:          'd) Penggunaan Kimia per HA Mengikut Blok',
+        mp_title_c:          'a) Penggunaan Kimia per HA Mengikut Pusingan',
+        mp_title_d:          'b) Penggunaan Kimia per HA Mengikut Blok',
         mp_form_title:       '➕ Tambah Tuntutan Penyelenggaraan',
         mp_lbl_round:        'Pusingan Penyelenggaraan',
         mp_lbl_block:        'Blok',
@@ -3955,7 +4068,7 @@ const ALL_SECTIONS = [
     { id: 'manuring',       label: '🌱 Manuring Program' },
     { id: 'roundprogress',  label: '📈 Manuring Progress' },
     { id: 'fieldmaint',     label: '🔧 Maintenance Program' },
-    { id: 'maintprogress',  label: '📊 Maintenance Progress & Chemical Usage' },
+    { id: 'maintprogress',  label: '📊 Maintenance Progress' },
 ];
 
 // Super Admin credentials (hardcoded — cannot be changed by users)
@@ -5164,6 +5277,69 @@ function clearTxnPicture() {
     if (preview) preview.src   = '';
     if (wrap)    wrap.classList.add('hidden');
     if (fn)      { fn.textContent = ''; fn.classList.add('hidden'); }
+}
+
+/* =================================================================
+   VIEW TRANSACTION PICTURE
+   ================================================================= */
+function viewTxnPicture(id) {
+    const txn = transactions.find(t => String(t.id) === String(id));
+    if (!txn || !txn.picture) { alert('No picture available for this transaction.'); return; }
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:16px;';
+    overlay.onclick = () => overlay.remove();
+    const img = document.createElement('img');
+    img.src = txn.picture;
+    img.style.cssText = 'max-width:100%;max-height:90vh;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.6);';
+    const close = document.createElement('button');
+    close.textContent = '✕';
+    close.style.cssText = 'position:absolute;top:16px;right:20px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:22px;width:40px;height:40px;border-radius:50%;cursor:pointer;';
+    close.onclick = () => overlay.remove();
+    overlay.appendChild(img);
+    overlay.appendChild(close);
+    document.body.appendChild(overlay);
+}
+
+/* =================================================================
+   TABLE FILTER / SEARCH HELPERS
+   ================================================================= */
+
+/** Generic: filter tbody rows by hiding non-matching ones */
+function filterTableRows(tbodyId, query) {
+    const q = query.trim().toLowerCase();
+    const rows = document.querySelectorAll('#' + tbodyId + ' tr');
+    let visible = 0;
+    rows.forEach(tr => {
+        const text = tr.textContent.toLowerCase();
+        const show = !q || text.includes(q);
+        tr.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+    return visible;
+}
+
+/* -- Manuring Progress -- */
+function applyFilterRpRound() {
+    filterTableRows('roundProgressBody', document.getElementById('filterRpRound').value);
+}
+function applyFilterRpBlock() {
+    filterTableRows('roundProgressBlockBody', document.getElementById('filterRpBlock').value);
+}
+
+/* -- Maintenance Progress -- */
+function applyFilterMpRound() {
+    filterTableRows('mpByRoundBody', document.getElementById('filterMpRound').value);
+}
+function applyFilterMpBlock() {
+    filterTableRows('mpByBlockBody', document.getElementById('filterMpBlock').value);
+}
+
+/* -- Chemical Usage -- */
+function applyFilterChemRound() {
+    filterTableRows('chemByRoundBody', document.getElementById('filterChemRound').value);
+}
+function applyFilterChemBlock() {
+    filterTableRows('chemByBlockBody', document.getElementById('filterChemBlock').value);
 }
 </script>
 
