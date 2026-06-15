@@ -236,7 +236,7 @@
         <button id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Open menu">
             <span></span><span></span><span></span>
         </button>
-        <h1>&#127796; OilPalm Stock</h1>
+        <h1 id="mobileAppTitle"></h1>
 <div style="width:32px;"></div>
     </div>
 
@@ -814,6 +814,10 @@
                         <input id="mrKgPerPalm" min="0" step="0.01" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="number" placeholder="e.g. 2" />
                         <p class="text-xs text-green-700 mt-1 italic" data-i18n="manuring_kg_hint">Used to calculate Budgeted Fertilizer Needed: <b>(Selected Blocks' Palms × kg/palm) ÷ Qty/Unit of the fertilizer</b>. Set the fertilizer's Qty/Unit in the Item File.</p>
                     </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="lbl_target_period">Target Period <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
+                        <input id="mrTargetPeriod" type="month" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                    </div>
                     <!-- Block selection — only blocks ticked here are included in this round -->
                     <div class="md:col-span-2">
                         <div class="flex items-center justify-between mb-2">
@@ -850,6 +854,7 @@
                             <tr>
                                 <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
                                 <th class="px-3 py-2 text-left" data-i18n="manuring_lbl_fertilizer">Fertilizer</th>
+                                <th class="px-3 py-2 text-left" data-i18n="lbl_target_period">Target Period</th>
                                 <th data-i18n="fm_col_blocks" class="px-3 py-2 text-left">Blocks Involved</th>
                                 <th class="px-3 py-2 text-right" data-i18n="col_budgeted">Budgeted Fertilizer Needed</th>
                                 <th class="px-3 py-2 text-left" data-i18n="manuring_lbl_notes">Notes</th>
@@ -940,6 +945,10 @@
                             class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                     </div>
                     <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="lbl_target_period">Target Period <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
+                        <input id="fmTargetPeriod" type="month" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                    </div>
+                    <div>
                         <label class="block text-sm font-semibold mb-1" data-i18n="fm_lbl_notes">Notes</label>
                         <textarea id="fmNotes" rows="2" placeholder="e.g. Mechanical weeding along main road"
                             class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600"></textarea>
@@ -976,6 +985,7 @@
                         <thead class="bg-green-100 text-green-800">
                             <tr>
                                 <th data-i18n="fm_col_round_name" class="px-3 py-2 text-left">Round Name</th>
+                                <th data-i18n="lbl_target_period" class="px-3 py-2 text-left">Target Period</th>
                                 <th data-i18n="fm_col_blocks" class="px-3 py-2 text-left">Blocks Involved</th>
                                 <th data-i18n="fm_col_notes" class="px-3 py-2 text-left">Notes</th>
                                 <th data-i18n="fm_col_created" class="px-3 py-2 text-left">Date Created</th>
@@ -1363,6 +1373,27 @@
             <div class="md:col-span-2">
                 <label class="block text-sm font-semibold mb-1" data-i18n="col_remarks">Remarks</label>
                 <textarea id="editTxnRemarks" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" rows="2"></textarea>
+            </div>
+            <!-- Supporting picture -->
+            <div class="md:col-span-2">
+                <label class="block text-sm font-semibold mb-1">Supporting Picture <span class="text-gray-400 font-normal text-xs">(Optional)</span></label>
+                <div class="flex flex-wrap gap-3 items-start">
+                    <!-- Upload from gallery -->
+                    <label class="cursor-pointer">
+                        <div class="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white text-xs font-semibold px-3 py-1.5 rounded-lg select-none">🖼️ Upload Photo</div>
+                        <input type="file" id="editTxnPicture" accept="image/*" class="hidden" onchange="previewEditTxnPicture(this)" />
+                    </label>
+                    <!-- Take photo -->
+                    <label class="cursor-pointer">
+                        <div class="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold px-3 py-1.5 rounded-lg select-none">📷 Take Photo</div>
+                        <input type="file" id="editTxnPictureCamera" accept="image/*" capture="environment" class="hidden" onchange="previewEditTxnPicture(this)" />
+                    </label>
+                    <!-- Preview -->
+                    <div id="editTxnPicturePreviewWrap" class="hidden flex items-start gap-2">
+                        <img id="editTxnPicturePreview" src="" alt="Preview" class="w-20 h-20 object-cover rounded-lg border border-green-300 shadow" />
+                        <button type="button" onclick="clearEditTxnPicture()" class="text-xs text-red-500 hover:underline mt-1">✖ Remove</button>
+                    </div>
+                </div>
             </div>
             <div class="md:col-span-2 flex gap-3">
                 <button type="button" onclick="saveEditTransaction()" class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold" data-i18n="btn_save_changes">Save Changes</button>
@@ -2190,6 +2221,7 @@ function startEditRound(id) {
     document.getElementById('mrFertilizer').value    = String(r.fertilizerItemId);
     document.getElementById('mrKgPerPalm').value     = r.kgPerPalm || 0;
     document.getElementById('mrNotes').value         = r.notes || '';
+    document.getElementById('mrTargetPeriod').value  = r.targetPeriod || '';
     // Restore checked blocks
     renderMrBlocksGrid(r.blocks || []);
     editingRoundId = id;
@@ -2204,6 +2236,7 @@ function cancelEditRound() {
     document.getElementById('mrFertilizer').value    = '';
     document.getElementById('mrKgPerPalm').value     = '';
     document.getElementById('mrNotes').value         = '';
+    document.getElementById('mrTargetPeriod').value  = '';
     document.querySelectorAll('.mr-block-cb').forEach(cb => cb.checked = false);
     document.getElementById('mrSubmitBtn').textContent = 'Save Round';
     document.getElementById('mrCancelBtn').classList.add('hidden');
@@ -2217,6 +2250,7 @@ function saveManuringRound() {
     const kgPerPalm  = document.getElementById('mrKgPerPalm').value;
     const notes      = document.getElementById('mrNotes').value.trim();
     const fertIdRaw  = document.getElementById('mrFertilizer').value;
+    const targetPeriod = document.getElementById('mrTargetPeriod').value;
     const blocks     = [...document.querySelectorAll('.mr-block-cb:checked')].map(cb => cb.value);
 
     // ── Validation ──────────────────────────────────────────────────
@@ -2246,10 +2280,11 @@ function saveManuringRound() {
         fertilizerItemId: fert.id,
         fertilizerName:   fert.name,
         unit:             fert.unit,
-        kgPerUnit:        parseFloat(fert.qtyPerUnit) || 0,  // kg per bag from Item File
+        kgPerUnit:        parseFloat(fert.qtyPerUnit) || 0,
         kgPerPalm:        parseFloat(kgPerPalm) || 0,
         blocks:           blocks,
-        notes:            notes
+        notes:            notes,
+        targetPeriod:     targetPeriod
     };
 
     // ── Create or update ─────────────────────────────────────────────
@@ -2273,6 +2308,7 @@ function saveManuringRound() {
         document.getElementById('mrKgPerPalm').value  = '';
         document.getElementById('mrNotes').value      = '';
         document.getElementById('mrFertilizer').value = '';
+        document.getElementById('mrTargetPeriod').value = '';
         document.querySelectorAll('.mr-block-cb').forEach(cb => cb.checked = false);
     }
 
@@ -2374,7 +2410,7 @@ function renderManuringRounds() {
     if (!body) return;
     body.innerHTML = '';
     if (manuringRounds.length === 0) {
-        body.innerHTML = '<tr><td colspan="7" class="px-3 py-4 text-center text-gray-500">No manuring rounds defined yet.</td></tr>';
+        body.innerHTML = '<tr><td colspan="8" class="px-3 py-4 text-center text-gray-500">No manuring rounds defined yet.</td></tr>';
         return;
     }
 
@@ -2407,6 +2443,7 @@ function renderManuringRounds() {
         mainRow.innerHTML = `
             <td class="px-3 py-2 font-semibold">🌱 ${r.name}</td>
             <td class="px-3 py-2">${r.fertilizerName || '-'}</td>
+            <td class="px-3 py-2 text-xs text-gray-500">${r.targetPeriod || '—'}</td>
             <td class="px-3 py-2">${blocksHtml}</td>
             <td class="px-3 py-2 text-right">
                 <b>${Math.round(budget)}</b> bags<br/>${kgLabel}
@@ -3448,6 +3485,17 @@ function openEditTxnModal(id) {
     }
 
     document.getElementById('editTxnModal').classList.remove('hidden');
+
+    // Populate picture preview
+    const editPreview = document.getElementById('editTxnPicturePreview');
+    const editWrap    = document.getElementById('editTxnPicturePreviewWrap');
+    if (t.picture) {
+        editPreview.src = t.picture;
+        editWrap.classList.remove('hidden');
+    } else {
+        editPreview.src = '';
+        editWrap.classList.add('hidden');
+    }
 }
 
 function toggleEditManuringWrap(t) {
@@ -3471,6 +3519,28 @@ function toggleEditManuringWrap(t) {
 function closeEditTxnModal() {
     document.getElementById('editTxnModal').classList.add('hidden');
     document.getElementById('editTxnForm').reset();
+    clearEditTxnPicture();
+}
+
+function previewEditTxnPicture(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        document.getElementById('editTxnPicturePreview').src = e.target.result;
+        document.getElementById('editTxnPicturePreviewWrap').classList.remove('hidden');
+    };
+    reader.readAsDataURL(input.files[0]);
+}
+
+function clearEditTxnPicture() {
+    const inp1 = document.getElementById('editTxnPicture');
+    const inp2 = document.getElementById('editTxnPictureCamera');
+    const prev = document.getElementById('editTxnPicturePreview');
+    const wrap = document.getElementById('editTxnPicturePreviewWrap');
+    if (inp1) inp1.value = '';
+    if (inp2) inp2.value = '';
+    if (prev) prev.src  = '';
+    if (wrap) wrap.classList.add('hidden');
 }
 
 // Re-evaluate manuring wrap when type changes inside the edit modal
@@ -3517,6 +3587,12 @@ function saveEditTransaction() {
         ? rawEditQty * editFactor   // convert package → base
         : rawEditQty;               // already base
 
+    // Read picture — keep existing if no new one selected
+    const editPrevImg = document.getElementById('editTxnPicturePreview');
+    const newPicture  = (editPrevImg && editPrevImg.src && editPrevImg.src.startsWith('data:'))
+        ? editPrevImg.src
+        : (t.picture || null);
+
     transactions[idx] = {
         ...t,
         date:              document.getElementById('editTxnDate').value,
@@ -3525,6 +3601,7 @@ function saveEditTransaction() {
         location:          document.getElementById('editTxnLocation').value,
         ref:               document.getElementById('editTxnRef').value.trim(),
         remarks:           document.getElementById('editTxnRemarks').value.trim(),
+        picture:           newPicture,
         manuringRoundId,
         manuringRoundName,
         maintRoundId,
@@ -3776,6 +3853,7 @@ const I18N = {
         fm_btn_save:         'Save Round',
         btn_select_all:      '✔ Select All',
         btn_clear_all:       '✖ Clear All',
+        lbl_target_period:   'Target Period',
         /* Manuring Progress (roundprogress) */
         rp_title_a:          'a) Manuring Progress by Round',
         rp_title_b:          'b) Manuring Progress by Block',
@@ -3902,6 +3980,7 @@ const I18N = {
         btn_cancel_edit:     'Batal Edit',
         btn_select_all:      '✔ Pilih Semua',
         btn_clear_all:       '✖ Kosongkan Semua',
+        lbl_target_period:   'Tempoh Sasaran',
         loc_import_title:    'Import Lokasi dari Fail',
         loc_import_hint:     'Muat naik fail <b>CSV</b> atau <b>Excel (.xlsx)</b> dengan lajur: <code class="bg-green-100 px-1 rounded">Block Name</code>, <code class="bg-green-100 px-1 rounded">Area (Ha)</code>, <code class="bg-green-100 px-1 rounded">No. of Palm</code>. Nama blok yang sama akan dilangkau.',
         btn_choose_file:     '📂 Pilih Fail',
@@ -4262,7 +4341,7 @@ function logoutUser() {
  * estate name. Falls back to "🌴 OilPalm Stock" when no estate selected.
  */
 function updateAppTitle(estate) { return; // sidebar title is static
-    const title = estate ? `🌴 ${estate}` : '🌴 OilPalm Stock';
+    const title = estate ? `🌴 ${estate}` : '';
     const sidebarTitle = document.getElementById('sidebarAppTitle');
     const mobileTitle  = document.getElementById('mobileAppTitle');
     if (sidebarTitle) sidebarTitle.textContent = title;
@@ -4655,9 +4734,10 @@ function fmSelectAllBlocks(check) {
 
 /** Save or update a Field Maintenance round. Called by the Save Round button. */
 function saveFieldMaintRound() {
-    const name   = document.getElementById('fmName').value.trim();
-    const notes  = document.getElementById('fmNotes').value.trim();
-    const blocks = [...document.querySelectorAll('.fm-block-cb:checked')].map(cb => cb.value);
+    const name         = document.getElementById('fmName').value.trim();
+    const notes        = document.getElementById('fmNotes').value.trim();
+    const targetPeriod = document.getElementById('fmTargetPeriod').value;
+    const blocks       = [...document.querySelectorAll('.fm-block-cb:checked')].map(cb => cb.value);
 
     if (!name) { alert('Please enter a Round Name.'); return; }
 
@@ -4669,15 +4749,16 @@ function saveFieldMaintRound() {
         if (idx < 0) { editingFmRoundId = null; return; }
         fieldMaintRounds[idx] = {
             ...fieldMaintRounds[idx],  // preserve id and createdAt
-            name, blocks, notes
+            name, blocks, notes, targetPeriod
         };
         cancelEditFieldMaintRound();
     } else {
         // CREATE new round
-        fieldMaintRounds.push({ id: Date.now(), name, blocks, notes, createdAt: today });
+        fieldMaintRounds.push({ id: Date.now(), name, blocks, notes, targetPeriod, createdAt: today });
         // Clear form fields
-        document.getElementById('fmName').value  = '';
-        document.getElementById('fmNotes').value = '';
+        document.getElementById('fmName').value         = '';
+        document.getElementById('fmNotes').value        = '';
+        document.getElementById('fmTargetPeriod').value = '';
         document.querySelectorAll('.fm-block-cb').forEach(cb => cb.checked = false);
     }
 
@@ -4697,8 +4778,9 @@ function saveFieldMaintRound() {
 function startEditFmRound(id) {
     const r = fieldMaintRounds.find(x => String(x.id) === String(id));
     if (!r) return;
-    document.getElementById('fmName').value  = r.name;
-    document.getElementById('fmNotes').value = r.notes || '';
+    document.getElementById('fmName').value         = r.name;
+    document.getElementById('fmNotes').value        = r.notes || '';
+    document.getElementById('fmTargetPeriod').value = r.targetPeriod || '';
     renderFmBlocksGrid(r.blocks || []);
     editingFmRoundId = id;
     document.getElementById('fmSubmitBtn').textContent = 'Update Round';
@@ -4711,8 +4793,9 @@ function startEditFmRound(id) {
 /** Reset the form back to Add mode. */
 function cancelEditFieldMaintRound() {
     editingFmRoundId = null;
-    document.getElementById('fmName').value  = '';
-    document.getElementById('fmNotes').value = '';
+    document.getElementById('fmName').value         = '';
+    document.getElementById('fmNotes').value        = '';
+    document.getElementById('fmTargetPeriod').value = '';
     document.querySelectorAll('.fm-block-cb').forEach(cb => cb.checked = false);
     document.getElementById('fmSubmitBtn').textContent = 'Save Round';
     document.getElementById('fmCancelBtn').classList.add('hidden');
@@ -4736,7 +4819,7 @@ function renderFieldMaintRounds() {
     body.innerHTML = '';
 
     if (fieldMaintRounds.length === 0) {
-        body.innerHTML = `<tr><td colspan="5" class="px-3 py-4 text-center text-gray-500">${currentLang==='ms'?'Tiada pusingan penyelenggaraan ditetapkan lagi.':'No maintenance rounds defined yet.'}</td></tr>`;
+        body.innerHTML = `<tr><td colspan="6" class="px-3 py-4 text-center text-gray-500">${currentLang==='ms'?'Tiada pusingan penyelenggaraan ditetapkan lagi.':'No maintenance rounds defined yet.'}</td></tr>`;
         return;
     }
 
@@ -4751,6 +4834,7 @@ function renderFieldMaintRounds() {
         tr.className = 'border-b border-green-100 hover:bg-green-50';
         tr.innerHTML = `
             <td class="px-3 py-2 font-semibold">🔧 ${r.name}</td>
+            <td class="px-3 py-2 text-xs text-gray-500">${r.targetPeriod || '—'}</td>
             <td class="px-3 py-2">${blocksHtml}</td>
             <td class="px-3 py-2 text-gray-600 italic text-sm">${r.notes || '—'}</td>
             <td class="px-3 py-2 text-xs text-gray-400">${r.createdAt || '—'}</td>
