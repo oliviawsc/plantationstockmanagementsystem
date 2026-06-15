@@ -3136,6 +3136,7 @@ function renderManuringPctChart() {
         monthlyBags = monthlyBags.map(function(v){ return parseFloat(v.toFixed(2)); });
         return { id:r.id, name:r.name, tpLabel:tpLabel, tpMIdx:tpMIdx,
                  budget:Math.round(budget), applied:Math.round(appliedBags),
+                 budgetRaw:budget, appliedRaw:appliedBags,
                  pct:pct, fertilizer:r.fertilizerName||'--', monthlyBags:monthlyBags };
     });
 
@@ -3215,22 +3216,29 @@ function renderManuringPctChart() {
                             ctx.save();
                             meta.data.forEach(function(bar,i){
                                 if (rData.monthlyBags[i]<=0) return;
-                                var bags   = Math.round(rData.monthlyBags[i]);
-                                var barH   = chart.scales.y.getPixelForValue(0) - bar.y;
-                                var isTarget = i===rData.tpMIdx;
-                                // % applied inside bar (if bar tall enough)
-                                if (rData.budget>0 && barH>18) {
-                                    var pctM = Math.round((rData.monthlyBags[i]/rData.budget)*100);
-                                    ctx.font='bold 7px Inter,sans-serif';
-                                    ctx.fillStyle='rgba(255,255,255,0.92)';
-                                    ctx.textAlign='center';ctx.textBaseline='middle';
-                                    ctx.fillText(pctM+'%', bar.x, bar.y + barH/2);
+                                var bags       = Math.round(rData.monthlyBags[i]);
+                                var y0         = chart.scales.y.getPixelForValue(0);
+                                var barH       = y0 - bar.y;
+                                var barCentreX = bar.x;
+                                var barCentreY = bar.y + barH / 2;
+                                var isTarget   = i===rData.tpMIdx;
+                                // Quantity INSIDE bar — white, centred horizontally and vertically
+                                if (barH>14) {
+                                    ctx.font='bold 8px Inter,sans-serif';
+                                    ctx.fillStyle='#ffffff';
+                                    ctx.textAlign='center';
+                                    ctx.textBaseline='middle';
+                                    ctx.fillText(bags, barCentreX, barCentreY);
                                 }
-                                // Bags label above bar
-                                ctx.font='bold 8px Inter,sans-serif';
-                                ctx.fillStyle=isTarget?'#4338CA':'#166634';
-                                ctx.textAlign='center';ctx.textBaseline='bottom';
-                                ctx.fillText(bags, bar.x, bar.y-1);
+                                // % applied ABOVE bar
+                                if (rData.budgetRaw>0) {
+                                    var pctM = Math.round((rData.monthlyBags[i]/rData.budgetRaw)*100);
+                                    ctx.font='bold 8px Inter,sans-serif';
+                                    ctx.fillStyle=isTarget?'#4338CA':'#166634';
+                                    ctx.textAlign='center';
+                                    ctx.textBaseline='bottom';
+                                    ctx.fillText(pctM+'%', barCentreX, bar.y-1);
+                                }
                             });
                             ctx.restore();
                         }
