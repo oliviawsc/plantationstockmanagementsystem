@@ -433,9 +433,50 @@
                 </div>
 
             </div>
-        </section>
 
-        <!-- ============ PAGE 2: ITEM FILE ============ -->
+            <!-- ── Manuring Program – Target vs Actual (%) ── -->
+            <div class="bg-white p-6 rounded-xl shadow mt-6">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-1">
+                    <div>
+                        <h3 class="text-lg font-bold text-green-800">🌱 Manuring Program — Target vs Actual (%)</h3>
+                        <p class="text-xs text-gray-400 mt-0.5" id="manuringPctChartYear"></p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs text-gray-500 font-medium">Round:</label>
+                        <select id="manuringPctRoundFilter" onchange="renderManuringPctChart()"
+                            class="text-xs border border-gray-200 rounded px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-green-400">
+                            <option value="all">All Rounds</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="manuringPctChartWrap" style="position:relative;height:260px;">
+                    <canvas id="manuringPctChart"></canvas>
+                </div>
+                <p id="manuringPctChartEmpty" class="hidden text-center text-gray-400 py-8 text-sm">No manuring rounds with a Target Period set for the current year.</p>
+                <div class="flex flex-wrap gap-5 mt-3">
+                    <div class="flex items-center gap-2">
+                        <span style="width:22px;height:0;border-top:2px dashed #EF4444;display:inline-block;"></span>
+                        <span class="text-xs text-gray-500">100% Target</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span style="width:12px;height:12px;border-radius:2px;background:#22C55E;display:inline-block;"></span>
+                        <span class="text-xs text-gray-500">≥ 100%</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span style="width:12px;height:12px;border-radius:2px;background:#F59E0B;display:inline-block;"></span>
+                        <span class="text-xs text-gray-500">50 – 99%</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span style="width:12px;height:12px;border-radius:2px;background:#EF4444;display:inline-block;"></span>
+                        <span class="text-xs text-gray-500">&lt; 50%</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span style="width:12px;height:12px;border-radius:2px;background:rgba(203,213,225,0.5);border:1px solid #CBD5E1;display:inline-block;"></span>
+                        <span class="text-xs text-gray-500">No data</span>
+                    </div>
+                </div>
+            </div>
+        </section>
         <section id="items" class="page-section">
             <h2 class="text-3xl font-bold mb-6" data-i18n="nav_items">Item File (Master Data)</h2>
             <div class="bg-white p-6 rounded-xl shadow mb-8">
@@ -1486,8 +1527,14 @@ function loadEstateData(estate) {
     items            = JSON.parse(localStorage.getItem(keys.items))            || [];
     locations        = JSON.parse(localStorage.getItem(keys.locations))        || [];
     transactions     = JSON.parse(localStorage.getItem(keys.transactions))     || [];
-    manuringRounds   = JSON.parse(localStorage.getItem(keys.manuringRounds))   || [];
-    fieldMaintRounds = JSON.parse(localStorage.getItem(keys.fieldMaintRounds)) || [];
+    manuringRounds   = (JSON.parse(localStorage.getItem(keys.manuringRounds))   || []).map(r => {
+        if (r.targetperiod !== undefined && r.targetPeriod === undefined) r.targetPeriod = r.targetperiod;
+        return r;
+    });
+    fieldMaintRounds = (JSON.parse(localStorage.getItem(keys.fieldMaintRounds)) || []).map(r => {
+        if (r.targetperiod !== undefined && r.targetPeriod === undefined) r.targetPeriod = r.targetperiod;
+        return r;
+    });
     maintClaims      = JSON.parse(localStorage.getItem(keys.maintClaims))      || [];
     chemIngredients  = JSON.parse(localStorage.getItem(keys.chemIngredients))  || [];
     // Refresh id snapshots
@@ -1597,8 +1644,23 @@ async function loadFromSupabase() {
         if (!itemsRes.error  && itemsRes.data  !== null) items            = itemsRes.data;
         if (!locsRes.error   && locsRes.data   !== null) locations        = locsRes.data;
         if (!txnsRes.error   && txnsRes.data   !== null) transactions     = txnsRes.data;
-        if (!roundsRes.error && roundsRes.data !== null) manuringRounds   = roundsRes.data;
-        if (!fmRoundsRes.error && fmRoundsRes.data !== null) fieldMaintRounds = fmRoundsRes.data;
+        if (!roundsRes.error && roundsRes.data !== null) {
+            manuringRounds = roundsRes.data.map(r => {
+                // Normalise targetPeriod regardless of Postgres column casing
+                if (r.targetperiod !== undefined && r.targetPeriod === undefined) {
+                    r.targetPeriod = r.targetperiod;
+                }
+                return r;
+            });
+        }
+        if (!fmRoundsRes.error && fmRoundsRes.data !== null) {
+            fieldMaintRounds = fmRoundsRes.data.map(r => {
+                if (r.targetperiod !== undefined && r.targetPeriod === undefined) {
+                    r.targetPeriod = r.targetperiod;
+                }
+                return r;
+            });
+        }
         if (!claimsRes.error && claimsRes.data !== null) maintClaims      = claimsRes.data;
         if (!chemRes.error   && chemRes.data   !== null) chemIngredients  = chemRes.data;
 
@@ -3015,21 +3077,240 @@ function renderDashboard() {
         .slice(0, 5);
     if (recent.length === 0) {
         body.innerHTML = '<tr><td colspan="5" class="px-3 py-4 text-center text-gray-500">No transactions yet.</td></tr>';
-        return;
-    }
-    recent.forEach(t => {
-        const tr = document.createElement('tr');
-        tr.className = 'border-b border-green-100 hover:bg-green-50';
-        const typeColour = t.type === 'In'  ? 'text-green-700'
-                        : t.type === 'Out' ? 'text-red-600'
-                        : 'text-yellow-700';
-        tr.innerHTML = `
+    } else {
+        recent.forEach(t => {
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-green-100 hover:bg-green-50';
+            const typeColour = t.type === 'In'  ? 'text-green-700'
+                            : t.type === 'Out' ? 'text-red-600'
+                            : 'text-yellow-700';
+            tr.innerHTML = `
             <td class="px-3 py-2">${t.date}</td>
             <td class="px-3 py-2">${t.itemName}</td>
             <td class="px-3 py-2 font-semibold ${typeColour}">${t.type}</td>
             <td class="px-3 py-2">${parseFloat(t.qty).toFixed(2)} ${t.unit}</td>
             <td class="px-3 py-2">${t.location}</td>`;
-        body.appendChild(tr);
+            body.appendChild(tr);
+        });
+    }
+
+    // Manuring Program % achievement chart — always render regardless of transactions
+    renderManuringPctChart();
+}
+
+/* =================================================================
+   MANURING PROGRAM – TARGET vs ACTUAL (%) CHART
+   X: Jan–Dec  |  Y: Achievement %  |  Red dashed 100% reference line
+   ================================================================= */
+let manuringPctChartInstance = null;
+
+function renderManuringPctChart() {
+    const canvas  = document.getElementById('manuringPctChart');
+    const wrap    = document.getElementById('manuringPctChartWrap');
+    const empty   = document.getElementById('manuringPctChartEmpty');
+    const yearLbl = document.getElementById('manuringPctChartYear');
+    const filter  = document.getElementById('manuringPctRoundFilter');
+    if (!canvas || !wrap || !empty) return;
+
+    const currentYear = new Date().getFullYear();
+    if (yearLbl) yearLbl.textContent = 'Current Year: ' + currentYear;
+
+    // Rounds that have a targetPeriod in the current year
+    const roundsWithTarget = manuringRounds.filter(function(r) {
+        const tp = r.targetPeriod || r.targetperiod || '';
+        return tp.startsWith(String(currentYear));
+    });
+
+    // Populate round filter, preserving current selection
+    const prevSel = filter ? filter.value : 'all';
+    if (filter) {
+        filter.innerHTML = '<option value="all">All Rounds</option>' +
+            roundsWithTarget.map(function(r) {
+                return '<option value="' + r.id + '">' + r.name + '</option>';
+            }).join('');
+        const optVals = Array.prototype.map.call(filter.options, function(o) { return o.value; });
+        filter.value = optVals.indexOf(prevSel) !== -1 ? prevSel : 'all';
+    }
+    const selectedId = filter ? filter.value : 'all';
+
+    const rounds = roundsWithTarget.filter(function(r) {
+        return selectedId === 'all' || String(r.id) === String(selectedId);
+    });
+
+    // No eligible rounds → show empty state
+    if (rounds.length === 0) {
+        wrap.style.display = 'none';
+        empty.classList.remove('hidden');
+        if (manuringPctChartInstance) { manuringPctChartInstance.destroy(); manuringPctChartInstance = null; }
+        return;
+    }
+    wrap.style.display = '';
+    empty.classList.add('hidden');
+
+    const MONTHS      = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const MONTH_NAMES = ['January','February','March','April','May','June',
+                         'July','August','September','October','November','December'];
+
+    // Per-month accumulators
+    const budgetByMonth  = new Array(12).fill(0);
+    const appliedByMonth = new Array(12).fill(0);
+    const targetRoundsByMonth = Array.from({length: 12}, function() { return []; });
+    const actualRoundsByMonth = Array.from({length: 12}, function() { return []; });
+
+    rounds.forEach(function(r) {
+        // Budget placed in targetPeriod month
+        const tp    = r.targetPeriod || r.targetperiod || '';
+        const parts = tp.split('-');
+        const mIdx  = parseInt(parts[1], 10) - 1;
+        if (mIdx >= 0 && mIdx < 12) {
+            const budget = calcRoundBudget(r);
+            budgetByMonth[mIdx] += budget;
+            if (budget > 0 && targetRoundsByMonth[mIdx].indexOf(r.name) === -1) {
+                targetRoundsByMonth[mIdx].push(r.name);
+            }
+        }
+        // Applied bags from Out transactions linked to this round in current year
+        const kgPerUnit = getKgPerUnit(r);
+        transactions
+            .filter(function(t) {
+                return String(t.manuringRoundId) === String(r.id) &&
+                       t.type === 'Out' &&
+                       t.date && t.date.startsWith(String(currentYear));
+            })
+            .forEach(function(t) {
+                const tMonth = parseInt((t.date || '').split('-')[1], 10) - 1;
+                if (tMonth >= 0 && tMonth < 12) {
+                    const bags = kgPerUnit > 0
+                        ? (parseFloat(t.qty) || 0) / kgPerUnit
+                        : (parseFloat(t.qty) || 0);
+                    appliedByMonth[tMonth] += bags;
+                    if (actualRoundsByMonth[tMonth].indexOf(r.name) === -1) {
+                        actualRoundsByMonth[tMonth].push(r.name);
+                    }
+                }
+            });
+    });
+
+    // Raw achievement % per month (uncapped, for tooltip and labels)
+    const pctRaw = MONTHS.map(function(_, i) {
+        if (budgetByMonth[i] <= 0) return 0;
+        return parseFloat(((appliedByMonth[i] / budgetByMonth[i]) * 100).toFixed(1));
+    });
+    // Bar data capped at 115 so 100% reference line always stays visible
+    const barData   = pctRaw.map(function(p) { return Math.min(p, 115); });
+    const barColors = pctRaw.map(function(p, i) {
+        if (budgetByMonth[i] <= 0) return 'rgba(203,213,225,0.45)';
+        if (p >= 100) return '#22C55E';
+        if (p >= 50)  return '#F59E0B';
+        return '#EF4444';
+    });
+
+    if (manuringPctChartInstance) { manuringPctChartInstance.destroy(); manuringPctChartInstance = null; }
+
+    // Plugin: red dashed 100% reference line + "Target 100%" label
+    const referenceLine100 = {
+        id: 'referenceLine100',
+        afterDraw: function(chart) {
+            const ctx   = chart.ctx;
+            const yAxis = chart.scales.y;
+            const xAxis = chart.scales.x;
+            const y100  = yAxis.getPixelForValue(100);
+            if (y100 < yAxis.top || y100 > yAxis.bottom) return;
+            ctx.save();
+            ctx.beginPath();
+            ctx.setLineDash([6, 4]);
+            ctx.strokeStyle = '#EF4444';
+            ctx.lineWidth   = 1.8;
+            ctx.moveTo(xAxis.left, y100);
+            ctx.lineTo(xAxis.right, y100);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle    = '#EF4444';
+            ctx.font         = 'bold 10px Inter, sans-serif';
+            ctx.textAlign    = 'right';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText('Target 100%', xAxis.right - 4, y100 - 3);
+            ctx.restore();
+        }
+    };
+
+    // Plugin: % labels above each bar
+    const pctLabels = {
+        id: 'pctLabels',
+        afterDatasetsDraw: function(chart) {
+            const ctx  = chart.ctx;
+            const meta = chart.getDatasetMeta(0);
+            ctx.save();
+            ctx.font         = 'bold 10px Inter, sans-serif';
+            ctx.textAlign    = 'center';
+            ctx.textBaseline = 'bottom';
+            meta.data.forEach(function(bar, i) {
+                if (pctRaw[i] <= 0) return;
+                const colour = pctRaw[i] >= 100 ? '#15803D'
+                             : pctRaw[i] >= 50  ? '#B45309' : '#B91C1C';
+                ctx.fillStyle = colour;
+                ctx.fillText(pctRaw[i] + '%', bar.x, bar.y - 2);
+            });
+            ctx.restore();
+        }
+    };
+
+    manuringPctChartInstance = new Chart(canvas, {
+        type:    'bar',
+        plugins: [referenceLine100, pctLabels],
+        data: {
+            labels: MONTHS,
+            datasets: [{
+                label:           'Achievement %',
+                data:            barData,
+                backgroundColor: barColors,
+                borderColor:     barColors,
+                borderWidth:     1,
+                borderRadius:    4
+            }]
+        },
+        options: {
+            responsive:          true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: function(items) {
+                            return MONTH_NAMES[items[0].dataIndex] + ' ' + currentYear;
+                        },
+                        label: function(ctx) {
+                            const i     = ctx.dataIndex;
+                            const tRnds = targetRoundsByMonth[i].length
+                                ? targetRoundsByMonth[i].join(', ') : '—';
+                            const aRnds = actualRoundsByMonth[i].length
+                                ? actualRoundsByMonth[i].join(', ') : '—';
+                            return [
+                                'Achievement  : ' + pctRaw[i] + '%',
+                                'Target Round : ' + tRnds,
+                                'Actual Round : ' + aRnds
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 11 } }
+                },
+                y: {
+                    beginAtZero: true,
+                    max:  115,
+                    grid: { color: '#F1F5F9' },
+                    ticks: {
+                        stepSize: 20,
+                        font: { size: 11 },
+                        callback: function(v) { return v <= 100 ? v + '%' : ''; }
+                    }
+                }
+            }
+        }
     });
 }
 
