@@ -1040,7 +1040,6 @@
                         <thead class="bg-green-100 text-green-800">
                             <tr>
                                 <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_date_month">Month</th>
                                 <th class="px-3 py-2 text-right" data-i18n="mp_col_total_area">Total Block Area (Ha)</th>
                                 <th class="px-3 py-2 text-right" data-i18n="mp_col_claimed">Total Claimed (Ha)</th>
                                 <th class="px-3 py-2 text-right" data-i18n="mp_col_pct">% Progress</th>
@@ -1068,7 +1067,6 @@
                             <tr>
                                 <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
                                 <th class="px-3 py-2 text-left" data-i18n="col_block">Block</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_date_month">Month</th>
                                 <th class="px-3 py-2 text-right" data-i18n="mp_col_block_area">Block Area (Ha)</th>
                                 <th class="px-3 py-2 text-right" data-i18n="mp_col_claimed_area">Claimed Area (Ha)</th>
                                 <th class="px-3 py-2 text-right" data-i18n="mp_col_pct">% Progress</th>
@@ -5353,15 +5351,15 @@ function renderMpByRound() {
     body.innerHTML = '';
 
     if (fieldMaintRounds.length === 0 || maintClaims.length === 0) {
-        body.innerHTML = '<tr><td colspan="5" class="px-3 py-3 text-center text-gray-400">No data yet. Add maintenance rounds and claims above.</td></tr>';
+        body.innerHTML = '<tr><td colspan="4" class="px-3 py-3 text-center text-gray-400">No data yet. Add maintenance rounds and claims above.</td></tr>';
         return;
     }
 
-    // Group claims by roundId + month
+    // Group claims by roundId only (aggregate across ALL months)
     const grouped = {};
     maintClaims.forEach(c => {
-        const key = `${c.roundId}||${c.month}`;
-        if (!grouped[key]) grouped[key] = { roundId: c.roundId, roundName: c.roundName, month: c.month, totalClaimed: 0 };
+        const key = String(c.roundId);
+        if (!grouped[key]) grouped[key] = { roundId: c.roundId, roundName: c.roundName, totalClaimed: 0 };
         grouped[key].totalClaimed += parseFloat(c.claimedArea) || 0;
     });
 
@@ -5378,10 +5376,11 @@ function renderMpByRound() {
         tr.className = 'border-b border-green-100 hover:bg-green-50';
         tr.innerHTML = `
             <td class="px-3 py-2 font-semibold">🔧 ${g.roundName}</td>
-            <td class="px-3 py-2">${g.month}</td>
             <td class="px-3 py-2 text-right">${totalArea.toFixed(2)}</td>
             <td class="px-3 py-2 text-right font-bold text-green-700">${g.totalClaimed.toFixed(2)}</td>
-            <td class="px-3 py-2">${progressBar(pct)}</td>`;
+            <td class="px-3 py-2">
+                <span class="${pct >= 100 ? 'text-green-700' : pct >= 50 ? 'text-yellow-700' : 'text-red-600'} font-bold">${Math.round(pct)}%</span>
+            </td>`;
         body.appendChild(tr);
     });
 }
@@ -5393,32 +5392,41 @@ function renderMpByBlock() {
     body.innerHTML = '';
 
     if (maintClaims.length === 0) {
-        body.innerHTML = '<tr><td colspan="7" class="px-3 py-3 text-center text-gray-400">No claims recorded yet.</td></tr>';
+        body.innerHTML = '<tr><td colspan="6" class="px-3 py-3 text-center text-gray-400">No claims recorded yet.</td></tr>';
         return;
     }
 
+    // Group claims by roundId + blockName (aggregate across ALL months)
+    const grouped = {};
     maintClaims.forEach(c => {
-        const loc       = locations.find(l => l.name === c.blockName);
+        const key = `${c.roundId}||${c.blockName}`;
+        if (!grouped[key]) grouped[key] = { roundId: c.roundId, roundName: c.roundName, blockName: c.blockName, totalClaimed: 0, lastId: c.id };
+        grouped[key].totalClaimed += parseFloat(c.claimedArea) || 0;
+        grouped[key].lastId = c.id;   // keep a claim id for edit/delete reference
+    });
+
+    Object.values(grouped).forEach(g => {
+        const loc       = locations.find(l => l.name === g.blockName);
         const blockArea = loc ? parseFloat(loc.area) || 0 : 0;
-        const claimed   = parseFloat(c.claimedArea) || 0;
-        const pct       = blockArea > 0 ? (claimed / blockArea) * 100 : 0;
+        const pct       = blockArea > 0 ? (g.totalClaimed / blockArea) * 100 : 0;
 
         const tr = document.createElement('tr');
         tr.className = 'border-b border-green-100 hover:bg-green-50';
         tr.innerHTML = `
-            <td class="px-3 py-2 font-semibold">🔧 ${c.roundName}</td>
+            <td class="px-3 py-2 font-semibold">🔧 ${g.roundName}</td>
             <td class="px-3 py-2">
-                <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">${c.blockName}</span>
+                <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">${g.blockName}</span>
             </td>
-            <td class="px-3 py-2">${c.month}</td>
             <td class="px-3 py-2 text-right">${blockArea.toFixed(2)}</td>
-            <td class="px-3 py-2 text-right font-bold text-green-700">${claimed.toFixed(2)}</td>
-            <td class="px-3 py-2">${progressBar(pct)}</td>
+            <td class="px-3 py-2 text-right font-bold text-green-700">${g.totalClaimed.toFixed(2)}</td>
+            <td class="px-3 py-2">
+                <span class="${pct >= 100 ? 'text-green-700' : pct >= 50 ? 'text-yellow-700' : 'text-red-600'} font-bold">${Math.round(pct)}%</span>
+            </td>
             <td class="px-3 py-2 whitespace-nowrap">
                 <button class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded mr-1"
-                    onclick="startEditMaintClaim('${c.id}')">✏️ Edit</button>
+                    onclick="startEditMaintClaim('${g.lastId}')">✏️ Edit</button>
                 <button class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold px-3 py-1 rounded"
-                    onclick="deleteMaintClaim('${c.id}')">🗑 Delete</button>
+                    onclick="deleteMaintClaim('${g.lastId}')">🗑 Delete</button>
             </td>`;
         body.appendChild(tr);
     });
