@@ -454,6 +454,26 @@
                 <div id="manuringPctCards" style="display:flex;flex-wrap:wrap;gap:12px;padding:16px 24px 24px;"></div>
             </div>
 
+            <!-- Maintenance Program - Progress Tracker -->
+            <div class="bg-white rounded-xl shadow mt-6" style="overflow:hidden;">
+                <div style="background:linear-gradient(135deg,#92400E 0%,#B45309 100%);padding:20px 24px 16px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                        <div>
+                            <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 2px;">&#128295; Maintenance Program &#8212; Progress Tracker</h3>
+                            <p style="color:#fde68a;font-size:11.5px;margin:0;" id="maintPctTrackerYear"></p>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="color:#fde68a;font-size:11.5px;font-weight:500;">Year:</span>
+                            <select id="maintPctTrackerYearFilter" onchange="renderMaintPctTracker()"
+                                style="font-size:11.5px;padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:#fff;outline:none;cursor:pointer;">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <p id="maintPctTrackerEmpty" class="hidden" style="text-align:center;color:#94A3B8;padding:40px 0;font-size:13px;">No maintenance rounds found. Add rounds in the Maintenance Program section.</p>
+                <div id="maintPctTrackerCards" style="display:flex;flex-wrap:wrap;gap:12px;padding:16px 24px 24px;"></div>
+            </div>
+
         </section>
 
         <!-- ============ PAGE 2: ITEM FILE ============ -->
@@ -966,6 +986,11 @@
                             class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                     </div>
                     <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="fm_lbl_maint_type">Type of Maintenance</label>
+                        <input id="fmMaintType" type="text" placeholder="e.g. Spraying, Weeding, Pruning"
+                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                    </div>
+                    <div>
                         <label class="block text-sm font-semibold mb-1" data-i18n="lbl_target_period">Target Period <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
                         <input id="fmTargetPeriod" type="month" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                     </div>
@@ -1006,6 +1031,7 @@
                         <thead class="bg-green-100 text-green-800">
                             <tr>
                                 <th data-i18n="fm_col_round_name" class="px-3 py-2 text-left">Round Name</th>
+                                <th data-i18n="fm_lbl_maint_type" class="px-3 py-2 text-left">Type of Maintenance</th>
                                 <th data-i18n="lbl_target_period" class="px-3 py-2 text-left">Target Period</th>
                                 <th data-i18n="fm_col_blocks" class="px-3 py-2 text-left">Blocks Involved</th>
                                 <th data-i18n="fm_col_notes" class="px-3 py-2 text-left">Notes</th>
@@ -1649,6 +1675,7 @@ async function loadFromSupabase() {
         renderCiTable();
         renderMaintProgressTables();
         renderManuringPctChart();
+        renderMaintPctTracker();
     } catch (err) {
         console.error('[Supabase] loadFromSupabase failed', err);
     }
@@ -3074,6 +3101,7 @@ function renderDashboard() {
     });
 
     renderManuringPctChart();
+    renderMaintPctTracker();
 }
 
 
@@ -3258,6 +3286,239 @@ function renderManuringPctChart() {
                                     ctx.textBaseline='bottom';
                                     ctx.fillText(pctM+'%', barCentreX, bar.y-1);
                                 }
+                            });
+                            ctx.restore();
+                        }
+                    }]
+                });
+            });
+        })(d);
+    });
+}
+
+/* =================================================================
+   MAINTENANCE PROGRAM – PROGRESS TRACKER (per-round monthly cards)
+   Monthly mini chart shows CUMULATIVE % progress by month
+   ================================================================= */
+let maintPctTrackerInstances = {};
+
+function renderMaintPctTracker() {
+    var yearLbl  = document.getElementById('maintPctTrackerYear');
+    var yearSel  = document.getElementById('maintPctTrackerYearFilter');
+    var empty    = document.getElementById('maintPctTrackerEmpty');
+    var cardBox  = document.getElementById('maintPctTrackerCards');
+    if (!empty || !cardBox) return;
+
+    var currentYear = new Date().getFullYear();
+    var yearsInData = {};
+    yearsInData[String(currentYear)] = 1;
+    fieldMaintRounds.forEach(function(r) {
+        var tp = r.targetPeriod || r.targetperiod || '';
+        if (tp) yearsInData[tp.slice(0,4)] = 1;
+        maintClaims.filter(function(c){ return String(c.roundId)===String(r.id)&&c.month; })
+            .forEach(function(c){ yearsInData[c.month.slice(0,4)] = 1; });
+    });
+    var sortedYears = Object.keys(yearsInData).sort().reverse();
+    if (yearSel) {
+        var prevYear = yearSel.value || String(currentYear);
+        yearSel.innerHTML = sortedYears.map(function(y){
+            return '<option value="'+y+'"'+(y===prevYear?' selected':'')+'>'+y+'</option>';
+        }).join('');
+    }
+    var selectedYear = (yearSel && yearSel.value) ? yearSel.value : String(currentYear);
+    if (yearLbl) yearLbl.textContent = 'Tracking Year: ' + selectedYear;
+
+    var rounds = fieldMaintRounds.filter(function(r){
+        var tp = r.targetPeriod || r.targetperiod || '';
+        var hasTp    = tp.startsWith(selectedYear);
+        var hasClaim = maintClaims.some(function(c){
+            return String(c.roundId)===String(r.id)&&c.month&&c.month.startsWith(selectedYear);
+        });
+        return hasTp || hasClaim;
+    });
+
+    Object.keys(maintPctTrackerInstances).forEach(function(k){
+        if (maintPctTrackerInstances[k]){ maintPctTrackerInstances[k].destroy(); delete maintPctTrackerInstances[k]; }
+    });
+
+    if (rounds.length === 0) {
+        empty.classList.remove('hidden');
+        cardBox.innerHTML = '';
+        return;
+    }
+    empty.classList.add('hidden');
+
+    var MN    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var MFull = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+    var roundData = rounds.map(function(r){
+        var tp      = r.targetPeriod || r.targetperiod || '';
+        var tpMIdx  = tp ? parseInt(tp.split('-')[1],10)-1 : -1;
+        var tpLabel = tpMIdx>=0 ? MN[tpMIdx]+' '+tp.slice(0,4) : '--';
+
+        var roundBlocks = r.blocks && r.blocks.length>0 ? r.blocks : locations.map(function(l){return l.name;});
+        var totalArea   = roundBlocks.reduce(function(s,b){
+            var loc = locations.find(function(l){return l.name===b;});
+            return s + (loc ? parseFloat(loc.area)||0 : 0);
+        }, 0);
+
+        var totalClaimed = maintClaims
+            .filter(function(c){return String(c.roundId)===String(r.id);})
+            .reduce(function(s,c){return s+(parseFloat(c.claimedArea)||0);}, 0);
+        var pct = totalArea>0 ? Math.round((totalClaimed/totalArea)*100) : null;
+
+        /* Monthly claimed (selected year) */
+        var monthlyClaimedArr = new Array(12).fill(0);
+        maintClaims
+            .filter(function(c){return String(c.roundId)===String(r.id)&&c.month&&c.month.startsWith(selectedYear);})
+            .forEach(function(c){
+                var mi = parseInt(c.month.split('-')[1],10)-1;
+                if (mi>=0&&mi<12) monthlyClaimedArr[mi] += parseFloat(c.claimedArea)||0;
+            });
+
+        /* Cumulative % per month — only show where data exists, stop after 100% reached */
+        var cumulativePct = new Array(12).fill(null);
+        var cumArea = 0;
+        var completed = false;
+        for (var mi=0; mi<12; mi++){
+            cumArea += monthlyClaimedArr[mi];
+            if (completed) {
+                /* After 100% — no bar shown */
+                cumulativePct[mi] = null;
+            } else if (cumArea>0){
+                var pctVal = totalArea>0 ? parseFloat(((cumArea/totalArea)*100).toFixed(1)) : 0;
+                cumulativePct[mi] = pctVal;
+                if (pctVal >= 100) completed = true;
+            }
+        }
+
+        return { id:r.id, name:r.name, tpLabel:tpLabel, tpMIdx:tpMIdx,
+                 totalArea:parseFloat(totalArea.toFixed(2)), totalClaimed:parseFloat(totalClaimed.toFixed(2)),
+                 pct:pct, monthlyClaimedArr:monthlyClaimedArr, cumulativePct:cumulativePct };
+    });
+
+    cardBox.innerHTML = '';
+
+    roundData.forEach(function(d){
+        var pctVal   = d.pct;
+        var barW     = pctVal!==null ? Math.min(100,pctVal) : 0;
+        var barColor = pctVal===null ? '#CBD5E1' : pctVal>=100 ? '#22C55E' : pctVal>=50 ? '#F59E0B' : '#EF4444';
+        var badge    = pctVal===null
+            ? '<span style="font-size:10px;color:#94A3B8;font-weight:600;">No target set</span>'
+            : '<span style="font-size:15px;font-weight:800;color:'+barColor+';">'+pctVal+'%</span>';
+
+        var card = document.createElement('div');
+        card.style.cssText = 'flex:1;min-width:240px;max-width:340px;background:#FAFAFA;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;';
+
+        var hdr = '<div style="background:#F1F5F9;padding:12px 14px 10px;border-bottom:1px solid #E2E8F0;">'
+            +'<div style="font-size:12px;font-weight:700;color:#1E293B;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+d.name+'">'+d.name+'</div>'
+            +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
+                +'<div style="font-size:10px;color:#64748B;">&#127919; Target: <b style="color:#0F172A;">'+d.tpLabel+'</b></div>'
+                +badge
+            +'</div>'
+            +'<div style="display:flex;align-items:center;gap:8px;">'
+                +'<div style="flex:1;height:5px;background:#E2E8F0;border-radius:99px;overflow:hidden;">'
+                    +'<div style="width:'+barW+'%;height:100%;background:'+barColor+';border-radius:99px;"></div>'
+                +'</div>'
+                +'<span style="font-size:10px;color:#64748B;white-space:nowrap;">'+d.totalClaimed+' / '+d.totalArea+' Ha</span>'
+            +'</div>'
+            +'</div>';
+
+        var canvasId = 'maintTrackerMonth_'+d.id;
+        var body = '<div style="padding:10px 12px 12px;">'
+            +'<div style="font-size:9.5px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Cumulative Progress by Month ('+selectedYear+')</div>'
+            +'<canvas id="'+canvasId+'" height="90"></canvas>'
+            +'</div>';
+
+        card.innerHTML = hdr + body;
+        cardBox.appendChild(card);
+
+        (function(rData){
+            requestAnimationFrame(function(){
+                var mc = document.getElementById('maintTrackerMonth_'+rData.id);
+                if (!mc) return;
+
+                var barColors = MN.map(function(_,i){
+                    var v = rData.cumulativePct[i];
+                    if (v===null) return 'rgba(203,213,225,.4)';
+                    if (i===rData.tpMIdx) return v>=100?'#22C55E':'#F59E0B';
+                    return v>=100?'#22C55E':v>=50?'#F59E0B':'#FB923C';
+                });
+                var borderColors = MN.map(function(_,i){
+                    return i===rData.tpMIdx ? '#92400E' : 'transparent';
+                });
+                var chartData = rData.cumulativePct.map(function(v,i){
+                    // No bar if nothing was claimed this month
+                    return (v!==null && rData.monthlyClaimedArr[i]>0) ? v : 0;
+                });
+
+                if (maintPctTrackerInstances[rData.id]){ maintPctTrackerInstances[rData.id].destroy(); }
+                maintPctTrackerInstances[rData.id] = new Chart(mc, {
+                    type: 'bar',
+                    data: { labels: MN, datasets: [{
+                        data:            chartData,
+                        backgroundColor: barColors,
+                        borderColor:     borderColors,
+                        borderWidth:     1.5,
+                        borderRadius:    3
+                    }]},
+                    options: {
+                        responsive: true, maintainAspectRatio: true,
+                        layout: { padding: { top: 18 } },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: {
+                                title: function(it){ return MFull[it[0].dataIndex]+' '+selectedYear; },
+                                label: function(ctx){
+                                    var v = rData.cumulativePct[ctx.dataIndex];
+                                    if (v===null||v===0) return '  No data';
+                                    var lines = ['  Cumulative: '+v+'%'];
+                                    var mo = rData.monthlyClaimedArr[ctx.dataIndex];
+                                    if (mo>0) lines.push('  This month: '+mo.toFixed(2)+' Ha');
+                                    if (ctx.dataIndex===rData.tpMIdx) lines.push('  \u2605 Target Month');
+                                    return lines;
+                                }
+                            }}
+                        },
+                        scales: {
+                            x: { grid:{display:false}, ticks:{font:{size:8},maxRotation:0} },
+                            y: { beginAtZero:true, max:100,
+                                 ticks:{font:{size:8},callback:function(v){return v+'%';},maxTicksLimit:5},
+                                 grid:{color:'rgba(241,245,249,.8)'},
+                                 title:{display:true,text:'%',font:{size:7},color:'#94A3B8'} }
+                        }
+                    },
+                    plugins: [{
+                        id: 'maintMonthLabel',
+                        afterDatasetsDraw: function(chart){
+                            var ctx  = chart.ctx;
+                            var meta = chart.getDatasetMeta(0);
+                            ctx.save();
+                            meta.data.forEach(function(bar,i){
+                                var v  = rData.cumulativePct[i];
+                                var ha = rData.monthlyClaimedArr[i];
+                                if (!ha || ha<=0) return;       // skip months with no claim
+                                var y0       = chart.scales.y.getPixelForValue(0);
+                                var barH     = y0 - bar.y;
+                                var isTarget = i===rData.tpMIdx;
+                                /* Ha INSIDE bar — rotated 90° so text is vertical, fully visible */
+                                if (barH>10){
+                                    ctx.save();
+                                    ctx.translate(bar.x, bar.y + barH/2);
+                                    ctx.rotate(-Math.PI/2);
+                                    ctx.font='bold 7px Inter,sans-serif';
+                                    ctx.fillStyle='#ffffff';
+                                    ctx.textAlign='center';
+                                    ctx.textBaseline='middle';
+                                    ctx.fillText(ha.toFixed(1)+' Ha', 0, 0);
+                                    ctx.restore();
+                                }
+                                /* Cumulative % ABOVE bar */
+                                ctx.font='bold 8px Inter,sans-serif';
+                                ctx.fillStyle = isTarget?'#92400E':'#166534';
+                                ctx.textAlign='center';
+                                ctx.textBaseline='bottom';
+                                ctx.fillText(Math.round(v)+'%', bar.x, bar.y-1);
                             });
                             ctx.restore();
                         }
@@ -4084,6 +4345,7 @@ const I18N = {
         fm_col_created:      'Date Created',
         fm_col_transactions: 'Transactions',
         fm_lbl_round_name:   'Round Name',
+        fm_lbl_maint_type:   'Type of Maintenance',
         fm_lbl_blocks:       'Blocks Involved',
         fm_lbl_notes:        'Notes',
         fm_btn_save:         'Save Round',
@@ -4109,6 +4371,7 @@ const I18N = {
         mp_lbl_block:        'Block',
         mp_lbl_area:         'Claimed Maintenance Area (Ha)',
         mp_lbl_month:        'Month of Claim',
+        mp_lbl_maint_type:   'Type of Maintenance',
         mp_btn_save:         'Save Claim',
         mp_col_total_area:   'Total Block Area (Ha)',
         mp_col_claimed:      'Total Claimed (Ha)',
@@ -4272,6 +4535,7 @@ const I18N = {
         fm_col_created:      'Tarikh Dicipta',
         fm_col_transactions: 'Transaksi',
         fm_lbl_round_name:   'Nama Pusingan',
+        fm_lbl_maint_type:   'Jenis Penyelenggaraan',
         fm_lbl_blocks:       'Blok Terlibat',
         fm_lbl_notes:        'Nota',
         fm_btn_save:         'Simpan Pusingan',
@@ -4296,6 +4560,7 @@ const I18N = {
         mp_lbl_block:        'Blok',
         mp_lbl_area:         'Kawasan Penyelenggaraan Dituntut (Ha)',
         mp_lbl_month:        'Bulan Tuntutan',
+        mp_lbl_maint_type:   'Jenis Penyelenggaraan',
         mp_btn_save:         'Simpan Tuntutan',
         mp_col_total_area:   'Jumlah Kawasan Blok (Ha)',
         mp_col_claimed:      'Jumlah Dituntut (Ha)',
@@ -4973,6 +5238,7 @@ function saveFieldMaintRound() {
     const name         = document.getElementById('fmName').value.trim();
     const notes        = document.getElementById('fmNotes').value.trim();
     const targetPeriod = document.getElementById('fmTargetPeriod').value;
+    const maintType    = document.getElementById('fmMaintType').value.trim();
     const blocks       = [...document.querySelectorAll('.fm-block-cb:checked')].map(cb => cb.value);
 
     if (!name) { alert('Please enter a Round Name.'); return; }
@@ -4985,16 +5251,17 @@ function saveFieldMaintRound() {
         if (idx < 0) { editingFmRoundId = null; return; }
         fieldMaintRounds[idx] = {
             ...fieldMaintRounds[idx],  // preserve id and createdAt
-            name, blocks, notes, targetPeriod
+            name, blocks, notes, targetPeriod, maintType
         };
         cancelEditFieldMaintRound();
     } else {
         // CREATE new round
-        fieldMaintRounds.push({ id: Date.now(), name, blocks, notes, targetPeriod, createdAt: today });
+        fieldMaintRounds.push({ id: Date.now(), name, blocks, notes, targetPeriod, maintType, createdAt: today });
         // Clear form fields
-        document.getElementById('fmName').value         = '';
-        document.getElementById('fmNotes').value        = '';
-        document.getElementById('fmTargetPeriod').value = '';
+        document.getElementById('fmName').value          = '';
+        document.getElementById('fmNotes').value         = '';
+        document.getElementById('fmTargetPeriod').value  = '';
+        document.getElementById('fmMaintType').value     = '';
         document.querySelectorAll('.fm-block-cb').forEach(cb => cb.checked = false);
     }
 
@@ -5014,9 +5281,10 @@ function saveFieldMaintRound() {
 function startEditFmRound(id) {
     const r = fieldMaintRounds.find(x => String(x.id) === String(id));
     if (!r) return;
-    document.getElementById('fmName').value         = r.name;
-    document.getElementById('fmNotes').value        = r.notes || '';
-    document.getElementById('fmTargetPeriod').value = r.targetPeriod || '';
+    document.getElementById('fmName').value          = r.name;
+    document.getElementById('fmNotes').value         = r.notes || '';
+    document.getElementById('fmTargetPeriod').value  = r.targetPeriod || '';
+    document.getElementById('fmMaintType').value     = r.maintType || '';
     renderFmBlocksGrid(r.blocks || []);
     editingFmRoundId = id;
     document.getElementById('fmSubmitBtn').textContent = 'Update Round';
@@ -5029,9 +5297,10 @@ function startEditFmRound(id) {
 /** Reset the form back to Add mode. */
 function cancelEditFieldMaintRound() {
     editingFmRoundId = null;
-    document.getElementById('fmName').value         = '';
-    document.getElementById('fmNotes').value        = '';
-    document.getElementById('fmTargetPeriod').value = '';
+    document.getElementById('fmName').value          = '';
+    document.getElementById('fmNotes').value         = '';
+    document.getElementById('fmTargetPeriod').value  = '';
+    document.getElementById('fmMaintType').value     = '';
     document.querySelectorAll('.fm-block-cb').forEach(cb => cb.checked = false);
     document.getElementById('fmSubmitBtn').textContent = 'Save Round';
     document.getElementById('fmCancelBtn').classList.add('hidden');
@@ -5055,7 +5324,7 @@ function renderFieldMaintRounds() {
     body.innerHTML = '';
 
     if (fieldMaintRounds.length === 0) {
-        body.innerHTML = `<tr><td colspan="6" class="px-3 py-4 text-center text-gray-500">${currentLang==='ms'?'Tiada pusingan penyelenggaraan ditetapkan lagi.':'No maintenance rounds defined yet.'}</td></tr>`;
+        body.innerHTML = `<tr><td colspan="7" class="px-3 py-4 text-center text-gray-500">${currentLang==='ms'?'Tiada pusingan penyelenggaraan ditetapkan lagi.':'No maintenance rounds defined yet.'}</td></tr>`;
         return;
     }
 
@@ -5070,6 +5339,7 @@ function renderFieldMaintRounds() {
         tr.className = 'border-b border-green-100 hover:bg-green-50';
         tr.innerHTML = `
             <td class="px-3 py-2 font-semibold">🔧 ${r.name}</td>
+            <td class="px-3 py-2">${r.maintType ? `<span class="inline-block bg-amber-100 text-amber-800 text-xs px-2 py-0.5 rounded-full font-semibold">${r.maintType}</span>` : '<span class="text-gray-400 text-xs">—</span>'}</td>
             <td class="px-3 py-2 text-xs text-gray-500">${r.targetPeriod || '—'}</td>
             <td class="px-3 py-2">${blocksHtml}</td>
             <td class="px-3 py-2 text-gray-600 italic text-sm">${r.notes || '—'}</td>
@@ -5159,7 +5429,6 @@ function saveMaintClaim() {
     if (!round) { alert('Selected round not found.'); return; }
 
     if (editId) {
-        // ── UPDATE existing claim ──
         const idx = maintClaims.findIndex(c => String(c.id) === String(editId));
         if (idx < 0) { cancelEditMaintClaim(); return; }
         maintClaims[idx] = {
@@ -5169,7 +5438,6 @@ function saveMaintClaim() {
         };
         cancelEditMaintClaim();
     } else {
-        // ── CREATE new claim (check for duplicate round+block+month) ──
         const existing = maintClaims.findIndex(c =>
             String(c.roundId) === String(roundId) &&
             c.blockName === blockName && c.month === month
@@ -5182,9 +5450,9 @@ function saveMaintClaim() {
                                blockName, claimedArea, month });
         }
         document.getElementById('mpClaimedArea').value = '';
-        document.getElementById('mpRound').value  = '';
-        document.getElementById('mpBlock').value  = '';
-        document.getElementById('mpMonth').value  = '';
+        document.getElementById('mpRound').value       = '';
+        document.getElementById('mpBlock').value       = '';
+        document.getElementById('mpMonth').value       = '';
     }
 
     save(STORAGE_KEYS.maintClaims, maintClaims);
