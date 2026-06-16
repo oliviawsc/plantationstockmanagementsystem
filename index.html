@@ -332,21 +332,99 @@
 
         <!-- Desktop top bar -->
         <div id="topHeaderBar">
-            <!-- Left: welcome greeting -->
+            <!-- Left: estate name pill -->
             <div style="flex:1;display:flex;align-items:center;">
-                <span id="topWelcomeMsg" style="font-size:13px;font-weight:600;color:#0F172A;white-space:nowrap;"></span>
-            </div>
-            <!-- Centre: estate name as indigo pill (updates when estate selected) -->
-            <div style="flex:1;display:flex;align-items:center;justify-content:center;">
                 <span id="topEstateLabel" style="font-size:13px;font-weight:600;color:#6366F1;background:#EEF2FF;padding:5px 14px;border-radius:99px;border:1px solid #C7D2FE;white-space:nowrap;display:none;"></span>
             </div>
-            <!-- Right: sign out -->
-            <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;">
-                <button onclick="logoutUser()"
-                    style="padding:6px 16px;border-radius:7px;border:1px solid #FEE2E2;background:#FEF2F2;color:#DC2626;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;transition:background .13s;"
-                    onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FEF2F2'">
-                    &#x1F6AA; Sign Out
+            <!-- Centre: empty -->
+            <div style="flex:1;"></div>
+            <!-- Right: avatar + dropdown -->
+            <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;position:relative;">
+                <button id="avatarBtn" onclick="toggleAvatarDropdown(event)"
+                    style="display:flex;align-items:center;gap:9px;padding:5px 10px 5px 6px;border-radius:99px;border:1px solid #E2E8F0;background:#F8FAFC;cursor:pointer;font-family:Inter,sans-serif;transition:background .13s;"
+                    onmouseover="this.style.background='#EEF2FF'" onmouseout="this.style.background='#F8FAFC'">
+                    <div id="avatarCircle" style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#4F46E5);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;">?</div>
+                    <div style="text-align:left;line-height:1.25;">
+                        <div id="avatarName" style="font-size:12.5px;font-weight:600;color:#0F172A;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;">—</div>
+                        <div id="avatarRole" style="font-size:10.5px;color:#6366F1;font-weight:500;text-transform:capitalize;">—</div>
+                    </div>
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="color:#94A3B8;flex-shrink:0;"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
+                <!-- Dropdown -->
+                <div id="avatarDropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;min-width:192px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.10);z-index:999;overflow:hidden;">
+                    <div style="padding:12px 14px;border-bottom:1px solid #F1F5F9;background:#F8FAFC;">
+                        <div id="dropdownUserName" style="font-size:13px;font-weight:700;color:#0F172A;">—</div>
+                        <div id="dropdownUserEmail" style="font-size:11px;color:#64748B;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</div>
+                    </div>
+                    <div style="padding:6px;">
+                        <button onclick="closeAvatarDropdown();showUserProfile()" style="width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:none;background:transparent;font-size:13px;font-weight:500;color:#374151;cursor:pointer;font-family:Inter,sans-serif;text-align:left;" onmouseover="this.style.background='#F3F4F6'" onmouseout="this.style.background='transparent'">
+                            <span>&#128100;</span> My Profile
+                        </button>
+                        <button onclick="closeAvatarDropdown();showChangePassword()" style="width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:none;background:transparent;font-size:13px;font-weight:500;color:#374151;cursor:pointer;font-family:Inter,sans-serif;text-align:left;" onmouseover="this.style.background='#F3F4F6'" onmouseout="this.style.background='transparent'">
+                            <span>&#128274;</span> Change Password
+                        </button>
+                        <div style="height:1px;background:#F1F5F9;margin:4px 0;"></div>
+                        <button onclick="closeAvatarDropdown();logoutUser()" style="width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:none;background:transparent;font-size:13px;font-weight:500;color:#DC2626;cursor:pointer;font-family:Inter,sans-serif;text-align:left;" onmouseover="this.style.background='#FEF2F2'" onmouseout="this.style.background='transparent'">
+                            <span>&#128682;</span> Log Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Profile modal -->
+        <div id="profileModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;align-items:center;justify-content:center;">
+            <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:360px;margin:16px;box-shadow:0 16px 48px rgba(0,0,0,.18);font-family:Inter,sans-serif;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                    <h3 style="font-size:16px;font-weight:700;color:#0F172A;margin:0;">&#128100; My Profile</h3>
+                    <button onclick="document.getElementById('profileModal').style.display='none'" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94A3B8;">&#x2715;</button>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;">
+                    <div id="profileAvatarCircle" style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#4F46E5);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;margin-bottom:10px;"></div>
+                    <div id="profileName" style="font-size:16px;font-weight:700;color:#0F172A;"></div>
+                    <div id="profileRole" style="font-size:12px;color:#6366F1;font-weight:600;margin-top:2px;text-transform:capitalize;"></div>
+                </div>
+                <div style="background:#F8FAFC;border-radius:10px;padding:14px 16px;border:1px solid #E2E8F0;">
+                    <div style="margin-bottom:10px;">
+                        <div style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#94A3B8;margin-bottom:3px;">Email</div>
+                        <div id="profileEmail" style="font-size:13.5px;font-weight:500;color:#0F172A;"></div>
+                    </div>
+                    <div>
+                        <div style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#94A3B8;margin-bottom:3px;">Role</div>
+                        <div id="profileRoleDetail" style="font-size:13.5px;font-weight:500;color:#0F172A;text-transform:capitalize;"></div>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('profileModal').style.display='none'" style="width:100%;margin-top:16px;padding:9px;border-radius:8px;border:1px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;">Close</button>
+            </div>
+        </div>
+
+        <!-- Change Password modal -->
+        <div id="changePasswordModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;align-items:center;justify-content:center;">
+            <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:360px;margin:16px;box-shadow:0 16px 48px rgba(0,0,0,.18);font-family:Inter,sans-serif;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                    <h3 style="font-size:16px;font-weight:700;color:#0F172A;margin:0;">&#128274; Change Password</h3>
+                    <button onclick="closeChangePasswordModal()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94A3B8;">&#x2715;</button>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                    <div>
+                        <label style="display:block;font-size:12.5px;font-weight:500;color:#374151;margin-bottom:4px;">Current Password</label>
+                        <input id="cpCurrentPw" type="password" placeholder="Enter current password" style="width:100%;padding:9px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#6366F1'" onblur="this.style.borderColor='#E2E8F0'" />
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:12.5px;font-weight:500;color:#374151;margin-bottom:4px;">New Password</label>
+                        <input id="cpNewPw" type="password" placeholder="Min 6 characters" style="width:100%;padding:9px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#6366F1'" onblur="this.style.borderColor='#E2E8F0'" />
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:12.5px;font-weight:500;color:#374151;margin-bottom:4px;">Confirm New Password</label>
+                        <input id="cpConfirmPw" type="password" placeholder="Re-enter new password" style="width:100%;padding:9px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#6366F1'" onblur="this.style.borderColor='#E2E8F0'" />
+                    </div>
+                    <p id="cpError"   style="display:none;font-size:12px;color:#DC2626;margin:0;"></p>
+                    <p id="cpSuccess" style="display:none;font-size:12px;color:#16A34A;font-weight:600;margin:0;"></p>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:18px;">
+                    <button onclick="closeChangePasswordModal()" style="flex:1;padding:9px;border-radius:8px;border:1px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;">Cancel</button>
+                    <button onclick="submitChangePassword()" style="flex:1;padding:9px;border-radius:8px;border:none;background:#6366F1;color:#fff;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;" onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#6366F1'">Save</button>
+                </div>
             </div>
         </div>
 
@@ -3674,7 +3752,7 @@ function renderChemUsageTracker() {
         var anyOver   = roundBars.some(function(rb){  return maxDosage>0  && rb.usagePerHa>maxDosage; });
         var hdrBg     = anyOver ? 'linear-gradient(135deg,#7F1D1D,#DC2626)' : 'linear-gradient(135deg,#1E3A5F,#1D4ED8)';
         var subLabel  = ci.itemName ? '&#128167; '+ci.itemName : '';
-        var maxLabel  = maxDosage > 0 ? 'Max: '+maxDosage.toFixed(2)+' '+ci.unit+'/Ha' : 'No dosage limit';
+        var maxLabel  = maxDosage > 0 ? 'Max dosage: '+maxDosage.toFixed(2)+' '+ci.unit+'/Ha' : 'No dosage limit';
         var statusPill= anyOver
             ? '<span style="font-size:9px;font-weight:700;background:rgba(255,255,255,.2);color:#FEE2E2;padding:2px 8px;border-radius:99px;">&#9888; Exceeded</span>'
             : maxDosage > 0
@@ -3689,7 +3767,7 @@ function renderChemUsageTracker() {
                 +'</div>'
                 +statusPill
             +'</div>'
-            +'<div style="font-size:9.5px;color:rgba(255,255,255,.65);margin-top:6px;">'+maxLabel+' &nbsp;|&nbsp; '+ci.unit+'/Ha</div>'
+            +'<div style="font-size:9.5px;color:rgba(255,255,255,.65);margin-top:6px;">'+maxLabel+'</div>'
             +'</div>';
 
         /* Canvas */
@@ -6284,9 +6362,111 @@ function applyFilterChemBlock() {
     var _origBootApp = window.bootApp;
     window.bootApp = function(session){
         _origBootApp(session);
-        updateTopWelcome(session && session.name ? session.name : '');
         updateTopEstateLabel('');
+        updateAvatarFromSession(session);
     };
+    // Avatar helpers
+    function updateAvatarFromSession(session){
+        if(!session) return;
+        var name  = session.name  || '';
+        var email = session.email || '';
+        var role  = session.role  || '';
+        var initials = name ? name.trim().split(' ').map(function(w){return w[0]||'';}).slice(0,2).join('').toUpperCase() : (email[0]||'?').toUpperCase();
+        var circle = document.getElementById('avatarCircle');
+        var aname  = document.getElementById('avatarName');
+        var arole  = document.getElementById('avatarRole');
+        var dname  = document.getElementById('dropdownUserName');
+        var demail = document.getElementById('dropdownUserEmail');
+        if(circle) circle.textContent = initials;
+        if(aname)  aname.textContent  = name || email;
+        if(arole)  arole.textContent  = role;
+        if(dname)  dname.textContent  = name || email;
+        if(demail) demail.textContent = email;
+    }
+    window.toggleAvatarDropdown = function(e){
+        e.stopPropagation();
+        var dd = document.getElementById('avatarDropdown');
+        if(!dd) return;
+        dd.style.display = dd.style.display==='none'?'block':'none';
+    };
+    window.closeAvatarDropdown = function(){
+        var dd = document.getElementById('avatarDropdown');
+        if(dd) dd.style.display='none';
+    };
+    document.addEventListener('click', function(e){
+        var dd = document.getElementById('avatarDropdown');
+        var btn = document.getElementById('avatarBtn');
+        if(dd && btn && !btn.contains(e.target) && !dd.contains(e.target)){
+            dd.style.display='none';
+        }
+    });
+    window.showUserProfile = function(){
+        var session = window.loadSession ? loadSession() : null;
+        if(!session) return;
+        var name  = session.name  || '';
+        var email = session.email || '';
+        var role  = session.role  || '';
+        var initials = name ? name.trim().split(' ').map(function(w){return w[0]||'';}).slice(0,2).join('').toUpperCase() : (email[0]||'?').toUpperCase();
+        var el = function(id){return document.getElementById(id);};
+        if(el('profileAvatarCircle')) el('profileAvatarCircle').textContent = initials;
+        if(el('profileName'))        el('profileName').textContent        = name;
+        if(el('profileRole'))        el('profileRole').textContent        = role;
+        if(el('profileEmail'))       el('profileEmail').textContent       = email;
+        if(el('profileRoleDetail'))  el('profileRoleDetail').textContent  = role;
+        var m = el('profileModal');
+        if(m){ m.style.display='flex'; }
+    };
+    window.showChangePassword = function(){
+        var m = document.getElementById('changePasswordModal');
+        if(!m) return;
+        ['cpCurrentPw','cpNewPw','cpConfirmPw'].forEach(function(id){
+            var f=document.getElementById(id); if(f) f.value='';
+        });
+        ['cpError','cpSuccess'].forEach(function(id){
+            var p=document.getElementById(id); if(p){p.style.display='none';p.textContent='';}
+        });
+        m.style.display='flex';
+    };
+    window.closeChangePasswordModal = function(){
+        var m = document.getElementById('changePasswordModal');
+        if(m) m.style.display='none';
+    };
+    window.submitChangePassword = function(){
+        var errEl = document.getElementById('cpError');
+        var sucEl = document.getElementById('cpSuccess');
+        var showErr = function(msg){ if(errEl){errEl.textContent=msg;errEl.style.display='block';} if(sucEl)sucEl.style.display='none'; };
+        var cur  = (document.getElementById('cpCurrentPw')  ||{}).value||'';
+        var nw   = (document.getElementById('cpNewPw')      ||{}).value||'';
+        var conf = (document.getElementById('cpConfirmPw')  ||{}).value||'';
+        if(!cur)           return showErr('Please enter your current password.');
+        if(nw.length < 6)  return showErr('New password must be at least 6 characters.');
+        if(nw !== conf)    return showErr('New passwords do not match.');
+        var session = loadSession();
+        if(!session)       return showErr('Session expired. Please log in again.');
+        // Verify current password
+        var SUPER = { email:'superadmin@oilpalm.com', password:'Admin@1234' };
+        var verified = false;
+        if(session.role === 'superadmin'){
+            verified = (cur === SUPER.password);
+        } else {
+            var users = JSON.parse(localStorage.getItem('opp_auth_users')) || [];
+            var u = users.find(function(x){return x.email===session.email;});
+            verified = u && u.password === cur;
+            if(verified){
+                u.password = nw;
+                localStorage.setItem('opp_auth_users', JSON.stringify(users));
+            }
+        }
+        if(!verified) return showErr('Current password is incorrect.');
+        if(errEl) errEl.style.display='none';
+        if(sucEl){ sucEl.textContent='Password changed successfully!'; sucEl.style.display='block'; }
+        setTimeout(function(){ closeChangePasswordModal(); }, 1500);
+    };
+    // On load, populate avatar from existing session
+    (function(){
+        var s = window.loadSession ? loadSession() : null;
+        if(s) updateAvatarFromSession(s);
+    })();
     // Patch onSidebarEstateChange to update estate label
     var _origOnEstate = window.onSidebarEstateChange;
     window.onSidebarEstateChange = function(){
