@@ -2599,7 +2599,16 @@ function renderRoundProgress() {
     if (manuringRounds.length === 0) {
         body.innerHTML = '<tr><td colspan="5" class="px-3 py-4 text-center text-gray-500">No manuring rounds defined yet.</td></tr>';
     } else {
-        manuringRounds.forEach(r => {
+        // Sort by targetPeriod ascending; rounds without targetPeriod go last
+        const sorted = [...manuringRounds].sort((a, b) => {
+            const tpA = a.targetPeriod || a.targetperiod || '';
+            const tpB = b.targetPeriod || b.targetperiod || '';
+            if (!tpA && !tpB) return 0;
+            if (!tpA) return 1;
+            if (!tpB) return -1;
+            return tpA.localeCompare(tpB);
+        });
+        sorted.forEach(r => {
             const totalApplied = calcRoundTotalApplied(r.id);
             const budget       = calcRoundBudget(r);
             const kgPerUnit    = getKgPerUnit(r);
@@ -2646,6 +2655,18 @@ function renderRoundProgress() {
             const budget   = calcBlockBudget(r, blockName);
             blockRows.push({ r, blockName, applied, budget });
         });
+    });
+
+    // Sort by round targetPeriod ascending, then by blockName
+    blockRows.sort((a, b) => {
+        const tpA = a.r.targetPeriod || a.r.targetperiod || '';
+        const tpB = b.r.targetPeriod || b.r.targetperiod || '';
+        if (tpA !== tpB) {
+            if (!tpA) return 1;
+            if (!tpB) return -1;
+            return tpA.localeCompare(tpB);
+        }
+        return a.blockName.localeCompare(b.blockName);
     });
 
     if (blockRows.length === 0) {
@@ -5363,14 +5384,35 @@ function renderMpByRound() {
         grouped[key].totalClaimed += parseFloat(c.claimedArea) || 0;
     });
 
-    Object.values(grouped).forEach(g => {
+    // Sort by targetPeriod of the linked round ascending; no targetPeriod goes last
+    const rows = Object.values(grouped).sort((a, b) => {
+        const rA = fieldMaintRounds.find(r => String(r.id) === String(a.roundId));
+        const rB = fieldMaintRounds.find(r => String(r.id) === String(b.roundId));
+        const tpA = (rA && (rA.targetPeriod || rA.targetperiod)) || '';
+        const tpB = (rB && (rB.targetPeriod || rB.targetperiod)) || '';
+        if (!tpA && !tpB) return 0;
+        if (!tpA) return 1;
+        if (!tpB) return -1;
+        return tpA.localeCompare(tpB);
+    });
+
+    rows.forEach(g => {
         const round       = fieldMaintRounds.find(r => String(r.id) === String(g.roundId));
         const roundBlocks = round && round.blocks && round.blocks.length > 0 ? round.blocks : locations.map(l => l.name);
         const totalArea   = roundBlocks.reduce((s, b) => {
             const loc = locations.find(l => l.name === b);
             return s + (loc ? parseFloat(loc.area) || 0 : 0);
         }, 0);
-        const pct = totalArea > 0 ? (g.totalClaimed / totalArea) * 100 : 0;
+        const pct    = totalArea > 0 ? (g.totalClaimed / totalArea) * 100 : 0;
+        const colour = pct >= 100 ? 'text-green-700' : pct >= 50 ? 'text-yellow-700' : 'text-red-600';
+        const barCol = pct >= 100 ? '#166534' : pct >= 50 ? '#d97706' : '#dc2626';
+        const barW   = Math.min(100, pct).toFixed(1);
+        const pctCell = `<div style="display:flex;align-items:center;gap:8px;min-width:120px;">
+            <div style="flex:1;background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;">
+                <div style="width:${barW}%;background:${barCol};height:100%;border-radius:99px;"></div>
+            </div>
+            <span class="${colour} font-bold" style="white-space:nowrap;">${Math.round(pct)}%</span>
+        </div>`;
 
         const tr = document.createElement('tr');
         tr.className = 'border-b border-green-100 hover:bg-green-50';
@@ -5378,9 +5420,7 @@ function renderMpByRound() {
             <td class="px-3 py-2 font-semibold">🔧 ${g.roundName}</td>
             <td class="px-3 py-2 text-right">${totalArea.toFixed(2)}</td>
             <td class="px-3 py-2 text-right font-bold text-green-700">${g.totalClaimed.toFixed(2)}</td>
-            <td class="px-3 py-2">
-                <span class="${pct >= 100 ? 'text-green-700' : pct >= 50 ? 'text-yellow-700' : 'text-red-600'} font-bold">${Math.round(pct)}%</span>
-            </td>`;
+            <td class="px-3 py-2">${pctCell}</td>`;
         body.appendChild(tr);
     });
 }
@@ -5402,13 +5442,36 @@ function renderMpByBlock() {
         const key = `${c.roundId}||${c.blockName}`;
         if (!grouped[key]) grouped[key] = { roundId: c.roundId, roundName: c.roundName, blockName: c.blockName, totalClaimed: 0, lastId: c.id };
         grouped[key].totalClaimed += parseFloat(c.claimedArea) || 0;
-        grouped[key].lastId = c.id;   // keep a claim id for edit/delete reference
+        grouped[key].lastId = c.id;
     });
 
-    Object.values(grouped).forEach(g => {
+    // Sort by round targetPeriod ascending, then by blockName
+    const rows = Object.values(grouped).sort((a, b) => {
+        const rA = fieldMaintRounds.find(r => String(r.id) === String(a.roundId));
+        const rB = fieldMaintRounds.find(r => String(r.id) === String(b.roundId));
+        const tpA = (rA && (rA.targetPeriod || rA.targetperiod)) || '';
+        const tpB = (rB && (rB.targetPeriod || rB.targetperiod)) || '';
+        if (tpA !== tpB) {
+            if (!tpA) return 1;
+            if (!tpB) return -1;
+            return tpA.localeCompare(tpB);
+        }
+        return a.blockName.localeCompare(b.blockName);
+    });
+
+    rows.forEach(g => {
         const loc       = locations.find(l => l.name === g.blockName);
         const blockArea = loc ? parseFloat(loc.area) || 0 : 0;
         const pct       = blockArea > 0 ? (g.totalClaimed / blockArea) * 100 : 0;
+        const colour    = pct >= 100 ? 'text-green-700' : pct >= 50 ? 'text-yellow-700' : 'text-red-600';
+        const barCol    = pct >= 100 ? '#166534' : pct >= 50 ? '#d97706' : '#dc2626';
+        const barW      = Math.min(100, pct).toFixed(1);
+        const pctCell   = `<div style="display:flex;align-items:center;gap:8px;min-width:120px;">
+            <div style="flex:1;background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;">
+                <div style="width:${barW}%;background:${barCol};height:100%;border-radius:99px;"></div>
+            </div>
+            <span class="${colour} font-bold" style="white-space:nowrap;">${Math.round(pct)}%</span>
+        </div>`;
 
         const tr = document.createElement('tr');
         tr.className = 'border-b border-green-100 hover:bg-green-50';
@@ -5419,9 +5482,7 @@ function renderMpByBlock() {
             </td>
             <td class="px-3 py-2 text-right">${blockArea.toFixed(2)}</td>
             <td class="px-3 py-2 text-right font-bold text-green-700">${g.totalClaimed.toFixed(2)}</td>
-            <td class="px-3 py-2">
-                <span class="${pct >= 100 ? 'text-green-700' : pct >= 50 ? 'text-yellow-700' : 'text-red-600'} font-bold">${Math.round(pct)}%</span>
-            </td>
+            <td class="px-3 py-2">${pctCell}</td>
             <td class="px-3 py-2 whitespace-nowrap">
                 <button class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded mr-1"
                     onclick="startEditMaintClaim('${g.lastId}')">✏️ Edit</button>
