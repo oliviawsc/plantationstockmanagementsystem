@@ -474,6 +474,20 @@
                 <div id="maintPctTrackerCards" style="display:flex;flex-wrap:wrap;gap:12px;padding:16px 24px 24px;"></div>
             </div>
 
+            <!-- Chemical Usage Tracker -->
+            <div class="bg-white rounded-xl shadow mt-6" style="overflow:hidden;">
+                <div style="background:linear-gradient(135deg,#1E3A5F 0%,#1D4ED8 100%);padding:20px 24px 16px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                        <div>
+                            <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 2px;">&#9879;&#65039; Chemical Usage Tracker</h3>
+                            <p style="color:#BFDBFE;font-size:11.5px;margin:0;">Usage per Ha vs Max Dosage — by Maintenance Round</p>
+                        </div>
+                    </div>
+                </div>
+                <p id="chemUsageTrackerEmpty" class="hidden" style="text-align:center;color:#94A3B8;padding:40px 0;font-size:13px;">No chemical usage data yet. Link chemical transactions to maintenance rounds.</p>
+                <div id="chemUsageTrackerCards" style="display:flex;flex-wrap:wrap;gap:12px;padding:16px 24px 24px;"></div>
+            </div>
+
         </section>
 
         <!-- ============ PAGE 2: ITEM FILE ============ -->
@@ -1676,6 +1690,7 @@ async function loadFromSupabase() {
         renderMaintProgressTables();
         renderManuringPctChart();
         renderMaintPctTracker();
+        renderChemUsageTracker();
     } catch (err) {
         console.error('[Supabase] loadFromSupabase failed', err);
     }
@@ -3102,6 +3117,7 @@ function renderDashboard() {
 
     renderManuringPctChart();
     renderMaintPctTracker();
+    renderChemUsageTracker();
 }
 
 
@@ -3566,6 +3582,231 @@ function renderMaintPctTracker() {
     });
 }
 
+
+
+/* =================================================================
+   CHEMICAL USAGE TRACKER — Dashboard card
+   Usage/Ha vs max dosage per ingredient per maintenance round
+   ================================================================= */
+function renderChemUsageTracker() {
+    var empty   = document.getElementById('chemUsageTrackerEmpty');
+    var cardBox = document.getElementById('chemUsageTrackerCards');
+    if (!empty || !cardBox) return;
+
+    /* Destroy old chart instances */
+    if (!window._chemTrackerInstances) window._chemTrackerInstances = {};
+    Object.keys(window._chemTrackerInstances).forEach(function(k){
+        if (window._chemTrackerInstances[k]){ window._chemTrackerInstances[k].destroy(); delete window._chemTrackerInstances[k]; }
+    });
+
+    if (chemIngredients.length === 0 || maintClaims.length === 0) {
+        empty.classList.remove('hidden');
+        cardBox.innerHTML = '';
+        return;
+    }
+
+    /* Aggregate claims by roundId */
+    var roundMap = {};
+    maintClaims.forEach(function(c) {
+        var key = String(c.roundId);
+        if (!roundMap[key]) roundMap[key] = { roundId:c.roundId, roundName:c.roundName, totalClaimed:0 };
+        roundMap[key].totalClaimed += parseFloat(c.claimedArea) || 0;
+    });
+    var rounds = Object.values(roundMap);
+
+    /* For each ingredient, compute usage/Ha per round */
+    var ciCards = [];
+    chemIngredients.forEach(function(ci) {
+        var roundBars = [];
+        rounds.forEach(function(rm) {
+            var totalQty = transactions.filter(function(t) {
+                return t.type === 'Out' &&
+                       String(t.itemId) === String(ci.itemId) &&
+                       t.maintRoundId &&
+                       fieldMaintRounds.some(function(r) {
+                           return String(r.id) === String(t.maintRoundId) &&
+                                  String(r.id) === String(rm.roundId);
+                       });
+            }).reduce(function(s,t){ return s + (parseFloat(t.qty)||0); }, 0);
+            if (totalQty <= 0) return;
+            var usagePerHa = rm.totalClaimed > 0 ? totalQty / rm.totalClaimed : 0;
+            roundBars.push({ roundName:rm.roundName, usagePerHa:usagePerHa });
+        });
+        if (roundBars.length > 0) {
+            ciCards.push({ ci:ci, roundBars:roundBars, maxDosage:parseFloat(ci.maxDosage)||0 });
+        }
+    });
+
+    if (ciCards.length === 0) {
+        empty.classList.remove('hidden');
+        cardBox.innerHTML = '';
+        return;
+    }
+    empty.classList.add('hidden');
+    cardBox.innerHTML = '';
+
+    ciCards.forEach(function(card) {
+        var ci         = card.ci;
+        var maxDosage  = card.maxDosage;
+        var roundBars  = card.roundBars;
+
+        /* Bar colours: green OK, amber ≥80% of max, red exceeded */
+        var barColors = roundBars.map(function(rb) {
+            if (maxDosage <= 0) return '#3B82F6';
+            var ratio = rb.usagePerHa / maxDosage;
+            if (ratio > 1)   return '#EF4444';
+            if (ratio >= 0.8) return '#F59E0B';
+            return '#22C55E';
+        });
+
+        /* Chart max Y: whichever is bigger — max usage or max dosage — with 20% headroom */
+        var maxUsage = Math.max.apply(null, roundBars.map(function(rb){ return rb.usagePerHa; }));
+        var yMax     = maxDosage > 0
+            ? parseFloat((Math.max(maxUsage, maxDosage) * 1.25).toFixed(2))
+            : parseFloat((maxUsage * 1.3).toFixed(2));
+
+        /* Card element */
+        var el = document.createElement('div');
+        el.style.cssText = 'flex:1;min-width:280px;max-width:420px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;';
+
+        /* Header */
+        var statusAll = roundBars.every(function(rb){ return maxDosage<=0 || rb.usagePerHa<=maxDosage; });
+        var anyOver   = roundBars.some(function(rb){  return maxDosage>0  && rb.usagePerHa>maxDosage; });
+        var hdrBg     = anyOver ? 'linear-gradient(135deg,#7F1D1D,#DC2626)' : 'linear-gradient(135deg,#1E3A5F,#1D4ED8)';
+        var subLabel  = ci.itemName ? '&#128167; '+ci.itemName : '';
+        var maxLabel  = maxDosage > 0 ? 'Max: '+maxDosage.toFixed(2)+' '+ci.unit+'/Ha' : 'No dosage limit';
+        var statusPill= anyOver
+            ? '<span style="font-size:9px;font-weight:700;background:rgba(255,255,255,.2);color:#FEE2E2;padding:2px 8px;border-radius:99px;">&#9888; Exceeded</span>'
+            : maxDosage > 0
+                ? '<span style="font-size:9px;font-weight:700;background:rgba(255,255,255,.2);color:#D1FAE5;padding:2px 8px;border-radius:99px;">&#10003; Within Limit</span>'
+                : '';
+
+        var hdr = '<div style="background:'+hdrBg+';padding:12px 14px 10px;">'
+            +'<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+                +'<div>'
+                    +'<div style="font-size:12.5px;font-weight:700;color:#fff;margin-bottom:1px;">'+ci.name+'</div>'
+                    +'<div style="font-size:10px;color:rgba(255,255,255,.7);">'+subLabel+'</div>'
+                +'</div>'
+                +statusPill
+            +'</div>'
+            +'<div style="font-size:9.5px;color:rgba(255,255,255,.65);margin-top:6px;">'+maxLabel+' &nbsp;|&nbsp; '+ci.unit+'/Ha</div>'
+            +'</div>';
+
+        /* Canvas */
+        var canvasId = 'chemTracker_'+ci.id;
+        var body = '<div style="padding:12px 14px 14px;">'
+            +'<canvas id="'+canvasId+'" height="'+(Math.max(roundBars.length * 28, 70))+'"></canvas>'
+            +'</div>';
+
+        el.innerHTML = hdr + body;
+        cardBox.appendChild(el);
+
+        /* Draw chart after DOM insertion */
+        (function(cdata, cid, barCols, ymax, md){
+            requestAnimationFrame(function(){
+                var mc = document.getElementById(cid);
+                if (!mc) return;
+
+                /* Plugin: red dashed vertical max dosage line */
+                var maxDosageLine = {
+                    id: 'maxDosageLine',
+                    afterDraw: function(chart) {
+                        if (md <= 0) return;
+                        var ctx   = chart.ctx;
+                        var xAxis = chart.scales.x;
+                        var yAxis = chart.scales.y;
+                        var xPos  = xAxis.getPixelForValue(md);
+                        if (xPos < xAxis.left || xPos > xAxis.right) return;
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.setLineDash([5, 4]);
+                        ctx.strokeStyle = '#EF4444';
+                        ctx.lineWidth   = 1.8;
+                        ctx.moveTo(xPos, yAxis.top);
+                        ctx.lineTo(xPos, yAxis.bottom);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                        ctx.fillStyle    = '#EF4444';
+                        ctx.font         = 'bold 9px Inter,sans-serif';
+                        ctx.textAlign    = 'left';
+                        ctx.textBaseline = 'top';
+                        ctx.fillText('Max', xPos+3, yAxis.top+2);
+                        ctx.restore();
+                    }
+                };
+
+                /* Plugin: value labels on bars */
+                var barLabels = {
+                    id: 'barLabels',
+                    afterDatasetsDraw: function(chart) {
+                        var ctx  = chart.ctx;
+                        var meta = chart.getDatasetMeta(0);
+                        ctx.save();
+                        meta.data.forEach(function(bar, i) {
+                            var val = cdata[i].usagePerHa;
+                            if (val <= 0) return;
+                            ctx.font         = 'bold 9px Inter,sans-serif';
+                            ctx.fillStyle    = barCols[i] === '#EF4444' ? '#DC2626' : barCols[i] === '#F59E0B' ? '#B45309' : '#166534';
+                            ctx.textAlign    = 'left';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(val.toFixed(2), bar.x + 4, bar.y);
+                        });
+                        ctx.restore();
+                    }
+                };
+
+                if (window._chemTrackerInstances[cid]){ window._chemTrackerInstances[cid].destroy(); }
+                window._chemTrackerInstances[cid] = new Chart(mc, {
+                    type: 'bar',
+                    plugins: [maxDosageLine, barLabels],
+                    data: {
+                        labels: cdata.map(function(rb){ return rb.roundName.length>22?rb.roundName.slice(0,21)+'…':rb.roundName; }),
+                        datasets: [{
+                            data:            cdata.map(function(rb){ return rb.usagePerHa; }),
+                            backgroundColor: barCols,
+                            borderColor:     barCols,
+                            borderWidth:     1,
+                            borderRadius:    4,
+                            barPercentage:   0.6
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',          // horizontal bars
+                        responsive:          true,
+                        maintainAspectRatio: false,
+                        layout: { padding: { right: 50 } },   // room for value labels
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(it){ return it[0].label; },
+                                    label: function(ctx){
+                                        var val = ctx.parsed.x;
+                                        var lines = ['  Usage: '+val.toFixed(2)+' '+ci.unit+'/Ha'];
+                                        if (md>0) lines.push('  Max  : '+md.toFixed(2)+' '+ci.unit+'/Ha');
+                                        return lines;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: ymax,
+                                grid: { color:'#F1F5F9' },
+                                ticks: { font:{size:9}, callback:function(v){ return v.toFixed(1); } }
+                            },
+                            y: {
+                                grid: { display:false },
+                                ticks: { font:{size:9} }
+                            }
+                        }
+                    }
+                });
+            });
+        })(roundBars, canvasId, barColors, yMax, maxDosage);
+    });
+}
 
 /* -----------------------------------------------------------------
    LIVE STOCK CHART - horizontal bar chart on the Dashboard
