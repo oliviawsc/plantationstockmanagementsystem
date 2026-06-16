@@ -182,6 +182,54 @@
         .bg-green-50{background-color:#EEF2FF!important}
         .bg-green-100{background-color:#DCFCE7!important}
         /* keep inline green for semantic badge/progress use */
+
+        /* ── Print styles ── */
+        @media print {
+            /* Hide all chrome — sidebar, top bar, other page sections */
+            #sidebar,
+            #topHeaderBar,
+            #mobileTopBar,
+            #sidebarOverlay,
+            #estateBlankState,
+            #dashPrintBtn,
+            .page-section:not(#dashboard) { display: none !important; }
+
+            /* Reset main wrapper so dashboard fills the page */
+            body, #mainWrapper, #mainContent {
+                margin: 0 !important;
+                padding: 0 !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                background: #fff !important;
+            }
+
+            /* Dashboard section fills full print width */
+            #dashboard {
+                display: block !important;
+                width: 100% !important;
+                padding: 16px !important;
+                background: #fff !important;
+            }
+
+            /* Remove card shadows for clean print */
+            * {
+                box-shadow: none !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Avoid breaking inside cards */
+            #dashboard .bg-white,
+            #dashboard > div,
+            #dashboard > div > div {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            /* Canvases render at their natural size */
+            canvas { max-width: 100% !important; }
+        }
     </style>
 </head>
 <body>
@@ -293,13 +341,6 @@
 
         <!-- Footer -->
         <div style="border-top:1px solid #E2E8F0;padding:10px;" class="sb-footer">
-            <div style="display:flex;align-items:center;gap:8px;padding:7px;background:#F8FAFC;border-radius:8px;margin-bottom:8px;">
-                <div style="width:26px;height:26px;border-radius:6px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">&#128100;</div>
-                <div style="min-width:0;flex:1;">
-                    <div id="sidebarUserName" style="font-size:13px;font-weight:600;color:#0F172A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">&#x2014;</div>
-                    <span id="sidebarUserRole" style="font-size:11px;font-weight:600;color:#6366F1;">&#x2014;</span>
-                </div>
-            </div>
             <!-- Estate selector (visible) -->
             <div style="margin-bottom:8px;">
                 <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#6366F1;margin-bottom:4px;display:block;">Estate</label>
@@ -441,7 +482,17 @@
 
         <!-- ============ PAGE 1: DASHBOARD ============ -->
         <section id="dashboard" class="page-section active">
-            <h2 class="text-3xl font-bold mb-6" data-i18n="nav_dashboard">Dashboard</h2>
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
+                <h2 class="text-3xl font-bold" data-i18n="nav_dashboard">Dashboard</h2>
+                <button id="dashPrintBtn" onclick="printDashboard()"
+                    style="display:flex;align-items:center;gap:7px;padding:8px 18px;background:#6366F1;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(99,102,241,.25);transition:background .13s;"
+                    onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#6366F1'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+                    </svg>
+                    Print
+                </button>
+            </div>
 
             <!-- Live Stock Listing -->
             <div class="bg-white p-6 rounded-xl shadow mb-8">
@@ -3310,7 +3361,7 @@ function renderManuringPctChart() {
 
         var canvasId='manuringMonth_'+d.id;
         var body='<div style="padding:10px 12px 12px;">'
-            +'<div style="font-size:9.5px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Monthly Applied ('+selectedYear+')</div>'
+            +'<div style="font-size:9.5px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Cumulative Progress by Month ('+selectedYear+')</div>'
             +'<canvas id="'+canvasId+'" height="90"></canvas>'
             +'</div>';
 
@@ -3884,6 +3935,14 @@ function renderChemUsageTracker() {
             });
         })(roundBars, canvasId, barColors, yMax, maxDosage);
     });
+}
+
+/* -----------------------------------------------------------------
+   DASHBOARD PRINT
+   ----------------------------------------------------------------- */
+function printDashboard() {
+    // Give charts a moment to finish rendering before printing
+    setTimeout(function() { window.print(); }, 150);
 }
 
 /* -----------------------------------------------------------------
@@ -4969,16 +5028,17 @@ function setLang(lang) {
         ? 'Ladang Sawit - Sistem Pengurusan Stok'
         : 'Oil Palm Plantation - Stock Management System';
 
-    // Highlight the active language button
-    document.getElementById('langEN').classList.toggle('bg-green-800', lang === 'en');
-    document.getElementById('langEN').classList.toggle('text-white',   lang === 'en');
-    document.getElementById('langEN').classList.toggle('bg-white',     lang !== 'en');
-    document.getElementById('langEN').classList.toggle('text-green-700', lang !== 'en');
-
-    document.getElementById('langMS').classList.toggle('bg-green-800', lang === 'ms');
-    document.getElementById('langMS').classList.toggle('text-white',   lang === 'ms');
-    document.getElementById('langMS').classList.toggle('bg-white',     lang !== 'ms');
-    document.getElementById('langMS').classList.toggle('text-green-700', lang !== 'ms');
+    // Highlight the active language button using inline styles
+    var enBtn = document.getElementById('langEN');
+    var msBtn = document.getElementById('langMS');
+    if (enBtn) {
+        enBtn.style.background = lang === 'en' ? '#6366F1' : '#fff';
+        enBtn.style.color      = lang === 'en' ? '#fff'    : '#6366F1';
+    }
+    if (msBtn) {
+        msBtn.style.background = lang === 'ms' ? '#6366F1' : '#fff';
+        msBtn.style.color      = lang === 'ms' ? '#fff'    : '#6366F1';
+    }
 }
 /* =================================================================
    AUTH SYSTEM
@@ -5005,6 +5065,7 @@ const ALL_SECTIONS = [
     { id: 'roundprogress',  label: '📈 Manuring Progress' },
     { id: 'fieldmaint',     label: '🔧 Maintenance Program' },
     { id: 'maintprogress',  label: '📊 Maintenance Progress' },
+    { id: 'chemusage',      label: '⚗️ Chemical Usage' },
 ];
 
 // Super Admin credentials (hardcoded — cannot be changed by users)
@@ -5110,14 +5171,18 @@ function bootApp(session) {
     updateAppTitle(activeEstate);
 
     // Update sidebar user info
-    document.getElementById('sidebarUserName').textContent = session.name;
+    // Update sidebar user info (elements removed from sidebar — guard safely)
+    const nameEl = document.getElementById('sidebarUserName');
+    if (nameEl) nameEl.textContent = session.name;
     const roleEl = document.getElementById('sidebarUserRole');
-    if (isSuperAdmin) {
-        roleEl.textContent = '⭐ Super Admin';
-        roleEl.style.background = '#b45309';
-    } else {
-        roleEl.textContent = '👤 User';
-        roleEl.style.background = '#166534';
+    if (roleEl) {
+        if (isSuperAdmin) {
+            roleEl.textContent = '⭐ Super Admin';
+            roleEl.style.background = '#b45309';
+        } else {
+            roleEl.textContent = '👤 User';
+            roleEl.style.background = '#166534';
+        }
     }
 
     applyNavPermissions(session);
