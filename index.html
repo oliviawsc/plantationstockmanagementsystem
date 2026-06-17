@@ -1870,8 +1870,6 @@ navButtons.forEach(btn => {
         pageSections.forEach(sec => sec.classList.toggle('active', sec.id === target));
         // refresh the section being shown so data is up-to-date
         refreshAll();
-        // Enforce view-only lock for this section based on the user's permissions
-        if (typeof applyViewOnlyLock === 'function') applyViewOnlyLock(target);
         // For maintprogress: explicitly re-populate dropdowns after section becomes active
         if (target === 'maintprogress') {
             renderMaintProgressDropdowns();
@@ -1881,6 +1879,10 @@ navButtons.forEach(btn => {
             renderChemByRound();
             renderChemByBlock();
         }
+        // Enforce view-only lock for this section based on the user's
+        // permissions — runs LAST, after every render call above, so any
+        // table that was just rebuilt is guaranteed to be locked down.
+        if (typeof applyViewOnlyLock === 'function') applyViewOnlyLock(target);
     });
 });
 
@@ -5461,9 +5463,6 @@ function isSafeAction(onclickAttr) {
 // Tracks which sections already have a MutationObserver attached, so we
 // don't create duplicates every time applyViewOnlyLock() is called.
 const _viewLockObservedSections = {};
-// Guard flag so the observer doesn't react to the mutations that
-// applyViewOnlyLock() itself makes (disabling fields, inserting the banner).
-let _viewLockApplying = false;
 
 function applyViewOnlyLock(sectionId) {
     _applyViewOnlyLockNow(sectionId);
@@ -5473,12 +5472,12 @@ function applyViewOnlyLock(sectionId) {
     // Filters", Chemical Usage's ingredient table after refreshAll()).
     // A MutationObserver re-asserts the lock automatically whenever the
     // section's DOM changes, so newly-injected Edit/Delete buttons never
-    // slip through still enabled.
+    // slip through still enabled — regardless of the order other render
+    // calls happen to run in relative to this function.
     if (!_viewLockObservedSections[sectionId]) {
         const section = document.getElementById(sectionId);
         if (section) {
             const observer = new MutationObserver(() => {
-                if (_viewLockApplying) return; // ignore our own DOM writes
                 _applyViewOnlyLockNow(sectionId);
             });
             observer.observe(section, { childList: true, subtree: true });
@@ -5487,6 +5486,12 @@ function applyViewOnlyLock(sectionId) {
     }
 }
 
+// Applies (or clears) the read-only lock for one section. Designed to be
+// safely re-entrant: it only ever writes a property/class when the value
+// actually needs to change, so when the MutationObserver above reacts to
+// this function's own DOM edits and calls it again, the second pass finds
+// nothing left to change and does not trigger a further mutation — no
+// guard flags or timers required, and no risk of an infinite loop.
 function _applyViewOnlyLockNow(sectionId) {
     const session = loadSession();
     if (!session) return;
@@ -5494,47 +5499,47 @@ function _applyViewOnlyLockNow(sectionId) {
     const section = document.getElementById(sectionId);
     if (!section) return;
 
-    _viewLockApplying = true;
-    try {
-        // Remove any previous banner before deciding whether to re-add it
+    const access     = getSectionAccess(session, sectionId);
+    const isReadOnly = session.role !== 'superadmin' && access === 'view';
+
+    if (!isReadOnly) {
+        // Re-enable everything (covers the case where access just changed
+        // from view to edit, or the section was unlocked)
+        section.querySelectorAll('input, select, textarea, button').forEach(el => {
+            if (el.disabled) el.disabled = false;
+            if (el.classList.contains('view-locked-field')) el.classList.remove('view-locked-field');
+        });
         const existingBanner = section.querySelector('.view-only-banner');
         if (existingBanner) existingBanner.remove();
+        return;
+    }
 
-        const access     = getSectionAccess(session, sectionId);
-        const isReadOnly = session.role !== 'superadmin' && access === 'view';
+    // Lock all native form controls EXCEPT the filter/search fields that
+    // are explicitly allowed to remain usable in view-only mode.
+    section.querySelectorAll('input, select, textarea').forEach(el => {
+        if (VIEW_LOCK_ALLOWED_FIELD_IDS.includes(el.id)) {
+            if (el.disabled) el.disabled = false;
+            return;
+        }
+        if (!el.disabled) el.disabled = true;
+        if (!el.classList.contains('view-locked-field')) el.classList.add('view-locked-field');
+    });
 
-        // Re-enable everything first (in case the user's access changed, or
-        // this section was previously locked and is now editable)
-        section.querySelectorAll('input, select, textarea').forEach(el => {
-            el.disabled = false;
-            el.classList.remove('view-locked-field');
-        });
-        section.querySelectorAll('button').forEach(btn => {
-            btn.disabled = false;
-            btn.classList.remove('view-locked-field');
-        });
+    // Lock buttons that perform a mutating action (anything not in the
+    // safe-action allow-list above)
+    section.querySelectorAll('button').forEach(btn => {
+        const handler = btn.getAttribute('onclick') || '';
+        if (isSafeAction(handler)) {
+            if (btn.disabled) btn.disabled = false;
+            return;
+        }
+        if (!btn.disabled) btn.disabled = true;
+        if (!btn.classList.contains('view-locked-field')) btn.classList.add('view-locked-field');
+    });
 
-        if (!isReadOnly) return;
-
-        // Lock all native form controls EXCEPT the filter/search fields that
-        // are explicitly allowed to remain usable in view-only mode.
-        section.querySelectorAll('input, select, textarea').forEach(el => {
-            if (VIEW_LOCK_ALLOWED_FIELD_IDS.includes(el.id)) return;
-            el.disabled = true;
-            el.classList.add('view-locked-field');
-        });
-
-        // Lock buttons that perform a mutating action (anything not in the
-        // safe-action allow-list above)
-        section.querySelectorAll('button').forEach(btn => {
-            const handler = btn.getAttribute('onclick') || '';
-            if (!isSafeAction(handler)) {
-                btn.disabled = true;
-                btn.classList.add('view-locked-field');
-            }
-        });
-
-        // Friendly read-only banner at the top of the section
+    // Friendly read-only banner at the top of the section — only inserted
+    // if not already present, so re-runs don't keep removing/re-adding it.
+    if (!section.querySelector('.view-only-banner')) {
         const banner = document.createElement('div');
         banner.className = 'view-only-banner';
         banner.style.cssText = 'background:#FEF3C7;border:1px solid #FCD34D;color:#92400E;' +
@@ -5542,10 +5547,6 @@ function _applyViewOnlyLockNow(sectionId) {
             'display:flex;align-items:center;gap:8px;';
         banner.innerHTML = '👁 You have <b>View Only</b> access to this section. Editing is disabled.';
         section.insertBefore(banner, section.firstChild);
-    } finally {
-        // Release the guard on the next tick so the MutationObserver's
-        // queued callback (for the mutations we just made) is ignored.
-        setTimeout(() => { _viewLockApplying = false; }, 0);
     }
 }
 
