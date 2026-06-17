@@ -230,6 +230,7 @@
             /* Canvases render at their natural size */
             canvas { max-width: 100% !important; }
         }
+        .view-locked-field { opacity: .55 !important; cursor: not-allowed !important; }
     </style>
 </head>
 <body>
@@ -1847,6 +1848,21 @@ const pageSections = document.querySelectorAll('.page-section');
 navButtons.forEach(btn => {
     btn.addEventListener('click', () => {
         const target = btn.getAttribute('data-target');
+
+        // Authoritative permission check — actually blocks the switch
+        // (not just a cosmetic alert) for sections the user can't access.
+        const session = loadSession();
+        if (session && session.role !== 'superadmin') {
+            if (target === 'useradmin') return; // never accessible to normal users
+            if (target !== 'dashboard') {
+                const access = typeof getSectionAccess === 'function' ? getSectionAccess(session, target) : 'none';
+                if (access === 'none') {
+                    alert('You do not have permission to access this section.');
+                    return;
+                }
+            }
+        }
+
         // toggle nav active class
         navButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
@@ -1854,6 +1870,8 @@ navButtons.forEach(btn => {
         pageSections.forEach(sec => sec.classList.toggle('active', sec.id === target));
         // refresh the section being shown so data is up-to-date
         refreshAll();
+        // Enforce view-only lock for this section based on the user's permissions
+        if (typeof applyViewOnlyLock === 'function') applyViewOnlyLock(target);
         // For maintprogress: explicitly re-populate dropdowns after section becomes active
         if (target === 'maintprogress') {
             renderMaintProgressDropdowns();
@@ -5319,6 +5337,7 @@ function bootApp(session) {
 
     // Populate the sidebar estate dropdown with only this user's estates
     const estateSelect = document.getElementById('sidebarEstate');
+    const estateSelectVisible = document.getElementById('sidebarEstateVisible');
     const isSuperAdmin = session.role === 'superadmin';
 
     const ALL_ESTATES = ['Mega Jutamas (Suai)','Ulu Niah Estate','MJM Plantation 1','MJM Plantation 2',
@@ -5326,12 +5345,20 @@ function bootApp(session) {
         'Sungai Mak Plantation','Gama Menang','Elewsun'];
     const allowedEstates = isSuperAdmin
         ? ALL_ESTATES
-        : (session.estates || (session.estate ? [session.estate] : ALL_ESTATES));
+        : (session.estates && session.estates.length > 0 ? session.estates : []);
 
-    estateSelect.innerHTML = '<option value="">-- Select Estate --</option>' +
+    const estateOptionsHtml = '<option value="">— Select estate —</option>' +
         allowedEstates.map(e => `<option value="${e}">${e}</option>`).join('');
+
+    estateSelect.innerHTML = estateOptionsHtml;
+    // Keep the VISIBLE selector (the one users actually interact with) in sync
+    // with the user's permitted estates — never show estates they aren't
+    // assigned to, even though those options exist statically in HTML.
+    if (estateSelectVisible) estateSelectVisible.innerHTML = estateOptionsHtml;
+
     // Always start with no estate selected — blank state shown until user picks one
     estateSelect.value = '';
+    if (estateSelectVisible) estateSelectVisible.value = '';
 
     // Active estate is always empty on fresh login
     activeEstate = '';
@@ -5362,6 +5389,13 @@ function bootApp(session) {
 
     applyNavPermissions(session);
 
+    // Lock down the section currently shown (usually 'dashboard') in case
+    // the user's permissions restrict it to view-only
+    const activeSection = document.querySelector('.page-section.active');
+    if (activeSection && typeof applyViewOnlyLock === 'function') {
+        applyViewOnlyLock(activeSection.id);
+    }
+
     document.getElementById('txnDate').valueAsDate = new Date();
     refreshAll();
 
@@ -5390,29 +5424,135 @@ function applyNavPermissions(session) {
     });
 }
 
-// ── Guard nav clicks so restricted sections can't be accessed directly ──
-// Wrap the existing navButtons forEach to check permissions
-const _origNavHandler = (btn) => {
-    btn.addEventListener('click', () => {
-        const target  = btn.getAttribute('data-target');
-        const session = loadSession();
-        if (!session) return;
+// ── View-only enforcement ────────────────────────────────────────
+// When a user's access level for a section is 'view', every form
+// control that can mutate data (inputs, selects, textareas, and any
+// button that isn't a pure navigation/cancel/close/export action) is
+// disabled, and a small "Read-only" banner is shown. Buttons whose
+// onclick handler matches one of the SAFE_ACTION patterns (cancel,
+// close, clear filters, export, print, edit-own-profile, etc.) are
+// left active since they don't write plantation data.
+const VIEW_LOCK_SAFE_ACTIONS = [
+    'cancel', 'Cancel', 'close', 'Close', 'clear', 'Clear',
+    'export', 'Export', 'print', 'Print', 'toggle', 'Toggle',
+    'filter', 'Filter', 'logout', 'Logout', 'showUserProfile',
+    'showChangePassword', 'submitChangePassword', 'closeChangePasswordModal',
+    'attemptLogin', 'onSidebarEstateChange', 'setLang',
+];
 
-        // useradmin is superadmin-only
-        if (target === 'useradmin' && session.role !== 'superadmin') return;
+// Filter / search input fields that must stay usable even in view-only
+// mode, since searching and filtering don't mutate any plantation data.
+const VIEW_LOCK_ALLOWED_FIELD_IDS = [
+    // Stock Summary filters
+    'filterCategory', 'filterItem', 'filterType', 'filterFrom', 'filterTo',
+    // Manuring Progress search
+    'filterRpRound', 'filterRpBlock',
+    // Maintenance Progress search
+    'filterMpRound', 'filterMpBlock',
+    // Chemical Usage search
+    'filterChemRound', 'filterChemBlock',
+];
 
-        // Non-dashboard sections: check permission for normal users
-        if (target !== 'dashboard' && target !== 'useradmin' && session.role !== 'superadmin') {
-            const access = getSectionAccess(session, target);
-            if (access === 'none') {
-                alert('You do not have permission to access this section.');
-                return;
-            }
+function isSafeAction(onclickAttr) {
+    if (!onclickAttr) return true; // no handler at all → harmless (e.g. plain links)
+    return VIEW_LOCK_SAFE_ACTIONS.some(fragment => onclickAttr.includes(fragment));
+}
+
+// Tracks which sections already have a MutationObserver attached, so we
+// don't create duplicates every time applyViewOnlyLock() is called.
+const _viewLockObservedSections = {};
+// Guard flag so the observer doesn't react to the mutations that
+// applyViewOnlyLock() itself makes (disabling fields, inserting the banner).
+let _viewLockApplying = false;
+
+function applyViewOnlyLock(sectionId) {
+    _applyViewOnlyLockNow(sectionId);
+
+    // Many sections rebuild their tables/cards with fresh, fully-enabled
+    // buttons every time data changes (e.g. Stock Summary after "Apply
+    // Filters", Chemical Usage's ingredient table after refreshAll()).
+    // A MutationObserver re-asserts the lock automatically whenever the
+    // section's DOM changes, so newly-injected Edit/Delete buttons never
+    // slip through still enabled.
+    if (!_viewLockObservedSections[sectionId]) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            const observer = new MutationObserver(() => {
+                if (_viewLockApplying) return; // ignore our own DOM writes
+                _applyViewOnlyLockNow(sectionId);
+            });
+            observer.observe(section, { childList: true, subtree: true });
+            _viewLockObservedSections[sectionId] = observer;
         }
-    });
-};
-// Apply guard to all nav buttons (runs after DOM ready)
-document.querySelectorAll('[data-target]').forEach(_origNavHandler);
+    }
+}
+
+function _applyViewOnlyLockNow(sectionId) {
+    const session = loadSession();
+    if (!session) return;
+
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+
+    _viewLockApplying = true;
+    try {
+        // Remove any previous banner before deciding whether to re-add it
+        const existingBanner = section.querySelector('.view-only-banner');
+        if (existingBanner) existingBanner.remove();
+
+        const access     = getSectionAccess(session, sectionId);
+        const isReadOnly = session.role !== 'superadmin' && access === 'view';
+
+        // Re-enable everything first (in case the user's access changed, or
+        // this section was previously locked and is now editable)
+        section.querySelectorAll('input, select, textarea').forEach(el => {
+            el.disabled = false;
+            el.classList.remove('view-locked-field');
+        });
+        section.querySelectorAll('button').forEach(btn => {
+            btn.disabled = false;
+            btn.classList.remove('view-locked-field');
+        });
+
+        if (!isReadOnly) return;
+
+        // Lock all native form controls EXCEPT the filter/search fields that
+        // are explicitly allowed to remain usable in view-only mode.
+        section.querySelectorAll('input, select, textarea').forEach(el => {
+            if (VIEW_LOCK_ALLOWED_FIELD_IDS.includes(el.id)) return;
+            el.disabled = true;
+            el.classList.add('view-locked-field');
+        });
+
+        // Lock buttons that perform a mutating action (anything not in the
+        // safe-action allow-list above)
+        section.querySelectorAll('button').forEach(btn => {
+            const handler = btn.getAttribute('onclick') || '';
+            if (!isSafeAction(handler)) {
+                btn.disabled = true;
+                btn.classList.add('view-locked-field');
+            }
+        });
+
+        // Friendly read-only banner at the top of the section
+        const banner = document.createElement('div');
+        banner.className = 'view-only-banner';
+        banner.style.cssText = 'background:#FEF3C7;border:1px solid #FCD34D;color:#92400E;' +
+            'padding:10px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;font-weight:600;' +
+            'display:flex;align-items:center;gap:8px;';
+        banner.innerHTML = '👁 You have <b>View Only</b> access to this section. Editing is disabled.';
+        section.insertBefore(banner, section.firstChild);
+    } finally {
+        // Release the guard on the next tick so the MutationObserver's
+        // queued callback (for the mutations we just made) is ignored.
+        setTimeout(() => { _viewLockApplying = false; }, 0);
+    }
+}
+
+// Nav click permission guard is now enforced directly inside the primary
+// navButtons click handler above (see NAVIGATION section), so it actually
+// blocks restricted section switches instead of just showing an alert
+// after the section has already changed.
 
 // ── Logout ─────────────────────────────────────────────────────────
 function logoutUser() {
