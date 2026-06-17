@@ -568,18 +568,18 @@
                 <div style="background:linear-gradient(135deg,#166534 0%,#15803D 100%);padding:20px 24px 16px;">
                     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
                         <div>
-                            <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 2px;">&#127807; Manuring Program &#8212; Progress Tracker</h3>
+                            <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 2px;" data-i18n="dash_manuring_tracker_title">&#127807; Manuring Program &#8212; Progress Tracker</h3>
                             <p style="color:#bbf7d0;font-size:11.5px;margin:0;" id="manuringPctChartYear"></p>
                         </div>
                         <div style="display:flex;align-items:center;gap:8px;">
-                            <span style="color:#bbf7d0;font-size:11.5px;font-weight:500;">Year:</span>
+                            <span style="color:#bbf7d0;font-size:11.5px;font-weight:500;" data-i18n="dash_lbl_year">Year:</span>
                             <select id="manuringPctYearFilter" onchange="renderManuringPctChart()"
                                 style="font-size:11.5px;padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:#fff;outline:none;cursor:pointer;">
                             </select>
                         </div>
                     </div>
                 </div>
-                <p id="manuringPctChartEmpty" class="hidden" style="text-align:center;color:#94A3B8;padding:40px 0;font-size:13px;">No manuring rounds found. Add rounds in the Manuring Program section.</p>
+                <p id="manuringPctChartEmpty" class="hidden" style="text-align:center;color:#94A3B8;padding:40px 0;font-size:13px;" data-i18n="dash_no_manuring_rounds">No manuring rounds found. Add rounds in the Manuring Program section.</p>
                 <div id="manuringPctCards" style="display:flex;flex-wrap:wrap;gap:12px;padding:16px 24px 24px;"></div>
             </div>
 
@@ -588,18 +588,18 @@
                 <div style="background:linear-gradient(135deg,#92400E 0%,#B45309 100%);padding:20px 24px 16px;">
                     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
                         <div>
-                            <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 2px;">&#128295; Maintenance Program &#8212; Progress Tracker</h3>
+                            <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 2px;" data-i18n="dash_maint_tracker_title">&#128295; Maintenance Program &#8212; Progress Tracker</h3>
                             <p style="color:#fde68a;font-size:11.5px;margin:0;" id="maintPctTrackerYear"></p>
                         </div>
                         <div style="display:flex;align-items:center;gap:8px;">
-                            <span style="color:#fde68a;font-size:11.5px;font-weight:500;">Year:</span>
+                            <span style="color:#fde68a;font-size:11.5px;font-weight:500;" data-i18n="dash_lbl_year">Year:</span>
                             <select id="maintPctTrackerYearFilter" onchange="renderMaintPctTracker()"
                                 style="font-size:11.5px;padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:#fff;outline:none;cursor:pointer;">
                             </select>
                         </div>
                     </div>
                 </div>
-                <p id="maintPctTrackerEmpty" class="hidden" style="text-align:center;color:#94A3B8;padding:40px 0;font-size:13px;">No maintenance rounds found. Add rounds in the Maintenance Program section.</p>
+                <p id="maintPctTrackerEmpty" class="hidden" style="text-align:center;color:#94A3B8;padding:40px 0;font-size:13px;" data-i18n="dash_no_maint_rounds">No maintenance rounds found. Add rounds in the Maintenance Program section.</p>
                 <div id="maintPctTrackerCards" style="display:flex;flex-wrap:wrap;gap:12px;padding:16px 24px 24px;"></div>
             </div>
 
@@ -608,12 +608,12 @@
                 <div style="background:linear-gradient(135deg,#1E3A5F 0%,#1D4ED8 100%);padding:20px 24px 16px;">
                     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
                         <div>
-                            <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 2px;">&#9879;&#65039; Chemical Usage Tracker</h3>
-                            <p style="color:#BFDBFE;font-size:11.5px;margin:0;">Usage per Ha vs Max Dosage — by Maintenance Round</p>
+                            <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 2px;" data-i18n="dash_chem_tracker_title">&#9879;&#65039; Chemical Usage Tracker</h3>
+                            <p style="color:#BFDBFE;font-size:11.5px;margin:0;" data-i18n="dash_chem_tracker_subtitle">Usage per Ha vs Max Dosage — by Maintenance Round</p>
                         </div>
                     </div>
                 </div>
-                <p id="chemUsageTrackerEmpty" class="hidden" style="text-align:center;color:#94A3B8;padding:40px 0;font-size:13px;">No chemical usage data yet. Link chemical transactions to maintenance rounds.</p>
+                <p id="chemUsageTrackerEmpty" class="hidden" style="text-align:center;color:#94A3B8;padding:40px 0;font-size:13px;" data-i18n="dash_no_chem_usage">No chemical usage data yet. Link chemical transactions to maintenance rounds.</p>
                 <div id="chemUsageTrackerCards" style="display:flex;flex-wrap:wrap;gap:12px;padding:16px 24px 24px;"></div>
             </div>
 
@@ -734,9 +734,9 @@
                         <label class="block text-sm font-semibold mb-1" data-i18n="txn_lbl_type">Transaction Type</label>
                         <select id="txnType" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
                             <option value="" data-i18n="select_type">-- Select Type --</option>
-                            <option value="In">In</option>
-                            <option value="Out">Out</option>
-                            <option value="Adj">Adj</option>
+                            <option value="In" data-i18n="txn_type_in">In</option>
+                            <option value="Out" data-i18n="txn_type_out">Out</option>
+                            <option value="Adj" data-i18n="txn_type_adj">Adj</option>
                         </select>
                     </div>
                     <div id="txnQtyWrap">
@@ -803,11 +803,11 @@
 
                     <!-- Maintenance round picker - shown for ALL Out transactions -->
                     <div id="txnMaintWrap" class="md:col-span-2 hidden bg-orange-50 border-2 border-dashed border-orange-400 p-4 rounded-lg">
-                        <label class="block text-sm font-semibold mb-1">🔧 Maintenance Round <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
+                        <label class="block text-sm font-semibold mb-1"><span data-i18n="txn_lbl_maint_round">🔧 Maintenance Round</span> <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
                         <select id="txnMaintRound" class="w-full border border-orange-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500">
-                            <option value="">-- None / Not Applicable --</option>
+                            <option value="" data-i18n="select_none_na">-- None / Not Applicable --</option>
                         </select>
-                        <p class="text-xs text-orange-700 mt-2 italic">
+                        <p class="text-xs text-orange-700 mt-2 italic" data-i18n="txn_maint_round_hint">
                             🔧 Link this Out transaction to a Maintenance Round if applicable. Define rounds in the <b>Maintenance Program</b> page.
                         </p>
                     </div>
@@ -818,13 +818,13 @@
                     <!-- Picture upload — mandatory before saving -->
                     <div class="md:col-span-2">
                         <label class="block text-sm font-semibold mb-1">
-                            Supporting Picture
-                            <span class="text-gray-400 font-normal text-xs ml-1">(Optional — photo of delivery note, DO, or site)</span>
+                            <span data-i18n="txn_lbl_picture">Supporting Picture</span>
+                            <span class="text-gray-400 font-normal text-xs ml-1" data-i18n="txn_picture_hint">(Optional — photo of delivery note, DO, or site)</span>
                         </label>
                         <div class="flex flex-wrap gap-3 items-start">
                             <!-- Option 1: Upload from gallery / file system -->
                             <label class="cursor-pointer">
-                                <div class="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white text-sm font-semibold px-4 py-2 rounded-lg select-none">
+                                <div class="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white text-sm font-semibold px-4 py-2 rounded-lg select-none" data-i18n="btn_upload_photo">
                                     🖼️ Upload Photo
                                 </div>
                                 <input type="file" id="txnPicture" accept="image/*"
@@ -832,7 +832,7 @@
                             </label>
                             <!-- Option 2: Take photo directly with camera -->
                             <label class="cursor-pointer">
-                                <div class="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-4 py-2 rounded-lg select-none">
+                                <div class="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-4 py-2 rounded-lg select-none" data-i18n="btn_take_photo">
                                     📷 Take Photo
                                 </div>
                                 <input type="file" id="txnPictureCamera" accept="image/*" capture="environment"
@@ -843,7 +843,7 @@
                                 <img id="txnPicturePreview" src="" alt="Preview"
                                     class="w-24 h-24 object-cover rounded-lg border border-green-300 shadow" />
                                 <button type="button" onclick="clearTxnPicture()"
-                                    class="text-xs text-red-500 hover:underline mt-1">✖ Remove</button>
+                                    class="text-xs text-red-500 hover:underline mt-1" data-i18n="btn_remove">✖ Remove</button>
                             </div>
                         </div>
                         <p id="txnPictureFilename" class="text-xs text-green-700 mt-1 italic hidden"></p>
@@ -1086,7 +1086,7 @@
 
             <!-- Manuring Application History (moved from Manuring Program) -->
             <div class="bg-white p-6 rounded-xl shadow mb-8">
-                <h3 class="text-xl font-bold mb-2">b) Manuring Progress by Block</h3>
+                <h3 class="text-xl font-bold mb-2" data-i18n="rp_title_b">b) Manuring Progress by Block</h3>
                 <p class="text-xs text-green-700 mb-2">% Applied per block = Qty Applied (that block) ÷ Budgeted Fertilizer Needed (that block)</p>
                 <div style="margin-bottom:12px;">
                     <input id="filterRpBlock" type="text" placeholder="🔍 Search round, fertilizer or block…"
@@ -1553,9 +1553,9 @@
                 </select>
             </div>
             <div id="editTxnMaintWrap" class="md:col-span-2 hidden bg-orange-50 border border-orange-300 rounded p-3">
-                <label class="block text-sm font-semibold mb-1">🔧 Maintenance Round <span class="text-gray-400 font-normal text-xs">(Optional)</span></label>
+                <label class="block text-sm font-semibold mb-1"><span data-i18n="txn_lbl_maint_round">🔧 Maintenance Round</span> <span class="text-gray-400 font-normal text-xs">(Optional)</span></label>
                 <select id="editTxnMaintRound" class="w-full border border-orange-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-orange-400">
-                    <option value="">-- Select a Maintenance Round --</option>
+                    <option value="" data-i18n="select_maint_round">-- Select a Maintenance Round --</option>
                 </select>
             </div>
             <div class="md:col-span-2">
@@ -1564,22 +1564,22 @@
             </div>
             <!-- Supporting picture -->
             <div class="md:col-span-2">
-                <label class="block text-sm font-semibold mb-1">Supporting Picture <span class="text-gray-400 font-normal text-xs">(Optional)</span></label>
+                <label class="block text-sm font-semibold mb-1"><span data-i18n="txn_lbl_picture">Supporting Picture</span> <span class="text-gray-400 font-normal text-xs">(Optional)</span></label>
                 <div class="flex flex-wrap gap-3 items-start">
                     <!-- Upload from gallery -->
                     <label class="cursor-pointer">
-                        <div class="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white text-xs font-semibold px-3 py-1.5 rounded-lg select-none">🖼️ Upload Photo</div>
+                        <div class="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white text-xs font-semibold px-3 py-1.5 rounded-lg select-none" data-i18n="btn_upload_photo">🖼️ Upload Photo</div>
                         <input type="file" id="editTxnPicture" accept="image/*" class="hidden" onchange="previewEditTxnPicture(this)" />
                     </label>
                     <!-- Take photo -->
                     <label class="cursor-pointer">
-                        <div class="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold px-3 py-1.5 rounded-lg select-none">📷 Take Photo</div>
+                        <div class="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold px-3 py-1.5 rounded-lg select-none" data-i18n="btn_take_photo">📷 Take Photo</div>
                         <input type="file" id="editTxnPictureCamera" accept="image/*" capture="environment" class="hidden" onchange="previewEditTxnPicture(this)" />
                     </label>
                     <!-- Preview -->
                     <div id="editTxnPicturePreviewWrap" class="hidden flex items-start gap-2">
                         <img id="editTxnPicturePreview" src="" alt="Preview" class="w-20 h-20 object-cover rounded-lg border border-green-300 shadow" />
-                        <button type="button" onclick="clearEditTxnPicture()" class="text-xs text-red-500 hover:underline mt-1">✖ Remove</button>
+                        <button type="button" onclick="clearEditTxnPicture()" class="text-xs text-red-500 hover:underline mt-1" data-i18n="btn_remove">✖ Remove</button>
                     </div>
                 </div>
             </div>
@@ -3280,7 +3280,7 @@ function renderManuringPctChart() {
         }).join('');
     }
     var selectedYear = (yearSel && yearSel.value) ? yearSel.value : String(currentYear);
-    if (yearLbl) yearLbl.textContent = 'Tracking Year: ' + selectedYear;
+    if (yearLbl) yearLbl.textContent = I18N[currentLang]['dash_lbl_tracking_year'] + selectedYear;
 
     var rounds = manuringRounds.filter(function(r){
         var tp = r.targetPeriod || r.targetperiod || '';
@@ -3339,7 +3339,7 @@ function renderManuringPctChart() {
         var barW     = pctVal!==null ? Math.min(100,pctVal) : 0;
         var barColor = pctVal===null ? '#CBD5E1' : pctVal>=100 ? '#22C55E' : pctVal>=50 ? '#F59E0B' : '#EF4444';
         var badge    = pctVal===null
-            ? '<span style="font-size:10px;color:#94A3B8;font-weight:600;">No target set</span>'
+            ? '<span style="font-size:10px;color:#94A3B8;font-weight:600;">'+I18N[currentLang]['dash_no_target_set']+'</span>'
             : '<span style="font-size:15px;font-weight:800;color:'+barColor+';">'+pctVal+'%</span>';
 
         var card = document.createElement('div');
@@ -3348,7 +3348,7 @@ function renderManuringPctChart() {
         var hdr='<div style="background:#F1F5F9;padding:12px 14px 10px;border-bottom:1px solid #E2E8F0;">'
             +'<div style="font-size:12px;font-weight:700;color:#1E293B;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+d.name+'">'+d.name+'</div>'
             +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
-                +'<div style="font-size:10px;color:#64748B;">Target: <b style="color:#0F172A;">'+d.tpLabel+'</b> &nbsp; '+d.fertilizer+'</div>'
+                +'<div style="font-size:10px;color:#64748B;">'+I18N[currentLang]['dash_lbl_target']+'<b style="color:#0F172A;">'+d.tpLabel+'</b> &nbsp; '+d.fertilizer+'</div>'
                 +badge
             +'</div>'
             +'<div style="display:flex;align-items:center;gap:8px;">'
@@ -3361,7 +3361,7 @@ function renderManuringPctChart() {
 
         var canvasId='manuringMonth_'+d.id;
         var body='<div style="padding:10px 12px 12px;">'
-            +'<div style="font-size:9.5px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Cumulative Progress by Month ('+selectedYear+')</div>'
+            +'<div style="font-size:9.5px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">'+I18N[currentLang]['dash_lbl_cumulative_progress']+' ('+selectedYear+')</div>'
             +'<canvas id="'+canvasId+'" height="90"></canvas>'
             +'</div>';
 
@@ -3419,10 +3419,10 @@ function renderManuringPctChart() {
                                     var i=ctx.dataIndex;
                                     var bags=rData.monthlyBags[i];
                                     var cv=cumPct[i];
-                                    if(!bags||bags<=0) return '  No data';
-                                    var lines=['  Applied  : '+Math.round(bags)+' bags'];
-                                    if(cv!=null) lines.push('  Cumulative: '+cv+'%');
-                                    if(i===rData.tpMIdx) lines.push('  ★ Target Month');
+                                    if(!bags||bags<=0) return I18N[currentLang]['dash_lbl_no_data'];
+                                    var lines=[I18N[currentLang]['dash_lbl_applied']+Math.round(bags)+I18N[currentLang]['dash_lbl_bags']];
+                                    if(cv!=null) lines.push(I18N[currentLang]['dash_lbl_cumulative']+cv+'%');
+                                    if(i===rData.tpMIdx) lines.push(I18N[currentLang]['dash_lbl_target_month']);
                                     return lines;
                                 }
                             }}
@@ -3503,7 +3503,7 @@ function renderMaintPctTracker() {
         }).join('');
     }
     var selectedYear = (yearSel && yearSel.value) ? yearSel.value : String(currentYear);
-    if (yearLbl) yearLbl.textContent = 'Tracking Year: ' + selectedYear;
+    if (yearLbl) yearLbl.textContent = I18N[currentLang]['dash_lbl_tracking_year'] + selectedYear;
 
     var rounds = fieldMaintRounds.filter(function(r){
         var tp = r.targetPeriod || r.targetperiod || '';
@@ -3581,7 +3581,7 @@ function renderMaintPctTracker() {
         var barW     = pctVal!==null ? Math.min(100,pctVal) : 0;
         var barColor = pctVal===null ? '#CBD5E1' : pctVal>=100 ? '#22C55E' : pctVal>=50 ? '#F59E0B' : '#EF4444';
         var badge    = pctVal===null
-            ? '<span style="font-size:10px;color:#94A3B8;font-weight:600;">No target set</span>'
+            ? '<span style="font-size:10px;color:#94A3B8;font-weight:600;">'+I18N[currentLang]['dash_no_target_set']+'</span>'
             : '<span style="font-size:15px;font-weight:800;color:'+barColor+';">'+pctVal+'%</span>';
 
         var card = document.createElement('div');
@@ -3590,7 +3590,7 @@ function renderMaintPctTracker() {
         var hdr = '<div style="background:#F1F5F9;padding:12px 14px 10px;border-bottom:1px solid #E2E8F0;">'
             +'<div style="font-size:12px;font-weight:700;color:#1E293B;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+d.name+'">'+d.name+'</div>'
             +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
-                +'<div style="font-size:10px;color:#64748B;">&#127919; Target: <b style="color:#0F172A;">'+d.tpLabel+'</b></div>'
+                +'<div style="font-size:10px;color:#64748B;">&#127919; '+I18N[currentLang]['dash_lbl_target']+'<b style="color:#0F172A;">'+d.tpLabel+'</b></div>'
                 +badge
             +'</div>'
             +'<div style="display:flex;align-items:center;gap:8px;">'
@@ -3603,7 +3603,7 @@ function renderMaintPctTracker() {
 
         var canvasId = 'maintTrackerMonth_'+d.id;
         var body = '<div style="padding:10px 12px 12px;">'
-            +'<div style="font-size:9.5px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Cumulative Progress by Month ('+selectedYear+')</div>'
+            +'<div style="font-size:9.5px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">'+I18N[currentLang]['dash_lbl_cumulative_progress']+selectedYear+')</div>'
             +'<canvas id="'+canvasId+'" height="90"></canvas>'
             +'</div>';
 
@@ -3653,11 +3653,11 @@ function renderMaintPctTracker() {
                                 title: function(it){ return MFull[it[0].dataIndex]+' '+selectedYear; },
                                 label: function(ctx){
                                     var v = rData.cumulativePct[ctx.dataIndex];
-                                    if (v===null||v===0) return '  No data';
-                                    var lines = ['  Cumulative: '+v+'%'];
+                                    if (v===null||v===0) return I18N[currentLang]['dash_lbl_no_data'];
+                                    var lines = [I18N[currentLang]['dash_lbl_cumulative']+v+'%'];
                                     var mo = rData.monthlyClaimedArr[ctx.dataIndex];
-                                    if (mo>0) lines.push('  This month: '+mo.toFixed(2)+' Ha');
-                                    if (ctx.dataIndex===rData.tpMIdx) lines.push('  \u2605 Target Month');
+                                    if (mo>0) lines.push(I18N[currentLang]['dash_lbl_this_month']+mo.toFixed(2)+I18N[currentLang]['dash_lbl_ha']);
+                                    if (ctx.dataIndex===rData.tpMIdx) lines.push(I18N[currentLang]['dash_lbl_target_month']);
                                     return lines;
                                 }
                             }}
@@ -3803,11 +3803,11 @@ function renderChemUsageTracker() {
         var anyOver   = roundBars.some(function(rb){  return maxDosage>0  && rb.usagePerHa>maxDosage; });
         var hdrBg     = anyOver ? 'linear-gradient(135deg,#7F1D1D,#DC2626)' : 'linear-gradient(135deg,#1E3A5F,#1D4ED8)';
         var subLabel  = ci.itemName ? '&#128167; '+ci.itemName : '';
-        var maxLabel  = maxDosage > 0 ? 'Max dosage: '+maxDosage.toFixed(2)+' '+ci.unit+'/Ha' : 'No dosage limit';
+        var maxLabel  = maxDosage > 0 ? I18N[currentLang]['dash_lbl_max_dosage']+maxDosage.toFixed(2)+' '+ci.unit+'/Ha' : I18N[currentLang]['dash_no_dosage_limit'];
         var statusPill= anyOver
-            ? '<span style="font-size:9px;font-weight:700;background:rgba(255,255,255,.2);color:#FEE2E2;padding:2px 8px;border-radius:99px;">&#9888; Exceeded</span>'
+            ? '<span style="font-size:9px;font-weight:700;background:rgba(255,255,255,.2);color:#FEE2E2;padding:2px 8px;border-radius:99px;">'+I18N[currentLang]['dash_lbl_exceeded']+'</span>'
             : maxDosage > 0
-                ? '<span style="font-size:9px;font-weight:700;background:rgba(255,255,255,.2);color:#D1FAE5;padding:2px 8px;border-radius:99px;">&#10003; Within Limit</span>'
+                ? '<span style="font-size:9px;font-weight:700;background:rgba(255,255,255,.2);color:#D1FAE5;padding:2px 8px;border-radius:99px;">'+I18N[currentLang]['dash_lbl_within_limit']+'</span>'
                 : '';
 
         var hdr = '<div style="background:'+hdrBg+';padding:12px 14px 10px;">'
@@ -3859,7 +3859,7 @@ function renderChemUsageTracker() {
                         ctx.font         = 'bold 9px Inter,sans-serif';
                         ctx.textAlign    = 'left';
                         ctx.textBaseline = 'top';
-                        ctx.fillText('Max', xPos+3, yAxis.top+2);
+                        ctx.fillText(I18N[currentLang]['dash_lbl_max_chart'], xPos+3, yAxis.top+2);
                         ctx.restore();
                     }
                 };
@@ -3911,8 +3911,8 @@ function renderChemUsageTracker() {
                                     title: function(it){ return it[0].label; },
                                     label: function(ctx){
                                         var val = ctx.parsed.x;
-                                        var lines = ['  Usage: '+val.toFixed(2)+' '+ci.unit+'/Ha'];
-                                        if (md>0) lines.push('  Max  : '+md.toFixed(2)+' '+ci.unit+'/Ha');
+                                        var lines = [I18N[currentLang]['dash_lbl_usage']+val.toFixed(2)+' '+ci.unit+'/Ha'];
+                                        if (md>0) lines.push(I18N[currentLang]['dash_lbl_max_short']+md.toFixed(2)+' '+ci.unit+'/Ha');
                                         return lines;
                                     }
                                 }
@@ -4688,8 +4688,47 @@ const I18N = {
         txn_col_location_block: 'Location (Block)',
         txn_breakdown_hint:  '📝 Add a row for each block where stock was applied. Each row creates a separate transaction record sharing the same Item, Date, Ref, and Round.',
         txn_round_hint:      '🌱 Required when issuing fertilizer for field application. Make sure the <b>Location</b> above is set to the target block (not Storage). Define rounds in the <b>Manuring Program</b> page.',
+        txn_lbl_maint_round: '🔧 Maintenance Round',
+        select_none_na:      '-- None / Not Applicable --',
+        select_maint_round:  '-- Select a Maintenance Round --',
+        txn_maint_round_hint:'🔧 Link this Out transaction to a Maintenance Round if applicable. Define rounds in the <b>Maintenance Program</b> page.',
+        txn_lbl_picture:     'Supporting Picture',
+        txn_picture_hint:    '(Optional — photo of delivery note, DO, or site)',
+        btn_upload_photo:    '🖼️ Upload Photo',
+        btn_take_photo:      '📷 Take Photo',
+        btn_remove:          '✖ Remove',
+        txn_type_in:         'In',
+        txn_type_out:        'Out',
+        txn_type_adj:        'Adj',
         btn_save_txn:        'Save Transaction',
         btn_add_row:         '+ Add Row',
+        /* Dashboard - Progress Trackers */
+        dash_manuring_tracker_title: '🌾 Manuring Program — Progress Tracker',
+        dash_maint_tracker_title:    '🔧 Maintenance Program — Progress Tracker',
+        dash_chem_tracker_title:     '⚗️ Chemical Usage Tracker',
+        dash_chem_tracker_subtitle:  'Usage per Ha vs Max Dosage — by Maintenance Round',
+        dash_lbl_year:                'Year:',
+        dash_lbl_tracking_year:       'Tracking Year: ',
+        dash_no_manuring_rounds:      'No manuring rounds found. Add rounds in the Manuring Program section.',
+        dash_no_maint_rounds:         'No maintenance rounds found. Add rounds in the Maintenance Program section.',
+        dash_no_chem_usage:           'No chemical usage data yet. Link chemical transactions to maintenance rounds.',
+        dash_no_target_set:           'No target set',
+        dash_lbl_target:              'Target: ',
+        dash_lbl_cumulative_progress: 'Cumulative Progress by Month (',
+        dash_lbl_no_data:             '  No data',
+        dash_lbl_applied:             '  Applied  : ',
+        dash_lbl_bags:                ' bags',
+        dash_lbl_cumulative:          '  Cumulative: ',
+        dash_lbl_target_month:        '  ★ Target Month',
+        dash_lbl_this_month:          '  This month: ',
+        dash_lbl_ha:                  ' Ha',
+        dash_lbl_max_dosage:          'Max dosage: ',
+        dash_no_dosage_limit:         'No dosage limit',
+        dash_lbl_exceeded:            '⚠ Exceeded',
+        dash_lbl_within_limit:        '✓ Within Limit',
+        dash_lbl_usage:               '  Usage: ',
+        dash_lbl_max_short:           '  Max  : ',
+        dash_lbl_max_chart:           'Max',
         /* Stock Summary */
         nav_summary:         '📑 Stock Summary',
         summary_filters:     'Filters',
@@ -4876,8 +4915,47 @@ const I18N = {
         txn_col_location_block: 'Lokasi (Blok)',
         txn_breakdown_hint:  '📝 Tambah baris untuk setiap blok yang menerima stok. Setiap baris mencipta rekod transaksi berasingan dengan Item, Tarikh, Ref, dan Pusingan yang sama.',
         txn_round_hint:      '🌱 Diperlukan semasa mengeluarkan baja untuk kerja lapangan. Pastikan <b>Lokasi</b> di atas ditetapkan kepada blok sasaran (bukan Stor). Tentukan pusingan di halaman <b>Program Pembajaan</b>.',
+        txn_lbl_maint_round: '🔧 Pusingan Penyelenggaraan',
+        select_none_na:      '-- Tiada / Tidak Berkenaan --',
+        select_maint_round:  '-- Pilih Pusingan Penyelenggaraan --',
+        txn_maint_round_hint:'🔧 Kaitkan transaksi Keluar ini dengan Pusingan Penyelenggaraan jika berkenaan. Tentukan pusingan di halaman <b>Program Penyelenggaraan</b>.',
+        txn_lbl_picture:     'Gambar Sokongan',
+        txn_picture_hint:    '(Pilihan — gambar nota penghantaran, DO, atau tapak)',
+        btn_upload_photo:    '🖼️ Muat Naik Gambar',
+        btn_take_photo:      '📷 Ambil Gambar',
+        btn_remove:          '✖ Buang',
+        txn_type_in:         'Masuk',
+        txn_type_out:        'Keluar',
+        txn_type_adj:        'Pelarasan',
         btn_save_txn:        'Simpan Transaksi',
         btn_add_row:         '+ Tambah Baris',
+        /* Dashboard - Progress Trackers */
+        dash_manuring_tracker_title: '🌾 Program Pembajaan — Penjejak Kemajuan',
+        dash_maint_tracker_title:    '🔧 Program Penyelenggaraan — Penjejak Kemajuan',
+        dash_chem_tracker_title:     '⚗️ Penjejak Penggunaan Kimia',
+        dash_chem_tracker_subtitle:  'Penggunaan per Ha vs Dos Maksimum — mengikut Pusingan Penyelenggaraan',
+        dash_lbl_year:                'Tahun:',
+        dash_lbl_tracking_year:       'Tahun Penjejakan: ',
+        dash_no_manuring_rounds:      'Tiada pusingan pembajaan dijumpai. Tambah pusingan dalam bahagian Program Pembajaan.',
+        dash_no_maint_rounds:         'Tiada pusingan penyelenggaraan dijumpai. Tambah pusingan dalam bahagian Program Penyelenggaraan.',
+        dash_no_chem_usage:           'Tiada data penggunaan kimia lagi. Kaitkan transaksi kimia dengan pusingan penyelenggaraan.',
+        dash_no_target_set:           'Tiada sasaran ditetapkan',
+        dash_lbl_target:              'Sasaran: ',
+        dash_lbl_cumulative_progress: 'Kemajuan Kumulatif mengikut Bulan (',
+        dash_lbl_no_data:             '  Tiada data',
+        dash_lbl_applied:             '  Digunakan : ',
+        dash_lbl_bags:                ' beg',
+        dash_lbl_cumulative:          '  Kumulatif: ',
+        dash_lbl_target_month:        '  ★ Bulan Sasaran',
+        dash_lbl_this_month:          '  Bulan ini: ',
+        dash_lbl_ha:                  ' Ha',
+        dash_lbl_max_dosage:          'Dos maksimum: ',
+        dash_no_dosage_limit:         'Tiada had dos',
+        dash_lbl_exceeded:            '⚠ Melebihi Had',
+        dash_lbl_within_limit:        '✓ Dalam Had',
+        dash_lbl_usage:               '  Penggunaan: ',
+        dash_lbl_max_short:           '  Maks  : ',
+        dash_lbl_max_chart:           'Maks',
         /* Stock Summary */
         summary_filters:     'Penapis',
         filter_date_from:    'Tarikh Dari',
@@ -6202,8 +6280,20 @@ function renderChemByRound() {
         rounds[key].blocks.push(c.blockName);
     });
 
+    // Sort by linked round's targetPeriod ascending; rounds without targetPeriod go last
+    const sortedRounds = Object.values(rounds).sort((a, b) => {
+        const rA = fieldMaintRounds.find(r => String(r.id) === String(a.roundId));
+        const rB = fieldMaintRounds.find(r => String(r.id) === String(b.roundId));
+        const tpA = (rA && (rA.targetPeriod || rA.targetperiod)) || '';
+        const tpB = (rB && (rB.targetPeriod || rB.targetperiod)) || '';
+        if (!tpA && !tpB) return 0;
+        if (!tpA) return 1;
+        if (!tpB) return -1;
+        return tpA.localeCompare(tpB);
+    });
+
     let hasRows = false;
-    Object.values(rounds).forEach(rm => {
+    sortedRounds.forEach(rm => {
         chemIngredients.forEach(ci => {
             // Sum ALL Out transactions for this chemical item linked to this maintenance round
             const totalQty = transactions.filter(t =>
@@ -6258,8 +6348,22 @@ function renderChemByBlock() {
         claimsByRoundBlock[key].totalClaimed += parseFloat(c.claimedArea) || 0;
     });
 
+    // Sort by linked round's targetPeriod ascending, then by blockName
+    const sortedRoundBlocks = Object.values(claimsByRoundBlock).sort((a, b) => {
+        const rA = fieldMaintRounds.find(r => String(r.id) === String(a.roundId));
+        const rB = fieldMaintRounds.find(r => String(r.id) === String(b.roundId));
+        const tpA = (rA && (rA.targetPeriod || rA.targetperiod)) || '';
+        const tpB = (rB && (rB.targetPeriod || rB.targetperiod)) || '';
+        if (tpA !== tpB) {
+            if (!tpA) return 1;
+            if (!tpB) return -1;
+            return tpA.localeCompare(tpB);
+        }
+        return a.blockName.localeCompare(b.blockName);
+    });
+
     let hasRows = false;
-    Object.values(claimsByRoundBlock).forEach(c => {
+    sortedRoundBlocks.forEach(c => {
         chemIngredients.forEach(ci => {
             // Sum ALL Out transactions for this chemical at this block linked to this round
             const totalQty = transactions.filter(t =>
