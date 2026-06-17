@@ -1609,6 +1609,19 @@ const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 /* -----------------------------------------------------------------
+   PASSWORD HASHING - SHA-256 via the browser's Web Crypto API.
+   Passwords are NEVER stored or transmitted in plain text; only the
+   resulting hex digest is saved to opp_users.password_hash.
+   ----------------------------------------------------------------- */
+async function sha256Hex(plainText) {
+    const encoder   = new TextEncoder();
+    const data      = encoder.encode(plainText);
+    const hashBuf   = await crypto.subtle.digest('SHA-256', data);
+    const hashArr   = Array.from(new Uint8Array(hashBuf));
+    return hashArr.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/* -----------------------------------------------------------------
    GLOBAL STATE - Loaded from / persisted to localStorage
    (localStorage is kept as an instant-render cache; Supabase is the
    source of truth and gets synced on every save.)
@@ -3361,7 +3374,7 @@ function renderManuringPctChart() {
 
         var canvasId='manuringMonth_'+d.id;
         var body='<div style="padding:10px 12px 12px;">'
-            +'<div style="font-size:9.5px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">'+I18N[currentLang]['dash_lbl_cumulative_progress']+' ('+selectedYear+')</div>'
+            +'<div style="font-size:9.5px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">'+I18N[currentLang]['dash_lbl_cumulative_progress']+selectedYear+')</div>'
             +'<canvas id="'+canvasId+'" height="90"></canvas>'
             +'</div>';
 
@@ -5121,16 +5134,22 @@ function setLang(lang) {
 /* =================================================================
    AUTH SYSTEM
    - Super Admin: hardcoded, full access.
-   - Normal Users: stored in localStorage, restricted access per
-     sections configured by Super Admin.
+   - Normal Users: stored in Supabase table `opp_users` (global, not
+     estate-scoped) so any user can log in from any device. Passwords
+     are SHA-256 hashed client-side before ever leaving the browser —
+     only the hash is sent to / stored in Supabase.
+   - A localStorage copy (`opp_auth_users`) is kept ONLY as an instant-
+     render cache (so the User Management table isn't empty while the
+     network request is in flight); it is never the source of truth.
    - Session persisted in sessionStorage so refresh keeps you logged in.
    ================================================================= */
 
 // ── Constants ──────────────────────────────────────────────────────
 const AUTH_KEYS = {
-    users:   'opp_auth_users',   // registered normal users (array)
+    users:   'opp_auth_users',   // local cache of users (array) — NOT source of truth
     session: 'opp_auth_session', // current session (object)
 };
+const USERS_TABLE = 'opp_users';
 
 // All navigable sections (excluding dashboard which is always visible,
 // and useradmin which is super-admin-only)
@@ -5156,14 +5175,85 @@ const SUPER_ADMIN = {
 };
 
 // ── Helpers ────────────────────────────────────────────────────────
-function loadUsers()         { try { return JSON.parse(localStorage.getItem(AUTH_KEYS.users)) || []; } catch { return []; } }
-function saveUsers(u)        { localStorage.setItem(AUTH_KEYS.users, JSON.stringify(u)); }
+// Local cache only — instant render while Supabase request is pending.
+function loadUsersCache()    { try { return JSON.parse(localStorage.getItem(AUTH_KEYS.users)) || []; } catch { return []; } }
+function saveUsersCache(u)   { localStorage.setItem(AUTH_KEYS.users, JSON.stringify(u)); }
 function loadSession()       { try { return JSON.parse(sessionStorage.getItem(AUTH_KEYS.session)) || null; } catch { return null; } }
 function saveSession(s)      { sessionStorage.setItem(AUTH_KEYS.session, JSON.stringify(s)); }
 function clearSession()      { sessionStorage.removeItem(AUTH_KEYS.session); }
 
+// Convert a Supabase row (snake_case) <-> the app's in-memory user shape (camelCase)
+function rowToUser(row) {
+    return {
+        id:           row.id,
+        name:         row.name,
+        email:        row.email,
+        passwordHash: row.password_hash,
+        estates:      row.estates || [],
+        permissions:  row.permissions || {},
+    };
+}
+function userToRow(u) {
+    return {
+        id:            u.id,
+        name:          u.name,
+        email:         u.email,
+        password_hash: u.passwordHash,
+        estates:       u.estates || [],
+        permissions:   u.permissions || {},
+    };
+}
+
+// ── Supabase-backed user CRUD ───────────────────────────────────────
+// Fetch the full user list from Supabase (source of truth) and refresh
+// the local cache. Falls back to the cache if the request fails (e.g.
+// offline) so the User Management screen still shows something.
+async function fetchUsersFromSupabase() {
+    try {
+        const { data, error } = await supabaseClient.from(USERS_TABLE).select('*');
+        if (error) throw error;
+        const users = (data || []).map(rowToUser);
+        saveUsersCache(users);
+        return users;
+    } catch (err) {
+        console.error('[Supabase] fetch users failed, using local cache', err);
+        return loadUsersCache();
+    }
+}
+
+// Look up a single user by email directly against Supabase (used at
+// login time so any device sees the latest account, not a stale cache).
+async function fetchUserByEmail(email) {
+    try {
+        const { data, error } = await supabaseClient
+            .from(USERS_TABLE).select('*').eq('email', email).maybeSingle();
+        if (error) throw error;
+        return data ? rowToUser(data) : null;
+    } catch (err) {
+        console.error('[Supabase] fetch user by email failed, trying local cache', err);
+        const cached = loadUsersCache();
+        return cached.find(u => u.email === email) || null;
+    }
+}
+
+async function insertUserToSupabase(user) {
+    const { error } = await supabaseClient.from(USERS_TABLE).insert(userToRow(user));
+    if (error) throw error;
+}
+
+async function updateUserInSupabase(user) {
+    const { error } = await supabaseClient
+        .from(USERS_TABLE).update(userToRow(user)).eq('id', user.id);
+    if (error) throw error;
+}
+
+async function deleteUserFromSupabase(id) {
+    const { error } = await supabaseClient.from(USERS_TABLE).delete().eq('id', id);
+    if (error) throw error;
+}
+
 // ── Login attempt ──────────────────────────────────────────────────
-function attemptLogin() {
+async function attemptLogin() {
     const email    = document.getElementById('loginEmail').value.trim().toLowerCase();
     const password = document.getElementById('loginPassword').value;
     const errEl    = document.getElementById('loginError');
@@ -5188,25 +5278,32 @@ function attemptLogin() {
         return;
     }
 
-    // Check normal users — estates stored on user record
-    const users = loadUsers();
-    const user  = users.find(u => u.email === email);
-    if (!user)                      { showLoginError('No account found for this email.'); return; }
-    if (user.password !== password) { showLoginError('Incorrect password.'); return; }
+    // Check normal users — looked up live from Supabase so login works
+    // from any device, not just the browser that registered the account.
+    const loginBtn = document.querySelector('button[onclick="attemptLogin()"]');
+    if (loginBtn) { loginBtn.disabled = true; loginBtn.style.opacity = '0.6'; }
 
-    // Support both old single-estate and new multi-estate records
-    const estates = user.estates || (user.estate ? [user.estate] : []);
+    try {
+        const user = await fetchUserByEmail(email);
+        if (!user) { showLoginError('No account found for this email.'); return; }
 
-    const session = {
-        email:       user.email,
-        name:        user.name,
-        estates:     estates,
-        estate:      '',   // always start with no estate selected — user must pick one
-        role:        'user',
-        permissions: user.permissions || [],
-    };
-    saveSession(session);
-    bootApp(session);
+        const enteredHash = await sha256Hex(password);
+        if (enteredHash !== user.passwordHash) { showLoginError('Incorrect password.'); return; }
+
+        const estates = user.estates || [];
+        const session = {
+            email:       user.email,
+            name:        user.name,
+            estates:     estates,
+            estate:      '',   // always start with no estate selected — user must pick one
+            role:        'user',
+            permissions: user.permissions || {},
+        };
+        saveSession(session);
+        bootApp(session);
+    } finally {
+        if (loginBtn) { loginBtn.disabled = false; loginBtn.style.opacity = '1'; }
+    }
 }
 
 function showLoginError(msg) {
@@ -5420,7 +5517,7 @@ function isEditAllowed(sectionId) {
     return getSectionAccess(session, sectionId) === 'edit';
 }
 
-function registerUser() {
+async function registerUser() {
     const name     = document.getElementById('regName').value.trim();
     const email    = document.getElementById('regEmail').value.trim().toLowerCase();
     const password = document.getElementById('regPassword').value;
@@ -5438,33 +5535,54 @@ function registerUser() {
     if (password.length < 6) { alert('Password must be at least 6 characters.'); return; }
     if (email === SUPER_ADMIN.email) { alert('That email is reserved.'); return; }
 
-    const users = loadUsers();
-    if (users.find(u => u.email === email)) { alert('A user with this email already exists.'); return; }
+    const regBtn = document.querySelector('button[onclick="registerUser()"]');
+    if (regBtn) { regBtn.disabled = true; regBtn.textContent = 'Registering…'; }
 
-    users.push({ id: Date.now(), name, email, password, estates, estate: estates[0], permissions: perms });
-    saveUsers(users);
+    try {
+        const existing = await fetchUserByEmail(email);
+        if (existing) { alert('A user with this email already exists.'); return; }
 
-    document.getElementById('regName').value     = '';
-    document.getElementById('regEmail').value    = '';
-    document.getElementById('regPassword').value = '';
-    document.querySelectorAll('.reg-estate-cb').forEach(cb => cb.checked = false);
-    renderPermissionCheckboxes();
+        const passwordHash = await sha256Hex(password);
+        const newUser = { id: Date.now(), name, email, passwordHash, estates, permissions: perms };
 
-    renderUsersTable();
-    alert(`User "${name}" registered successfully.`);
+        await insertUserToSupabase(newUser);
+
+        // Refresh local cache + table from Supabase (source of truth)
+        await fetchUsersFromSupabase();
+
+        document.getElementById('regName').value     = '';
+        document.getElementById('regEmail').value    = '';
+        document.getElementById('regPassword').value = '';
+        document.querySelectorAll('.reg-estate-cb').forEach(cb => cb.checked = false);
+        renderPermissionCheckboxes();
+
+        await renderUsersTable();
+        alert(`User "${name}" registered successfully.`);
+    } catch (err) {
+        console.error('[Supabase] registerUser failed', err);
+        alert('Could not register user — ' + (err.message || 'please check your connection and try again.'));
+    } finally {
+        if (regBtn) { regBtn.disabled = false; regBtn.textContent = '➕ Register User'; }
+    }
 }
 
-function deleteUser(id) {
+async function deleteUser(id) {
     if (!confirm('Delete this user?')) return;
-    const users = loadUsers().filter(u => u.id !== id);
-    saveUsers(users);
-    renderUsersTable();
+    try {
+        await deleteUserFromSupabase(id);
+        await fetchUsersFromSupabase();
+        await renderUsersTable();
+    } catch (err) {
+        console.error('[Supabase] deleteUser failed', err);
+        alert('Could not delete user — ' + (err.message || 'please check your connection and try again.'));
+    }
 }
 
-function renderUsersTable() {
+async function renderUsersTable() {
     const tbody = document.getElementById('usersTableBody');
     if (!tbody) return;
-    const users = loadUsers();
+    tbody.innerHTML = `<tr><td colspan="5" class="px-3 py-6 text-center text-gray-400">Loading users…</td></tr>`;
+    const users = await fetchUsersFromSupabase();
     if (users.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" class="px-3 py-6 text-center text-gray-400">No users registered yet.</td></tr>`;
         return;
@@ -5503,8 +5621,8 @@ function renderUsersTable() {
     }).join('');
 }
 
-function openEditUserModal(id) {
-    const users = loadUsers();
+async function openEditUserModal(id) {
+    const users = await fetchUsersFromSupabase();
     const user  = users.find(u => u.id === id);
     if (!user) return;
 
@@ -5580,7 +5698,7 @@ function openEditUserModal(id) {
     document.body.appendChild(modal);
 }
 
-function saveEditUser() {
+async function saveEditUser() {
     const id       = parseInt(document.getElementById('editUserId').value, 10);
     const name     = document.getElementById('editUserName').value.trim();
     const password = document.getElementById('editUserPassword').value;
@@ -5595,24 +5713,40 @@ function saveEditUser() {
 
     if (!name)                { alert('Name is required.'); return; }
     if (estates.length === 0) { alert('Please select at least one Estate.'); return; }
+    if (password && password.length < 6) { alert('Password must be at least 6 characters.'); return; }
 
-    const users = loadUsers();
-    const idx   = users.findIndex(u => u.id === id);
-    if (idx < 0) return;
+    const saveBtn = document.querySelector('#editUserModal button[onclick="saveEditUser()"]');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
 
-    users[idx].name        = name;
-    users[idx].estates     = estates;
-    users[idx].estate      = estates[0];
-    users[idx].permissions = perms;
-    if (password) {
-        if (password.length < 6) { alert('Password must be at least 6 characters.'); return; }
-        users[idx].password = password;
+    try {
+        const users = await fetchUsersFromSupabase();
+        const existing = users.find(u => u.id === id);
+        if (!existing) { alert('User not found.'); return; }
+
+        const updatedUser = {
+            id,
+            name,
+            email:       existing.email,          // email is immutable here
+            passwordHash: existing.passwordHash,
+            estates,
+            permissions: perms,
+        };
+        if (password) {
+            updatedUser.passwordHash = await sha256Hex(password);
+        }
+
+        await updateUserInSupabase(updatedUser);
+        await fetchUsersFromSupabase();
+
+        document.getElementById('editUserModal').remove();
+        await renderUsersTable();
+        alert(`User "${name}" updated successfully.`);
+    } catch (err) {
+        console.error('[Supabase] saveEditUser failed', err);
+        alert('Could not save changes — ' + (err.message || 'please check your connection and try again.'));
+    } finally {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Changes'; }
     }
-
-    saveUsers(users);
-    document.getElementById('editUserModal').remove();
-    renderUsersTable();
-    alert(`User "${name}" updated successfully.`);
 }
 
 // ── Auto-resume session on page load ──────────────────────────────
@@ -6600,7 +6734,7 @@ function applyFilterChemBlock() {
         var m = document.getElementById('changePasswordModal');
         if(m) m.style.display='none';
     };
-    window.submitChangePassword = function(){
+    window.submitChangePassword = async function(){
         var errEl = document.getElementById('cpError');
         var sucEl = document.getElementById('cpSuccess');
         var showErr = function(msg){ if(errEl){errEl.textContent=msg;errEl.style.display='block';} if(sucEl)sucEl.style.display='none'; };
@@ -6612,24 +6746,46 @@ function applyFilterChemBlock() {
         if(nw !== conf)    return showErr('New passwords do not match.');
         var session = loadSession();
         if(!session)       return showErr('Session expired. Please log in again.');
-        // Verify current password
-        var SUPER = { email:'superadmin@oilpalm.com', password:'Admin@1234' };
-        var verified = false;
-        if(session.role === 'superadmin'){
-            verified = (cur === SUPER.password);
-        } else {
-            var users = JSON.parse(localStorage.getItem('opp_auth_users')) || [];
-            var u = users.find(function(x){return x.email===session.email;});
-            verified = u && u.password === cur;
-            if(verified){
-                u.password = nw;
-                localStorage.setItem('opp_auth_users', JSON.stringify(users));
+
+        var saveBtn = document.querySelector('#changePasswordModal button[onclick="submitChangePassword()"]');
+        if (saveBtn) saveBtn.disabled = true;
+
+        try {
+            var verified = false;
+            if (session.role === 'superadmin') {
+                var SUPER = { email:'superadmin@oilpalm.com', password:'Admin@1234' };
+                verified = (cur === SUPER.password);
+                if (!verified) return showErr('Current password is incorrect.');
+                // Super Admin credentials are hardcoded — no record to update.
+            } else {
+                var user = await fetchUserByEmail(session.email);
+                if (!user) return showErr('Account not found. Please log in again.');
+
+                var curHash = await sha256Hex(cur);
+                verified = (curHash === user.passwordHash);
+                if (!verified) return showErr('Current password is incorrect.');
+
+                var newHash = await sha256Hex(nw);
+                await updateUserInSupabase({
+                    id:           user.id,
+                    name:         user.name,
+                    email:        user.email,
+                    passwordHash: newHash,
+                    estates:      user.estates,
+                    permissions:  user.permissions,
+                });
+                await fetchUsersFromSupabase(); // refresh local cache
             }
+
+            if(errEl) errEl.style.display='none';
+            if(sucEl){ sucEl.textContent='Password changed successfully!'; sucEl.style.display='block'; }
+            setTimeout(function(){ closeChangePasswordModal(); }, 1500);
+        } catch (err) {
+            console.error('[Supabase] change password failed', err);
+            showErr('Could not change password — please check your connection and try again.');
+        } finally {
+            if (saveBtn) saveBtn.disabled = false;
         }
-        if(!verified) return showErr('Current password is incorrect.');
-        if(errEl) errEl.style.display='none';
-        if(sucEl){ sucEl.textContent='Password changed successfully!'; sucEl.style.display='block'; }
-        setTimeout(function(){ closeChangePasswordModal(); }, 1500);
     };
     // On load, populate avatar from existing session
     (function(){
