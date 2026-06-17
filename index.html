@@ -2285,6 +2285,7 @@ function saveTransaction() {
         const baseRemarks = document.getElementById('txnRemarks').value.trim();
         const baseId      = Date.now();
         const pictureData = getTxnPictureBase64();
+        const currentUserName = (loadSession() && loadSession().name) || 'Unknown User';
         parsedRows.forEach((r, idx) => {
             transactions.push({
                 id: baseId + idx,
@@ -2305,7 +2306,7 @@ function saveTransaction() {
                 maintRoundId: maintRoundId,
                 maintRoundName: maintRoundName,
                 picture: pictureData,
-                user: 'Tester_Admin'
+                user: currentUserName
             });
         });
         save(STORAGE_KEYS.transactions, transactions);
@@ -2350,7 +2351,7 @@ function saveTransaction() {
         manuringRoundId: null,
         manuringRoundName: null,
         picture: pictureData,
-        user: 'Tester_Admin'
+        user: (loadSession() && loadSession().name) || 'Unknown User'
     };
     transactions.push(newTxn);
     save(STORAGE_KEYS.transactions, transactions);
