@@ -611,6 +611,13 @@
                         <div>
                             <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 2px;" data-i18n="dash_chem_tracker_title">&#9879;&#65039; Chemical Usage Tracker</h3>
                             <p style="color:#BFDBFE;font-size:11.5px;margin:0;" data-i18n="dash_chem_tracker_subtitle">Usage per Ha vs Max Dosage — by Maintenance Round</p>
+                            <p style="color:#BFDBFE;font-size:11.5px;margin:2px 0 0;" id="chemUsageTrackerYear"></p>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="color:#BFDBFE;font-size:11.5px;font-weight:500;" data-i18n="dash_lbl_year">Year:</span>
+                            <select id="chemUsageTrackerYearFilter" onchange="renderChemUsageTracker()"
+                                style="font-size:11.5px;padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:#fff;outline:none;cursor:pointer;">
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -3752,6 +3759,8 @@ function renderMaintPctTracker() {
    Usage/Ha vs max dosage per ingredient per maintenance round
    ================================================================= */
 function renderChemUsageTracker() {
+    var yearLbl = document.getElementById('chemUsageTrackerYear');
+    var yearSel = document.getElementById('chemUsageTrackerYearFilter');
     var empty   = document.getElementById('chemUsageTrackerEmpty');
     var cardBox = document.getElementById('chemUsageTrackerCards');
     if (!empty || !cardBox) return;
@@ -3768,14 +3777,39 @@ function renderChemUsageTracker() {
         return;
     }
 
-    /* Aggregate claims by roundId */
+    /* Build the Year filter from each maintenance round's Target Period */
+    var currentYear = new Date().getFullYear();
+    var yearsInData = {};
+    yearsInData[String(currentYear)] = 1;
+    fieldMaintRounds.forEach(function(r) {
+        var tp = r.targetPeriod || r.targetperiod || '';
+        if (tp) yearsInData[tp.slice(0,4)] = 1;
+    });
+    var sortedYears = Object.keys(yearsInData).sort().reverse();
+    if (yearSel) {
+        var prevYear = yearSel.value || String(currentYear);
+        yearSel.innerHTML = sortedYears.map(function(y){
+            return '<option value="'+y+'"'+(y===prevYear?' selected':'')+'>'+y+'</option>';
+        }).join('');
+    }
+    var selectedYear = (yearSel && yearSel.value) ? yearSel.value : String(currentYear);
+    if (yearLbl) yearLbl.textContent = I18N[currentLang]['dash_lbl_tracking_year'] + selectedYear;
+
+    /* Aggregate claims by roundId — only rounds whose Target Period falls in the selected year */
     var roundMap = {};
     maintClaims.forEach(function(c) {
+        var round = fieldMaintRounds.find(function(r){ return String(r.id) === String(c.roundId); });
+        var tp    = round ? (round.targetPeriod || round.targetperiod || '') : '';
+        if (!tp.startsWith(selectedYear)) return;
+
         var key = String(c.roundId);
-        if (!roundMap[key]) roundMap[key] = { roundId:c.roundId, roundName:c.roundName, totalClaimed:0 };
+        if (!roundMap[key]) roundMap[key] = { roundId:c.roundId, roundName:c.roundName, totalClaimed:0, targetPeriod:tp };
         roundMap[key].totalClaimed += parseFloat(c.claimedArea) || 0;
     });
-    var rounds = Object.values(roundMap);
+    /* Sort rounds by their linked Target Period, ascending */
+    var rounds = Object.values(roundMap).sort(function(a, b){
+        return (a.targetPeriod || '').localeCompare(b.targetPeriod || '');
+    });
 
     /* For each ingredient, compute usage/Ha per round */
     var ciCards = [];
