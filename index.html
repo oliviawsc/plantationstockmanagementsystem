@@ -32,11 +32,30 @@
         #appLayout{display:flex;flex-direction:column;min-height:100vh}
         #appLayout:not(.hidden){display:flex}
         @media(min-width:768px){
-            #appLayout{flex-direction:row;align-items:stretch}
+            #appLayout{flex-direction:row;align-items:stretch;--sb-w:248px}
+            #appLayout.sidebar-collapsed{--sb-w:64px}
             #sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;width:var(--sb-w,248px);transition:width .22s cubic-bezier(.4,0,.2,1);transform:translateX(0)!important}
-            #sidebar.collapsed{--sb-w:60px}
-            #sidebar.collapsed .sb-label,#sidebar.collapsed .sb-section,#sidebar.collapsed .sb-footer{display:none!important}
-            #sidebar.collapsed .nav-item{justify-content:center;padding:9px 0}
+            #appLayout.sidebar-collapsed #sidebar{overflow-x:hidden}
+            #appLayout.sidebar-collapsed #sidebar .sb-label,
+            #appLayout.sidebar-collapsed #sidebar .sb-footer{display:none!important}
+            /* Section labels ("Overview", "Stock"...) become slim centered dividers instead of vanishing abruptly */
+            #appLayout.sidebar-collapsed #sidebar .sb-section{
+                font-size:0;line-height:0;height:1px;margin:10px 14px;padding:0;
+                background:#E2E8F0;color:transparent;overflow:hidden;
+            }
+            #appLayout.sidebar-collapsed #sidebar .sb-section:first-child{margin-top:4px}
+            #appLayout.sidebar-collapsed #sidebar .nav-item{
+                justify-content:center;padding:11px 0;margin:2px 8px;width:calc(100% - 16px);
+                position:relative;
+            }
+            #appLayout.sidebar-collapsed #sidebar .nav-item .nav-icon{font-size:19px;width:auto}
+            #appLayout.sidebar-collapsed #sidebar .nav-item.active::before{
+                content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);
+                width:3px;height:18px;border-radius:0 3px 3px 0;background:#6366F1;
+            }
+            #appLayout.sidebar-collapsed #sidebar #sidebarAppTitle{display:none!important}
+            #sidebarCollapseBtn{display:flex!important}
+            #topCollapseBtn{display:flex!important}
             #mainWrapper{flex:1;min-width:0;display:flex;flex-direction:column;overflow-x:hidden;position:relative;padding-top:56px}
             #mainContent{flex:1;padding:32px;width:100%;box-sizing:border-box}
             #mobileTopBar,#sidebarOverlay{display:none!important}
@@ -299,6 +318,8 @@
             <span id="sidebarAppTitle" style="font-size:13px;font-weight:700;color:#0F172A;white-space:nowrap;" data-i18n="app_subtitle">Inventory Management System</span>
             <button onclick="closeSidebar()" id="sidebarCloseBtn" aria-label="Close"
                 style="display:none;width:24px;height:24px;flex-shrink:0;border-radius:6px;border:none;background:none;color:#64748B;font-size:15px;cursor:pointer;">&#x2715;</button>
+            <button id="sidebarCollapseBtn" aria-label="Collapse sidebar" title="Collapse sidebar"
+                style="display:none;width:24px;height:24px;flex-shrink:0;border-radius:6px;border:none;background:none;color:#64748B;font-size:14px;cursor:pointer;align-items:center;justify-content:center;margin-left:auto;">&#8249;</button>
         </div>
 
 
@@ -322,21 +343,21 @@
         <!-- Nav -->
         <nav style="padding:8px;flex:1;overflow-y:auto;">
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;padding:6px 8px 3px;">Overview</p>
-            <button data-target="dashboard"     class="nav-item active" data-i18n="nav_dashboard">    <span class="nav-icon">&#128202;</span><span class="sb-label">Dashboard</span></button>
+            <button data-target="dashboard"     class="nav-item active">    <span class="nav-icon">&#128202;</span><span class="sb-label" data-i18n="sb_lbl_dashboard">Dashboard</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;padding:8px 8px 3px;">Stock</p>
-            <button data-target="items"         class="nav-item" data-i18n="nav_items">               <span class="nav-icon">&#128230;</span><span class="sb-label">Item File</span></button>
-            <button data-target="transactions"  class="nav-item" data-i18n="nav_transactions">        <span class="nav-icon">&#128260;</span><span class="sb-label">Stock Transaction</span></button>
-            <button data-target="summary"       class="nav-item" data-i18n="nav_summary">             <span class="nav-icon">&#128209;</span><span class="sb-label">Stock Summary</span></button>
-            <button data-target="locations"     class="nav-item" data-i18n="nav_locations">           <span class="nav-icon">&#128205;</span><span class="sb-label">Location Area</span></button>
+            <button data-target="items"         class="nav-item">               <span class="nav-icon">&#128230;</span><span class="sb-label" data-i18n="sb_lbl_items">Item File</span></button>
+            <button data-target="transactions"  class="nav-item">        <span class="nav-icon">&#128260;</span><span class="sb-label" data-i18n="sb_lbl_transactions">Stock Transaction</span></button>
+            <button data-target="summary"       class="nav-item">             <span class="nav-icon">&#128209;</span><span class="sb-label" data-i18n="sb_lbl_summary">Stock Summary</span></button>
+            <button data-target="locations"     class="nav-item">           <span class="nav-icon">&#128205;</span><span class="sb-label" data-i18n="sb_lbl_locations">Location Area</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;padding:8px 8px 3px;">Field Operations</p>
-            <button data-target="manuring"      class="nav-item" data-i18n="nav_manuring">            <span class="nav-icon">&#127807;</span><span class="sb-label">Manuring Program</span></button>
-            <button data-target="roundprogress" class="nav-item" data-i18n="nav_roundprogress">       <span class="nav-icon">&#128200;</span><span class="sb-label">Manuring Progress</span></button>
-            <button data-target="fieldmaint"    class="nav-item" data-i18n="nav_fieldmaint">          <span class="nav-icon">&#128295;</span><span class="sb-label">Maintenance Program</span></button>
-            <button data-target="maintprogress" class="nav-item" data-i18n="nav_maintprogress"><span class="nav-icon">&#128202;</span><span class="sb-label">Maintenance Progress</span></button>
-            <button data-target="chemusage"    class="nav-item" data-i18n="nav_chemusage">          <span class="nav-icon">&#9879;&#65039;</span><span class="sb-label">Chemical Usage</span></button>
+            <button data-target="manuring"      class="nav-item">            <span class="nav-icon">&#127807;</span><span class="sb-label" data-i18n="sb_lbl_manuring">Manuring Program</span></button>
+            <button data-target="roundprogress" class="nav-item">       <span class="nav-icon">&#128200;</span><span class="sb-label" data-i18n="sb_lbl_roundprogress">Manuring Progress</span></button>
+            <button data-target="fieldmaint"    class="nav-item">          <span class="nav-icon">&#128295;</span><span class="sb-label" data-i18n="sb_lbl_fieldmaint">Maintenance Program</span></button>
+            <button data-target="maintprogress" class="nav-item"><span class="nav-icon">&#128202;</span><span class="sb-label" data-i18n="sb_lbl_maintprogress">Maintenance Progress</span></button>
+            <button data-target="chemusage"    class="nav-item">          <span class="nav-icon">&#9879;&#65039;</span><span class="sb-label" data-i18n="sb_lbl_chemusage">Chemical Usage</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;padding:8px 8px 3px;">Admin</p>
-            <button data-target="useradmin" id="navUserAdmin" class="nav-item hidden" data-i18n="nav_useradmin">
-                <span class="nav-icon">&#128100;</span><span class="sb-label">User Management</span>
+            <button data-target="useradmin" id="navUserAdmin" class="nav-item hidden">
+                <span class="nav-icon">&#128100;</span><span class="sb-label" data-i18n="sb_lbl_useradmin">User Management</span>
             </button>
         </nav>
 
@@ -374,8 +395,11 @@
 
         <!-- Desktop top bar -->
         <div id="topHeaderBar">
-            <!-- Left: estate name pill -->
-            <div style="flex:1;display:flex;align-items:center;">
+            <!-- Left: collapse toggle + estate name pill -->
+            <div style="flex:1;display:flex;align-items:center;gap:10px;">
+                <button id="topCollapseBtn" aria-label="Toggle sidebar" title="Toggle sidebar"
+                    style="display:none;width:28px;height:28px;flex-shrink:0;border-radius:7px;border:1px solid #E2E8F0;background:#F8FAFC;color:#64748B;font-size:13px;cursor:pointer;align-items:center;justify-content:center;transition:background .13s;"
+                    onmouseover="this.style.background='#EEF2FF'" onmouseout="this.style.background='#F8FAFC'">&#9776;</button>
                 <span id="topEstateLabel" style="font-size:13px;font-weight:600;color:#6366F1;background:#EEF2FF;padding:5px 14px;border-radius:99px;border:1px solid #C7D2FE;white-space:nowrap;display:none;"></span>
             </div>
             <!-- Centre: empty -->
@@ -4829,6 +4853,17 @@ const I18N = {
         nav_locations:       '📍 Location Area',
         nav_manuring:        '🌱 Manuring Program',
         nav_roundprogress:   '📈 Manuring Progress',
+        sb_lbl_dashboard:    'Dashboard',
+        sb_lbl_items:        'Item File',
+        sb_lbl_transactions: 'Stock Transaction',
+        sb_lbl_summary:      'Stock Summary',
+        sb_lbl_locations:    'Location Area',
+        sb_lbl_manuring:     'Manuring Program',
+        sb_lbl_roundprogress:'Manuring Progress',
+        sb_lbl_fieldmaint:   'Maintenance Program',
+        sb_lbl_maintprogress:'Maintenance Progress',
+        sb_lbl_chemusage:    'Chemical Usage',
+        sb_lbl_useradmin:    'User Management',
         nav_livestock:       'Live Stock Listing',
         lang_label:          'Language / Bahasa',
         logged_in_as:        'Logged in as:',
@@ -5058,6 +5093,17 @@ const I18N = {
         nav_locations:       '📍 Kawasan Lokasi',
         nav_manuring:        '🌱 Program Pembajaan',
         nav_roundprogress:   '📈 Kemajuan Pembajaan',
+        sb_lbl_dashboard:    'Papan Pemuka',
+        sb_lbl_items:        'Fail Item',
+        sb_lbl_transactions: 'Transaksi Stok',
+        sb_lbl_summary:      'Ringkasan Stok',
+        sb_lbl_locations:    'Kawasan Lokasi',
+        sb_lbl_manuring:     'Program Pembajaan',
+        sb_lbl_roundprogress:'Kemajuan Pembajaan',
+        sb_lbl_fieldmaint:   'Program Penyelenggaraan',
+        sb_lbl_maintprogress:'Kemajuan Penyelenggaraan',
+        sb_lbl_chemusage:    'Penggunaan Kimia',
+        sb_lbl_useradmin:    'Pengurusan Pengguna',
         nav_livestock:       'Senarai Stok Semasa',
         lang_label:          'Bahasa / Language',
         logged_in_as:        'Log masuk sebagai:',
@@ -5289,6 +5335,16 @@ let currentLang = 'en';
  * matching translation. Also updates the toggle button styles and the
  * page <title>. Persists the preference to localStorage.
  */
+/** Set each sidebar nav button's title attribute from its current label
+ *  text, so hovering an icon still shows its name once the sidebar is
+ *  collapsed to icons-only. Called after every language switch. */
+function refreshNavTooltips() {
+    document.querySelectorAll('#sidebar .nav-item').forEach(btn => {
+        const label = btn.querySelector('.sb-label');
+        if (label) btn.title = label.textContent.trim();
+    });
+}
+
 function setLang(lang) {
     if (!I18N[lang]) return;
     currentLang = lang;
@@ -5309,6 +5365,10 @@ function setLang(lang) {
     document.title = lang === 'ms'
         ? 'Ladang Sawit - Sistem Pengurusan Stok'
         : 'Oil Palm Plantation - Stock Management System';
+
+    // Keep nav button tooltips (used when the sidebar is collapsed to icons
+    // only) in sync with whichever language is currently active.
+    refreshNavTooltips();
 
     // Highlight the active language button using inline styles
     var enBtn = document.getElementById('langEN');
@@ -6986,12 +7046,27 @@ function applyFilterChemBlock() {
 <script>
 (function(){
     function toggleSidebarCollapse(){
-        var sb = document.getElementById('sidebar');
-        if(!sb) return;
-        sb.classList.toggle('collapsed');
+        var layout = document.getElementById('appLayout');
+        if(!layout) return;
+        layout.classList.toggle('sidebar-collapsed');
+        var isCollapsed = layout.classList.contains('sidebar-collapsed');
         var btn1 = document.getElementById('sidebarCollapseBtn');
-        if(btn1) btn1.innerHTML = sb.classList.contains('collapsed') ? '&#8250;' : '&#8249;';
+        if(btn1){
+            btn1.innerHTML = isCollapsed ? '&#8250;' : '&#8249;';
+            btn1.title = isCollapsed ? 'Expand sidebar' : 'Collapse sidebar';
+        }
+        try { localStorage.setItem('opp_sidebar_collapsed', isCollapsed ? '1' : '0'); } catch(e){}
     }
+    // Restore the user's last collapse preference on page load (desktop only —
+    // mobile always uses the slide-out overlay sidebar, never the collapsed rail)
+    try {
+        if (localStorage.getItem('opp_sidebar_collapsed') === '1') {
+            var layoutInit = document.getElementById('appLayout');
+            var btnInit = document.getElementById('sidebarCollapseBtn');
+            if (layoutInit) layoutInit.classList.add('sidebar-collapsed');
+            if (btnInit) { btnInit.innerHTML = '&#8250;'; btnInit.title = 'Expand sidebar'; }
+        }
+    } catch(e){}
     function updateTopHeaderTitle(target){
         // topHeaderTitle removed; estate label and welcome msg handled by bootApp/onSidebarEstateChange
     }
