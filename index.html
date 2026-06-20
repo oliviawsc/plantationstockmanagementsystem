@@ -962,8 +962,8 @@
                 <h3 class="text-xl font-bold mb-2" data-i18n="loc_import_title">Import Locations from File</h3>
                 <p class="text-sm text-green-700 mb-4" data-i18n="loc_import_hint">Upload a <b>CSV</b> or <b>Excel (.xlsx)</b> file with columns: <code class="bg-green-100 px-1 rounded">Block Name</code>, <code class="bg-green-100 px-1 rounded">Area (Ha)</code>, <code class="bg-green-100 px-1 rounded">No. of Palm</code>. Duplicate block names will be skipped.</p>
                 <div class="flex items-center gap-3 flex-wrap">
-                    <label class="cursor-pointer bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg font-semibold inline-block">
-                        <span data-i18n="btn_choose_file">📂 Choose File</span>
+                    <label class="cursor-pointer bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg font-semibold inline-block" data-i18n="btn_choose_file">
+                        📂 Choose File
                         <input type="file" id="locImportInput" accept=".csv,.xlsx,.xls" class="hidden" />
                     </label>
                     <span id="locImportFileName" class="text-sm text-gray-500 italic" data-i18n="no_file_selected">No file selected</span>
@@ -3817,31 +3817,36 @@ function renderChemUsageTracker() {
         return (a.targetPeriod || '').localeCompare(b.targetPeriod || '');
     });
 
-    /* For each ingredient, compute usage/Ha per round */
+    /* For each ingredient NAME (may span multiple linked chemical items), compute usage/Ha per round */
     var ciCards = [];
-    chemIngredients.forEach(function(ci) {
-        var ciItem = items.find(function(i){ return String(i.id) === String(ci.itemId); });
+    var ciGroups = groupChemIngredientsByName();
+    ciGroups.forEach(function(group) {
         var roundBars = [];
         rounds.forEach(function(rm) {
-            var totalQty = transactions.filter(function(t) {
-                return t.type === 'Out' &&
-                       String(t.itemId) === String(ci.itemId) &&
-                       t.maintRoundId &&
-                       fieldMaintRounds.some(function(r) {
-                           return String(r.id) === String(t.maintRoundId) &&
-                                  String(r.id) === String(rm.roundId);
-                       });
-            }).reduce(function(s,t){ return s + (parseFloat(t.qty)||0); }, 0);
+            // Sum quantities across every chemical item sharing this ingredient name
+            var totalQty = 0;
+            group.items.forEach(function(ciRow) {
+                var ciItem = items.find(function(i){ return String(i.id) === String(ciRow.itemId); });
+                var rawQty = transactions.filter(function(t) {
+                    return t.type === 'Out' &&
+                           String(t.itemId) === String(ciRow.itemId) &&
+                           t.maintRoundId &&
+                           fieldMaintRounds.some(function(r) {
+                               return String(r.id) === String(t.maintRoundId) &&
+                                      String(r.id) === String(rm.roundId);
+                           });
+                }).reduce(function(s,t){ return s + (parseFloat(t.qty)||0); }, 0);
+                if (rawQty <= 0) return;
+                // Convert from THIS item's own stock unit into the group's
+                // reporting unit before adding to the combined total.
+                totalQty += convertChemQtyToCiUnit(rawQty, ciItem && (ciItem.baseUnit || ciItem.unit), { unit: group.unit, density: ciRow.density });
+            });
             if (totalQty <= 0) return;
-            // Convert from the item's stock unit (e.g. ml, g) into the
-            // ingredient's dosage display unit (e.g. litre, kg) before
-            // dividing by area, so "Usage/Ha" is always in ci.unit.
-            var convertedQty = convertChemQtyToCiUnit(totalQty, ciItem && (ciItem.baseUnit || ciItem.unit), ci);
-            var usagePerHa = rm.totalClaimed > 0 ? convertedQty / rm.totalClaimed : 0;
+            var usagePerHa = rm.totalClaimed > 0 ? totalQty / rm.totalClaimed : 0;
             roundBars.push({ roundName:rm.roundName, usagePerHa:usagePerHa });
         });
         if (roundBars.length > 0) {
-            ciCards.push({ ci:ci, roundBars:roundBars, maxDosage:parseFloat(ci.maxDosage)||0 });
+            ciCards.push({ ci:group, roundBars:roundBars, maxDosage:parseFloat(group.maxDosage)||0 });
         }
     });
 
@@ -3853,7 +3858,7 @@ function renderChemUsageTracker() {
     empty.classList.add('hidden');
     cardBox.innerHTML = '';
 
-    ciCards.forEach(function(card) {
+    ciCards.forEach(function(card, cardIdx) {
         var ci         = card.ci;
         var maxDosage  = card.maxDosage;
         var roundBars  = card.roundBars;
@@ -3881,7 +3886,8 @@ function renderChemUsageTracker() {
         var statusAll = roundBars.every(function(rb){ return maxDosage<=0 || rb.usagePerHa<=maxDosage; });
         var anyOver   = roundBars.some(function(rb){  return maxDosage>0  && rb.usagePerHa>maxDosage; });
         var hdrBg     = anyOver ? 'linear-gradient(135deg,#7F1D1D,#DC2626)' : 'linear-gradient(135deg,#1E3A5F,#1D4ED8)';
-        var subLabel  = ci.itemName ? '&#128167; '+ci.itemName : '';
+        var linkedItemNames = ci.items ? ci.items.map(function(r){ return r.itemName; }).filter(Boolean) : (ci.itemName ? [ci.itemName] : []);
+        var subLabel  = linkedItemNames.length ? '&#128167; '+linkedItemNames.join(', ') : '';
         var maxLabel  = maxDosage > 0 ? I18N[currentLang]['dash_lbl_max_dosage']+maxDosage.toFixed(2)+' '+ci.unit+'/Ha' : I18N[currentLang]['dash_no_dosage_limit'];
         var statusPill= anyOver
             ? '<span style="font-size:9px;font-weight:700;background:rgba(255,255,255,.2);color:#FEE2E2;padding:2px 8px;border-radius:99px;">'+I18N[currentLang]['dash_lbl_exceeded']+'</span>'
@@ -3901,7 +3907,7 @@ function renderChemUsageTracker() {
             +'</div>';
 
         /* Canvas */
-        var canvasId = 'chemTracker_'+ci.id;
+        var canvasId = 'chemTracker_'+cardIdx+'_'+ci.name.replace(/[^a-zA-Z0-9]/g, '_');
         var body = '<div style="padding:12px 14px 14px;">'
             +'<canvas id="'+canvasId+'" height="'+(Math.max(roundBars.length * 28, 70))+'"></canvas>'
             +'</div>';
@@ -4374,6 +4380,46 @@ function convertChemQtyToCiUnit(qty, fromUnit, ci) {
     // return the raw quantity rather than guess, so the figure is at least
     // visibly traceable back to the recorded stock unit.
     return qty;
+}
+
+/**
+ * Group chemIngredients records by Ingredient Name. The same active
+ * ingredient (e.g. "Glyphosate") can be sold under more than one
+ * commercial chemical item, so each may be registered as a separate
+ * row in Chemical Ingredient Setup, all sharing the same Ingredient
+ * Name. Usage tables and the dashboard tracker should report ONE
+ * combined figure per ingredient name — summing the quantity used
+ * across every linked chemical item — rather than one row per item.
+ *
+ * The earliest-created row for a given name (lowest id) is treated as
+ * authoritative for the reporting Unit, Max Dosage and Density, since
+ * the dosage limit belongs to the active ingredient, not to any one
+ * product. Every linked chemical item's quantities are converted from
+ * its OWN item's stock unit before being summed, so it's safe even if
+ * different products use different stock units (e.g. one in ml, one
+ * already in litre).
+ *
+ * @returns {Array<{name, unit, maxDosage, density, items: Array<ci>}>}
+ */
+function groupChemIngredientsByName() {
+    const groups = {};
+    chemIngredients.forEach(ci => {
+        const key = String(ci.name || '').trim().toLowerCase();
+        if (!key) return;
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(ci);
+    });
+    return Object.values(groups).map(rows => {
+        // Earliest-created row (lowest id) defines the group's reporting unit/dosage/density
+        const primary = rows.slice().sort((a, b) => (a.id || 0) - (b.id || 0))[0];
+        return {
+            name:      primary.name,
+            unit:      primary.unit,
+            maxDosage: primary.maxDosage,
+            density:   primary.density,
+            items:     rows, // every linked chemical item record sharing this name
+        };
+    });
 }
 
 /** Update the unit selector options and conversion hint for the single-row Qty field */
@@ -6464,7 +6510,7 @@ function startEditChemIngredient(id) {
 function cancelEditChemIngredient() {
     document.getElementById('ciEditId').value          = '';
     document.getElementById('ciName').value            = '';
-    document.getElementById('ciItem').value             = '';
+    document.getElementById('ciItem').value            = '';
     document.getElementById('ciMaxDosage').value       = '';
     document.getElementById('ciDensity').value         = '';
     document.getElementById('ciFormTitle').textContent = '🧪 Chemical Ingredient Setup';
@@ -6697,35 +6743,44 @@ function renderChemByRound() {
     });
 
     let hasRows = false;
+    const ciGroupsByRound = groupChemIngredientsByName();
     sortedRounds.forEach(rm => {
-        chemIngredients.forEach(ci => {
-            // Sum ALL Out transactions for this chemical item linked to this maintenance round
-            const totalQty = transactions.filter(t =>
-                t.type === 'Out' &&
-                String(t.itemId) === String(ci.itemId) &&
-                t.maintRoundId &&
-                fieldMaintRounds.some(r => String(r.id) === String(t.maintRoundId) && String(r.id) === String(rm.roundId))
-            ).reduce((s, t) => s + (parseFloat(t.qty) || 0), 0);
+        ciGroupsByRound.forEach(group => {
+            // Sum ALL Out transactions across every chemical item sharing this ingredient name
+            let totalQty = 0;
+            const breakdown = [];
+            group.items.forEach(ciRow => {
+                const rawQty = transactions.filter(t =>
+                    t.type === 'Out' &&
+                    String(t.itemId) === String(ciRow.itemId) &&
+                    t.maintRoundId &&
+                    fieldMaintRounds.some(r => String(r.id) === String(t.maintRoundId) && String(r.id) === String(rm.roundId))
+                ).reduce((s, t) => s + (parseFloat(t.qty) || 0), 0);
+                if (rawQty <= 0) return;
+                // Convert from THIS item's own stock unit into the group's reporting unit
+                const ciItem = items.find(i => String(i.id) === String(ciRow.itemId));
+                const fromUnit = ciItem && (ciItem.baseUnit || ciItem.unit);
+                const converted = convertChemQtyToCiUnit(rawQty, fromUnit, { unit: group.unit, density: ciRow.density });
+                totalQty += converted;
+                breakdown.push(`${ciRow.itemName}: ${rawQty} ${fromUnit || '?'} → ${converted.toFixed(2)} ${group.unit}${(fromUnit && String(fromUnit).toLowerCase() !== String(group.unit).toLowerCase() && converted === rawQty) ? ' (⚠ not converted — check unit spelling or set Density)' : ''}`);
+            });
 
             if (totalQty === 0) return;
             hasRows = true;
 
-            // Convert from the item's stock unit into the ingredient's
-            // dosage display unit before dividing by area.
-            const ciItem = items.find(i => String(i.id) === String(ci.itemId));
-            const convertedQty = convertChemQtyToCiUnit(totalQty, ciItem && (ciItem.baseUnit || ciItem.unit), ci);
-            const usagePerHa = rm.totalClaimed > 0 ? convertedQty / rm.totalClaimed : 0;
+            const linkedItemNames = group.items.map(r => r.itemName).filter(Boolean).join(', ');
+            const usagePerHa = rm.totalClaimed > 0 ? totalQty / rm.totalClaimed : 0;
             const tr = document.createElement('tr');
             tr.className = 'border-b border-orange-50 hover:bg-orange-50';
             tr.innerHTML = `
                 <td class="px-3 py-2 font-semibold">🔧 ${rm.roundName}</td>
-                <td class="px-3 py-2 font-semibold text-blue-700">${ci.name}</td>
-                <td class="px-3 py-2">${ci.itemName}</td>
-                <td class="px-3 py-2 text-right">${convertedQty.toFixed(2)} ${ci.unit}</td>
+                <td class="px-3 py-2 font-semibold text-blue-700">${group.name}</td>
+                <td class="px-3 py-2" title="${breakdown.join(' | ').replace(/"/g, '&quot;')}">${linkedItemNames} <span class="text-gray-400" style="cursor:help;">ⓘ</span></td>
+                <td class="px-3 py-2 text-right">${totalQty.toFixed(2)} ${group.unit}</td>
                 <td class="px-3 py-2 text-right">${rm.totalClaimed.toFixed(2)} Ha</td>
-                <td class="px-3 py-2 text-right font-bold">${usagePerHa.toFixed(2)} ${ci.unit}/Ha</td>
-                <td class="px-3 py-2 text-right">${ci.maxDosage} ${ci.unit}/Ha</td>
-                <td class="px-3 py-2">${statusBadge(usagePerHa, ci.maxDosage)}</td>`;
+                <td class="px-3 py-2 text-right font-bold">${usagePerHa.toFixed(2)} ${group.unit}/Ha</td>
+                <td class="px-3 py-2 text-right">${group.maxDosage} ${group.unit}/Ha</td>
+                <td class="px-3 py-2">${statusBadge(usagePerHa, group.maxDosage)}</td>`;
             body.appendChild(tr);
         });
     });
@@ -6771,26 +6826,35 @@ function renderChemByBlock() {
     });
 
     let hasRows = false;
+    const ciGroupsByBlock = groupChemIngredientsByName();
     sortedRoundBlocks.forEach(c => {
-        chemIngredients.forEach(ci => {
-            // Sum ALL Out transactions for this chemical at this block linked to this round
-            const totalQty = transactions.filter(t =>
-                t.type === 'Out' &&
-                String(t.itemId) === String(ci.itemId) &&
-                t.location === c.blockName &&
-                t.maintRoundId &&
-                fieldMaintRounds.some(r => String(r.id) === String(t.maintRoundId) && String(r.id) === String(c.roundId))
-            ).reduce((s, t) => s + (parseFloat(t.qty) || 0), 0);
+        ciGroupsByBlock.forEach(group => {
+            // Sum ALL Out transactions across every chemical item sharing this ingredient name
+            let totalQty = 0;
+            const breakdown = [];
+            group.items.forEach(ciRow => {
+                const rawQty = transactions.filter(t =>
+                    t.type === 'Out' &&
+                    String(t.itemId) === String(ciRow.itemId) &&
+                    t.location === c.blockName &&
+                    t.maintRoundId &&
+                    fieldMaintRounds.some(r => String(r.id) === String(t.maintRoundId) && String(r.id) === String(c.roundId))
+                ).reduce((s, t) => s + (parseFloat(t.qty) || 0), 0);
+                if (rawQty <= 0) return;
+                // Convert from THIS item's own stock unit into the group's reporting unit
+                const ciItem = items.find(i => String(i.id) === String(ciRow.itemId));
+                const fromUnit = ciItem && (ciItem.baseUnit || ciItem.unit);
+                const converted = convertChemQtyToCiUnit(rawQty, fromUnit, { unit: group.unit, density: ciRow.density });
+                totalQty += converted;
+                breakdown.push(`${ciRow.itemName}: ${rawQty} ${fromUnit || '?'} → ${converted.toFixed(2)} ${group.unit}${(fromUnit && String(fromUnit).toLowerCase() !== String(group.unit).toLowerCase() && converted === rawQty) ? ' (⚠ not converted — check unit spelling or set Density)' : ''}`);
+            });
 
             if (totalQty === 0) return;
             hasRows = true;
 
-            // Convert from the item's stock unit into the ingredient's
-            // dosage display unit before dividing by area.
-            const ciItem = items.find(i => String(i.id) === String(ci.itemId));
-            const convertedQty = convertChemQtyToCiUnit(totalQty, ciItem && (ciItem.baseUnit || ciItem.unit), ci);
+            const linkedItemNames = group.items.map(r => r.itemName).filter(Boolean).join(', ');
             const claimed    = parseFloat(c.totalClaimed) || 0;
-            const usagePerHa = claimed > 0 ? convertedQty / claimed : 0;
+            const usagePerHa = claimed > 0 ? totalQty / claimed : 0;
 
             const tr = document.createElement('tr');
             tr.className = 'border-b border-orange-50 hover:bg-orange-50';
@@ -6799,13 +6863,13 @@ function renderChemByBlock() {
                 <td class="px-3 py-2">
                     <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">${c.blockName}</span>
                 </td>
-                <td class="px-3 py-2 font-semibold text-blue-700">${ci.name}</td>
-                <td class="px-3 py-2">${ci.itemName}</td>
-                <td class="px-3 py-2 text-right">${convertedQty.toFixed(2)} ${ci.unit}</td>
+                <td class="px-3 py-2 font-semibold text-blue-700">${group.name}</td>
+                <td class="px-3 py-2" title="${breakdown.join(' | ').replace(/"/g, '&quot;')}">${linkedItemNames} <span class="text-gray-400" style="cursor:help;">ⓘ</span></td>
+                <td class="px-3 py-2 text-right">${totalQty.toFixed(2)} ${group.unit}</td>
                 <td class="px-3 py-2 text-right">${claimed.toFixed(2)} Ha</td>
-                <td class="px-3 py-2 text-right font-bold">${usagePerHa.toFixed(2)} ${ci.unit}/Ha</td>
-                <td class="px-3 py-2 text-right">${ci.maxDosage} ${ci.unit}/Ha</td>
-                <td class="px-3 py-2">${statusBadge(usagePerHa, ci.maxDosage)}</td>`;
+                <td class="px-3 py-2 text-right font-bold">${usagePerHa.toFixed(2)} ${group.unit}/Ha</td>
+                <td class="px-3 py-2 text-right">${group.maxDosage} ${group.unit}/Ha</td>
+                <td class="px-3 py-2">${statusBadge(usagePerHa, group.maxDosage)}</td>`;
             body.appendChild(tr);
         });
     });
