@@ -1397,6 +1397,12 @@
                         <input id="ciMaxDosage" type="number" min="0" step="0.001" placeholder="e.g. 3.0"
                             class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                     </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="ci_lbl_density">Density (kg per Litre) <span class="text-gray-400 font-normal text-xs">(optional — only needed to convert g/kg ⇄ Litre/ml)</span></label>
+                        <input id="ciDensity" type="number" min="0" step="0.001" placeholder="e.g. 1.05"
+                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                        <p class="text-xs text-gray-400 mt-1" data-i18n="ci_density_hint">Stock recorded in grams/kg can only be shown as Litre/Ha if you enter the chemical's density here (check the product label or safety data sheet). Leave blank if the stock unit and dosage unit are already the same type (e.g. both volume, or both weight).</p>
+                    </div>
                 </div>
                 <div class="flex gap-2">
                     <button type="button" onclick="saveChemIngredient()"
@@ -3814,6 +3820,7 @@ function renderChemUsageTracker() {
     /* For each ingredient, compute usage/Ha per round */
     var ciCards = [];
     chemIngredients.forEach(function(ci) {
+        var ciItem = items.find(function(i){ return String(i.id) === String(ci.itemId); });
         var roundBars = [];
         rounds.forEach(function(rm) {
             var totalQty = transactions.filter(function(t) {
@@ -3826,7 +3833,11 @@ function renderChemUsageTracker() {
                        });
             }).reduce(function(s,t){ return s + (parseFloat(t.qty)||0); }, 0);
             if (totalQty <= 0) return;
-            var usagePerHa = rm.totalClaimed > 0 ? totalQty / rm.totalClaimed : 0;
+            // Convert from the item's stock unit (e.g. ml, g) into the
+            // ingredient's dosage display unit (e.g. litre, kg) before
+            // dividing by area, so "Usage/Ha" is always in ci.unit.
+            var convertedQty = convertChemQtyToCiUnit(totalQty, ciItem && (ciItem.baseUnit || ciItem.unit), ci);
+            var usagePerHa = rm.totalClaimed > 0 ? convertedQty / rm.totalClaimed : 0;
             roundBars.push({ roundName:rm.roundName, usagePerHa:usagePerHa });
         });
         if (roundBars.length > 0) {
@@ -4288,6 +4299,81 @@ function convertToBase(qty, unitType, item) {
 function convertFromBase(baseQty, item) {
     const factor = parseFloat(item.qtyPerUnit) || 1;
     return factor > 0 ? baseQty / factor : baseQty;
+}
+
+/**
+ * Convert a chemical-usage quantity (recorded in the linked Item's stock
+ * base unit, e.g. "ml" or "g") into the unit the Chemical Ingredient setup
+ * wants to report dosage in (ci.unit, e.g. "litre" or "kg").
+ *
+ * Handles same-family conversions automatically (volume↔volume: ml↔litre,
+ * mass↔mass: g↔kg) using straightforward unit math — these are always
+ * safe and exact. Converting BETWEEN families (mass → volume, e.g. a
+ * chemical stocked in grams but reported in Litre/Ha) is not a pure unit
+ * conversion — it requires the chemical's density (how much a litre of it
+ * weighs), since "grams" and "litres" measure different physical things.
+ * If the ingredient has a density set (ci.density, in kg per Litre), that
+ * figure is used; otherwise the quantity is returned unconverted (no
+ * guessed number) so the result doesn't silently look right when the
+ * units don't actually match.
+ *
+ * @param {number} qty      - quantity recorded on transactions (item's base unit)
+ * @param {string} fromUnit - the linked item's base unit (free text, e.g. "ml", "Litre", "g", "Kg")
+ * @param {object} ci       - the chemical ingredient record (uses ci.unit, ci.density)
+ * @returns {number}        - quantity expressed in ci.unit, when convertible
+ */
+function convertChemQtyToCiUnit(qty, fromUnit, ci) {
+    const toUnit = (ci && ci.unit) || '';
+    const norm = (u) => String(u || '').trim().toLowerCase();
+    const from = norm(fromUnit);
+    const to   = norm(toUnit);
+
+    // Classify a free-text unit string into a known unit, or null if unrecognised
+    function classify(u) {
+        if (['ml', 'milliliter', 'millilitre', 'mls'].includes(u)) return 'ml';
+        if (['l', 'litre', 'liter', 'litres', 'liters'].includes(u)) return 'litre';
+        if (['g', 'gram', 'grams', 'gm'].includes(u)) return 'gram';
+        if (['kg', 'kilogram', 'kilograms'].includes(u)) return 'kg';
+        return null;
+    }
+
+    const fromKind = classify(from);
+    const toKind   = classify(to);
+
+    if (from === to || !fromKind || !toKind) return qty; // same unit, or nothing to convert
+
+    // Same-family conversions — exact, no extra info needed
+    if (fromKind === 'ml'  && toKind === 'litre') return qty / 1000;
+    if (fromKind === 'litre' && toKind === 'ml')  return qty * 1000;
+    if (fromKind === 'gram'  && toKind === 'kg')  return qty / 1000;
+    if (fromKind === 'kg'    && toKind === 'gram') return qty * 1000;
+
+    // Cross-family (mass ↔ volume) — only possible with a known density.
+    // Density is stored on the ingredient as kg per Litre (kg/L), the
+    // same way it would appear on a product safety sheet.
+    const density = parseFloat(ci && ci.density) || 0;
+    if (density > 0) {
+        // Normalise qty to kg (mass) or litre (volume) first
+        let qtyInKg = null, qtyInLitre = null;
+        if (fromKind === 'gram') qtyInKg = qty / 1000;
+        if (fromKind === 'kg')   qtyInKg = qty;
+        if (fromKind === 'ml')   qtyInLitre = qty / 1000;
+        if (fromKind === 'litre') qtyInLitre = qty;
+
+        if (qtyInKg !== null && (toKind === 'litre' || toKind === 'ml')) {
+            const litres = qtyInKg / density;           // L = kg ÷ (kg/L)
+            return toKind === 'litre' ? litres : litres * 1000;
+        }
+        if (qtyInLitre !== null && (toKind === 'kg' || toKind === 'gram')) {
+            const kg = qtyInLitre * density;             // kg = L × (kg/L)
+            return toKind === 'kg' ? kg : kg * 1000;
+        }
+    }
+
+    // No safe conversion available (different families, no density set) —
+    // return the raw quantity rather than guess, so the figure is at least
+    // visibly traceable back to the recorded stock unit.
+    return qty;
 }
 
 /** Update the unit selector options and conversion hint for the single-row Qty field */
@@ -4909,6 +4995,8 @@ const I18N = {
         ci_lbl_item:         'Linked Chemical Item',
         ci_lbl_unit:         'Unit',
         ci_lbl_dosage:       'Max Dosage Rate (optional)',
+        ci_lbl_density:      'Density (kg per Litre) (optional — only needed to convert g/kg ⇄ Litre/ml)',
+        ci_density_hint:     'Stock recorded in grams/kg can only be shown as Litre/Ha if you enter the chemical\'s density here (check the product label or safety data sheet). Leave blank if the stock unit and dosage unit are already the same type (e.g. both volume, or both weight).',
         ci_btn_save:         'Save Ingredient',
         ci_col_chemical:     'Linked Chemical',
         ci_col_max_dosage:   'Max Dosage / Ha',
@@ -5138,6 +5226,8 @@ const I18N = {
         ci_lbl_item:         'Item Kimia Dikaitkan',
         ci_lbl_unit:         'Unit',
         ci_lbl_dosage:       'Kadar Dos Maksimum (pilihan)',
+        ci_lbl_density:      'Ketumpatan (kg per Liter) (pilihan — hanya diperlukan untuk menukar g/kg ⇄ Liter/ml)',
+        ci_density_hint:     'Stok yang direkod dalam gram/kg hanya boleh dipaparkan sebagai Liter/Ha jika anda masukkan ketumpatan bahan kimia di sini (semak label produk atau helaian data keselamatan). Biarkan kosong jika unit stok dan unit dos sudah jenis yang sama (cth. kedua-duanya isipadu, atau kedua-duanya berat).',
         ci_btn_save:         'Simpan Bahan Aktif',
         ci_col_chemical:     'Kimia Dikaitkan',
         ci_col_max_dosage:   'Dos Maks / Ha',
@@ -6322,6 +6412,7 @@ function saveChemIngredient() {
     const itemId    = document.getElementById('ciItem').value;
     const unit      = document.getElementById('ciUnit').value;
     const maxDosage = parseFloat(document.getElementById('ciMaxDosage').value);
+    const density   = parseFloat(document.getElementById('ciDensity').value) || null;
 
     if (!name)    { alert('Please enter an Ingredient Name.'); return; }
     if (!itemId)  { alert('Please select a Chemical Item.'); return; }
@@ -6335,16 +6426,17 @@ function saveChemIngredient() {
         if (idx < 0) { cancelEditChemIngredient(); return; }
         chemIngredients[idx] = {
             ...chemIngredients[idx],
-            name, itemId: item.id, itemName: item.name, unit, maxDosage
+            name, itemId: item.id, itemName: item.name, unit, maxDosage, density
         };
         cancelEditChemIngredient();
     } else {
         // ── CREATE new ingredient ──
         chemIngredients.push({ id: Date.now(), name, itemId: item.id, itemName: item.name,
-                               unit, maxDosage });
+                               unit, maxDosage, density });
         document.getElementById('ciName').value      = '';
         document.getElementById('ciItem').value      = '';
         document.getElementById('ciMaxDosage').value = '';
+        document.getElementById('ciDensity').value   = '';
     }
 
     save(STORAGE_KEYS.chemIngredients, chemIngredients);
@@ -6361,6 +6453,7 @@ function startEditChemIngredient(id) {
     document.getElementById('ciItem').value            = String(ci.itemId);
     document.getElementById('ciUnit').value            = ci.unit;
     document.getElementById('ciMaxDosage').value       = ci.maxDosage;
+    document.getElementById('ciDensity').value         = ci.density || '';
     document.getElementById('ciFormTitle').textContent = '✏️ Edit Chemical Ingredient';
     document.getElementById('ciSaveBtn').textContent   = 'Update Ingredient';
     document.getElementById('ciCancelBtn').classList.remove('hidden');
@@ -6371,8 +6464,9 @@ function startEditChemIngredient(id) {
 function cancelEditChemIngredient() {
     document.getElementById('ciEditId').value          = '';
     document.getElementById('ciName').value            = '';
-    document.getElementById('ciItem').value            = '';
+    document.getElementById('ciItem').value             = '';
     document.getElementById('ciMaxDosage').value       = '';
+    document.getElementById('ciDensity').value         = '';
     document.getElementById('ciFormTitle').textContent = '🧪 Chemical Ingredient Setup';
     document.getElementById('ciSaveBtn').textContent   = 'Save Ingredient';
     document.getElementById('ciCancelBtn').classList.add('hidden');
@@ -6403,7 +6497,7 @@ function renderCiTable() {
         tr.innerHTML = `
             <td class="px-3 py-2 font-semibold">${ci.name}</td>
             <td class="px-3 py-2">${ci.itemName}</td>
-            <td class="px-3 py-2">${ci.unit}</td>
+            <td class="px-3 py-2">${ci.unit}${ci.density ? ` <span class="text-gray-400 text-xs">(d=${ci.density})</span>` : ''}</td>
             <td class="px-3 py-2 text-right font-bold">${ci.maxDosage}</td>
             <td class="px-3 py-2 whitespace-nowrap">
                 <button class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded mr-1"
@@ -6616,14 +6710,18 @@ function renderChemByRound() {
             if (totalQty === 0) return;
             hasRows = true;
 
-            const usagePerHa = rm.totalClaimed > 0 ? totalQty / rm.totalClaimed : 0;
+            // Convert from the item's stock unit into the ingredient's
+            // dosage display unit before dividing by area.
+            const ciItem = items.find(i => String(i.id) === String(ci.itemId));
+            const convertedQty = convertChemQtyToCiUnit(totalQty, ciItem && (ciItem.baseUnit || ciItem.unit), ci);
+            const usagePerHa = rm.totalClaimed > 0 ? convertedQty / rm.totalClaimed : 0;
             const tr = document.createElement('tr');
             tr.className = 'border-b border-orange-50 hover:bg-orange-50';
             tr.innerHTML = `
                 <td class="px-3 py-2 font-semibold">🔧 ${rm.roundName}</td>
                 <td class="px-3 py-2 font-semibold text-blue-700">${ci.name}</td>
                 <td class="px-3 py-2">${ci.itemName}</td>
-                <td class="px-3 py-2 text-right">${totalQty.toFixed(2)} ${ci.unit}</td>
+                <td class="px-3 py-2 text-right">${convertedQty.toFixed(2)} ${ci.unit}</td>
                 <td class="px-3 py-2 text-right">${rm.totalClaimed.toFixed(2)} Ha</td>
                 <td class="px-3 py-2 text-right font-bold">${usagePerHa.toFixed(2)} ${ci.unit}/Ha</td>
                 <td class="px-3 py-2 text-right">${ci.maxDosage} ${ci.unit}/Ha</td>
@@ -6687,8 +6785,12 @@ function renderChemByBlock() {
             if (totalQty === 0) return;
             hasRows = true;
 
+            // Convert from the item's stock unit into the ingredient's
+            // dosage display unit before dividing by area.
+            const ciItem = items.find(i => String(i.id) === String(ci.itemId));
+            const convertedQty = convertChemQtyToCiUnit(totalQty, ciItem && (ciItem.baseUnit || ciItem.unit), ci);
             const claimed    = parseFloat(c.totalClaimed) || 0;
-            const usagePerHa = claimed > 0 ? totalQty / claimed : 0;
+            const usagePerHa = claimed > 0 ? convertedQty / claimed : 0;
 
             const tr = document.createElement('tr');
             tr.className = 'border-b border-orange-50 hover:bg-orange-50';
@@ -6699,7 +6801,7 @@ function renderChemByBlock() {
                 </td>
                 <td class="px-3 py-2 font-semibold text-blue-700">${ci.name}</td>
                 <td class="px-3 py-2">${ci.itemName}</td>
-                <td class="px-3 py-2 text-right">${totalQty.toFixed(2)} ${ci.unit}</td>
+                <td class="px-3 py-2 text-right">${convertedQty.toFixed(2)} ${ci.unit}</td>
                 <td class="px-3 py-2 text-right">${claimed.toFixed(2)} Ha</td>
                 <td class="px-3 py-2 text-right font-bold">${usagePerHa.toFixed(2)} ${ci.unit}/Ha</td>
                 <td class="px-3 py-2 text-right">${ci.maxDosage} ${ci.unit}/Ha</td>
