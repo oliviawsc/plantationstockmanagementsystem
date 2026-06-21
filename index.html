@@ -5635,9 +5635,31 @@ function bootApp(session) {
 
     applyNavPermissions(session);
 
+    // Guard against a stale "active" page section left over from a
+    // previous user's session on this device (e.g. a superadmin was
+    // last viewing User Management, then logged out — without this
+    // check, the next person to log in, even a normal user, would land
+    // directly on that same restricted page). If the current user has
+    // no access to whatever section is marked active, snap back to the
+    // Dashboard before doing anything else.
+    let activeSection = document.querySelector('.page-section.active');
+    if (activeSection && activeSection.id !== 'dashboard' && session.role !== 'superadmin') {
+        const sectionAccess = activeSection.id === 'useradmin'
+            ? 'none' // useradmin is exclusively superadmin-only, never permission-mapped
+            : getSectionAccess(session, activeSection.id);
+        if (sectionAccess === 'none') {
+            document.querySelectorAll('.page-section').forEach(sec => {
+                sec.classList.toggle('active', sec.id === 'dashboard');
+            });
+            document.querySelectorAll('.nav-item[data-target]').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-target') === 'dashboard');
+            });
+            activeSection = document.getElementById('dashboard');
+        }
+    }
+
     // Lock down the section currently shown (usually 'dashboard') in case
     // the user's permissions restrict it to view-only
-    const activeSection = document.querySelector('.page-section.active');
     if (activeSection && typeof applyViewOnlyLock === 'function') {
         applyViewOnlyLock(activeSection.id);
     }
@@ -5744,7 +5766,13 @@ function _applyViewOnlyLockNow(sectionId) {
     if (!section) return;
 
     const access     = getSectionAccess(session, sectionId);
-    const isReadOnly = session.role !== 'superadmin' && access === 'view';
+    // 'view' is intentionally read-only. 'none' means the user has no
+    // business being in this section at all (e.g. useradmin for a normal
+    // user) — lock it down the same way, as a safety net in case this
+    // section ever ends up displayed despite the normal nav guard (for
+    // example, a stale "active" class left over from a previous user's
+    // session on a shared device).
+    const isReadOnly = session.role !== 'superadmin' && (access === 'view' || access === 'none');
 
     if (!isReadOnly) {
         // Re-enable everything (covers the case where access just changed
@@ -5812,6 +5840,18 @@ function logoutUser() {
     updateAppTitle('');
     document.getElementById('appLayout').classList.add('hidden');
     document.getElementById('authOverlay').style.display = 'flex';
+
+    // Reset which page section is "active" back to the Dashboard so the
+    // next person to log in on this device — who may have far fewer
+    // permissions than whoever just logged out — never lands on a
+    // restricted section (e.g. User Management) just because that's
+    // whatever page was left open before logging out.
+    document.querySelectorAll('.page-section').forEach(sec => {
+        sec.classList.toggle('active', sec.id === 'dashboard');
+    });
+    document.querySelectorAll('.nav-item[data-target]').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-target') === 'dashboard');
+    });
 }
 
 /**
