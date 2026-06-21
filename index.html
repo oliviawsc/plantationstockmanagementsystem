@@ -65,10 +65,12 @@
             #sidebar.open{transform:translateX(0)}
             #sidebarOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(2px);z-index:199}
             #sidebarOverlay.open{display:block}
-            #topHeaderBar{left:0!important;top:56px!important;padding:0 12px!important}
-            #mainWrapper{padding-top:112px;flex:1;overflow-y:auto}
+            #mobileTopBar{display:none!important}
+            #topCollapseBtn{display:flex!important}
+            #topHeaderBar{left:0!important;top:0!important;padding:0 12px!important}
+            #mainWrapper{padding-top:56px;flex:1;overflow-y:auto}
             #mainContent{padding:12px}
-            #estateBlankState{top:112px}
+            #estateBlankState{top:56px}
             .stat-card{padding:14px 16px}
             .stat-value{font-size:22px}
             .card{padding:14px;margin-bottom:14px}
@@ -393,7 +395,7 @@
     <!-- MAIN WRAPPER -->
     <div id="mainWrapper">
 
-        <!-- Desktop top bar -->
+        <!-- Top bar (desktop: shows collapse toggle; mobile: shows hamburger menu toggle) -->
         <div id="topHeaderBar">
             <!-- Left: collapse toggle + estate name pill -->
             <div style="flex:1;display:flex;align-items:center;gap:10px;">
@@ -7225,7 +7227,13 @@ function applyFilterChemBlock() {
     var colBtn = document.getElementById('sidebarCollapseBtn');
     if(colBtn) colBtn.onclick = toggleSidebarCollapse;
     var topBtn = document.getElementById('topCollapseBtn');
-    if(topBtn) topBtn.onclick = toggleSidebarCollapse;
+    if(topBtn) topBtn.onclick = function(){
+        // Below the desktop breakpoint, this button acts as the mobile
+        // hamburger menu (slide-out sidebar) instead of the icon-rail
+        // collapse toggle, since mobile has no separate top bar anymore.
+        if (window.innerWidth < 768) { toggleSidebar(); }
+        else { toggleSidebarCollapse(); }
+    };
     document.querySelectorAll('[data-target]').forEach(function(btn){
         btn.addEventListener('click',function(){
             updateTopHeaderTitle(btn.getAttribute('data-target'));
