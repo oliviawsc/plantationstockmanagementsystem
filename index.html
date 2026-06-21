@@ -3904,9 +3904,11 @@ function renderChemUsageTracker() {
             ? parseFloat((Math.max(maxUsage, maxDosage) * 1.25).toFixed(2))
             : parseFloat((maxUsage * 1.3).toFixed(2));
 
-        /* Card element */
+        /* Card element — fixed size, matching the Manuring/Maintenance
+         * trackers, so every ingredient card lines up the same regardless
+         * of how many rounds it has or how long its round names are. */
         var el = document.createElement('div');
-        el.style.cssText = 'flex:1;min-width:280px;max-width:420px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;';
+        el.style.cssText = 'flex:1;min-width:300px;max-width:380px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;';
 
         /* Header */
         var statusAll = roundBars.every(function(rb){ return maxDosage<=0 || rb.usagePerHa<=maxDosage; });
@@ -3921,21 +3923,26 @@ function renderChemUsageTracker() {
                 ? '<span style="font-size:9px;font-weight:700;background:rgba(255,255,255,.2);color:#D1FAE5;padding:2px 8px;border-radius:99px;">'+I18N[currentLang]['dash_lbl_within_limit']+'</span>'
                 : '';
 
-        var hdr = '<div style="background:'+hdrBg+';padding:12px 14px 10px;">'
+        var hdr = '<div style="background:'+hdrBg+';padding:12px 14px 10px;flex-shrink:0;">'
             +'<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
-                +'<div>'
-                    +'<div style="font-size:12.5px;font-weight:700;color:#fff;margin-bottom:1px;">'+ci.name+'</div>'
-                    +'<div style="font-size:10px;color:rgba(255,255,255,.7);">'+subLabel+'</div>'
+                +'<div style="min-width:0;">'
+                    +'<div style="font-size:12.5px;font-weight:700;color:#fff;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+ci.name+'</div>'
+                    +'<div style="font-size:10px;color:rgba(255,255,255,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+linkedItemNames.join(', ').replace(/"/g, '&quot;')+'">'+subLabel+'</div>'
                 +'</div>'
                 +statusPill
             +'</div>'
             +'<div style="font-size:9.5px;color:rgba(255,255,255,.65);margin-top:6px;">'+maxLabel+'</div>'
             +'</div>';
 
-        /* Canvas */
+        /* Canvas — fixed-height scroll area so cards with many rounds
+         * stay the same overall card size as cards with few rounds; the
+         * chart itself grows tall enough inside that area for every bar
+         * to render at a comfortable height, with a scrollbar if needed. */
+        var FIXED_CHART_AREA_HEIGHT = 150;
+        var idealChartHeight = Math.max(roundBars.length * 28, 70);
         var canvasId = 'chemTracker_'+cardIdx+'_'+ci.name.replace(/[^a-zA-Z0-9]/g, '_');
-        var body = '<div style="padding:12px 14px 14px;">'
-            +'<canvas id="'+canvasId+'" height="'+(Math.max(roundBars.length * 28, 70))+'"></canvas>'
+        var body = '<div style="padding:12px 14px 14px;flex:1;overflow-y:auto;max-height:'+FIXED_CHART_AREA_HEIGHT+'px;">'
+            +'<canvas id="'+canvasId+'" height="'+idealChartHeight+'"></canvas>'
             +'</div>';
 
         el.innerHTML = hdr + body;
@@ -4000,7 +4007,7 @@ function renderChemUsageTracker() {
                     type: 'bar',
                     plugins: [maxDosageLine, barLabels],
                     data: {
-                        labels: cdata.map(function(rb){ return rb.roundName.length>22?rb.roundName.slice(0,21)+'…':rb.roundName; }),
+                        labels: cdata.map(function(rb){ return rb.roundName; }),
                         datasets: [{
                             data:            cdata.map(function(rb){ return rb.usagePerHa; }),
                             backgroundColor: barCols,
@@ -4038,7 +4045,11 @@ function renderChemUsageTracker() {
                             },
                             y: {
                                 grid: { display:false },
-                                ticks: { font:{size:9} }
+                                ticks: {
+                                    font:{size:9},
+                                    autoSkip: false,
+                                    crossAlign: 'far'
+                                }
                             }
                         }
                     }
