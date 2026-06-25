@@ -5602,18 +5602,25 @@ function bootApp(session) {
     // assigned to, even though those options exist statically in HTML.
     if (estateSelectVisible) estateSelectVisible.innerHTML = estateOptionsHtml;
 
-    // Always start with no estate selected — blank state shown until user picks one
-    estateSelect.value = '';
-    if (estateSelectVisible) estateSelectVisible.value = '';
+    // Automatically select the user's first available estate on login,
+    // instead of making them pick one manually every time. They can still
+    // switch to any other estate they're permitted to access via the
+    // dropdown at any point afterwards.
+    const defaultEstate = allowedEstates.length > 0 ? allowedEstates[0] : '';
+    estateSelect.value = defaultEstate;
+    if (estateSelectVisible) estateSelectVisible.value = defaultEstate;
 
-    // Active estate is always empty on fresh login
-    activeEstate = '';
+    activeEstate = defaultEstate;
 
-    // Always show blank state on login — user must select an estate
-    showEstateBlankState();
-
-    // Load cached data for this estate from localStorage immediately
-    if (activeEstate) loadEstateData(activeEstate);
+    if (defaultEstate) {
+        // Hide the blank state and load this estate's data right away
+        hideEstateBlankState();
+        loadEstateData(defaultEstate);
+    } else {
+        // No estate assigned at all (e.g. a brand-new user with no
+        // estates yet) — fall back to the original blank-state prompt
+        showEstateBlankState();
+    }
 
     // Update app title
     updateAppTitle(activeEstate);
@@ -7135,7 +7142,11 @@ function applyFilterChemBlock() {
     var _origBootApp = window.bootApp;
     window.bootApp = function(session){
         _origBootApp(session);
-        updateTopEstateLabel('');
+        // activeEstate is now auto-selected on login (the user's first
+        // permitted estate) rather than always starting blank, so reflect
+        // whatever was actually selected instead of forcing it empty.
+        var hidSel = document.getElementById('sidebarEstate');
+        updateTopEstateLabel(hidSel ? hidSel.value : '');
         updateAvatarFromSession(session);
     };
     // Avatar helpers
