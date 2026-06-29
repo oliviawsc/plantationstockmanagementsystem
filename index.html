@@ -16,7 +16,7 @@
         theme: { extend: {
             fontFamily: { sans: ['Inter','ui-sans-serif','system-ui'] },
             colors: {
-                primary:{ DEFAULT:'#6366F1', light:'#EEF2FF', dark:'#4F46E5' },
+                primary:{ DEFAULT:'#2E7D32', light:'#E8F5E9', dark:'#1B5E20' },
                 canvas: { DEFAULT:'#F8FAFC', dark:'#0D0D14' },
                 surface:{ DEFAULT:'#FFFFFF', dark:'#16162A' },
             }
@@ -41,7 +41,7 @@
             /* Section labels ("Overview", "Stock"...) become slim centered dividers instead of vanishing abruptly */
             #appLayout.sidebar-collapsed #sidebar .sb-section{
                 font-size:0;line-height:0;height:1px;margin:10px 14px;padding:0;
-                background:#E2E8F0;color:transparent;overflow:hidden;
+                background:rgba(255,255,255,0.18);color:transparent;overflow:hidden;
             }
             #appLayout.sidebar-collapsed #sidebar .sb-section:first-child{margin-top:4px}
             #appLayout.sidebar-collapsed #sidebar .nav-item{
@@ -51,7 +51,7 @@
             #appLayout.sidebar-collapsed #sidebar .nav-item .nav-icon{font-size:19px;width:auto}
             #appLayout.sidebar-collapsed #sidebar .nav-item.active::before{
                 content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);
-                width:3px;height:18px;border-radius:0 3px 3px 0;background:#6366F1;
+                width:3px;height:18px;border-radius:0 3px 3px 0;background:rgba(255,255,255,0.8);
             }
             #appLayout.sidebar-collapsed #sidebar #sidebarAppTitle{display:none!important}
             #sidebarCollapseBtn{display:flex!important}
@@ -84,32 +84,32 @@
         }
 
         /* Sidebar */
-        #sidebar{background:#fff;border-right:1px solid #E2E8F0;display:flex;flex-direction:column}
-        .dark #sidebar{background:#16162A;border-color:#252540}
+        #sidebar{background:linear-gradient(180deg,#1B5E20 0%,#2E7D32 100%);border-right:none;display:flex;flex-direction:column}
+        .dark #sidebar{background:linear-gradient(180deg,#0A2E0C 0%,#1B5E20 100%);border-color:transparent}
 
         /* Nav items */
-        .nav-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border-radius:8px;border:none;background:transparent;font-size:13px;font-weight:500;color:#475569;cursor:pointer;text-align:left;white-space:nowrap;overflow:hidden;transition:background .13s,color .13s}
-        .nav-item:hover{background:#EEF2FF;color:#4F46E5}
-        .nav-item.active{background:#EEF2FF;color:#6366F1;font-weight:600}
-        .nav-item .nav-icon{font-size:14px;flex-shrink:0;width:20px;text-align:center}
-        .dark .nav-item{color:#94A3B8}
-        .dark .nav-item:hover,.dark .nav-item.active{background:#1e1e36;color:#818CF8}
+        .nav-item{display:flex;align-items:center;gap:9px;width:100%;padding:9px 11px;border-radius:10px;border:none;background:transparent;font-size:13px;font-weight:500;color:rgba(255,255,255,0.72);cursor:pointer;text-align:left;white-space:nowrap;overflow:hidden;transition:background .15s,color .15s}
+        .nav-item:hover{background:rgba(255,255,255,0.13);color:#fff}
+        .nav-item.active{background:rgba(255,255,255,0.2);color:#fff;font-weight:600}
+        .nav-item .nav-icon{font-size:15px;flex-shrink:0;width:20px;text-align:center}
+        .dark .nav-item{color:rgba(255,255,255,0.6)}
+        .dark .nav-item:hover,.dark .nav-item.active{background:rgba(255,255,255,0.15);color:#fff}
 
         /* Page sections */
         .page-section{display:none}
         .page-section.active{display:block}
 
         /* Card */
-        .card{background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.05);margin-bottom:24px}
+        .card{background:#fff;border:1px solid #E5E7EB;border-radius:18px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.05);margin-bottom:24px}
         .dark .card{background:#16162A;border-color:#252540}
 
         /* Tables */
         table{width:100%;border-collapse:collapse}
-        thead th{background:#F8FAFC;color:#64748B;font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:10px 14px;border-bottom:1px solid #E2E8F0;white-space:nowrap}
+        thead th{background:#F0FDF4;color:#374151;font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:10px 14px;border-bottom:1px solid #D1FAE5;white-space:nowrap}
         .dark thead th{background:#12121F;color:#475569;border-color:#252540}
         tbody tr{border-bottom:1px solid #F1F5F9;transition:background .1s}
         tbody tr:last-child{border-bottom:none}
-        tbody tr:hover{background:#F8FAFC}
+        tbody tr:hover{background:#F0FDF4}
         .dark tbody tr{border-color:#1e1e36}
         .dark tbody tr:hover{background:#1a1a2e}
         td{padding:11px 14px;font-size:13.5px;color:#334155;vertical-align:middle}
@@ -117,23 +117,23 @@
 
         /* Form controls */
         input[type=text],input[type=email],input[type=password],input[type=number],input[type=date],input[type=month],input[type=time],select,textarea{width:100%;padding:8px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13.5px;font-family:inherit;color:#0F172A;background:#fff;outline:none;transition:border-color .15s,box-shadow .15s;box-sizing:border-box}
-        input:focus,select:focus,textarea:focus{border-color:#6366F1;box-shadow:0 0 0 3px rgba(99,102,241,.13)}
+        input:focus,select:focus,textarea:focus{border-color:#2E7D32;box-shadow:0 0 0 3px rgba(46,125,50,.13)}
         .dark input,.dark select,.dark textarea{background:#12121F;border-color:#252540;color:#E2E8F0}
-        .dark input:focus,.dark select:focus,.dark textarea:focus{border-color:#818CF8;box-shadow:0 0 0 3px rgba(129,140,248,.15)}
+        .dark input:focus,.dark select:focus,.dark textarea:focus{border-color:#4CAF50;box-shadow:0 0 0 3px rgba(76,175,80,.15)}
         label{font-size:12.5px;font-weight:500;color:#374151;display:block;margin-bottom:4px}
         .dark label{color:#94A3B8}
 
         /* Buttons */
         .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;border:none;transition:opacity .13s,background .13s;white-space:nowrap}
         .btn:active{transform:scale(.98)}
-        .btn-primary{background:#6366F1;color:#fff}
-        .btn-primary:hover{background:#4F46E5}
-        .btn-success{background:#22C55E;color:#fff}
-        .btn-success:hover{background:#16A34A}
+        .btn-primary{background:linear-gradient(135deg,#2E7D32 0%,#43A047 100%);color:#fff;box-shadow:0 2px 8px rgba(46,125,50,.25)}
+        .btn-primary:hover{filter:brightness(1.07);box-shadow:0 4px 14px rgba(46,125,50,.35)}
+        .btn-success{background:#2E7D32;color:#fff}
+        .btn-success:hover{background:#1B5E20}
         .btn-danger{background:#FEE2E2;color:#DC2626}
         .btn-danger:hover{background:#FECACA}
-        .btn-ghost{background:transparent;color:#6366F1;border:1px solid #C7D2FE}
-        .btn-ghost:hover{background:#EEF2FF}
+        .btn-ghost{background:transparent;color:#2E7D32;border:1px solid #A5D6A7}
+        .btn-ghost:hover{background:#E8F5E9}
         .btn-secondary{background:#F1F5F9;color:#334155}
         .btn-secondary:hover{background:#E2E8F0}
         .btn-sm{padding:5px 12px;font-size:12px}
@@ -141,7 +141,7 @@
 
         /* Badges */
         .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:11.5px;font-weight:600}
-        .badge-indigo{background:#EEF2FF;color:#4338CA}
+        .badge-indigo{background:#E8F5E9;color:#1B5E20}
         .badge-green{background:#DCFCE7;color:#15803D}
         .badge-yellow{background:#FEF9C3;color:#A16207}
         .badge-red{background:#FEE2E2;color:#B91C1C}
@@ -149,8 +149,8 @@
         .badge-orange{background:#FEF3C7;color:#B45309}
 
         /* Stat card */
-        .stat-card{background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:20px 24px;display:flex;flex-direction:column;gap:6px;box-shadow:0 1px 3px rgba(0,0,0,.05);transition:transform .15s,box-shadow .15s}
-        .stat-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(99,102,241,.1)}
+        .stat-card{background:#fff;border:1px solid #E5E7EB;border-radius:18px;padding:20px 24px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 12px rgba(0,0,0,.05);transition:transform .15s,box-shadow .15s}
+        .stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(46,125,50,.14)}
         .dark .stat-card{background:#16162A;border-color:#252540}
         .stat-value{font-size:30px;font-weight:700;color:#0F172A;line-height:1}
         .dark .stat-value{color:#F1F5F9}
@@ -162,21 +162,21 @@
         .dark .progress-bar{background:#252540}
 
         /* Mobile top bar */
-        #mobileTopBar{position:fixed;top:0;left:0;right:0;height:56px;background:#fff;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:198}
-        .dark #mobileTopBar{background:#16162A;border-color:#252540}
-        #mobileTopBar h1{font-size:14px;font-weight:700;color:#0F172A}
-        .dark #mobileTopBar h1{color:#F1F5F9}
+        #mobileTopBar{position:fixed;top:0;left:0;right:0;height:56px;background:linear-gradient(90deg,#1B5E20,#2E7D32);border-bottom:none;display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:198;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+        .dark #mobileTopBar{background:linear-gradient(90deg,#0A2E0C,#1B5E20)}
+        #mobileTopBar h1{font-size:14px;font-weight:700;color:#fff}
+        .dark #mobileTopBar h1{color:#fff}
         #hamburgerBtn{background:none;border:none;cursor:pointer;padding:8px;display:flex;flex-direction:column;gap:4.5px}
-        #hamburgerBtn span{display:block;width:20px;height:2px;background:#475569;border-radius:2px}
-        .dark #hamburgerBtn span{background:#94A3B8}
+        #hamburgerBtn span{display:block;width:20px;height:2px;background:rgba(255,255,255,0.85);border-radius:2px}
+        .dark #hamburgerBtn span{background:rgba(255,255,255,0.75)}
 
         /* Top header bar */
-        #topHeaderBar{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:56px;flex-shrink:0;background:#fff;border-bottom:1px solid #E2E8F0;position:fixed;top:0;left:var(--sb-w,248px);right:0;z-index:90}
+        #topHeaderBar{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:56px;flex-shrink:0;background:#fff;border-bottom:1px solid #E5E7EB;position:fixed;top:0;left:var(--sb-w,248px);right:0;z-index:90;box-shadow:0 1px 4px rgba(0,0,0,.04)}
         .dark #topHeaderBar{background:#16162A;border-color:#252540}
 
         /* Summary card */
         .summary-card{transition:transform .15s,box-shadow .15s}
-        .summary-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(99,102,241,.1)}
+        .summary-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(46,125,50,.12)}
 
         /* Sync toast */
         .sync-toast{position:fixed;bottom:24px;right:24px;z-index:9998;background:#1E1E2E;color:#F1F5F9;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,.25);display:flex;align-items:center;gap:8px;cursor:pointer;max-width:380px;animation:toastIn .22s ease}
@@ -187,22 +187,14 @@
         /* Scrollbar */
         ::-webkit-scrollbar{width:5px;height:5px}
         ::-webkit-scrollbar-track{background:transparent}
-        ::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:99px}
-        .dark ::-webkit-scrollbar-thumb{background:#374151}
+        ::-webkit-scrollbar-thumb{background:#A5D6A7;border-radius:99px}
+        .dark ::-webkit-scrollbar-thumb{background:#2E7D32}
 
         /* Responsive table */
         @media(max-width:767px){table{font-size:12px}th,td{padding:7px 9px!important}h2{font-size:1.3rem!important}}
 
-        /* Override legacy green theme from page sections */
-        .bg-green-800{background-color:#6366F1!important}
-        .hover\:bg-green-900:hover{background-color:#4F46E5!important}
-        .bg-green-900{background-color:#4F46E5!important}
-        .border-green-300{border-color:#C7D2FE!important}
-        .border-green-700{border-color:#C7D2FE!important}
-        .focus\:ring-green-600:focus,.focus\:ring-green-500:focus{--tw-ring-color:rgba(99,102,241,.2)!important}
-        .bg-green-50{background-color:#EEF2FF!important}
-        .bg-green-100{background-color:#DCFCE7!important}
-        /* keep inline green for semantic badge/progress use */
+        /* Green theme — Tailwind green classes now use natural green values */
+        .focus\:ring-green-600:focus,.focus\:ring-green-500:focus{--tw-ring-color:rgba(46,125,50,.2)!important}
 
         /* ── Print styles ── */
         @media print {
@@ -266,8 +258,8 @@
             position: fixed;
             top: 0; left: 0; right: 0;
             height: 34px;
-            background: #1E1B4B;
-            color: #C7D2FE;
+            background: #1B5E20;
+            color: rgba(255,255,255,0.88);
             font-size: 12.5px;
             font-weight: 700;
             font-family: Inter, sans-serif;
@@ -275,6 +267,7 @@
             text-transform: uppercase;
             align-items: center;
             justify-content: center;
+            gap: 0;
             z-index: 95;
         }
         body.estate-mobile #estateAppBanner { display: flex !important; }
@@ -292,7 +285,7 @@
             font-family:Inter,sans-serif;text-align:center;
         }
         .estate-card:hover,.estate-card:active {
-            border-color:#6366F1;box-shadow:0 8px 28px rgba(99,102,241,.2);transform:translateY(-2px);
+            border-color:#2E7D32;box-shadow:0 8px 28px rgba(46,125,50,.2);transform:translateY(-2px);
         }
         .estate-card:active { transform:scale(.97); }
 
@@ -412,9 +405,9 @@
 
         /* ── Category: frozen/locked state in estate mobile ─────── */
         body.estate-mobile #txnCategory:disabled {
-            background: #EEF2FF;
-            color: #4338CA;
-            border-color: #A5B4FC;
+            background: #E8F5E9;
+            color: #1B5E20;
+            border-color: #A5D6A7;
             font-weight: 700;
             opacity: 1;
             cursor: default;
@@ -504,49 +497,351 @@
             text-overflow: ellipsis;
             font-variant-numeric: tabular-nums;
         }
+    /* ═══════════════════════════════════════════
+       LOGIN PAGE — PREMIUM REDESIGN
+       ═══════════════════════════════════════════ */
+    @keyframes loginFadeUp {
+        from { opacity: 0; transform: translateY(28px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes loginSpin { to { transform: rotate(360deg); } }
+
+    .login-glow { position:absolute; border-radius:50%; pointer-events:none; }
+    .login-glow-1 {
+        width:700px; height:700px;
+        background:radial-gradient(circle, rgba(46,125,50,0.07) 0%, transparent 65%);
+        top:-250px; left:-100px;
+    }
+    .login-glow-2 {
+        width:600px; height:600px;
+        background:radial-gradient(circle, rgba(67,160,71,0.05) 0%, transparent 65%);
+        bottom:-200px; right:-100px;
+    }
+    .palm-corner { position:absolute; pointer-events:none; opacity:0.04; }
+
+    #loginCard {
+        background:#ffffff;
+        border-radius:24px;
+        border:1px solid #E5E7EB;
+        box-shadow:0 20px 60px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+        padding:48px;
+        width:100%; max-width:500px;
+        position:relative; z-index:10;
+        animation:loginFadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
+        box-sizing:border-box;
+    }
+    .login-logo-ring {
+        width:80px; height:80px; border-radius:50%;
+        background:linear-gradient(145deg,#E8F5E9,#C8E6C9);
+        border:2px solid #A5D6A7;
+        display:flex; align-items:center; justify-content:center;
+        margin:0 auto 18px;
+        box-shadow:0 4px 20px rgba(46,125,50,0.15);
+    }
+    .login-brand-name {
+        font-size:40px; font-weight:800; text-align:center;
+        line-height:1; margin-bottom:8px;
+        font-family:Inter,sans-serif; letter-spacing:-1px;
+    }
+    .login-palm { color:#2E7D32; }
+    .login-inv  { color:#1F2937; }
+    .login-brand-sub {
+        font-size:13.5px; color:#64748B; text-align:center;
+        font-family:Inter,sans-serif; font-weight:400;
+        margin-bottom:28px; line-height:1.5;
+    }
+    .login-divider { border:none; border-top:1px solid #F1F5F9; margin:0 -48px 28px; }
+
+    .login-welcome-h {
+        font-size:30px; font-weight:700; color:#1F2937;
+        font-family:Inter,sans-serif; letter-spacing:-0.5px; margin-bottom:6px;
+    }
+    .login-welcome-sub {
+        font-size:14px; color:#64748B;
+        font-family:Inter,sans-serif; margin-bottom:28px;
+    }
+    .login-label {
+        display:block; font-size:13px; font-weight:600;
+        color:#374151; margin-bottom:8px; font-family:Inter,sans-serif;
+    }
+    .login-field { margin-bottom:20px; }
+    /* Wrapper is now the visible field box — icon + input are flex siblings */
+    .login-input-wrap {
+        display:flex; align-items:center;
+        height:56px; border-radius:14px;
+        border:1.5px solid #D1D5DB;
+        background:#F9FAFB;
+        padding:0 14px 0 16px; gap:12px;
+        transition:border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        box-sizing:border-box;
+    }
+    .login-input-wrap:focus-within {
+        border-color:#2E7D32;
+        box-shadow:0 0 0 3px rgba(46,125,50,0.12);
+        background:#fff;
+    }
+    .login-icon-left {
+        color:#9CA3AF; display:flex; align-items:center; flex-shrink:0;
+    }
+    .login-icon-right {
+        color:#9CA3AF; background:none; border:none; cursor:pointer;
+        padding:6px; display:flex; align-items:center; border-radius:6px;
+        transition:color 0.15s, background 0.15s; flex-shrink:0;
+    }
+    .login-icon-right:hover { color:#4B5563; background:#F3F4F6; }
+
+    /* Input strips its own styling — wrapper provides border/bg/radius */
+    .login-input {
+        flex:1; min-width:0; border:none; outline:none;
+        background:transparent; padding:0;
+        font-size:15px; font-family:Inter,sans-serif; color:#1F2937;
+        height:100%;
+    }
+    .login-input::placeholder { color:#9CA3AF; }
+    .login-input:focus { border-color:unset; box-shadow:none; background:transparent; }
+
+    #loginError {
+        font-size:13.5px; color:#DC2626;
+        background:#FEF2F2; border:1px solid #FECACA;
+        border-radius:10px; padding:10px 14px;
+        margin-bottom:16px; font-family:Inter,sans-serif;
+    }
+
+    #loginBtn {
+        width:100%; height:56px; border-radius:14px; border:none;
+        background:linear-gradient(135deg,#2E7D32 0%,#43A047 100%);
+        color:#fff; font-size:15px; font-weight:600;
+        font-family:Inter,sans-serif; cursor:pointer;
+        display:flex; align-items:center; justify-content:center; gap:10px;
+        transition:transform 0.15s, box-shadow 0.15s, filter 0.15s;
+        box-shadow:0 4px 16px rgba(46,125,50,0.30);
+        margin-bottom:24px;
+    }
+    #loginBtn:hover:not(:disabled) {
+        transform:translateY(-2px);
+        box-shadow:0 8px 28px rgba(46,125,50,0.42);
+        filter:brightness(1.06);
+    }
+    #loginBtn:active:not(:disabled) {
+        transform:translateY(0) scale(0.99);
+        box-shadow:0 2px 8px rgba(46,125,50,0.25);
+        filter:brightness(0.97);
+    }
+    #loginBtn:disabled { opacity:0.70; cursor:not-allowed; transform:none; filter:none; }
+
+    #loginSpinner {
+        display:none; width:20px; height:20px;
+        border:2.5px solid rgba(255,255,255,0.35);
+        border-top-color:#fff; border-radius:50%;
+        animation:loginSpin 0.75s linear infinite;
+        flex-shrink:0;
+    }
+
+    .login-help {
+        text-align:center; font-size:13px; color:#94A3B8;
+        font-family:Inter,sans-serif; margin-bottom:24px; line-height:1.6;
+    }
+    .login-help strong { color:#64748B; font-weight:500; }
+
+    .login-footer {
+        display:flex; align-items:center; justify-content:space-between;
+        border-top:1px solid #F1F5F9; padding-top:20px;
+        font-family:Inter,sans-serif; flex-wrap:wrap; gap:10px;
+    }
+    .login-copyright { font-size:12px; color:#94A3B8; }
+    .login-lang {
+        display:flex; align-items:center; gap:6px;
+        font-size:12.5px; color:#64748B; font-weight:500;
+    }
+    .login-lang select {
+        border:1px solid #D1D5DB; border-radius:8px;
+        padding:5px 10px; font-size:12.5px;
+        font-family:Inter,sans-serif; color:#374151;
+        background:#fff; cursor:pointer; outline:none;
+        transition:border-color 0.15s;
+    }
+    .login-lang select:focus { border-color:#2E7D32; }
+
+    @media (max-width:560px) {
+        #loginCard { padding:32px 22px; border-radius:20px; }
+        .login-brand-name { font-size:32px; }
+        .login-welcome-h  { font-size:26px; }
+        .login-divider    { margin-left:-22px; margin-right:-22px; }
+        .login-logo-ring  { width:64px; height:64px; }
+    }
     </style>
 </head>
 <body>
 <!-- ================================================================
      AUTH OVERLAY
      ================================================================ -->
-<div id="authOverlay" class="fixed inset-0 z-[9999] flex items-center justify-center"
-    style="background:linear-gradient(135deg,#13111C 0%,#1e1b4b 45%,#13111C 100%);">
-    <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(99,102,241,.16) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;"></div>
-    <div style="position:absolute;top:-100px;right:-60px;width:440px;height:440px;background:radial-gradient(circle,rgba(99,102,241,.18) 0%,transparent 70%);pointer-events:none;"></div>
-    <div style="position:relative;z-index:1;width:100%;max-width:400px;padding:0 20px;">
-        <div style="text-align:center;margin-bottom:32px;">
-            <div style="display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;background:linear-gradient(135deg,#6366F1,#4F46E5);border-radius:14px;margin-bottom:12px;box-shadow:0 8px 24px rgba(99,102,241,.45);">
-                <span style="font-size:24px;">&#127796;</span>
-            </div>
-            <h1 style="color:#fff;font-size:20px;font-weight:800;letter-spacing:-.3px;margin-bottom:4px;font-family:Inter,sans-serif;">Oil Palm Plantation</h1>
-            <p style="color:#a5b4fc;font-size:12.5px;font-family:Inter,sans-serif;" data-i18n="app_subtitle">Inventory Management System</p>
-        </div>
-        <div style="background:rgba(255,255,255,.06);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:32px;">
-            <h2 style="color:#f1f5f9;font-size:16px;font-weight:700;margin-bottom:22px;font-family:Inter,sans-serif;">Sign in to your account</h2>
-            <div style="margin-bottom:14px;">
-                <label style="display:block;color:#c7d2fe;font-size:12px;font-weight:500;margin-bottom:5px;font-family:Inter,sans-serif;">Email address</label>
-                <input id="loginEmail" type="email" placeholder="you@estate.com"
-                    onkeydown="if(event.key==='Enter')attemptLogin()"
-                    style="width:100%;padding:9px 13px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:9px;color:#f1f5f9;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;transition:border-color .15s,box-shadow .15s;"
-                    onfocus="this.style.borderColor='rgba(129,140,248,.7)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.2)'"
-                    onblur="this.style.borderColor='rgba(255,255,255,.12)';this.style.boxShadow='none'" />
-            </div>
-            <div style="margin-bottom:20px;">
-                <label style="display:block;color:#c7d2fe;font-size:12px;font-weight:500;margin-bottom:5px;font-family:Inter,sans-serif;">Password</label>
-                <input id="loginPassword" type="password" placeholder="&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;"
-                    onkeydown="if(event.key==='Enter')attemptLogin()"
-                    style="width:100%;padding:9px 13px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:9px;color:#f1f5f9;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;transition:border-color .15s,box-shadow .15s;"
-                    onfocus="this.style.borderColor='rgba(129,140,248,.7)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.2)'"
-                    onblur="this.style.borderColor='rgba(255,255,255,.12)';this.style.boxShadow='none'" />
-            </div>
-            <p id="loginError" class="hidden" style="color:#fca5a5;font-size:12.5px;margin-bottom:14px;font-family:Inter,sans-serif;"></p>
-            <button onclick="attemptLogin()"
-                style="width:100%;padding:10px;background:linear-gradient(135deg,#6366F1,#4F46E5);border:none;border-radius:9px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;box-shadow:0 4px 14px rgba(99,102,241,.4);transition:opacity .15s;"
-                onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'">Sign in &#8594;</button>
-        </div>
-<p style="color:rgba(148,163,184,.55);font-size:11.5px;text-align:center;margin-top:16px;font-family:Inter,sans-serif;">Contact your Super Admin to register or reset your account.</p>
+<div id="authOverlay" style="position:fixed;inset:0;z-index:9999;overflow-y:auto;background:linear-gradient(160deg,#F0FDF4 0%,#F8FAFC 45%,#EFF6FF 75%,#F8FAFC 100%);">
+
+    <!-- Faint palm leaf silhouettes in corners -->
+    <div class="palm-corner" style="top:0;left:0;width:260px;height:260px;">
+        <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" width="260" height="260">
+            <path d="M 10,10 Q 160,40 290,120 Q 160,80 10,10Z" fill="#2E7D32"/>
+            <path d="M 10,10 Q 140,140 200,280 Q 80,160 10,10Z" fill="#43A047"/>
+            <path d="M 10,10 Q 50,150 80,290 Q 20,160 10,10Z" fill="#4CAF50"/>
+            <path d="M 10,10 Q 200,80 290,200 Q 160,100 10,10Z" fill="#388E3C"/>
+        </svg>
     </div>
+    <div class="palm-corner" style="top:0;right:0;width:260px;height:260px;">
+        <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" width="260" height="260">
+            <path d="M 290,10 Q 140,40 10,120 Q 140,80 290,10Z" fill="#2E7D32"/>
+            <path d="M 290,10 Q 160,140 100,280 Q 220,160 290,10Z" fill="#43A047"/>
+            <path d="M 290,10 Q 250,150 220,290 Q 280,160 290,10Z" fill="#4CAF50"/>
+            <path d="M 290,10 Q 100,80 10,200 Q 140,100 290,10Z" fill="#388E3C"/>
+        </svg>
+    </div>
+    <div class="palm-corner" style="bottom:0;left:0;width:260px;height:260px;">
+        <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" width="260" height="260">
+            <path d="M 10,290 Q 160,260 290,180 Q 160,220 10,290Z" fill="#2E7D32"/>
+            <path d="M 10,290 Q 140,160 200,20 Q 80,140 10,290Z" fill="#43A047"/>
+            <path d="M 10,290 Q 50,150 80,10 Q 20,140 10,290Z" fill="#4CAF50"/>
+            <path d="M 10,290 Q 200,220 290,100 Q 160,200 10,290Z" fill="#388E3C"/>
+        </svg>
+    </div>
+    <div class="palm-corner" style="bottom:0;right:0;width:260px;height:260px;">
+        <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" width="260" height="260">
+            <path d="M 290,290 Q 140,260 10,180 Q 140,220 290,290Z" fill="#2E7D32"/>
+            <path d="M 290,290 Q 160,160 100,20 Q 220,140 290,290Z" fill="#43A047"/>
+            <path d="M 290,290 Q 250,150 220,10 Q 280,140 290,290Z" fill="#4CAF50"/>
+            <path d="M 290,290 Q 100,220 10,100 Q 140,200 290,290Z" fill="#388E3C"/>
+        </svg>
+    </div>
+
+    <!-- Ambient glow -->
+    <div class="login-glow login-glow-1"></div>
+    <div class="login-glow login-glow-2"></div>
+
+    <!-- Centering wrapper (allows scroll on small screens) -->
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;">
+
+        <!-- Login Card -->
+        <div id="loginCard">
+
+            <!-- Logo -->
+            <div style="text-align:center;">
+                <div class="login-logo-ring">
+                    <svg width="54" height="54" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Trunk -->
+                        <path d="M 44 84 Q 42 92 41 100 L 59 100 Q 58 92 56 84 Z" fill="#795548"/>
+
+                        <!-- Fruit bunch — 14 circles in diamond honeycomb (bottom=darkest) -->
+                        <circle cx="45" cy="79" r="6" fill="#BF360C"/>
+                        <circle cx="55" cy="79" r="6" fill="#BF360C"/>
+                        <circle cx="39" cy="71" r="6" fill="#D84315"/>
+                        <circle cx="50" cy="71" r="6" fill="#D84315"/>
+                        <circle cx="61" cy="71" r="6" fill="#D84315"/>
+                        <circle cx="34" cy="63" r="6" fill="#E65100"/>
+                        <circle cx="45" cy="63" r="6" fill="#E65100"/>
+                        <circle cx="55" cy="63" r="6" fill="#E65100"/>
+                        <circle cx="66" cy="63" r="6" fill="#E65100"/>
+                        <circle cx="39" cy="55" r="6" fill="#F4511E"/>
+                        <circle cx="50" cy="55" r="6" fill="#F4511E"/>
+                        <circle cx="61" cy="55" r="6" fill="#F4511E"/>
+                        <circle cx="44" cy="47" r="6" fill="#FF7043"/>
+                        <circle cx="56" cy="47" r="6" fill="#FF7043"/>
+
+                        <!-- Center stem (crown to fruit) -->
+                        <rect x="48" y="30" width="4" height="17" fill="#1B5E20"/>
+
+                        <!-- 8 flowing fronds from crown (50,30) — heaviest droop on outer fronds -->
+                        <!-- Far left droop -->
+                        <path d="M 50 30 Q 20 12 3 52 Q 22 44 50 30Z" fill="#2E7D32"/>
+                        <!-- Left outer -->
+                        <path d="M 50 30 Q 22 8 10 30 Q 28 30 50 30Z" fill="#2E7D32"/>
+                        <!-- Left mid -->
+                        <path d="M 50 30 Q 28 4 20 12 Q 34 18 50 30Z" fill="#1B5E20"/>
+                        <!-- Left inner -->
+                        <path d="M 50 30 Q 38 0 34 4 Q 40 14 50 30Z" fill="#2E7D32"/>
+                        <!-- Right inner -->
+                        <path d="M 50 30 Q 62 0 66 4 Q 60 14 50 30Z" fill="#2E7D32"/>
+                        <!-- Right mid -->
+                        <path d="M 50 30 Q 72 4 80 12 Q 66 18 50 30Z" fill="#1B5E20"/>
+                        <!-- Right outer -->
+                        <path d="M 50 30 Q 78 8 90 30 Q 72 30 50 30Z" fill="#2E7D32"/>
+                        <!-- Far right droop -->
+                        <path d="M 50 30 Q 80 12 97 52 Q 78 44 50 30Z" fill="#2E7D32"/>
+
+                        <!-- Crown cap (fills frond overlap at center) -->
+                        <circle cx="50" cy="30" r="5" fill="#1B5E20"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Brand -->
+            <div class="login-brand-name"><span class="login-palm">Palm</span><span class="login-inv">Inventory</span></div>
+            <p class="login-brand-sub">Oil Palm Plantation Inventory Management System</p>
+
+            <!-- Welcome -->
+            <h2 class="login-welcome-h">Welcome Back</h2>
+            <p class="login-welcome-sub">Sign in to your PalmInventory account</p>
+
+            <!-- Email -->
+            <div class="login-field">
+                <label class="login-label" for="loginEmail">Email Address</label>
+                <div class="login-input-wrap">
+                    <span class="login-icon-left">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="4" width="20" height="16" rx="2"/>
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                        </svg>
+                    </span>
+                    <input id="loginEmail" type="email" class="login-input"
+                        placeholder="Enter your email"
+                        onkeydown="if(event.key==='Enter')attemptLogin()"
+                        autocomplete="email"/>
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="login-field">
+                <label class="login-label" for="loginPassword">Password</label>
+                <div class="login-input-wrap">
+                    <span class="login-icon-left">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                    </span>
+                    <input id="loginPassword" type="password" class="login-input"
+                        placeholder="Enter your password"
+                        onkeydown="if(event.key==='Enter')attemptLogin()"
+                        autocomplete="current-password"/>
+                    <button type="button" class="login-icon-right" onclick="toggleLoginPw()" aria-label="Toggle password visibility">
+                        <svg id="eyeIconShow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <svg id="eyeIconHide" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                            <line x1="1" y1="1" x2="23" y2="23"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error message -->
+            <p id="loginError" class="hidden"></p>
+
+            <!-- Sign In button -->
+            <button id="loginBtn" onclick="attemptLogin()">
+                <span id="loginBtnText">Sign In</span>
+                <div id="loginSpinner"></div>
+            </button>
+
+            <!-- Help text -->
+            <p class="login-help">Need assistance? <strong>Contact your System Administrator</strong></p>
+
+            <!-- Footer -->
+            <div class="login-footer">
+                <span class="login-copyright">© 2026 MJM Group</span>
+            </div>
+
+        </div><!-- /loginCard -->
+    </div><!-- /centering wrapper -->
 </div>
 <!-- ================================================================
      APP LAYOUT
@@ -558,7 +853,7 @@
         <button id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Open menu">
             <span></span><span></span><span></span>
         </button>
-        <h1 id="mobileAppTitle"></h1>
+        <h1 id="mobileAppTitle" style="font-size:15px;font-weight:800;letter-spacing:-0.2px;"><span style="color:#fff;">Palm</span><span style="color:#A5D6A7;">Inventory</span></h1>
 <div style="width:32px;"></div>
     </div>
 
@@ -568,12 +863,28 @@
     <!-- SIDEBAR -->
     <aside id="sidebar">
         <!-- Brand -->
-        <div style="padding:16px 14px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;justify-content:space-between;">
-            <span id="sidebarAppTitle" style="font-size:13px;font-weight:700;color:#0F172A;white-space:nowrap;" data-i18n="app_subtitle">Inventory Management System</span>
+        <div style="padding:14px 14px;border-bottom:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+                <!-- Mini palm icon -->
+                <svg id="sidebarAppTitle" width="22" height="22" viewBox="0 0 100 100" fill="none" style="flex-shrink:0;">
+                    <path d="M 44 80 Q 42 90 42 100 L 58 100 Q 58 90 56 80 Z" fill="#A5D6A7"/>
+                    <circle cx="45" cy="70" r="5.5" fill="#E65100"/>
+                    <circle cx="55" cy="70" r="5.5" fill="#E65100"/>
+                    <circle cx="50" cy="62" r="5.5" fill="#E65100"/>
+                    <path d="M 50 32 Q 18 14 4 50 Q 24 44 50 32Z" fill="#fff"/>
+                    <path d="M 50 32 Q 24 10 12 30 Q 30 30 50 32Z" fill="rgba(255,255,255,0.82)"/>
+                    <path d="M 50 32 Q 36 2 32 8 Q 40 16 50 32Z" fill="#fff"/>
+                    <path d="M 50 32 Q 64 2 68 8 Q 60 16 50 32Z" fill="#fff"/>
+                    <path d="M 50 32 Q 76 10 88 30 Q 70 30 50 32Z" fill="rgba(255,255,255,0.82)"/>
+                    <path d="M 50 32 Q 82 14 96 50 Q 76 44 50 32Z" fill="#fff"/>
+                    <circle cx="50" cy="32" r="5" fill="#A5D6A7"/>
+                </svg>
+                <span class="sb-label" style="font-size:14.5px;font-weight:800;white-space:nowrap;letter-spacing:-0.2px;"><span style="color:#fff;">Palm</span><span style="color:#A5D6A7;">Inventory</span></span>
+            </div>
             <button onclick="closeSidebar()" id="sidebarCloseBtn" aria-label="Close"
-                style="display:none;width:24px;height:24px;flex-shrink:0;border-radius:6px;border:none;background:none;color:#64748B;font-size:15px;cursor:pointer;">&#x2715;</button>
+                style="display:none;width:24px;height:24px;flex-shrink:0;border-radius:6px;border:none;background:none;color:rgba(255,255,255,0.7);font-size:15px;cursor:pointer;">&#x2715;</button>
             <button id="sidebarCollapseBtn" aria-label="Collapse sidebar" title="Collapse sidebar"
-                style="display:none;width:24px;height:24px;flex-shrink:0;border-radius:6px;border:none;background:none;color:#64748B;font-size:14px;cursor:pointer;align-items:center;justify-content:center;margin-left:auto;">&#8249;</button>
+                style="display:none;width:24px;height:24px;flex-shrink:0;border-radius:6px;border:none;background:none;color:rgba(255,255,255,0.7);font-size:14px;cursor:pointer;align-items:center;justify-content:center;margin-left:auto;">&#8249;</button>
         </div>
 
 
@@ -596,33 +907,33 @@
 
         <!-- Nav -->
         <nav style="padding:8px;flex:1;overflow-y:auto;">
-            <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;padding:6px 8px 3px;">Overview</p>
+            <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:6px 8px 3px;">Overview</p>
             <button data-target="dashboard"     class="nav-item active">    <span class="nav-icon">&#128202;</span><span class="sb-label" data-i18n="sb_lbl_dashboard">Dashboard</span></button>
-            <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;padding:8px 8px 3px;">Stock</p>
+            <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;">Stock</p>
             <button data-target="items"         class="nav-item">               <span class="nav-icon">&#128230;</span><span class="sb-label" data-i18n="sb_lbl_items">Item File</span></button>
             <button data-target="transactions"  class="nav-item">        <span class="nav-icon">&#128260;</span><span class="sb-label" data-i18n="sb_lbl_transactions">Stock Transaction</span></button>
             <button data-target="summary"       class="nav-item">             <span class="nav-icon">&#128209;</span><span class="sb-label" data-i18n="sb_lbl_summary">Stock Summary</span></button>
             <button data-target="locations"     class="nav-item">           <span class="nav-icon">&#128205;</span><span class="sb-label" data-i18n="sb_lbl_locations">Location Area</span></button>
-            <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;padding:8px 8px 3px;">Field Operations</p>
+            <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;">Field Operations</p>
             <button data-target="manuring"      class="nav-item">            <span class="nav-icon">&#127807;</span><span class="sb-label" data-i18n="sb_lbl_manuring">Manuring Program</span></button>
             <button data-target="roundprogress" class="nav-item">       <span class="nav-icon">&#128200;</span><span class="sb-label" data-i18n="sb_lbl_roundprogress">Manuring Progress</span></button>
             <button data-target="fieldmaint"    class="nav-item">          <span class="nav-icon">&#128295;</span><span class="sb-label" data-i18n="sb_lbl_fieldmaint">Maintenance Program</span></button>
             <button data-target="maintprogress" class="nav-item"><span class="nav-icon">&#128202;</span><span class="sb-label" data-i18n="sb_lbl_maintprogress">Maintenance Progress</span></button>
             <button data-target="chemusage"    class="nav-item">          <span class="nav-icon">&#9879;&#65039;</span><span class="sb-label" data-i18n="sb_lbl_chemusage">Chemical Usage</span></button>
-            <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#94A3B8;padding:8px 8px 3px;">Admin</p>
+            <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;">Admin</p>
             <button data-target="useradmin" id="navUserAdmin" class="nav-item hidden">
                 <span class="nav-icon">&#128100;</span><span class="sb-label" data-i18n="sb_lbl_useradmin">User Management</span>
             </button>
         </nav>
 
         <!-- Footer -->
-        <div style="border-top:1px solid #E2E8F0;padding:10px;" class="sb-footer">
+        <div style="border-top:1px solid rgba(255,255,255,0.15);padding:10px;" class="sb-footer">
             <!-- Estate selector (visible) -->
             <div style="margin-bottom:8px;">
-                <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#6366F1;margin-bottom:4px;display:block;">Estate</label>
+                <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,0.5);margin-bottom:4px;display:block;">Estate</label>
                 <select id="sidebarEstateVisible" onchange="document.getElementById('sidebarEstate').value=this.value;onSidebarEstateChange();"
-                    style="width:100%;padding:6px 10px;border:1px solid #E2E8F0;border-radius:7px;font-size:13px;font-family:Inter,sans-serif;color:#0F172A;background:#F8FAFC;outline:none;cursor:pointer;"
-                    onfocus="this.style.borderColor='#6366F1'" onblur="this.style.borderColor='#E2E8F0'">
+                    style="width:100%;padding:6px 10px;border:1px solid rgba(255,255,255,0.25);border-radius:7px;font-size:13px;font-family:Inter,sans-serif;color:#1B5E20;background:#fff;outline:none;cursor:pointer;"
+                    onfocus="this.style.borderColor='rgba(255,255,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.25)'">
                     <option value="">&#x2014; Select estate &#x2014;</option>
                     <option value="Mega Jutamas (Suai)">Mega Jutamas (Suai)</option>
                     <option value="Ulu Niah Estate">Ulu Niah Estate</option>
@@ -637,9 +948,9 @@
                     <option value="Elewsun">Elewsun</option>
                 </select>
             </div>
-            <div style="display:flex;border:1px solid #E2E8F0;border-radius:7px;overflow:hidden;margin-bottom:7px;">
-                <button id="langEN" onclick="setLang('en')" style="flex:1;padding:5px;font-size:13px;font-weight:600;background:#6366F1;color:#fff;border:none;cursor:pointer;font-family:Inter,sans-serif;">&#127468;&#127463; EN</button>
-                <button id="langMS" onclick="setLang('ms')" style="flex:1;padding:5px;font-size:13px;font-weight:600;background:#fff;color:#6366F1;border:none;cursor:pointer;font-family:Inter,sans-serif;">&#127474;&#127486; BM</button>
+            <div style="display:flex;border:1px solid rgba(255,255,255,0.25);border-radius:7px;overflow:hidden;margin-bottom:7px;">
+                <button id="langEN" onclick="setLang('en')" style="flex:1;padding:5px;font-size:13px;font-weight:600;background:#fff;color:#1B5E20;border:none;cursor:pointer;font-family:Inter,sans-serif;">&#127468;&#127463; EN</button>
+                <button id="langMS" onclick="setLang('ms')" style="flex:1;padding:5px;font-size:13px;font-weight:600;background:transparent;color:rgba(255,255,255,0.75);border:none;cursor:pointer;font-family:Inter,sans-serif;">&#127474;&#127486; BM</button>
             </div>
         </div>
     </aside>
@@ -649,7 +960,18 @@
 
         <!-- Estate mobile: app title banner above the header bar -->
         <div id="estateAppBanner">
-            <span data-i18n="app_subtitle">Inventory Management System</span>
+            <svg width="16" height="16" viewBox="0 0 100 100" fill="none" style="flex-shrink:0;margin-right:6px;">
+                <path d="M 44 80 Q 42 90 42 100 L 58 100 Q 58 90 56 80 Z" fill="#A5D6A7"/>
+                <circle cx="45" cy="70" r="5.5" fill="#E65100"/>
+                <circle cx="55" cy="70" r="5.5" fill="#E65100"/>
+                <circle cx="50" cy="62" r="5.5" fill="#E65100"/>
+                <path d="M 50 32 Q 18 14 4 50 Q 24 44 50 32Z" fill="#fff"/>
+                <path d="M 50 32 Q 36 2 32 8 Q 40 16 50 32Z" fill="#fff"/>
+                <path d="M 50 32 Q 64 2 68 8 Q 60 16 50 32Z" fill="#fff"/>
+                <path d="M 50 32 Q 82 14 96 50 Q 76 44 50 32Z" fill="#fff"/>
+                <circle cx="50" cy="32" r="5" fill="#A5D6A7"/>
+            </svg>
+            <span><span style="color:#fff;font-weight:800;">Palm</span><span style="color:#A5D6A7;font-weight:800;">Inventory</span></span>
         </div>
 
         <!-- Top bar (desktop: shows collapse toggle; mobile: shows hamburger menu toggle) -->
@@ -657,25 +979,25 @@
             <!-- Left: collapse toggle + estate name pill / estate back button -->
             <div style="flex:1;display:flex;align-items:center;gap:10px;">
                 <button id="topCollapseBtn" aria-label="Toggle sidebar" title="Toggle sidebar"
-                    style="display:none;width:28px;height:28px;flex-shrink:0;border-radius:7px;border:1px solid #E2E8F0;background:#F8FAFC;color:#64748B;font-size:13px;cursor:pointer;align-items:center;justify-content:center;transition:background .13s;"
-                    onmouseover="this.style.background='#EEF2FF'" onmouseout="this.style.background='#F8FAFC'">&#9776;</button>
+                    style="display:none;width:28px;height:28px;flex-shrink:0;border-radius:7px;border:1px solid #D1FAE5;background:#F0FDF4;color:#2E7D32;font-size:13px;cursor:pointer;align-items:center;justify-content:center;transition:background .13s;"
+                    onmouseover="this.style.background='#D1FAE5'" onmouseout="this.style.background='#F0FDF4'">&#9776;</button>
                 <button id="estateBackBtn" onclick="navToSection('estate_hub')"
-                    style="display:none;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;border:1px solid #C7D2FE;background:#EEF2FF;color:#4F46E5;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">
+                    style="display:none;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;border:1px solid #A5D6A7;background:#E8F5E9;color:#1B5E20;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">
                     &#8592; Home
                 </button>
-                <span id="topEstateLabel" style="font-size:13px;font-weight:600;color:#6366F1;background:#EEF2FF;padding:5px 14px;border-radius:99px;border:1px solid #C7D2FE;white-space:nowrap;display:none;"></span>
+                <span id="topEstateLabel" style="font-size:13px;font-weight:600;color:#1B5E20;background:#E8F5E9;padding:5px 14px;border-radius:99px;border:1px solid #A5D6A7;white-space:nowrap;display:none;"></span>
             </div>
             <!-- Centre: empty -->
             <div style="flex:1;"></div>
             <!-- Right: avatar + dropdown -->
             <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;position:relative;">
                 <button id="avatarBtn" onclick="toggleAvatarDropdown(event)"
-                    style="display:flex;align-items:center;gap:9px;padding:5px 10px 5px 6px;border-radius:99px;border:1px solid #E2E8F0;background:#F8FAFC;cursor:pointer;font-family:Inter,sans-serif;transition:background .13s;"
-                    onmouseover="this.style.background='#EEF2FF'" onmouseout="this.style.background='#F8FAFC'">
-                    <div id="avatarCircle" style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#4F46E5);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;">?</div>
+                    style="display:flex;align-items:center;gap:9px;padding:5px 10px 5px 6px;border-radius:99px;border:1px solid #D1FAE5;background:#F0FDF4;cursor:pointer;font-family:Inter,sans-serif;transition:background .13s;"
+                    onmouseover="this.style.background='#D1FAE5'" onmouseout="this.style.background='#F0FDF4'">
+                    <div id="avatarCircle" style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#2E7D32,#43A047);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;">?</div>
                     <div style="text-align:left;line-height:1.25;">
                         <div id="avatarName" style="font-size:12.5px;font-weight:600;color:#0F172A;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;">—</div>
-                        <div id="avatarRole" style="font-size:10.5px;color:#6366F1;font-weight:500;text-transform:capitalize;">—</div>
+                        <div id="avatarRole" style="font-size:10.5px;color:#2E7D32;font-weight:500;text-transform:capitalize;">—</div>
                     </div>
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="color:#94A3B8;flex-shrink:0;"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
@@ -709,9 +1031,9 @@
                     <button onclick="document.getElementById('profileModal').style.display='none'" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94A3B8;">&#x2715;</button>
                 </div>
                 <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;">
-                    <div id="profileAvatarCircle" style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#4F46E5);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;margin-bottom:10px;"></div>
+                    <div id="profileAvatarCircle" style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#2E7D32,#43A047);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;margin-bottom:10px;"></div>
                     <div id="profileName" style="font-size:16px;font-weight:700;color:#0F172A;"></div>
-                    <div id="profileRole" style="font-size:12px;color:#6366F1;font-weight:600;margin-top:2px;text-transform:capitalize;"></div>
+                    <div id="profileRole" style="font-size:12px;color:#2E7D32;font-weight:600;margin-top:2px;text-transform:capitalize;"></div>
                 </div>
                 <div style="background:#F8FAFC;border-radius:10px;padding:14px 16px;border:1px solid #E2E8F0;">
                     <div style="margin-bottom:10px;">
@@ -737,29 +1059,29 @@
                 <div style="display:flex;flex-direction:column;gap:12px;">
                     <div>
                         <label style="display:block;font-size:12.5px;font-weight:500;color:#374151;margin-bottom:4px;">Current Password</label>
-                        <input id="cpCurrentPw" type="password" placeholder="Enter current password" style="width:100%;padding:9px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#6366F1'" onblur="this.style.borderColor='#E2E8F0'" />
+                        <input id="cpCurrentPw" type="password" placeholder="Enter current password" style="width:100%;padding:9px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2E7D32'" onblur="this.style.borderColor='#E2E8F0'" />
                     </div>
                     <div>
                         <label style="display:block;font-size:12.5px;font-weight:500;color:#374151;margin-bottom:4px;">New Password</label>
-                        <input id="cpNewPw" type="password" placeholder="Min 6 characters" style="width:100%;padding:9px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#6366F1'" onblur="this.style.borderColor='#E2E8F0'" />
+                        <input id="cpNewPw" type="password" placeholder="Min 6 characters" style="width:100%;padding:9px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2E7D32'" onblur="this.style.borderColor='#E2E8F0'" />
                     </div>
                     <div>
                         <label style="display:block;font-size:12.5px;font-weight:500;color:#374151;margin-bottom:4px;">Confirm New Password</label>
-                        <input id="cpConfirmPw" type="password" placeholder="Re-enter new password" style="width:100%;padding:9px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#6366F1'" onblur="this.style.borderColor='#E2E8F0'" />
+                        <input id="cpConfirmPw" type="password" placeholder="Re-enter new password" style="width:100%;padding:9px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2E7D32'" onblur="this.style.borderColor='#E2E8F0'" />
                     </div>
                     <p id="cpError"   style="display:none;font-size:12px;color:#DC2626;margin:0;"></p>
                     <p id="cpSuccess" style="display:none;font-size:12px;color:#16A34A;font-weight:600;margin:0;"></p>
                 </div>
                 <div style="display:flex;gap:8px;margin-top:18px;">
                     <button onclick="closeChangePasswordModal()" style="flex:1;padding:9px;border-radius:8px;border:1px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;">Cancel</button>
-                    <button onclick="submitChangePassword()" style="flex:1;padding:9px;border-radius:8px;border:none;background:#6366F1;color:#fff;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;" onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#6366F1'">Save</button>
+                    <button onclick="submitChangePassword()" style="flex:1;padding:9px;border-radius:8px;border:none;background:linear-gradient(135deg,#2E7D32,#43A047);color:#fff;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;" onmouseover="this.style.filter='brightness(1.08)'" onmouseout="this.style.filter='none'">Save</button>
                 </div>
             </div>
         </div>
 
         <!-- Estate blank state -->
         <div id="estateBlankState" style="display:none;position:absolute;inset:0;background:#F8FAFC;z-index:10;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
-            <div style="width:60px;height:60px;background:linear-gradient(135deg,#6366F1,#4F46E5);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 8px 24px rgba(99,102,241,.3);">&#127796;</div>
+            <div style="width:60px;height:60px;background:linear-gradient(135deg,#2E7D32,#43A047);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 8px 24px rgba(46,125,50,.3);">&#127796;</div>
             <h2 style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;color:#0F172A;">Select an Estate</h2>
             <p style="color:#64748B;font-size:13px;text-align:center;max-width:280px;line-height:1.6;">Choose an estate from the sidebar to load its inventory data.</p>
         </div>
@@ -773,8 +1095,8 @@
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
                 <h2 class="text-3xl font-bold" data-i18n="nav_dashboard">Dashboard</h2>
                 <button id="dashPrintBtn" onclick="printDashboard()"
-                    style="display:flex;align-items:center;gap:7px;padding:8px 18px;background:#6366F1;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(99,102,241,.25);transition:background .13s;"
-                    onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#6366F1'">
+                    style="display:flex;align-items:center;gap:7px;padding:8px 18px;background:linear-gradient(135deg,#2E7D32,#43A047);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(46,125,50,.25);transition:filter .13s;"
+                    onmouseover="this.style.filter='brightness(1.07)'" onmouseout="this.style.filter='none'">
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
                     </svg>
@@ -1006,7 +1328,7 @@
 
         <!-- ============ ESTATE MOBILE HUB ============ -->
         <section id="estate_hub" class="page-section">
-            <div style="min-height:100vh;background:linear-gradient(160deg,#F0F4FF 0%,#EEF2FF 60%,#F8FAFC 100%);padding-bottom:48px;">
+            <div style="min-height:100vh;background:linear-gradient(160deg,#F0FDF4 0%,#E8F5E9 40%,#F8FAFC 100%);padding-bottom:48px;">
 
                 <!-- Greeting -->
                 <div style="padding:32px 20px 20px;">
@@ -1020,14 +1342,14 @@
                     <!-- Dashboard — full-width horizontal -->
                     <button id="estateHubDashCard" class="estate-card" onclick="navToSection('dashboard')"
                         style="flex-direction:row;justify-content:flex-start;padding:20px 22px;gap:18px;border-radius:18px;">
-                        <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#6366F1,#4F46E5);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(99,102,241,.3);">
+                        <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#2E7D32,#43A047);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(46,125,50,.3);">
                             <span style="font-size:26px;">&#128202;</span>
                         </div>
                         <div style="text-align:left;flex:1;">
                             <div data-i18n="hub_dashboard" style="font-size:17px;font-weight:700;color:#0F172A;margin-bottom:3px;">Dashboard</div>
                             <div data-i18n="hub_dash_sub" style="font-size:12px;color:#64748B;">Overview &amp; stock charts</div>
                         </div>
-                        <span style="font-size:22px;color:#C7D2FE;">&#8250;</span>
+                        <span style="font-size:22px;color:#A5D6A7;">&#8250;</span>
                     </button>
 
                     <!-- 2×2 grid: Fertilizer, Chemical, Oil Palm Seedling, Stock Summary -->
@@ -1065,11 +1387,11 @@
 
                         <!-- Stock Summary -->
                         <button id="estateHubSumCard" class="estate-card" onclick="navToSection('summary')">
-                            <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#7c3aed,#6d28d9);display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 14px rgba(124,58,237,.25);">
+                            <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#1B5E20,#2E7D32);display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 14px rgba(46,125,50,.28);">
                                 <span style="font-size:28px;">&#128209;</span>
                             </div>
                             <div data-i18n="hub_summary" style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:5px;line-height:1.3;">Stock Summary</div>
-                            <span data-i18n="hub_view_report" style="font-size:11px;color:#7c3aed;background:#EDE9FE;padding:3px 10px;border-radius:99px;font-weight:600;">View Report</span>
+                            <span data-i18n="hub_view_report" style="font-size:11px;color:#1B5E20;background:#DCFCE7;padding:3px 10px;border-radius:99px;font-weight:600;">View Report</span>
                         </button>
 
                     </div>
@@ -1077,9 +1399,9 @@
 
                 <!-- Language switch -->
                 <div style="padding:28px 20px 16px;display:flex;justify-content:center;">
-                    <div style="display:flex;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);">
-                        <button id="estateHubLangEN" onclick="setLang('en')" style="padding:10px 28px;font-size:14px;font-weight:600;background:#6366F1;color:#fff;border:none;cursor:pointer;font-family:Inter,sans-serif;">&#127468;&#127463; EN</button>
-                        <button id="estateHubLangMS" onclick="setLang('ms')" style="padding:10px 28px;font-size:14px;font-weight:600;background:#fff;color:#6366F1;border:none;cursor:pointer;font-family:Inter,sans-serif;">&#127474;&#127486; BM</button>
+                    <div style="display:flex;border:1px solid #A5D6A7;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(46,125,50,.1);">
+                        <button id="estateHubLangEN" onclick="setLang('en')" style="padding:10px 28px;font-size:14px;font-weight:600;background:#2E7D32;color:#fff;border:none;cursor:pointer;font-family:Inter,sans-serif;">&#127468;&#127463; EN</button>
+                        <button id="estateHubLangMS" onclick="setLang('ms')" style="padding:10px 28px;font-size:14px;font-weight:600;background:#fff;color:#2E7D32;border:none;cursor:pointer;font-family:Inter,sans-serif;">&#127474;&#127486; BM</button>
                     </div>
                 </div>
 
@@ -1442,7 +1764,7 @@
                     <input id="filterRpRound" type="text" placeholder="🔍 Search round or fertilizer…"
                         oninput="applyFilterRpRound()"
                         style="width:100%;padding:7px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none;background:#F8FAFC;"
-                        onfocus="this.style.borderColor='#6366F1';this.style.background='#fff'"
+                        onfocus="this.style.borderColor='#2E7D32';this.style.background='#fff'"
                         onblur="this.style.borderColor='#E2E8F0';this.style.background='#F8FAFC'" />
                 </div>
                 <div class="overflow-x-auto">
@@ -1469,7 +1791,7 @@
                     <input id="filterRpBlock" type="text" placeholder="🔍 Search round, fertilizer or block…"
                         oninput="applyFilterRpBlock()"
                         style="width:100%;padding:7px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none;background:#F8FAFC;"
-                        onfocus="this.style.borderColor='#6366F1';this.style.background='#fff'"
+                        onfocus="this.style.borderColor='#2E7D32';this.style.background='#fff'"
                         onblur="this.style.borderColor='#E2E8F0';this.style.background='#F8FAFC'" />
                 </div>
                 <div class="overflow-x-auto">
@@ -1578,7 +1900,7 @@
                     <input id="filterMpRound" type="text" placeholder="🔍 Search round…"
                         oninput="applyFilterMpRound()"
                         style="width:100%;padding:7px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none;background:#F8FAFC;"
-                        onfocus="this.style.borderColor='#6366F1';this.style.background='#fff'"
+                        onfocus="this.style.borderColor='#2E7D32';this.style.background='#fff'"
                         onblur="this.style.borderColor='#E2E8F0';this.style.background='#F8FAFC'" />
                 </div>
                 <div class="overflow-x-auto">
@@ -1604,7 +1926,7 @@
                     <input id="filterMpBlock" type="text" placeholder="🔍 Search round or block…"
                         oninput="applyFilterMpBlock()"
                         style="width:100%;padding:7px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none;background:#F8FAFC;"
-                        onfocus="this.style.borderColor='#6366F1';this.style.background='#fff'"
+                        onfocus="this.style.borderColor='#2E7D32';this.style.background='#fff'"
                         onblur="this.style.borderColor='#E2E8F0';this.style.background='#F8FAFC'" />
                 </div>
                 <div class="overflow-x-auto">
@@ -1682,7 +2004,7 @@
                     <input id="filterChemRound" type="text" placeholder="🔍 Search round or ingredient…"
                         oninput="applyFilterChemRound()"
                         style="width:100%;padding:7px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none;background:#F8FAFC;"
-                        onfocus="this.style.borderColor='#6366F1';this.style.background='#fff'"
+                        onfocus="this.style.borderColor='#2E7D32';this.style.background='#fff'"
                         onblur="this.style.borderColor='#E2E8F0';this.style.background='#F8FAFC'" />
                 </div>
                 <div class="overflow-x-auto">
@@ -1712,7 +2034,7 @@
                     <input id="filterChemBlock" type="text" placeholder="🔍 Search round, block or ingredient…"
                         oninput="applyFilterChemBlock()"
                         style="width:100%;padding:7px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none;background:#F8FAFC;"
-                        onfocus="this.style.borderColor='#6366F1';this.style.background='#fff'"
+                        onfocus="this.style.borderColor='#2E7D32';this.style.background='#fff'"
                         onblur="this.style.borderColor='#E2E8F0';this.style.background='#F8FAFC'" />
                 </div>
                 <div class="overflow-x-auto">
@@ -3846,14 +4168,14 @@ function renderManuringPctChart() {
                     var v=cumPct[i];
                     if(!rData.monthlyBags[i]||rData.monthlyBags[i]<=0) return 'rgba(203,213,225,.35)';
                     if(v>=100) return '#22C55E';                              // completed → green
-                    if(i===rData.tpMIdx) return '#7C3AED';                   // target month → deep violet
-                    return v>=50?'#818CF8':'#C7D2FE';                         // ≥50% indigo, <50% light indigo
+                    if(i===rData.tpMIdx) return '#1B5E20';                   // target month → dark green
+                    return v>=50?'#388E3C':'#A5D6A7';                         // ≥50% medium green, <50% light green
                 });
                 var borderColors=MN.map(function(_,i){
                     var v=cumPct[i];
                     if(!rData.monthlyBags[i]||rData.monthlyBags[i]<=0) return 'transparent';
                     if(v>=100) return '#16A34A';
-                    return i===rData.tpMIdx?'#5B21B6':'#6366F1';
+                    return i===rData.tpMIdx?'#1B5E20':'#2E7D32';
                 });
 
                 if(manuringMonthInstances[rData.id]){manuringMonthInstances[rData.id].destroy();}
@@ -3910,7 +4232,7 @@ function renderManuringPctChart() {
                                 /* Cumulative % ABOVE bar */
                                 if(cv!=null){
                                     ctx.font='bold 8px Inter,sans-serif';
-                                    ctx.fillStyle=isTarget?'#5B21B6':'#4338CA';
+                                    ctx.fillStyle=isTarget?'#1B5E20':'#2E7D32';
                                     ctx.textAlign='center';
                                     ctx.textBaseline='bottom';
                                     ctx.fillText(Math.round(cv)+'%',bar.x,bar.y-1);
@@ -5237,7 +5559,7 @@ document.addEventListener('DOMContentLoaded', () => {
 const I18N = {
     en: {
         /* Sidebar */
-        app_subtitle:        'Inventory Management System',
+        app_subtitle:        'PalmInventory',
         nav_dashboard:       '📊 Dashboard',
         nav_items:           '📦 Item File',
         nav_transactions:    '🔄 Stock Transaction',
@@ -5492,7 +5814,7 @@ const I18N = {
 
     ms: {
         /* Sidebar */
-        app_subtitle:        'Sistem Pengurusan Inventori',
+        app_subtitle:        'PalmInventory',
         nav_dashboard:       '📊 Papan Hitam',
         nav_items:           '📦 Fail Item',
         nav_transactions:    '🔄 Transaksi Stok',
@@ -5796,23 +6118,23 @@ function setLang(lang) {
     var enBtn = document.getElementById('langEN');
     var msBtn = document.getElementById('langMS');
     if (enBtn) {
-        enBtn.style.background = lang === 'en' ? '#6366F1' : '#fff';
-        enBtn.style.color      = lang === 'en' ? '#fff'    : '#6366F1';
+        enBtn.style.background = lang === 'en' ? '#fff' : 'transparent';
+        enBtn.style.color      = lang === 'en' ? '#1B5E20' : 'rgba(255,255,255,0.75)';
     }
     if (msBtn) {
-        msBtn.style.background = lang === 'ms' ? '#6366F1' : '#fff';
-        msBtn.style.color      = lang === 'ms' ? '#fff'    : '#6366F1';
+        msBtn.style.background = lang === 'ms' ? '#fff' : 'transparent';
+        msBtn.style.color      = lang === 'ms' ? '#1B5E20' : 'rgba(255,255,255,0.75)';
     }
     // Sync estate hub language buttons
     var hubEnBtn = document.getElementById('estateHubLangEN');
     var hubMsBtn = document.getElementById('estateHubLangMS');
     if (hubEnBtn) {
-        hubEnBtn.style.background = lang === 'en' ? '#6366F1' : '#fff';
-        hubEnBtn.style.color      = lang === 'en' ? '#fff'    : '#6366F1';
+        hubEnBtn.style.background = lang === 'en' ? '#2E7D32' : '#fff';
+        hubEnBtn.style.color      = lang === 'en' ? '#fff'    : '#2E7D32';
     }
     if (hubMsBtn) {
-        hubMsBtn.style.background = lang === 'ms' ? '#6366F1' : '#fff';
-        hubMsBtn.style.color      = lang === 'ms' ? '#fff'    : '#6366F1';
+        hubMsBtn.style.background = lang === 'ms' ? '#2E7D32' : '#fff';
+        hubMsBtn.style.color      = lang === 'ms' ? '#fff'    : '#2E7D32';
     }
 
     // Re-render summary table so data-label attributes and action buttons
@@ -6021,8 +6343,14 @@ async function attemptLogin() {
     if (!email)    { showLoginError('Please enter your email.'); return; }
     if (!password) { showLoginError('Please enter your password.'); return; }
 
-    const loginBtn = document.querySelector('button[onclick="attemptLogin()"]');
-    if (loginBtn) { loginBtn.disabled = true; loginBtn.style.opacity = '0.6'; }
+    const loginBtn    = document.getElementById('loginBtn');
+    const loginBtnTxt = document.getElementById('loginBtnText');
+    const loginSpn    = document.getElementById('loginSpinner');
+    if (loginBtn) {
+        loginBtn.disabled = true;
+        if (loginBtnTxt) loginBtnTxt.textContent = 'Signing in…';
+        if (loginSpn)    loginSpn.style.display  = 'block';
+    }
 
     try {
         // All users — including the Super Admin — authenticate via Supabase Auth.
@@ -6081,7 +6409,11 @@ async function attemptLogin() {
         saveSession(session);
         bootApp(session);
     } finally {
-        if (loginBtn) { loginBtn.disabled = false; loginBtn.style.opacity = '1'; }
+        if (loginBtn) {
+            loginBtn.disabled = false;
+            if (loginBtnTxt) loginBtnTxt.textContent = 'Sign In';
+            if (loginSpn)    loginSpn.style.display  = 'none';
+        }
     }
 }
 
@@ -6089,6 +6421,16 @@ function showLoginError(msg) {
     const errEl = document.getElementById('loginError');
     errEl.textContent = msg;
     errEl.classList.remove('hidden');
+}
+
+function toggleLoginPw() {
+    const pw  = document.getElementById('loginPassword');
+    const on  = document.getElementById('eyeIconShow');
+    const off = document.getElementById('eyeIconHide');
+    const hidden = pw.type === 'password';
+    pw.type = hidden ? 'text' : 'password';
+    if (on)  on.style.display  = hidden ? 'none' : '';
+    if (off) off.style.display = hidden ? ''     : 'none';
 }
 
 
