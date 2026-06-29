@@ -252,6 +252,234 @@
             canvas { max-width: 100% !important; }
         }
         .view-locked-field { opacity: .55 !important; cursor: not-allowed !important; }
+
+        /* ── Estate mobile mode (manager_estate / user_estate) ── */
+        /* Sidebar hidden; standard top header stays visible, full-width */
+        body.estate-mobile #sidebar,
+        body.estate-mobile #sidebarOverlay,
+        body.estate-mobile #mobileTopBar { display: none !important; }
+        body.estate-mobile #topCollapseBtn { display: none !important; }
+
+        /* App title banner above the header */
+        #estateAppBanner {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 34px;
+            background: #1E1B4B;
+            color: #C7D2FE;
+            font-size: 12.5px;
+            font-weight: 700;
+            font-family: Inter, sans-serif;
+            letter-spacing: .4px;
+            text-transform: uppercase;
+            align-items: center;
+            justify-content: center;
+            z-index: 95;
+        }
+        body.estate-mobile #estateAppBanner { display: flex !important; }
+        /* Push header bar below the banner */
+        body.estate-mobile #topHeaderBar { top: 34px !important; left: 0 !important; }
+        /* Extend main content padding to clear both banner + header */
+        body.estate-mobile #mainWrapper { padding-top: 90px; }
+
+        /* Estate hub card */
+        .estate-card {
+            display:flex;flex-direction:column;align-items:center;justify-content:center;
+            width:100%;padding:24px 12px;background:#fff;
+            border:2px solid #E2E8F0;border-radius:20px;cursor:pointer;
+            transition:all .18s ease;box-shadow:0 2px 8px rgba(0,0,0,.06);
+            font-family:Inter,sans-serif;text-align:center;
+        }
+        .estate-card:hover,.estate-card:active {
+            border-color:#6366F1;box-shadow:0 8px 28px rgba(99,102,241,.2);transform:translateY(-2px);
+        }
+        .estate-card:active { transform:scale(.97); }
+
+        /* ── Application Breakdown: mobile-card layout ───────────── */
+        /* Row labels hidden by default; shown only in estate-mobile */
+        .em-row-label { display: none; }
+
+        body.estate-mobile #txnMultiWrap .overflow-x-auto { overflow: visible; }
+        body.estate-mobile #txnMultiWrap table,
+        body.estate-mobile #txnMultiWrap tbody { display: block; width: 100%; }
+        body.estate-mobile #txnMultiWrap thead { display: none; }
+        body.estate-mobile #txnMultiWrap tr {
+            display: block;
+            background: #fff;
+            border: 1.5px solid #BFDBFE !important;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        body.estate-mobile #txnMultiWrap td {
+            display: block;
+            padding: 0;
+            margin-bottom: 10px;
+        }
+        body.estate-mobile #txnMultiWrap td:last-child { margin-bottom: 0; }
+        body.estate-mobile .em-row-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1E40AF;
+            margin-bottom: 5px;
+        }
+        body.estate-mobile #txnMultiWrap .txn-row-qty {
+            width: 100% !important;
+            padding: 11px 14px;
+            font-size: 16px;
+            border-radius: 10px;
+            border: 1.5px solid #93C5FD;
+            box-sizing: border-box;
+        }
+        body.estate-mobile #txnMultiWrap .txn-row-loc {
+            width: 100%;
+            padding: 11px 14px;
+            font-size: 15px;
+            border-radius: 10px;
+            border: 1.5px solid #93C5FD;
+            background: #fff;
+            box-sizing: border-box;
+        }
+        body.estate-mobile #txnMultiWrap .txn-row-unit-label {
+            font-size: 13px;
+            padding: 9px 12px;
+            white-space: nowrap;
+        }
+        body.estate-mobile #txnMultiWrap .flex.gap-1 { gap: 8px; }
+        body.estate-mobile #txnMultiWrap td:last-child > button {
+            display: block !important;
+            width: 100%;
+            background: #FEE2E2;
+            color: #DC2626;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+            text-decoration: none;
+        }
+        body.estate-mobile #txnAddRowBtn {
+            width: 100%;
+            padding: 11px;
+            font-size: 15px;
+            border-radius: 10px;
+        }
+        body.estate-mobile #txnMultiWrap > div:first-child {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        /* ── Manuring Round: mobile improvements ─────────────────── */
+        body.estate-mobile #txnManuringWrap { padding: 16px; }
+        body.estate-mobile #txnManuringWrap > label {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        body.estate-mobile #txnManuringRound {
+            padding: 12px 14px;
+            font-size: 15px;
+            border-radius: 10px;
+            border: 1.5px solid #86EFAC;
+        }
+        body.estate-mobile #txnManuringWrap p {
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+
+        /* ── Maintenance Round: mobile improvements ──────────────── */
+        body.estate-mobile #txnMaintWrap { padding: 16px; }
+        body.estate-mobile #txnMaintWrap > label {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        body.estate-mobile #txnMaintRound {
+            padding: 12px 14px;
+            font-size: 15px;
+            border-radius: 10px;
+            border: 1.5px solid #FDBA74;
+        }
+        body.estate-mobile #txnMaintWrap p {
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+
+        /* ── Stock Summary: mobile layout ────────────────────────── */
+        body.estate-mobile #summary h2 { font-size: 1.3rem; margin-bottom: 14px; }
+        body.estate-mobile #summary .bg-white.p-6 { padding: 14px; }
+
+        /* Filter inputs */
+        body.estate-mobile #summary select,
+        body.estate-mobile #summary input[type="date"] {
+            padding: 10px 12px;
+            font-size: 15px;
+            border-radius: 10px;
+        }
+
+        /* Filter buttons row: Apply + Clear side-by-side, Export full-width below */
+        body.estate-mobile #summary .mt-4.flex { flex-wrap: wrap; gap: 8px; }
+        body.estate-mobile #summary .mt-4.flex button {
+            flex: 1 1 auto;
+            padding: 10px 14px;
+            font-size: 14px;
+            border-radius: 10px;
+            margin-left: 0 !important;
+        }
+        body.estate-mobile #summary #exportExcelBtn {
+            flex-basis: 100%;
+            margin-left: 0 !important;
+        }
+
+        /* Table → stacked cards */
+        body.estate-mobile #summary .overflow-x-auto { overflow: visible; }
+        body.estate-mobile #summary table,
+        body.estate-mobile #summary tbody { display: block; width: 100%; }
+        body.estate-mobile #summary thead { display: none; }
+        body.estate-mobile #summary tbody tr {
+            display: block;
+            background: #fff;
+            border: 1.5px solid #BBF7D0;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.05);
+        }
+        body.estate-mobile #summary tbody tr:hover { background: #F0FDF4; }
+        body.estate-mobile #summary td {
+            display: flex;
+            align-items: baseline;
+            padding: 5px 0;
+            border-bottom: 1px solid #F0FDF4;
+            font-size: 14px;
+            text-align: left !important;
+        }
+        body.estate-mobile #summary td:last-child {
+            border-bottom: none;
+            padding-top: 10px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        body.estate-mobile #summary td.em-empty { display: none !important; }
+        body.estate-mobile #summary td::before {
+            content: attr(data-label);
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            color: #9CA3AF;
+            min-width: 72px;
+            flex-shrink: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding-top: 2px;
+        }
+        body.estate-mobile #summary td:not([data-label])::before,
+        body.estate-mobile #summary td:last-child::before { display: none; }
     </style>
 </head>
 <body>
@@ -292,6 +520,31 @@
             <button onclick="attemptLogin()"
                 style="width:100%;padding:10px;background:linear-gradient(135deg,#6366F1,#4F46E5);border:none;border-radius:9px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;box-shadow:0 4px 14px rgba(99,102,241,.4);transition:opacity .15s;"
                 onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'">Sign in &#8594;</button>
+        </div>
+        <!-- First-time Super Admin setup -->
+        <div style="margin-top:12px;">
+            <button onclick="toggleSetupPanel()"
+                style="width:100%;padding:7px;background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:9px;color:rgba(165,180,252,.7);font-size:12px;cursor:pointer;font-family:Inter,sans-serif;transition:border-color .15s;"
+                onmouseover="this.style.borderColor='rgba(165,180,252,.5)'" onmouseout="this.style.borderColor='rgba(255,255,255,.15)'">
+                First-time setup &#x2699;&#xFE0F;
+            </button>
+            <div id="setupPanel" style="display:none;margin-top:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px;">
+                <p style="color:#fde68a;font-size:12px;font-weight:600;font-family:Inter,sans-serif;margin-bottom:8px;">&#x26A0;&#xFE0F; Email signups are disabled on this Supabase project.</p>
+                <p style="color:#c7d2fe;font-size:12px;font-family:Inter,sans-serif;margin-bottom:10px;line-height:1.6;">
+                    Create the Super Admin account manually in the Supabase dashboard:
+                </p>
+                <ol style="color:#a5b4fc;font-size:12px;font-family:Inter,sans-serif;margin:0 0 10px 16px;line-height:2;">
+                    <li>Go to <b>Supabase Dashboard</b></li>
+                    <li>Open <b>Authentication &rarr; Users</b></li>
+                    <li>Click <b>"Add user"</b> &rarr; <b>"Create new user"</b></li>
+                    <li>Email: <span style="color:#e0e7ff;font-weight:600;">hqadmin.puigroups@gmail.com</span></li>
+                    <li>Set a password and click <b>Create user</b></li>
+                    <li>Come back here and <b>Sign in</b></li>
+                </ol>
+                <p style="color:rgba(148,163,184,.6);font-size:11px;font-family:Inter,sans-serif;">
+                    Tip: In <b>Authentication &rarr; Providers &rarr; Email</b> you can also enable signups to allow account creation from the app.
+                </p>
+            </div>
         </div>
         <p style="color:rgba(148,163,184,.55);font-size:11.5px;text-align:center;margin-top:16px;font-family:Inter,sans-serif;">Contact your Super Admin to register or reset your account.</p>
     </div>
@@ -394,6 +647,11 @@
 
     <!-- MAIN WRAPPER -->
     <div id="mainWrapper">
+
+        <!-- Estate mobile: app title banner above the header bar -->
+        <div id="estateAppBanner">
+            <span data-i18n="app_subtitle">Inventory Management System</span>
+        </div>
 
         <!-- Top bar (desktop: shows collapse toggle; mobile: shows hamburger menu toggle) -->
         <div id="topHeaderBar">
@@ -740,6 +998,88 @@
                         <tbody id="itemsTableBody"></tbody>
                     </table>
                 </div>
+            </div>
+        </section>
+
+        <!-- ============ ESTATE MOBILE HUB ============ -->
+        <section id="estate_hub" class="page-section">
+            <div style="min-height:100vh;background:linear-gradient(160deg,#F0F4FF 0%,#EEF2FF 60%,#F8FAFC 100%);padding-bottom:48px;">
+
+                <!-- Greeting -->
+                <div style="padding:32px 20px 20px;">
+                    <p data-i18n="hub_welcome_lbl" style="font-size:13px;color:#64748B;margin-bottom:4px;font-family:Inter,sans-serif;">Welcome</p>
+                    <h2 id="estateHubGreetName" style="font-size:28px;font-weight:800;color:#0F172A;letter-spacing:-.3px;font-family:Inter,sans-serif;">—</h2>
+                </div>
+
+                <!-- Module cards -->
+                <div style="padding:0 16px;display:flex;flex-direction:column;gap:14px;">
+
+                    <!-- Dashboard — full-width horizontal -->
+                    <button id="estateHubDashCard" class="estate-card" onclick="navToSection('dashboard')"
+                        style="flex-direction:row;justify-content:flex-start;padding:20px 22px;gap:18px;border-radius:18px;">
+                        <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#6366F1,#4F46E5);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(99,102,241,.3);">
+                            <span style="font-size:26px;">&#128202;</span>
+                        </div>
+                        <div style="text-align:left;flex:1;">
+                            <div data-i18n="hub_dashboard" style="font-size:17px;font-weight:700;color:#0F172A;margin-bottom:3px;">Dashboard</div>
+                            <div data-i18n="hub_dash_sub" style="font-size:12px;color:#64748B;">Overview &amp; stock charts</div>
+                        </div>
+                        <span style="font-size:22px;color:#C7D2FE;">&#8250;</span>
+                    </button>
+
+                    <!-- 2×2 grid: Fertilizer, Chemical, Oil Palm Seedling, Stock Summary -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+                        <!-- Fertilizer -->
+                        <button id="estateHubFertCard" class="estate-card" onclick="navToEstateModule('Fertilizer')">
+                            <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#16a34a,#166534);display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 14px rgba(22,163,74,.25);">
+                                <span style="font-size:28px;">&#127807;</span>
+                            </div>
+                            <div data-i18n="cat_fertilizer" style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:5px;">Fertilizer</div>
+                            <span data-i18n="hub_record_stock" style="font-size:11px;color:#16a34a;background:#DCFCE7;padding:3px 10px;border-radius:99px;font-weight:600;">Record Stock</span>
+                        </button>
+
+                        <!-- Chemical -->
+                        <button id="estateHubChemCard" class="estate-card" onclick="navToEstateModule('Chemical')">
+                            <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#2563eb,#1d4ed8);display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 14px rgba(37,99,235,.25);">
+                                <span style="font-size:28px;">&#9879;&#65039;</span>
+                            </div>
+                            <div data-i18n="cat_chemical" style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:5px;">Chemical</div>
+                            <span data-i18n="hub_record_stock" style="font-size:11px;color:#2563eb;background:#DBEAFE;padding:3px 10px;border-radius:99px;font-weight:600;">Record Stock</span>
+                        </button>
+
+                        <!-- Oil Palm Seedling -->
+                        <button id="estateHubOPSCard" class="estate-card" onclick="navToEstateModule('Oil Palm Seedling')">
+                            <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#d97706,#b45309);display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 14px rgba(217,119,6,.25);">
+                                <span style="font-size:28px;">&#127807;</span>
+                            </div>
+                            <div style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:5px;line-height:1.3;">
+                                <span data-i18n="hub_ops_line1">Oil Palm</span><br>
+                                <span data-i18n="hub_ops_line2">Seedling</span>
+                            </div>
+                            <span data-i18n="hub_record_stock" style="font-size:11px;color:#b45309;background:#FEF3C7;padding:3px 10px;border-radius:99px;font-weight:600;">Record Stock</span>
+                        </button>
+
+                        <!-- Stock Summary -->
+                        <button id="estateHubSumCard" class="estate-card" onclick="navToSection('summary')">
+                            <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#7c3aed,#6d28d9);display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 14px rgba(124,58,237,.25);">
+                                <span style="font-size:28px;">&#128209;</span>
+                            </div>
+                            <div data-i18n="hub_summary" style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:5px;line-height:1.3;">Stock Summary</div>
+                            <span data-i18n="hub_view_report" style="font-size:11px;color:#7c3aed;background:#EDE9FE;padding:3px 10px;border-radius:99px;font-weight:600;">View Report</span>
+                        </button>
+
+                    </div>
+                </div>
+
+                <!-- Language switch -->
+                <div style="padding:28px 20px 16px;display:flex;justify-content:center;">
+                    <div style="display:flex;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);">
+                        <button id="estateHubLangEN" onclick="setLang('en')" style="padding:10px 28px;font-size:14px;font-weight:600;background:#6366F1;color:#fff;border:none;cursor:pointer;font-family:Inter,sans-serif;">&#127468;&#127463; EN</button>
+                        <button id="estateHubLangMS" onclick="setLang('ms')" style="padding:10px 28px;font-size:14px;font-weight:600;background:#fff;color:#6366F1;border:none;cursor:pointer;font-family:Inter,sans-serif;">&#127474;&#127486; BM</button>
+                    </div>
+                </div>
+
             </div>
         </section>
 
@@ -1466,7 +1806,8 @@
 
             <!-- Register new user -->
             <div class="bg-white p-6 rounded-xl shadow mb-8">
-                <h3 class="text-xl font-bold mb-4">Register New User</h3>
+                <h3 class="text-xl font-bold mb-1">Register New User</h3>
+                <p class="text-xs text-gray-400 mb-4">Creates a Supabase Auth account and assigns the user's role and access. Requires <b>Email Signup</b> to be enabled in Supabase Auth settings.</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold mb-1">Full Name</label>
@@ -1484,6 +1825,14 @@
                             class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                     </div>
                     <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold mb-1">Account Type</label>
+                        <select id="regRole" onchange="toggleRegPermissionsSection()"
+                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600 bg-white">
+                            <!-- Options populated by JS via buildRoleOptions() on DOMContentLoaded -->
+                        </select>
+                    </div>
+                    <!-- Estates — hidden for Admin role -->
+                    <div class="md:col-span-2" id="regEstatesSection">
                         <label class="block text-sm font-semibold mb-2">Estates <span class="text-red-500">*</span> <span class="text-gray-400 font-normal text-xs">(select one or more)</span></label>
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="regEstatesGrid">
                             <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="reg-estate-cb accent-green-700 w-4 h-4" value="Mega Jutamas (Suai)" /> Mega Jutamas (Suai)</label>
@@ -1499,18 +1848,24 @@
                             <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="reg-estate-cb accent-green-700 w-4 h-4" value="Elewsun" /> Elewsun</label>
                         </div>
                     </div>
-                    <!-- Section access -->
-                    <div class="md:col-span-2">
+                    <!-- Section access (hidden for admin role) -->
+                    <div class="md:col-span-2" id="regPermissionsSection">
                         <label class="block text-sm font-semibold mb-2">Sections Allowed to Access</label>
                         <div class="border border-green-200 rounded-lg p-3 bg-green-50" id="regPermissionsGrid">
                             <!-- Rendered by JS -->
                         </div>
-                        <p class="text-xs text-gray-400 mt-1">Dashboard is always accessible. <b>View</b> = read-only. <b>Edit</b> = full access.</p>
+                        <p class="text-xs text-gray-400 mt-1"><b>View</b> = read-only. <b>Edit</b> = full access.</p>
+                    </div>
+                    <!-- Admin role notice -->
+                    <div class="md:col-span-2 hidden" id="regAdminNotice">
+                        <div class="border border-purple-200 rounded-lg p-3 bg-purple-50 text-sm text-purple-800">
+                            ⭐ <b>Admin</b> has full access to all sections and all estates, including User Management.
+                        </div>
                     </div>
                     <div class="md:col-span-2 flex gap-3">
                         <button onclick="registerUser()"
                             class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold">
-                            ➕ Register User
+                            ➕ Assign Profile
                         </button>
                     </div>
                 </div>
@@ -1525,6 +1880,7 @@
                             <tr>
                                 <th class="px-3 py-2 text-left">Name</th>
                                 <th class="px-3 py-2 text-left">Email</th>
+                                <th class="px-3 py-2 text-left">Role</th>
                                 <th class="px-3 py-2 text-left">Estate</th>
                                 <th class="px-3 py-2 text-left">Sections Allowed</th>
                                 <th data-i18n="col_action" class="px-3 py-2 text-left">Action</th>
@@ -1648,18 +2004,8 @@ const SUPABASE_URL = 'https://eukvdlyzhyjohkjqbqjb.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1a3ZkbHl6aHlqb2hranFicWpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2OTg5MzYsImV4cCI6MjA5NDI3NDkzNn0.czKzWGeiujgZ_VpOBZjFaxDjGCca-_-aZ41N5T0gjmk';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
-/* -----------------------------------------------------------------
-   PASSWORD HASHING - SHA-256 via the browser's Web Crypto API.
-   Passwords are NEVER stored or transmitted in plain text; only the
-   resulting hex digest is saved to opp_users.password_hash.
-   ----------------------------------------------------------------- */
-async function sha256Hex(plainText) {
-    const encoder   = new TextEncoder();
-    const data      = encoder.encode(plainText);
-    const hashBuf   = await crypto.subtle.digest('SHA-256', data);
-    const hashArr   = Array.from(new Uint8Array(hashBuf));
-    return hashArr.map(b => b.toString(16).padStart(2, '0')).join('');
-}
+/* Authentication is now handled by Supabase Auth (supabase.auth.signInWithPassword).
+   Passwords are never stored in opp_users — that table holds only profile data. */
 
 /* -----------------------------------------------------------------
    GLOBAL STATE - Loaded from / persisted to localStorage
@@ -1873,6 +2219,31 @@ async function loadFromSupabase() {
         renderManuringPctChart();
         renderMaintPctTracker();
         renderChemUsageTracker();
+
+        // Silently refresh the current user's own permissions from Supabase.
+        // This ensures that if an admin changes this user's access while they
+        // are logged in, the nav updates without requiring a re-login.
+        const _liveSession = loadSession();
+        if (_liveSession && _liveSession.role !== 'superadmin' && _liveSession.email) {
+            try {
+                const _freshUser = await fetchUserByEmail(_liveSession.email);
+                if (_freshUser) {
+                    const _permsBefore = JSON.stringify(_liveSession.permissions);
+                    const _permsAfter  = JSON.stringify(_freshUser.permissions);
+                    if (_permsBefore !== _permsAfter || _liveSession.role !== _freshUser.role) {
+                        const _refreshed = {
+                            ..._liveSession,
+                            name:        _freshUser.name,
+                            estates:     _freshUser.estates,
+                            permissions: _freshUser.permissions,
+                            role:        _freshUser.role,
+                        };
+                        saveSession(_refreshed);
+                        applyNavPermissions(_refreshed);
+                    }
+                }
+            } catch (_e) { /* non-critical — ignore */ }
+        }
     } catch (err) {
         console.error('[Supabase] loadFromSupabase failed', err);
     }
@@ -1887,18 +2258,16 @@ const pageSections = document.querySelectorAll('.page-section');
 navButtons.forEach(btn => {
     btn.addEventListener('click', () => {
         const target = btn.getAttribute('data-target');
+        if (!target) return; // no data-target, nothing to do
 
-        // Authoritative permission check — actually blocks the switch
-        // (not just a cosmetic alert) for sections the user can't access.
+        // Authoritative permission check — blocks navigation to inaccessible sections.
         const session = loadSession();
         if (session && session.role !== 'superadmin') {
-            if (target === 'useradmin') return; // never accessible to normal users
-            if (target !== 'dashboard') {
-                const access = typeof getSectionAccess === 'function' ? getSectionAccess(session, target) : 'none';
-                if (access === 'none') {
-                    alert('You do not have permission to access this section.');
-                    return;
-                }
+            if (target === 'useradmin') return; // never accessible to non-superadmins
+            const access = typeof getSectionAccess === 'function' ? getSectionAccess(session, target) : 'none';
+            if (access === 'none') {
+                alert('You do not have permission to access this section.');
+                return;
             }
         }
 
@@ -2244,6 +2613,7 @@ function addTxnRow() {
     tr.className = 'border-b border-blue-100';
     tr.innerHTML = `
         <td class="px-3 py-2">
+            <span class="em-row-label">Quantity</span>
             <div class="flex gap-1 items-center">
                 <input type="number" min="0" step="0.001" class="txn-row-qty w-24 border border-blue-300 rounded p-1"
                     oninput="updateRowConversion(this)" />
@@ -2252,8 +2622,11 @@ function addTxnRow() {
             </div>
             <p class="txn-row-conv text-xs text-green-700 mt-1 italic"></p>
         </td>
-        <td class="px-3 py-2"><select class="txn-row-loc border border-blue-300 rounded p-1 bg-white">${buildLocationOptionsHtml()}</select></td>
-        <td class="px-3 py-2"><button type="button" class="text-red-600 hover:underline text-sm" onclick="this.closest('tr').remove()">Remove</button></td>`;
+        <td class="px-3 py-2">
+            <span class="em-row-label">Location (Block)</span>
+            <select class="txn-row-loc w-full border border-blue-300 rounded p-1 bg-white">${buildLocationOptionsHtml()}</select>
+        </td>
+        <td class="px-3 py-2"><button type="button" class="text-red-600 hover:underline text-sm" onclick="this.closest('tr').remove()">&#10005; Remove</button></td>`;
     tbody.appendChild(tr);
 }
 document.getElementById('txnAddRowBtn').addEventListener('click', addTxnRow);
@@ -3181,14 +3554,14 @@ function renderSummary() {
         })();
 
         tr.innerHTML = `
-            <td class="px-3 py-2">${t.date}</td>
-            <td class="px-3 py-2">${t.itemName}</td>
-            <td class="px-3 py-2 text-right text-green-700 font-semibold">${qtyIn}</td>
-            <td class="px-3 py-2 text-right text-red-600 font-semibold">${qtyOut}</td>
-            <td class="px-3 py-2">${t.location}</td>
-            <td class="px-3 py-2">${roundHtml}</td>
-            <td class="px-3 py-2 text-right font-bold">${balanceDisplay}</td>
-            <td class="px-3 py-2">${t.user}</td>
+            <td class="px-3 py-2" data-label="Date">${t.date}</td>
+            <td class="px-3 py-2" data-label="Item">${t.itemName}</td>
+            <td class="px-3 py-2 text-right text-green-700 font-semibold${!qtyIn ? ' em-empty' : ''}" data-label="Qty In">${qtyIn}</td>
+            <td class="px-3 py-2 text-right text-red-600 font-semibold${!qtyOut ? ' em-empty' : ''}" data-label="Qty Out">${qtyOut}</td>
+            <td class="px-3 py-2" data-label="Location">${t.location}</td>
+            <td class="px-3 py-2" data-label="Round">${roundHtml}</td>
+            <td class="px-3 py-2 text-right font-bold" data-label="Balance">${balanceDisplay}</td>
+            <td class="px-3 py-2" data-label="User">${t.user}</td>
             <td class="px-3 py-2 flex gap-2 flex-wrap">
                 ${t.picture ? `<button class="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-semibold px-3 py-1 rounded" onclick="viewTxnPicture(${t.id})">🖼 View</button>` : ''}
                 <button class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded"
@@ -4928,6 +5301,15 @@ const I18N = {
         cat_fertilizer:      'Fertilizer',
         cat_chemical:        'Chemical',
         cat_seedling:        'Oil Palm Seedling',
+        /* Estate Hub */
+        hub_welcome_lbl:     'Welcome',
+        hub_dashboard:       'Dashboard',
+        hub_dash_sub:        'Overview &amp; stock charts',
+        hub_record_stock:    'Record Stock',
+        hub_ops_line1:       'Oil Palm',
+        hub_ops_line2:       'Seedling',
+        hub_summary:         'Stock Summary',
+        hub_view_report:     'View Report',
         /* Stock Transaction */
         txn_form_title:      'Record Stock Movement',
         txn_lbl_type:        'Transaction Type',
@@ -5168,6 +5550,15 @@ const I18N = {
         cat_fertilizer:      'Baja',
         cat_chemical:        'Bahan Kimia',
         cat_seedling:        'Anak Pokok Sawit',
+        /* Estate Hub */
+        hub_welcome_lbl:     'Selamat Datang',
+        hub_dashboard:       'Papan Hitam',
+        hub_dash_sub:        'Gambaran &amp; carta stok',
+        hub_record_stock:    'Rekod Stok',
+        hub_ops_line1:       'Anak Pokok',
+        hub_ops_line2:       'Sawit',
+        hub_summary:         'Ringkasan Stok',
+        hub_view_report:     'Lihat Laporan',
         /* Stock Transaction */
         txn_form_title:      'Rekod Pergerakan Stok',
         txn_lbl_type:        'Jenis Transaksi',
@@ -5394,6 +5785,17 @@ function setLang(lang) {
         msBtn.style.background = lang === 'ms' ? '#6366F1' : '#fff';
         msBtn.style.color      = lang === 'ms' ? '#fff'    : '#6366F1';
     }
+    // Sync estate hub language buttons
+    var hubEnBtn = document.getElementById('estateHubLangEN');
+    var hubMsBtn = document.getElementById('estateHubLangMS');
+    if (hubEnBtn) {
+        hubEnBtn.style.background = lang === 'en' ? '#6366F1' : '#fff';
+        hubEnBtn.style.color      = lang === 'en' ? '#fff'    : '#6366F1';
+    }
+    if (hubMsBtn) {
+        hubMsBtn.style.background = lang === 'ms' ? '#6366F1' : '#fff';
+        hubMsBtn.style.color      = lang === 'ms' ? '#fff'    : '#6366F1';
+    }
 }
 /* =================================================================
    AUTH SYSTEM
@@ -5415,9 +5817,9 @@ const AUTH_KEYS = {
 };
 const USERS_TABLE = 'opp_users';
 
-// All navigable sections (excluding dashboard which is always visible,
-// and useradmin which is super-admin-only)
+// All permission-controlled navigable sections (useradmin is super-admin-only and excluded)
 const ALL_SECTIONS = [
+    { id: 'dashboard',      label: '📊 Dashboard' },
     { id: 'items',          label: '📦 Item File' },
     { id: 'transactions',   label: '🔄 Stock Transaction' },
     { id: 'summary',        label: '📑 Stock Summary' },
@@ -5429,14 +5831,46 @@ const ALL_SECTIONS = [
     { id: 'chemusage',      label: '⚗️ Chemical Usage' },
 ];
 
-// Super Admin credentials (hardcoded — cannot be changed by users)
+// Super Admin — identified by email; password is managed in Supabase Auth.
 const SUPER_ADMIN = {
-    email:    'superadmin@oilpalm.com',
-    password: 'Admin@1234',
-    name:     'Super Admin',
-    estate:   'All Estates',
-    role:     'superadmin',
+    email: 'hqadmin.puigroups@gmail.com',
+    name:  'HQ Admin',
+    role:  'superadmin',
 };
+
+// All account types available in the system.
+// 'superadmin' = Admin (HQ) — full access, no custom permissions needed.
+// All others = custom permissions configured per user.
+const ROLES = [
+    { value: 'superadmin',     label: 'Admin (HQ)',        icon: '⭐', badgeClass: 'bg-purple-100 text-purple-800',  fullLabel: 'Admin (HQ) — full access to everything' },
+    { value: 'admin_estate',   label: 'Admin (Estate)',    icon: '🏛', badgeClass: 'bg-indigo-100 text-indigo-800', fullLabel: 'Admin (Estate) — custom permissions' },
+    { value: 'manager_hq',     label: 'Manager (HQ)',      icon: '👔', badgeClass: 'bg-blue-100 text-blue-800',    fullLabel: 'Manager (HQ) — custom permissions' },
+    { value: 'manager_estate', label: 'Manager (Estate)',  icon: '🌿', badgeClass: 'bg-teal-100 text-teal-800',    fullLabel: 'Manager (Estate) — custom permissions' },
+    { value: 'user_hq',        label: 'User (HQ)',         icon: '👤', badgeClass: 'bg-gray-100 text-gray-700',    fullLabel: 'User (HQ) — custom permissions' },
+    { value: 'user_estate',    label: 'User (Estate)',     icon: '🌱', badgeClass: 'bg-green-100 text-green-800',  fullLabel: 'User (Estate) — custom permissions' },
+];
+
+function getRoleDef(roleValue) {
+    return ROLES.find(r => r.value === roleValue) || { label: roleValue, icon: '👤', badgeClass: 'bg-gray-100 text-gray-700' };
+}
+
+function isEstateMobile(session) {
+    return session && (session.role === 'manager_estate' || session.role === 'user_estate');
+}
+
+function navToEstateModule(category) {
+    // Set category BEFORE navToSection so filterTxnItemsByCategory (called
+    // inside refreshAll → populateItemDropdowns) already sees the right value.
+    const catSel = document.getElementById('txnCategory');
+    if (catSel) catSel.value = category;
+    navToSection('transactions');
+}
+
+function buildRoleOptions(selectedValue) {
+    return ROLES.map(r =>
+        `<option value="${r.value}" ${r.value === selectedValue ? 'selected' : ''}>${r.icon} ${r.fullLabel}</option>`
+    ).join('');
+}
 
 // ── Helpers ────────────────────────────────────────────────────────
 // Local cache only — instant render while Supabase request is pending.
@@ -5446,25 +5880,34 @@ function loadSession()       { try { return JSON.parse(sessionStorage.getItem(AU
 function saveSession(s)      { sessionStorage.setItem(AUTH_KEYS.session, JSON.stringify(s)); }
 function clearSession()      { sessionStorage.removeItem(AUTH_KEYS.session); }
 
-// Convert a Supabase row (snake_case) <-> the app's in-memory user shape (camelCase)
+// Convert a Supabase row (snake_case) <-> the app's in-memory user shape (camelCase).
+// Note: password_hash is preserved in round-trips but is no longer used for auth
+// (authentication is handled by Supabase Auth; opp_users stores profile data only).
 function rowToUser(row) {
+    const rawPerms = row.permissions || {};
+    const role = (typeof rawPerms === 'object' && !Array.isArray(rawPerms) && rawPerms.__role)
+        ? rawPerms.__role : 'user';
     return {
         id:           row.id,
         name:         row.name,
         email:        row.email,
         passwordHash: row.password_hash,
         estates:      row.estates || [],
-        permissions:  row.permissions || {},
+        permissions:  rawPerms,
+        role,
     };
 }
 function userToRow(u) {
+    const perms = Object.assign({}, u.permissions || {});
+    if (u.role && u.role !== 'user') perms.__role = u.role;
+    else delete perms.__role;
     return {
         id:            u.id,
         name:          u.name,
         email:         u.email,
         password_hash: u.passwordHash,
         estates:       u.estates || [],
-        permissions:   u.permissions || {},
+        permissions:   perms,
     };
 }
 
@@ -5500,6 +5943,19 @@ async function fetchUserByEmail(email) {
     }
 }
 
+// Fetch all Supabase Auth users via the get_auth_users() SECURITY DEFINER function.
+// Falls back to empty array if the function doesn't exist yet.
+async function fetchAuthUsers() {
+    try {
+        const { data, error } = await supabaseClient.rpc('get_auth_users');
+        if (error) throw error;
+        return data || [];
+    } catch (err) {
+        console.warn('[Supabase] get_auth_users RPC not available — run the SQL setup first', err);
+        return [];
+    }
+}
+
 async function insertUserToSupabase(user) {
     const { error } = await supabaseClient.from(USERS_TABLE).insert(userToRow(user));
     if (error) throw error;
@@ -5528,39 +5984,61 @@ async function attemptLogin() {
     if (!email)    { showLoginError('Please enter your email.'); return; }
     if (!password) { showLoginError('Please enter your password.'); return; }
 
-    // Check Super Admin
-    if (email === SUPER_ADMIN.email && password === SUPER_ADMIN.password) {
-        const session = {
-            email:       SUPER_ADMIN.email,
-            name:        SUPER_ADMIN.name,
-            estate:      '',   // always start blank — user must select estate
-            role:        'superadmin',
-            permissions: ALL_SECTIONS.map(s => s.id),
-        };
-        saveSession(session);
-        bootApp(session);
-        return;
-    }
-
-    // Check normal users — looked up live from Supabase so login works
-    // from any device, not just the browser that registered the account.
     const loginBtn = document.querySelector('button[onclick="attemptLogin()"]');
     if (loginBtn) { loginBtn.disabled = true; loginBtn.style.opacity = '0.6'; }
 
     try {
-        const user = await fetchUserByEmail(email);
-        if (!user) { showLoginError('No account found for this email.'); return; }
+        // All users — including the Super Admin — authenticate via Supabase Auth.
+        const { data: authData, error: authError } =
+            await supabaseClient.auth.signInWithPassword({ email, password });
+        if (authError) {
+            showLoginError(authError.message || 'Incorrect email or password.');
+            return;
+        }
 
-        const enteredHash = await sha256Hex(password);
-        if (enteredHash !== user.passwordHash) { showLoginError('Incorrect password.'); return; }
+        // Super Admin is identified by email; no opp_users record required.
+        if (email === SUPER_ADMIN.email) {
+            const session = {
+                email:       SUPER_ADMIN.email,
+                name:        SUPER_ADMIN.name,
+                estate:      '',
+                role:        'superadmin',
+                permissions: ALL_SECTIONS.map(s => s.id),
+            };
+            saveSession(session);
+            bootApp(session);
+            return;
+        }
 
-        const estates = user.estates || [];
+        // Regular / site-account users — load profile from opp_users.
+        let user = await fetchUserByEmail(email);
+        if (!user) {
+            // Auth succeeded but no opp_users profile yet — auto-create a minimal one.
+            // Admin can update the role via User Management.
+            const authUser = authData.user;
+            const autoName = (authUser.user_metadata && authUser.user_metadata.name)
+                || email.split('@')[0];
+            try {
+                const newUser = {
+                    id: Date.now(), name: autoName, email,
+                    passwordHash: '', estates: [], permissions: {}, role: 'user',
+                };
+                await insertUserToSupabase(newUser);
+                user = newUser;
+            } catch (profileErr) {
+                console.error('[Auth] auto-profile creation failed', profileErr);
+                showLoginError('Account found but profile could not be created. Contact your administrator.');
+                await supabaseClient.auth.signOut();
+                return;
+            }
+        }
+
         const session = {
             email:       user.email,
             name:        user.name,
-            estates:     estates,
-            estate:      '',   // always start with no estate selected — user must pick one
-            role:        'user',
+            estates:     user.estates || [],
+            estate:      '',
+            role:        user.role || 'user',
             permissions: user.permissions || {},
         };
         saveSession(session);
@@ -5576,8 +6054,27 @@ function showLoginError(msg) {
     errEl.classList.remove('hidden');
 }
 
+function toggleSetupPanel() {
+    const panel = document.getElementById('setupPanel');
+    if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
 // ── Boot the app after successful login ────────────────────────────
 function bootApp(session) {
+    // Purge any estate-mobile state from a previous session before showing the app.
+    // This runs before appLayout becomes visible so no other role ever sees the hub.
+    document.body.classList.remove('estate-mobile');
+    // Ensure estate_hub is never the active section for non-estate users
+    if (!isEstateMobile(session)) {
+        const hubSec = document.getElementById('estate_hub');
+        if (hubSec) hubSec.classList.remove('active');
+        // If nothing is active, default to dashboard (stale-section guard will fix it if needed)
+        if (!document.querySelector('.page-section.active')) {
+            const dash = document.getElementById('dashboard');
+            if (dash) dash.classList.add('active');
+        }
+    }
+
     document.getElementById('authOverlay').style.display = 'none';
     document.getElementById('appLayout').classList.remove('hidden');
 
@@ -5642,33 +6139,45 @@ function bootApp(session) {
 
     applyNavPermissions(session);
 
-    // Guard against a stale "active" page section left over from a
-    // previous user's session on this device (e.g. a superadmin was
-    // last viewing User Management, then logged out — without this
-    // check, the next person to log in, even a normal user, would land
-    // directly on that same restricted page). If the current user has
-    // no access to whatever section is marked active, snap back to the
-    // Dashboard before doing anything else.
-    let activeSection = document.querySelector('.page-section.active');
-    if (activeSection && activeSection.id !== 'dashboard' && session.role !== 'superadmin') {
-        const sectionAccess = activeSection.id === 'useradmin'
-            ? 'none' // useradmin is exclusively superadmin-only, never permission-mapped
-            : getSectionAccess(session, activeSection.id);
-        if (sectionAccess === 'none') {
-            document.querySelectorAll('.page-section').forEach(sec => {
-                sec.classList.toggle('active', sec.id === 'dashboard');
-            });
-            document.querySelectorAll('.nav-item[data-target]').forEach(btn => {
-                btn.classList.toggle('active', btn.getAttribute('data-target') === 'dashboard');
-            });
-            activeSection = document.getElementById('dashboard');
+    // Estate mobile users (manager_estate / user_estate) get the dedicated mobile hub
+    if (isEstateMobile(session)) {
+        document.body.classList.add('estate-mobile');
+        // Populate greeting
+        const greetNameEl = document.getElementById('estateHubGreetName');
+        if (greetNameEl) greetNameEl.textContent = session.name || 'User';
+        document.getElementById('txnDate').valueAsDate = new Date();
+        applyEstateHubPermissions(session); // hide cards for inaccessible sections
+        navToSection('estate_hub');
+        return;
+    }
+
+    {
+        // Guard: if the currently-active section is inaccessible to this user,
+        // navigate to their first accessible section instead.
+        const activeSection = document.querySelector('.page-section.active');
+        if (activeSection && session.role !== 'superadmin') {
+            const sectionAccess = activeSection.id === 'useradmin'
+                ? 'none'
+                : getSectionAccess(session, activeSection.id);
+            if (sectionAccess === 'none') {
+                const firstAccessible = ALL_SECTIONS.find(
+                    s => getSectionAccess(session, s.id) !== 'none'
+                );
+                const landId = firstAccessible ? firstAccessible.id : null;
+                document.querySelectorAll('.page-section').forEach(sec => {
+                    sec.classList.toggle('active', sec.id === landId);
+                });
+                document.querySelectorAll('.nav-item[data-target]').forEach(btn => {
+                    btn.classList.toggle('active', btn.getAttribute('data-target') === landId);
+                });
+            }
         }
     }
 
-    // Lock down the section currently shown (usually 'dashboard') in case
-    // the user's permissions restrict it to view-only
-    if (activeSection && typeof applyViewOnlyLock === 'function') {
-        applyViewOnlyLock(activeSection.id);
+    // Lock down the section currently shown in case permissions restrict it to view-only
+    const currentSection = document.querySelector('.page-section.active');
+    if (currentSection && typeof applyViewOnlyLock === 'function') {
+        applyViewOnlyLock(currentSection.id);
     }
 
     document.getElementById('txnDate').valueAsDate = new Date();
@@ -5681,6 +6190,36 @@ function bootApp(session) {
     renderUsersTable();
 }
 
+function navToSection(sectionId) {
+    // Hard guard: estate_hub is ONLY for estate-mobile users.
+    // Any other caller (stale link, direct call, etc.) is silently redirected to dashboard.
+    if (sectionId === 'estate_hub' && !document.body.classList.contains('estate-mobile')) {
+        sectionId = 'dashboard';
+    }
+
+    // Permission guard: applies to every call path (sidebar, estate hub cards, direct calls).
+    // estate_hub itself is always allowed — it's the estate-mobile home screen.
+    if (sectionId !== 'estate_hub') {
+        const _gs = loadSession();
+        if (_gs && _gs.role !== 'superadmin' && getSectionAccess(_gs, sectionId) === 'none') {
+            return; // silently block — caller has no access to this section
+        }
+    }
+
+    document.querySelectorAll('.page-section').forEach(sec => {
+        sec.classList.toggle('active', sec.id === sectionId);
+    });
+    document.querySelectorAll('.nav-item[data-target]').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-target') === sectionId);
+    });
+
+    // Hub page is static — skip data refresh when landing on it
+    if (sectionId === 'estate_hub') return;
+
+    if (typeof applyViewOnlyLock === 'function') applyViewOnlyLock(sectionId);
+    refreshAll();
+}
+
 // ── Apply nav & section visibility based on session ────────────────
 function applyNavPermissions(session) {
     const isSuperAdmin = session.role === 'superadmin';
@@ -5688,15 +6227,35 @@ function applyNavPermissions(session) {
     // Show/hide User Management nav
     document.getElementById('navUserAdmin').classList.toggle('hidden', !isSuperAdmin);
 
-    // For each non-dashboard section nav button, show/hide based on permissions
+    // Show/hide each nav button based on permissions (useradmin is superadmin-only)
     document.querySelectorAll('[data-target]').forEach(btn => {
         const target = btn.getAttribute('data-target');
-        if (target === 'dashboard' || target === 'useradmin') return;
+        if (target === 'useradmin') return; // handled above
 
         const access = getSectionAccess(session, target);
         const allowed = isSuperAdmin || access === 'view' || access === 'edit';
         btn.classList.toggle('hidden', !allowed);
     });
+}
+
+// ── Estate hub card visibility ───────────────────────────────────────
+// Hide hub cards for sections the current user cannot access.
+// Called once during bootApp for estate-mobile users.
+function applyEstateHubPermissions(session) {
+    const txnOk  = getSectionAccess(session, 'transactions') !== 'none';
+    const sumOk  = getSectionAccess(session, 'summary')      !== 'none';
+    const dashOk = getSectionAccess(session, 'dashboard')    !== 'none';
+
+    const hide = (id, show) => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = show ? '' : 'none';
+    };
+
+    hide('estateHubDashCard', dashOk);
+    hide('estateHubFertCard', txnOk);
+    hide('estateHubChemCard', txnOk);
+    hide('estateHubOPSCard',  txnOk);
+    hide('estateHubSumCard',  sumOk);
 }
 
 // ── View-only enforcement ────────────────────────────────────────
@@ -5838,6 +6397,7 @@ function _applyViewOnlyLockNow(sectionId) {
 function logoutUser() {
     if (!confirm('Sign out?')) return;
     clearSession();
+    supabaseClient.auth.signOut().catch(e => console.warn('[Auth] signOut error', e));
     ['loginEmail', 'loginPassword'].forEach(id => {
         document.getElementById(id).value = '';
     });
@@ -5845,6 +6405,7 @@ function logoutUser() {
     document.getElementById('sidebarEstate').value = '';
     // Reset app title back to default
     updateAppTitle('');
+    document.body.classList.remove('estate-mobile');
     document.getElementById('appLayout').classList.add('hidden');
     document.getElementById('authOverlay').style.display = 'flex';
 
@@ -5909,6 +6470,29 @@ function onSidebarEstateChange() {
 }
 
 // ── User Management (Super Admin) ─────────────────────────────────
+function toggleRegPermissionsSection() {
+    const role        = (document.getElementById('regRole') || {}).value || 'user_estate';
+    const isAdmin     = role === 'superadmin';
+    const permsSection = document.getElementById('regPermissionsSection');
+    const estSection   = document.getElementById('regEstatesSection');
+    const adminNotice  = document.getElementById('regAdminNotice');
+    if (permsSection) permsSection.classList.toggle('hidden', isAdmin);
+    if (estSection)   estSection.classList.toggle('hidden', isAdmin);
+    if (adminNotice)  adminNotice.classList.toggle('hidden', !isAdmin);
+}
+
+function toggleEditPermissionsSection() {
+    const roleEl      = document.getElementById('editUserRole');
+    const role        = roleEl ? roleEl.value : 'user_estate';
+    const isAdmin     = role === 'superadmin';
+    const permsSection = document.getElementById('editPermissionsSection');
+    const estSection   = document.getElementById('editEstatesSection');
+    const adminNotice  = document.getElementById('editAdminNotice');
+    if (permsSection) permsSection.classList.toggle('hidden', isAdmin);
+    if (estSection)   estSection.classList.toggle('hidden', isAdmin);
+    if (adminNotice)  adminNotice.classList.toggle('hidden', !isAdmin);
+}
+
 // Render permission checkboxes in the registration form
 function renderPermissionCheckboxes() {
     const grid = document.getElementById('regPermissionsGrid');
@@ -5935,7 +6519,9 @@ function normalisePermissions(perms) {
         perms.forEach(p => { obj[p] = 'edit'; });
         return obj;
     }
-    return perms;
+    const result = Object.assign({}, perms);
+    delete result.__role;
+    return result;
 }
 
 function getSectionAccess(session, sectionId) {
@@ -5952,44 +6538,64 @@ function isEditAllowed(sectionId) {
 async function registerUser() {
     const name     = document.getElementById('regName').value.trim();
     const email    = document.getElementById('regEmail').value.trim().toLowerCase();
-    const password = document.getElementById('regPassword').value;
-    const estates  = [...document.querySelectorAll('.reg-estate-cb:checked')].map(cb => cb.value);
+    const password = (document.getElementById('regPassword') || {}).value || '';
+    const role     = (document.getElementById('regRole') || {}).value || 'user';
+    const isAdmin  = role === 'superadmin';
+    const estates  = isAdmin ? [] : [...document.querySelectorAll('.reg-estate-cb:checked')].map(cb => cb.value);
 
     const perms = {};
-    ALL_SECTIONS.forEach(s => {
-        const checked = document.querySelector(`input[name="perm_reg_${s.id}"]:checked`);
-        const val = checked ? checked.value : 'none';
-        if (val !== 'none') perms[s.id] = val;
-    });
+    if (!isAdmin) {
+        ALL_SECTIONS.forEach(s => {
+            const checked = document.querySelector(`input[name="perm_reg_${s.id}"]:checked`);
+            const val = checked ? checked.value : 'none';
+            if (val !== 'none') perms[s.id] = val;
+        });
+    }
 
-    if (!name || !email || !password) { alert('Please fill in Name, Email and Password.'); return; }
-    if (estates.length === 0) { alert('Please select at least one Estate.'); return; }
-    if (password.length < 6) { alert('Password must be at least 6 characters.'); return; }
-    if (email === SUPER_ADMIN.email) { alert('That email is reserved.'); return; }
+    if (!name || !email)                          { alert('Please fill in Name and Email.'); return; }
+    if (!isAdmin && estates.length === 0)         { alert('Please select at least one Estate.'); return; }
+    if (password && password.length < 6)          { alert('Password must be at least 6 characters.'); return; }
+    if (email === SUPER_ADMIN.email)              { alert('That email belongs to the Super Admin.'); return; }
 
     const regBtn = document.querySelector('button[onclick="registerUser()"]');
-    if (regBtn) { regBtn.disabled = true; regBtn.textContent = 'Registering…'; }
+    if (regBtn) { regBtn.disabled = true; regBtn.textContent = 'Saving…'; }
 
     try {
+        // Step 1: Create Supabase Auth account if a password was provided
+        if (password) {
+            const { error: authError } = await supabaseClient.auth.signUp({ email, password, options: { data: { name } } });
+            if (authError) {
+                const alreadyExists = authError.message && (
+                    authError.message.toLowerCase().includes('already registered') ||
+                    authError.message.toLowerCase().includes('already been registered')
+                );
+                if (!alreadyExists) throw authError;
+                // Already in Auth — continue to create/update the profile
+            }
+        }
+
+        // Step 2: Create or update the opp_users profile
         const existing = await fetchUserByEmail(email);
-        if (existing) { alert('A user with this email already exists.'); return; }
+        if (existing) {
+            await updateUserInSupabase({ ...existing, name, estates, permissions: perms, role });
+            alert(`User "${name}" updated successfully.`);
+        } else {
+            await insertUserToSupabase({ id: Date.now(), name, email, passwordHash: '', estates, permissions: perms, role });
+            alert(`User "${name}" registered successfully.`);
+        }
 
-        const passwordHash = await sha256Hex(password);
-        const newUser = { id: Date.now(), name, email, passwordHash, estates, permissions: perms };
-
-        await insertUserToSupabase(newUser);
-
-        // Refresh local cache + table from Supabase (source of truth)
         await fetchUsersFromSupabase();
 
-        document.getElementById('regName').value     = '';
-        document.getElementById('regEmail').value    = '';
-        document.getElementById('regPassword').value = '';
+        document.getElementById('regName').value  = '';
+        document.getElementById('regEmail').value = '';
+        const pwEl = document.getElementById('regPassword');
+        if (pwEl) pwEl.value = '';
+        if (document.getElementById('regRole')) document.getElementById('regRole').value = 'user_estate';
         document.querySelectorAll('.reg-estate-cb').forEach(cb => cb.checked = false);
+        toggleRegPermissionsSection();
         renderPermissionCheckboxes();
 
         await renderUsersTable();
-        alert(`User "${name}" registered successfully.`);
     } catch (err) {
         console.error('[Supabase] registerUser failed', err);
         alert('Could not register user — ' + (err.message || 'please check your connection and try again.'));
@@ -6010,24 +6616,23 @@ async function deleteUser(id) {
     }
 }
 
-async function renderUsersTable() {
-    const tbody = document.getElementById('usersTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = `<tr><td colspan="5" class="px-3 py-6 text-center text-gray-400">Loading users…</td></tr>`;
-    const users = await fetchUsersFromSupabase();
-    if (users.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="px-3 py-6 text-center text-gray-400">No users registered yet.</td></tr>`;
-        return;
-    }
-    tbody.innerHTML = users.map(u => {
-        const estateList  = u.estates || (u.estate ? [u.estate] : []);
-        const estatesHtml = estateList.map(e =>
-            `<span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full mr-1 mb-1">${e}</span>`
-        ).join('') || '<span class="text-gray-400 text-xs">—</span>';
+function buildUserRow(u) {
+    const estateList  = u.estates || [];
+    const estatesHtml = estateList.map(e =>
+        `<span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full mr-1 mb-1">${e}</span>`
+    ).join('') || '<span class="text-gray-400 text-xs">—</span>';
 
-        const perms   = normalisePermissions(u.permissions);
-        const hasAny  = Object.keys(perms).length > 0;
-        const permsHtml = hasAny
+    const isSuperAdmin = u.role === 'superadmin';
+    const roleDef   = getRoleDef(u.role);
+    const roleBadge = `<span class="inline-block ${roleDef.badgeClass} text-xs font-semibold px-2 py-0.5 rounded-full">${roleDef.icon} ${roleDef.label}</span>`;
+
+    let permsHtml;
+    if (isSuperAdmin) {
+        permsHtml = `<span class="inline-block bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full">Full Access — All Sections</span>`;
+    } else {
+        const perms  = normalisePermissions(u.permissions);
+        const hasAny = Object.keys(perms).length > 0;
+        permsHtml = hasAny
             ? ALL_SECTIONS.map(s => {
                 const level = perms[s.id];
                 if (!level || level === 'none') return '';
@@ -6036,21 +6641,68 @@ async function renderUsersTable() {
                 return `<span class="inline-block ${colour} text-xs px-2 py-0.5 rounded-full mr-1 mb-1">${s.label} <b>${badge}</b></span>`;
               }).filter(Boolean).join('')
             : `<span class="text-gray-400 text-xs">Dashboard only</span>`;
+    }
 
-        return `
-        <tr class="border-b border-green-50">
-            <td class="px-3 py-2 font-semibold">${u.name}</td>
-            <td class="px-3 py-2 text-sm text-gray-600">${u.email}</td>
-            <td class="px-3 py-2">${estatesHtml}</td>
-            <td class="px-3 py-2">${permsHtml}</td>
+    return `
+    <tr class="border-b border-green-50">
+        <td class="px-3 py-2 font-semibold">${u.name}</td>
+        <td class="px-3 py-2 text-sm text-gray-600">${u.email}</td>
+        <td class="px-3 py-2">${roleBadge}</td>
+        <td class="px-3 py-2">${estatesHtml}</td>
+        <td class="px-3 py-2">${permsHtml}</td>
+        <td class="px-3 py-2">
+            <button onclick="openEditUserModal(${u.id})"
+                class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded mr-1">✏️ Edit</button>
+            <button onclick="deleteUser(${u.id})"
+                class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold px-3 py-1 rounded">🗑 Delete</button>
+        </td>
+    </tr>`;
+}
+
+async function renderUsersTable() {
+    const tbody = document.getElementById('usersTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = `<tr><td colspan="6" class="px-3 py-6 text-center text-gray-400">Loading users…</td></tr>`;
+
+    // Always load opp_users profiles — this is the guaranteed source
+    const [profiles, authUsers] = await Promise.all([
+        fetchUsersFromSupabase(),
+        fetchAuthUsers(),   // returns [] if SQL function not set up yet
+    ]);
+
+    // Build profile rows
+    const profileRows = profiles.map(u => buildUserRow(u)).join('');
+
+    // Build "No Profile" rows for auth users that have no opp_users record yet
+    const superEmail     = SUPER_ADMIN.email.toLowerCase();
+    const profileEmails  = new Set(profiles.map(p => p.email.toLowerCase()));
+    const noProfileRows  = authUsers
+        .filter(au => au.email.toLowerCase() !== superEmail && !profileEmails.has(au.email.toLowerCase()))
+        .map(au => `
+        <tr class="border-b border-yellow-50 bg-yellow-50">
+            <td class="px-3 py-2 text-sm text-gray-400 italic">—</td>
+            <td class="px-3 py-2 text-sm text-gray-700">${au.email}</td>
+            <td class="px-3 py-2"><span class="inline-block bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded-full">⚠️ No Profile</span></td>
+            <td class="px-3 py-2 text-xs text-gray-400">—</td>
+            <td class="px-3 py-2 text-xs text-gray-400">—</td>
             <td class="px-3 py-2">
-                <button onclick="openEditUserModal(${u.id})"
-                    class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded mr-1">✏️ Edit</button>
-                <button onclick="deleteUser(${u.id})"
-                    class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold px-3 py-1 rounded">🗑 Delete</button>
+                <button onclick="prefillRegisterForm('${au.email}')"
+                    class="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-semibold px-3 py-1 rounded">➕ Assign Profile</button>
             </td>
-        </tr>`;
-    }).join('');
+        </tr>`).join('');
+
+    const allRows = profileRows + noProfileRows;
+    tbody.innerHTML = allRows || `<tr><td colspan="6" class="px-3 py-6 text-center text-gray-400">No users registered yet.</td></tr>`;
+}
+
+// Pre-fill the register form with an email from an unprovisioned auth user
+function prefillRegisterForm(email) {
+    const emailEl = document.getElementById('regEmail');
+    if (emailEl) {
+        emailEl.value = email;
+        emailEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        emailEl.focus();
+    }
 }
 
 async function openEditUserModal(id) {
@@ -6092,6 +6744,11 @@ async function openEditUserModal(id) {
         </div>`;
     }).join('');
 
+    const userRole    = user.role || 'user_estate';
+    const isAdminEdit = userRole === 'superadmin';
+    const hideEstEdit  = isAdminEdit;
+    const hidePermEdit = isAdminEdit;
+
     const modal = document.createElement('div');
     modal.id = 'editUserModal';
     modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-[9998] flex items-center justify-center';
@@ -6106,18 +6763,30 @@ async function openEditUserModal(id) {
                         class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold mb-1">New Password <span class="text-gray-400 font-normal">(leave blank to keep current)</span></label>
-                    <input id="editUserPassword" type="password" placeholder="••••••••"
-                        class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                    <p class="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded p-2">
+                        🔒 Password management is handled by <b>Supabase Auth</b>. To reset a user's password, ask them to use <b>Change Password</b> in the app, or reset it from the Supabase Auth dashboard.
+                    </p>
                 </div>
                 <div>
+                    <label class="block text-sm font-semibold mb-1">Account Type</label>
+                    <select id="editUserRole" onchange="toggleEditPermissionsSection()"
+                        class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600 bg-white">
+                        ${buildRoleOptions(userRole)}
+                    </select>
+                </div>
+                <div id="editEstatesSection" ${hideEstEdit ? 'class="hidden"' : ''}>
                     <label class="block text-sm font-semibold mb-2">Estates <span class="text-red-500">*</span></label>
                     <div class="grid grid-cols-2 gap-2">${estateChecks}</div>
                 </div>
-                <div>
+                <div id="editPermissionsSection" ${hidePermEdit ? 'class="hidden"' : ''}>
                     <label class="block text-sm font-semibold mb-2">Sections Allowed</label>
                     <div class="border border-green-200 rounded-lg p-3 bg-green-50">${permsRows}</div>
                     <p class="text-xs text-gray-400 mt-1"><b>View</b> = read-only. <b>Edit</b> = full access.</p>
+                </div>
+                <div id="editAdminNotice" ${!isAdminEdit ? 'class="hidden"' : ''}>
+                    <div class="border border-purple-200 rounded-lg p-3 bg-purple-50 text-sm text-purple-800">
+                        ⭐ <b>Admin</b> has full access to all sections and all estates, including User Management.
+                    </div>
                 </div>
                 <div class="flex gap-3 pt-2">
                     <button onclick="saveEditUser()"
@@ -6131,21 +6800,23 @@ async function openEditUserModal(id) {
 }
 
 async function saveEditUser() {
-    const id       = parseInt(document.getElementById('editUserId').value, 10);
-    const name     = document.getElementById('editUserName').value.trim();
-    const password = document.getElementById('editUserPassword').value;
-    const estates  = [...document.querySelectorAll('.edit-estate-cb:checked')].map(cb => cb.value);
+    const id      = parseInt(document.getElementById('editUserId').value, 10);
+    const name    = document.getElementById('editUserName').value.trim();
+    const role    = (document.getElementById('editUserRole') || {}).value || 'user';
+    const isAdmin = role === 'superadmin';
+    const estates = isAdmin ? [] : [...document.querySelectorAll('.edit-estate-cb:checked')].map(cb => cb.value);
 
     const perms = {};
-    ALL_SECTIONS.forEach(s => {
-        const checked = document.querySelector(`input[name="perm_edit_${s.id}"]:checked`);
-        const val = checked ? checked.value : 'none';
-        if (val !== 'none') perms[s.id] = val;
-    });
+    if (!isAdmin) {
+        ALL_SECTIONS.forEach(s => {
+            const checked = document.querySelector(`input[name="perm_edit_${s.id}"]:checked`);
+            const val = checked ? checked.value : 'none';
+            if (val !== 'none') perms[s.id] = val;
+        });
+    }
 
-    if (!name)                { alert('Name is required.'); return; }
-    if (estates.length === 0) { alert('Please select at least one Estate.'); return; }
-    if (password && password.length < 6) { alert('Password must be at least 6 characters.'); return; }
+    if (!name)                          { alert('Name is required.'); return; }
+    if (!isAdmin && estates.length === 0) { alert('Please select at least one Estate.'); return; }
 
     const saveBtn = document.querySelector('#editUserModal button[onclick="saveEditUser()"]');
     if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
@@ -6158,17 +6829,24 @@ async function saveEditUser() {
         const updatedUser = {
             id,
             name,
-            email:       existing.email,          // email is immutable here
+            email:        existing.email,    // email is immutable here
             passwordHash: existing.passwordHash,
             estates,
-            permissions: perms,
+            permissions:  perms,
+            role,
         };
-        if (password) {
-            updatedUser.passwordHash = await sha256Hex(password);
-        }
 
         await updateUserInSupabase(updatedUser);
         await fetchUsersFromSupabase();
+
+        // If the admin just changed their own account (or the currently-logged-in user),
+        // update the live session immediately so the nav reflects the new permissions.
+        const _cur = loadSession();
+        if (_cur && _cur.email === existing.email) {
+            const _refreshed = { ..._cur, name, estates, permissions: perms, role };
+            saveSession(_refreshed);
+            applyNavPermissions(_refreshed);
+        }
 
         document.getElementById('editUserModal').remove();
         await renderUsersTable();
@@ -6182,14 +6860,89 @@ async function saveEditUser() {
 }
 
 // ── Auto-resume session on page load ──────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Populate the Account Type select in the register form from the ROLES constant
+    const regRoleEl = document.getElementById('regRole');
+    if (regRoleEl) regRoleEl.innerHTML = buildRoleOptions('user_estate');
+
     renderPermissionCheckboxes();
-    const session = loadSession();
-    if (session) {
-        bootApp(session);
-    }
     // Apply saved language preference regardless of login state
     setLang(localStorage.getItem('opp_lang') || 'en');
+
+    // Quick resume from sessionStorage so the app appears instantly on refresh.
+    const localSession = loadSession();
+    if (localSession) {
+        bootApp(localSession);
+        // Do NOT return — always do the Supabase check below to catch
+        // permission changes made by an admin while this user was logged in.
+    }
+
+    // Always verify / refresh against Supabase Auth:
+    //   - If no localSession: this is the only boot path (tab reopen, etc.)
+    //   - If localSession exists: silently sync permissions; re-apply nav if anything changed
+    try {
+        const { data: { session: authSession } } = await supabaseClient.auth.getSession();
+        if (authSession && authSession.user) {
+            const email = authSession.user.email;
+
+            // Super Admin has no opp_users record — only boot if not already booted
+            if (email === SUPER_ADMIN.email) {
+                if (!localSession) {
+                    const session = {
+                        email:       SUPER_ADMIN.email,
+                        name:        SUPER_ADMIN.name,
+                        estate:      '',
+                        role:        'superadmin',
+                        permissions: ALL_SECTIONS.map(s => s.id),
+                    };
+                    saveSession(session);
+                    bootApp(session);
+                }
+                return;
+            }
+
+            const user = await fetchUserByEmail(email);
+            if (user) {
+                const freshSession = {
+                    email:       user.email,
+                    name:        user.name,
+                    estates:     user.estates || [],
+                    estate:      '',
+                    role:        user.role || 'user',
+                    permissions: user.permissions || {},
+                };
+                saveSession(freshSession);
+
+                if (!localSession) {
+                    // No cached session — full boot with fresh data
+                    bootApp(freshSession);
+                } else if (localSession.email === freshSession.email) {
+                    // Already booted — just re-apply nav if permissions or role changed
+                    const permsBefore = JSON.stringify(localSession.permissions);
+                    const permsAfter  = JSON.stringify(freshSession.permissions);
+                    if (permsBefore !== permsAfter || localSession.role !== freshSession.role) {
+                        applyNavPermissions(freshSession);
+                        // Also redirect away from any section now inaccessible under new permissions
+                        if (freshSession.role !== 'superadmin') {
+                            if (isEstateMobile(freshSession)) {
+                                applyEstateHubPermissions(freshSession);
+                            } else {
+                                const _curActive = document.querySelector('.page-section.active');
+                                if (_curActive && _curActive.id !== 'estate_hub') {
+                                    if (getSectionAccess(freshSession, _curActive.id) === 'none') {
+                                        const _firstAcc = ALL_SECTIONS.find(s => getSectionAccess(freshSession, s.id) !== 'none');
+                                        if (_firstAcc) navToSection(_firstAcc.id);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.warn('[Auth] Could not refresh session from Supabase Auth', e);
+    }
 });
 /* =================================================================
    RESPONSIVE SIDEBAR — mobile hamburger toggle
@@ -7161,9 +7914,10 @@ function applyFilterChemBlock() {
         var arole  = document.getElementById('avatarRole');
         var dname  = document.getElementById('dropdownUserName');
         var demail = document.getElementById('dropdownUserEmail');
+        var roleLabel = role === 'superadmin' ? 'Super Admin' : (getRoleDef(role).label || role);
         if(circle) circle.textContent = initials;
         if(aname)  aname.textContent  = name || email;
-        if(arole)  arole.textContent  = role;
+        if(arole)  arole.textContent  = roleLabel;
         if(dname)  dname.textContent  = name || email;
         if(demail) demail.textContent = email;
     }
@@ -7190,13 +7944,14 @@ function applyFilterChemBlock() {
         var name  = session.name  || '';
         var email = session.email || '';
         var role  = session.role  || '';
+        var roleLabel = role === 'superadmin' ? 'Super Admin' : (getRoleDef(role).label || role || 'User');
         var initials = name ? name.trim().split(' ').map(function(w){return w[0]||'';}).slice(0,2).join('').toUpperCase() : (email[0]||'?').toUpperCase();
         var el = function(id){return document.getElementById(id);};
         if(el('profileAvatarCircle')) el('profileAvatarCircle').textContent = initials;
         if(el('profileName'))        el('profileName').textContent        = name;
-        if(el('profileRole'))        el('profileRole').textContent        = role;
+        if(el('profileRole'))        el('profileRole').textContent        = roleLabel;
         if(el('profileEmail'))       el('profileEmail').textContent       = email;
-        if(el('profileRoleDetail'))  el('profileRoleDetail').textContent  = role;
+        if(el('profileRoleDetail'))  el('profileRoleDetail').textContent  = roleLabel;
         var m = el('profileModal');
         if(m){ m.style.display='flex'; }
     };
@@ -7232,31 +7987,14 @@ function applyFilterChemBlock() {
         if (saveBtn) saveBtn.disabled = true;
 
         try {
-            var verified = false;
-            if (session.role === 'superadmin') {
-                var SUPER = { email:'superadmin@oilpalm.com', password:'Admin@1234' };
-                verified = (cur === SUPER.password);
-                if (!verified) return showErr('Current password is incorrect.');
-                // Super Admin credentials are hardcoded — no record to update.
-            } else {
-                var user = await fetchUserByEmail(session.email);
-                if (!user) return showErr('Account not found. Please log in again.');
+            // All users (including Super Admin) authenticate via Supabase Auth.
+            var verifyRes = await supabaseClient.auth.signInWithPassword({
+                email: session.email, password: cur
+            });
+            if (verifyRes.error) return showErr('Current password is incorrect.');
 
-                var curHash = await sha256Hex(cur);
-                verified = (curHash === user.passwordHash);
-                if (!verified) return showErr('Current password is incorrect.');
-
-                var newHash = await sha256Hex(nw);
-                await updateUserInSupabase({
-                    id:           user.id,
-                    name:         user.name,
-                    email:        user.email,
-                    passwordHash: newHash,
-                    estates:      user.estates,
-                    permissions:  user.permissions,
-                });
-                await fetchUsersFromSupabase(); // refresh local cache
-            }
+            var updateRes = await supabaseClient.auth.updateUser({ password: nw });
+            if (updateRes.error) throw updateRes.error;
 
             if(errEl) errEl.style.display='none';
             if(sucEl){ sucEl.textContent='Password changed successfully!'; sucEl.style.display='block'; }
