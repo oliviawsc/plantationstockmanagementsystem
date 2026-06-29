@@ -410,6 +410,18 @@
             margin-top: 10px;
         }
 
+        /* ── Category: frozen/locked state in estate mobile ─────── */
+        body.estate-mobile #txnCategory:disabled {
+            background: #EEF2FF;
+            color: #4338CA;
+            border-color: #A5B4FC;
+            font-weight: 700;
+            opacity: 1;
+            cursor: default;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
         /* ── Stock Summary: mobile layout ────────────────────────── */
         body.estate-mobile #summary h2 { font-size: 1.3rem; margin-bottom: 14px; }
         body.estate-mobile #summary .bg-white.p-6 { padding: 14px; }
@@ -5866,7 +5878,10 @@ function navToEstateModule(category) {
     // Set category BEFORE navToSection so filterTxnItemsByCategory (called
     // inside refreshAll → populateItemDropdowns) already sees the right value.
     const catSel = document.getElementById('txnCategory');
-    if (catSel) catSel.value = category;
+    if (catSel) {
+        catSel.value = category;
+        catSel.disabled = true; // freeze — estate mobile always enters via a specific hub card
+    }
     navToSection('transactions');
 }
 
