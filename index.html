@@ -2739,6 +2739,7 @@ function saveTransaction() {
         });
         save(STORAGE_KEYS.transactions, transactions);
         document.getElementById('txnForm').reset();
+        refreezeTxnCategory();
         document.getElementById('txnDate').valueAsDate = new Date();
         document.getElementById('txnRowsBody').innerHTML = '';
         document.getElementById('txnManuringWrap').classList.add('hidden');
@@ -2784,6 +2785,7 @@ function saveTransaction() {
     transactions.push(newTxn);
     save(STORAGE_KEYS.transactions, transactions);
     document.getElementById('txnForm').reset();
+    refreezeTxnCategory();
     document.getElementById('txnDate').valueAsDate = new Date();
     document.getElementById('txnManuringWrap').classList.add('hidden');
     document.getElementById('txnMaintWrap').classList.add('hidden');
@@ -5880,9 +5882,20 @@ function navToEstateModule(category) {
     const catSel = document.getElementById('txnCategory');
     if (catSel) {
         catSel.value = category;
-        catSel.disabled = true; // freeze — estate mobile always enters via a specific hub card
+        catSel.dataset.frozenCategory = category; // remembered for post-reset restore
     }
     navToSection('transactions');
+    // Disable AFTER navToSection because applyViewOnlyLock (called inside) blindly
+    // re-enables every disabled element it finds, which would undo the lock.
+    if (catSel) catSel.disabled = true;
+}
+
+function refreezeTxnCategory() {
+    if (!document.body.classList.contains('estate-mobile')) return;
+    const catSel = document.getElementById('txnCategory');
+    if (!catSel || !catSel.dataset.frozenCategory) return;
+    catSel.value    = catSel.dataset.frozenCategory;
+    catSel.disabled = true;
 }
 
 function buildRoleOptions(selectedValue) {
