@@ -492,10 +492,9 @@
         }
         body.estate-mobile #summary td:not([data-label])::before,
         body.estate-mobile #summary td:last-child::before { display: none; }
-        /* Standardise date column — fixed value width, digits always same width */
+        /* Date value fills remaining space after the label — same as every other row */
         body.estate-mobile #summary .sum-date-val {
-            display: inline-block;
-            min-width: 88px;
+            flex: 1;
             white-space: nowrap;
             font-variant-numeric: tabular-nums;
         }
