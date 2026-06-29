@@ -492,11 +492,12 @@
         }
         body.estate-mobile #summary td:not([data-label])::before,
         body.estate-mobile #summary td:last-child::before { display: none; }
-        /* Standardise date column — never wrap, digits always same width */
-        body.estate-mobile #summary td[data-label="Date"] {
+        /* Standardise date column — fixed value width, digits always same width */
+        body.estate-mobile #summary .sum-date-val {
+            display: inline-block;
+            min-width: 88px;
             white-space: nowrap;
             font-variant-numeric: tabular-nums;
-            min-width: 0;
         }
     </style>
 </head>
@@ -3578,7 +3579,7 @@ function renderSummary() {
         })();
 
         tr.innerHTML = `
-            <td class="px-3 py-2" data-label="Date">${t.date}</td>
+            <td class="px-3 py-2" data-label="Date"><span class="sum-date-val">${t.date}</span></td>
             <td class="px-3 py-2" data-label="Item">${t.itemName}</td>
             <td class="px-3 py-2 text-right text-green-700 font-semibold${!qtyIn ? ' em-empty' : ''}" data-label="Qty In">${qtyIn}</td>
             <td class="px-3 py-2 text-right text-red-600 font-semibold${!qtyOut ? ' em-empty' : ''}" data-label="Qty Out">${qtyOut}</td>
