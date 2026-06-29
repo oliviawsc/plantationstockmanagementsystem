@@ -3558,21 +3558,22 @@ function renderSummary() {
             return `${parseFloat(balance).toFixed(2)} ${baseUnit} <span class="text-gray-400 text-xs">(${pkgBal.toFixed(2)} ${pkgUnit})</span>`;
         })();
 
+        const d = I18N[currentLang] || I18N['en'];
         tr.innerHTML = `
-            <td class="px-3 py-2" data-label="Date"><span class="sum-date-val">${t.date}</span></td>
-            <td class="px-3 py-2" data-label="Item">${t.itemName}</td>
-            <td class="px-3 py-2 text-right text-green-700 font-semibold${!qtyIn ? ' em-empty' : ''}" data-label="Qty In">${qtyIn}</td>
-            <td class="px-3 py-2 text-right text-red-600 font-semibold${!qtyOut ? ' em-empty' : ''}" data-label="Qty Out">${qtyOut}</td>
-            <td class="px-3 py-2" data-label="Location">${t.location}</td>
-            <td class="px-3 py-2" data-label="Round">${roundHtml}</td>
-            <td class="px-3 py-2 text-right font-bold" data-label="Balance">${balanceDisplay}</td>
-            <td class="px-3 py-2" data-label="User">${t.user}</td>
+            <td class="px-3 py-2" data-label="${d.col_date}"><span class="sum-date-val">${t.date}</span></td>
+            <td class="px-3 py-2" data-label="${d.col_item}">${t.itemName}</td>
+            <td class="px-3 py-2 text-right text-green-700 font-semibold${!qtyIn ? ' em-empty' : ''}" data-label="${d.sum_lbl_qty_in}">${qtyIn}</td>
+            <td class="px-3 py-2 text-right text-red-600 font-semibold${!qtyOut ? ' em-empty' : ''}" data-label="${d.sum_lbl_qty_out}">${qtyOut}</td>
+            <td class="px-3 py-2" data-label="${d.col_location}">${t.location}</td>
+            <td class="px-3 py-2" data-label="${d.col_round}">${roundHtml}</td>
+            <td class="px-3 py-2 text-right font-bold" data-label="${d.col_balance}">${balanceDisplay}</td>
+            <td class="px-3 py-2" data-label="${d.col_user}">${t.user}</td>
             <td class="px-3 py-2 flex gap-2 flex-wrap">
-                ${t.picture ? `<button class="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-semibold px-3 py-1 rounded" onclick="viewTxnPicture(${t.id})">🖼 View</button>` : ''}
+                ${t.picture ? `<button class="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-semibold px-3 py-1 rounded" onclick="viewTxnPicture(${t.id})">${d.btn_view}</button>` : ''}
                 <button class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded"
-                    onclick="openEditTxnModal(${t.id})">✏️ Edit</button>
+                    onclick="openEditTxnModal(${t.id})">${d.btn_edit}</button>
                 <button class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold px-3 py-1 rounded"
-                    onclick="deleteSummaryTransaction(${t.id})">🗑 Delete</button>
+                    onclick="deleteSummaryTransaction(${t.id})">${d.btn_delete}</button>
             </td>`;
         body.appendChild(tr);
     });
@@ -5283,6 +5284,11 @@ const I18N = {
         col_action:          'Action',
         col_min_threshold:   'Min Threshold',
         col_round:           'Round',
+        sum_lbl_qty_in:      'Qty In',
+        sum_lbl_qty_out:     'Qty Out',
+        btn_view:            '🖼 View',
+        btn_edit:            '✏️ Edit',
+        btn_delete:          '🗑 Delete',
         col_block:           'Block',
         col_budgeted:        'Budgeted Fertilizer Needed',
         col_total_applied:   'Total Applied',
@@ -5533,6 +5539,11 @@ const I18N = {
         col_action:          'Tindakan',
         col_min_threshold:   'Had Minimum',
         col_round:           'Pusingan',
+        sum_lbl_qty_in:      'Jum Masuk',
+        sum_lbl_qty_out:     'Jum Keluar',
+        btn_view:            '🖼 Lihat',
+        btn_edit:            '✏️ Sunting',
+        btn_delete:          '🗑 Padam',
         col_block:           'Blok',
         col_budgeted:        'Keperluan Baja (Bajet)',
         col_total_applied:   'Jumlah Digunakan',
@@ -5803,6 +5814,10 @@ function setLang(lang) {
         hubMsBtn.style.background = lang === 'ms' ? '#6366F1' : '#fff';
         hubMsBtn.style.color      = lang === 'ms' ? '#fff'    : '#6366F1';
     }
+
+    // Re-render summary table so data-label attributes and action buttons
+    // reflect the new language immediately.
+    if (typeof renderSummary === 'function') renderSummary();
 }
 /* =================================================================
    AUTH SYSTEM
