@@ -5883,10 +5883,11 @@ function navToEstateModule(category) {
     if (catSel) {
         catSel.value = category;
         catSel.dataset.frozenCategory = category; // remembered for post-reset restore
+        catSel.dataset.estateFreeze   = '1';      // tells applyViewOnlyLock to skip this element
+        catSel.disabled = true;
     }
     navToSection('transactions');
-    // Disable AFTER navToSection because applyViewOnlyLock (called inside) blindly
-    // re-enables every disabled element it finds, which would undo the lock.
+    // Re-assert disabled after navToSection in case anything inside cleared it.
     if (catSel) catSel.disabled = true;
 }
 
@@ -6258,8 +6259,18 @@ function navToSection(sectionId) {
 
     syncEstateBackBtn(); // show ← Home when away from hub, hide when on hub
 
-    // Hub page is static — skip data refresh when landing on it
-    if (sectionId === 'estate_hub') return;
+    // Hub page is static — skip data refresh when landing on it.
+    // Clear the category freeze so it doesn't persist across sessions.
+    if (sectionId === 'estate_hub') {
+        const catSel = document.getElementById('txnCategory');
+        if (catSel) {
+            delete catSel.dataset.estateFreeze;
+            delete catSel.dataset.frozenCategory;
+            catSel.disabled = false;
+            catSel.value    = '';
+        }
+        return;
+    }
 
     if (typeof applyViewOnlyLock === 'function') applyViewOnlyLock(sectionId);
     refreshAll();
@@ -6387,8 +6398,11 @@ function _applyViewOnlyLockNow(sectionId) {
 
     if (!isReadOnly) {
         // Re-enable everything (covers the case where access just changed
-        // from view to edit, or the section was unlocked)
+        // from view to edit, or the section was unlocked).
+        // Skip elements explicitly frozen by the estate module — those stay
+        // disabled regardless of access level.
         section.querySelectorAll('input, select, textarea, button').forEach(el => {
+            if (el.dataset.estateFreeze) return;
             if (el.disabled) el.disabled = false;
             if (el.classList.contains('view-locked-field')) el.classList.remove('view-locked-field');
         });
