@@ -5328,6 +5328,7 @@ const I18N = {
         hub_ops_line2:       'Seedling',
         hub_summary:         'Stock Summary',
         hub_view_report:     'View Report',
+        view_only_banner:    '&#128065; You have <b>View Only</b> access to this section. Editing is disabled.',
         /* Stock Transaction */
         txn_form_title:      'Record Stock Movement',
         txn_lbl_type:        'Transaction Type',
@@ -5577,6 +5578,7 @@ const I18N = {
         hub_ops_line2:       'Sawit',
         hub_summary:         'Ringkasan Stok',
         hub_view_report:     'Lihat Laporan',
+        view_only_banner:    '&#128065; Anda mempunyai akses <b>Lihat Sahaja</b> untuk bahagian ini. Penyuntingan dinyahaktifkan.',
         /* Stock Transaction */
         txn_form_title:      'Rekod Pergerakan Stok',
         txn_lbl_type:        'Jenis Transaksi',
@@ -6447,10 +6449,11 @@ function _applyViewOnlyLockNow(sectionId) {
     if (!section.querySelector('.view-only-banner')) {
         const banner = document.createElement('div');
         banner.className = 'view-only-banner';
+        banner.setAttribute('data-i18n', 'view_only_banner');
         banner.style.cssText = 'background:#FEF3C7;border:1px solid #FCD34D;color:#92400E;' +
             'padding:10px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;font-weight:600;' +
             'display:flex;align-items:center;gap:8px;';
-        banner.innerHTML = '👁 You have <b>View Only</b> access to this section. Editing is disabled.';
+        banner.innerHTML = (I18N[currentLang] || I18N['en']).view_only_banner;
         section.insertBefore(banner, section.firstChild);
     }
 }
