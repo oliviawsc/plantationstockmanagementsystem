@@ -464,41 +464,39 @@
         }
         body.estate-mobile #summary tbody tr:hover { background: #F0FDF4; }
         body.estate-mobile #summary td {
-            display: grid;
-            grid-template-columns: 72px 1fr;
+            display: flex;
             align-items: baseline;
             padding: 5px 0;
             border-bottom: 1px solid #F0FDF4;
             font-size: 14px;
             text-align: left !important;
-            width: 100%;
-            box-sizing: border-box;
         }
         body.estate-mobile #summary td:last-child {
             border-bottom: none;
             padding-top: 10px;
-            display: flex;
             flex-wrap: wrap;
             gap: 6px;
         }
         body.estate-mobile #summary td.em-empty { display: none !important; }
         body.estate-mobile #summary td::before {
             content: attr(data-label);
+            display: inline-block;
             font-size: 10px;
             font-weight: 700;
             color: #9CA3AF;
+            min-width: 72px;
+            flex-shrink: 0;
             text-transform: uppercase;
             letter-spacing: 0.04em;
             padding-top: 2px;
-            white-space: nowrap;
         }
         body.estate-mobile #summary td:not([data-label])::before,
         body.estate-mobile #summary td:last-child::before { display: none; }
-        /* Date value: tabular digits, no wrap, fills its grid column */
+        /* Date value fills remaining space after the label — same as every other row */
         body.estate-mobile #summary .sum-date-val {
+            flex: 1;
             white-space: nowrap;
             font-variant-numeric: tabular-nums;
-            overflow: hidden;
         }
     </style>
 </head>
