@@ -6152,6 +6152,9 @@ function bootApp(session) {
         document.getElementById('txnDate').valueAsDate = new Date();
         applyEstateHubPermissions(session); // hide cards for inaccessible sections
         navToSection('estate_hub');
+        refreshAll();                               // render localStorage data immediately
+        if (activeEstate) loadFromSupabase();       // then fetch fresh data from Supabase
+        setLang(localStorage.getItem('opp_lang') || 'en');
         return;
     }
 
