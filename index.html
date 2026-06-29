@@ -540,32 +540,7 @@
                 style="width:100%;padding:10px;background:linear-gradient(135deg,#6366F1,#4F46E5);border:none;border-radius:9px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;box-shadow:0 4px 14px rgba(99,102,241,.4);transition:opacity .15s;"
                 onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'">Sign in &#8594;</button>
         </div>
-        <!-- First-time Super Admin setup -->
-        <div style="margin-top:12px;">
-            <button onclick="toggleSetupPanel()"
-                style="width:100%;padding:7px;background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:9px;color:rgba(165,180,252,.7);font-size:12px;cursor:pointer;font-family:Inter,sans-serif;transition:border-color .15s;"
-                onmouseover="this.style.borderColor='rgba(165,180,252,.5)'" onmouseout="this.style.borderColor='rgba(255,255,255,.15)'">
-                First-time setup &#x2699;&#xFE0F;
-            </button>
-            <div id="setupPanel" style="display:none;margin-top:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px;">
-                <p style="color:#fde68a;font-size:12px;font-weight:600;font-family:Inter,sans-serif;margin-bottom:8px;">&#x26A0;&#xFE0F; Email signups are disabled on this Supabase project.</p>
-                <p style="color:#c7d2fe;font-size:12px;font-family:Inter,sans-serif;margin-bottom:10px;line-height:1.6;">
-                    Create the Super Admin account manually in the Supabase dashboard:
-                </p>
-                <ol style="color:#a5b4fc;font-size:12px;font-family:Inter,sans-serif;margin:0 0 10px 16px;line-height:2;">
-                    <li>Go to <b>Supabase Dashboard</b></li>
-                    <li>Open <b>Authentication &rarr; Users</b></li>
-                    <li>Click <b>"Add user"</b> &rarr; <b>"Create new user"</b></li>
-                    <li>Email: <span style="color:#e0e7ff;font-weight:600;">hqadmin.puigroups@gmail.com</span></li>
-                    <li>Set a password and click <b>Create user</b></li>
-                    <li>Come back here and <b>Sign in</b></li>
-                </ol>
-                <p style="color:rgba(148,163,184,.6);font-size:11px;font-family:Inter,sans-serif;">
-                    Tip: In <b>Authentication &rarr; Providers &rarr; Email</b> you can also enable signups to allow account creation from the app.
-                </p>
-            </div>
-        </div>
-        <p style="color:rgba(148,163,184,.55);font-size:11.5px;text-align:center;margin-top:16px;font-family:Inter,sans-serif;">Contact your Super Admin to register or reset your account.</p>
+<p style="color:rgba(148,163,184,.55);font-size:11.5px;text-align:center;margin-top:16px;font-family:Inter,sans-serif;">Contact your Super Admin to register or reset your account.</p>
     </div>
 </div>
 <!-- ================================================================
@@ -6096,10 +6071,6 @@ function showLoginError(msg) {
     errEl.classList.remove('hidden');
 }
 
-function toggleSetupPanel() {
-    const panel = document.getElementById('setupPanel');
-    if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-}
 
 // ── Boot the app after successful login ────────────────────────────
 function bootApp(session) {
