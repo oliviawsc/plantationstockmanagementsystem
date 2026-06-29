@@ -6848,7 +6848,9 @@ function logoutUser() {
     updateAppTitle('');
     document.body.classList.remove('estate-mobile');
     document.getElementById('appLayout').classList.add('hidden');
-    document.getElementById('authOverlay').style.display = 'flex';
+    const _overlay = document.getElementById('authOverlay');
+    _overlay.scrollTop = 0;
+    _overlay.style.display = 'flex';
 
     // Reset which page section is "active" back to the Dashboard so the
     // next person to log in on this device — who may have far fewer
