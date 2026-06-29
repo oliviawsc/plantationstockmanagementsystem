@@ -6434,6 +6434,14 @@ function _applyViewOnlyLockNow(sectionId) {
         if (!btn.classList.contains('view-locked-field')) btn.classList.add('view-locked-field');
     });
 
+    // Export button uses addEventListener (no onclick attribute) so it passes
+    // through isSafeAction undetected — disable it explicitly for view-only users.
+    const exportBtn = section.querySelector('#exportExcelBtn');
+    if (exportBtn) {
+        if (!exportBtn.disabled) exportBtn.disabled = true;
+        if (!exportBtn.classList.contains('view-locked-field')) exportBtn.classList.add('view-locked-field');
+    }
+
     // Friendly read-only banner at the top of the section — only inserted
     // if not already present, so re-runs don't keep removing/re-adding it.
     if (!section.querySelector('.view-only-banner')) {
