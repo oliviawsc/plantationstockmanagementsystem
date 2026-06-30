@@ -6293,7 +6293,19 @@ function isEstateMobile(session) {
     return session && (session.role === 'manager_estate' || session.role === 'user_estate');
 }
 
+// Wipe any leftover/unsaved input from a previous module before opening a new
+// one, so switching hub cards always lands on a clean blank form.
+function resetTxnFormForNewEntry() {
+    document.getElementById('txnForm').reset();
+    document.getElementById('txnDate').valueAsDate = new Date();
+    document.getElementById('txnRowsBody').innerHTML = '';
+    clearTxnPicture();
+}
+
 function navToEstateModule(category) {
+    // Reset BEFORE setting category so the reset doesn't wipe out the value
+    // we're about to lock in.
+    resetTxnFormForNewEntry();
     // Set category BEFORE navToSection so filterTxnItemsByCategory (called
     // inside refreshAll → populateItemDropdowns) already sees the right value.
     const catSel = document.getElementById('txnCategory');
