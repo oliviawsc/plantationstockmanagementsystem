@@ -6563,6 +6563,12 @@ function setLang(lang) {
     // Re-render summary table so data-label attributes and action buttons
     // reflect the new language immediately.
     if (typeof renderSummary === 'function') renderSummary();
+
+    // Re-render the Stock Ledger pivot table too — its Item/Detail/Month
+    // header and Quantity In/Out/Balance row labels are built from the
+    // I18N dict in JS, not [data-i18n] attributes, so they need an
+    // explicit re-render on language switch like Stock Summary above.
+    if (typeof renderLedger === 'function') renderLedger();
 }
 /* =================================================================
    AUTH SYSTEM
