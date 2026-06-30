@@ -2675,6 +2675,9 @@ navButtons.forEach(btn => {
         btn.classList.add('active');
         // toggle visible section
         pageSections.forEach(sec => sec.classList.toggle('active', sec.id === target));
+        // Remember this section so a page reload resumes here instead of
+        // always landing back on the Dashboard.
+        sessionStorage.setItem('opp_active_section', target);
         // refresh the section being shown so data is up-to-date
         refreshAll();
         // For maintprogress: explicitly re-populate dropdowns after section becomes active
@@ -6885,8 +6888,25 @@ function bootApp(session) {
     if (!isEstateMobile(session)) {
         const hubSec = document.getElementById('estate_hub');
         if (hubSec) hubSec.classList.remove('active');
-        // If nothing is active, default to dashboard (stale-section guard will fix it if needed)
-        if (!document.querySelector('.page-section.active')) {
+
+        // Resume whichever section the user was last viewing before the page
+        // reloaded — sessionStorage survives a refresh but not a fresh visit
+        // or logout (see logoutUser(), which clears it). The static HTML
+        // always marks Dashboard active by default, so clear that first and
+        // let the restore (or the dashboard fallback) decide what's shown.
+        // The permission guard further below will redirect away again if
+        // the restored section is no longer accessible to this user.
+        document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+        const lastSectionId = sessionStorage.getItem('opp_active_section');
+        const lastSection = lastSectionId && lastSectionId !== 'estate_hub'
+            ? document.getElementById(lastSectionId)
+            : null;
+        if (lastSection) {
+            lastSection.classList.add('active');
+            document.querySelectorAll('.nav-item[data-target]').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-target') === lastSectionId);
+            });
+        } else {
             const dash = document.getElementById('dashboard');
             if (dash) dash.classList.add('active');
         }
@@ -6916,11 +6936,14 @@ function bootApp(session) {
     // assigned to, even though those options exist statically in HTML.
     if (estateSelectVisible) estateSelectVisible.innerHTML = estateOptionsHtml;
 
-    // Automatically select the user's first available estate on login,
-    // instead of making them pick one manually every time. They can still
-    // switch to any other estate they're permitted to access via the
-    // dropdown at any point afterwards.
-    const defaultEstate = allowedEstates.length > 0 ? allowedEstates[0] : '';
+    // Resume the estate the user had selected before the page reloaded
+    // (session.estate, persisted by onSidebarEstateChange) if it's still one
+    // they're allowed to access. Otherwise — first login, or that estate was
+    // revoked — fall back to their first available estate so they're never
+    // forced to pick one manually every time.
+    const defaultEstate = (session.estate && allowedEstates.includes(session.estate))
+        ? session.estate
+        : (allowedEstates.length > 0 ? allowedEstates[0] : '');
     estateSelect.value = defaultEstate;
     if (estateSelectVisible) estateSelectVisible.value = defaultEstate;
 
@@ -7040,6 +7063,9 @@ function navToSection(sectionId) {
     document.querySelectorAll('.nav-item[data-target]').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-target') === sectionId);
     });
+    // Remember this section so a page reload resumes here instead of
+    // always landing back on the Dashboard.
+    sessionStorage.setItem('opp_active_section', sectionId);
 
     syncEstateBackBtn(); // show ← Home when away from hub, hide when on hub
 
@@ -7278,6 +7304,9 @@ function logoutUser() {
     document.querySelectorAll('.nav-item[data-target]').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-target') === 'dashboard');
     });
+    // Also forget the last-viewed section so the next login starts fresh
+    // instead of resuming whatever page this user was last on.
+    sessionStorage.removeItem('opp_active_section');
 }
 
 /**
@@ -7765,7 +7794,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     email:       user.email,
                     name:        user.name,
                     estates:     user.estates || [],
-                    estate:      '',
+                    // Carry the previously-selected estate forward — this
+                    // refresh is just re-syncing permissions from Supabase,
+                    // it shouldn't reset which estate the user was viewing.
+                    estate:      (localSession && localSession.estate) || '',
                     role:        user.role || 'user',
                     permissions: user.permissions || {},
                 };
