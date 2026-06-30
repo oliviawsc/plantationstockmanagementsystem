@@ -126,10 +126,14 @@
         /* Buttons */
         .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;border:none;transition:opacity .13s,background .13s;white-space:nowrap}
         .btn:active{transform:scale(.98)}
-        .btn-primary{background:linear-gradient(135deg,#2E7D32 0%,#43A047 100%);color:#fff;box-shadow:0 2px 8px rgba(46,125,50,.25)}
-        .btn-primary:hover{filter:brightness(1.07);box-shadow:0 4px 14px rgba(46,125,50,.35)}
+        .btn-primary{background:linear-gradient(135deg,#2E7D32 0%,#43A047 100%);color:#fff;box-shadow:0 2px 8px rgba(46,125,50,.25);transition:transform .16s cubic-bezier(.22,1,.36,1),box-shadow .16s,filter .16s,opacity .16s}
+        .btn-primary:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.1);box-shadow:0 8px 22px rgba(46,125,50,.42)}
+        .btn-primary:active:not(:disabled){transform:translateY(0) scale(.97);filter:brightness(.97);box-shadow:0 2px 6px rgba(46,125,50,.22);transition-duration:.07s}
+        .btn-primary:disabled{opacity:.7;cursor:not-allowed;transform:none!important;filter:none!important;box-shadow:0 2px 6px rgba(46,125,50,.15)!important}
         .btn-success{background:#2E7D32;color:#fff}
         .btn-success:hover{background:#1B5E20}
+        @keyframes saveBtnSpin{to{transform:rotate(360deg)}}
+        .save-spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:saveBtnSpin .65s linear infinite;flex-shrink:0;vertical-align:-2px}
         .btn-danger{background:#FEE2E2;color:#DC2626}
         .btn-danger:hover{background:#FECACA}
         .btn-ghost{background:transparent;color:#2E7D32;border:1px solid #A5D6A7}
@@ -1105,7 +1109,7 @@
                 </div>
                 <div style="display:flex;gap:8px;margin-top:18px;">
                     <button onclick="closeChangePasswordModal()" style="flex:1;padding:9px;border-radius:8px;border:1px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;">Cancel</button>
-                    <button onclick="submitChangePassword()" style="flex:1;padding:9px;border-radius:8px;border:none;background:linear-gradient(135deg,#2E7D32,#43A047);color:#fff;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;" onmouseover="this.style.filter='brightness(1.08)'" onmouseout="this.style.filter='none'">Save</button>
+                    <button id="cpSaveBtn" onclick="submitChangePassword()" class="btn btn-primary" style="flex:1;justify-content:center;padding:9px;font-size:13px;">Save</button>
                 </div>
             </div>
         </div>
@@ -1327,7 +1331,7 @@
                         <p class="text-xs text-green-700 mt-1 italic" data-i18n="items_threshold_hint">⚠️ Min Threshold only applies to <b>Chemicals</b>. Fertilizers & Seedlings ignore this value.</p>
                     </div>
                     <div class="md:col-span-2 flex gap-3">
-                        <button id="itemSubmitBtn" type="button" onclick="saveItem()" class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold" data-i18n="btn_save_item">Save Item</button>
+                        <button id="itemSubmitBtn" type="button" onclick="saveItem()" class="btn btn-primary" data-i18n="btn_save_item">Save Item</button>
                         <button id="itemCancelBtn" type="button" onclick="cancelEditItem()" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg font-semibold" data-i18n="btn_cancel_edit">Cancel Edit</button>
                     </div>
                 </form>
@@ -1579,7 +1583,7 @@
                         <p id="txnPictureFilename" class="text-xs text-green-700 mt-1 italic hidden"></p>
                     </div>
                     <div class="md:col-span-2">
-                        <button type="button" onclick="saveTransaction()" class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold" data-i18n="btn_save_txn">Save Transaction</button>
+                        <button id="txnSaveBtn" type="button" onclick="saveTransaction()" class="btn btn-primary" data-i18n="btn_save_txn">Save Transaction</button>
                     </div>
                 </form>
             </div>
@@ -1674,7 +1678,7 @@
                         <input id="locPalms" min="0" step="1" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="number" placeholder="e.g. 3500" />
                     </div>
                     <div class="md:col-span-2 flex gap-3">
-                        <button id="locSubmitBtn" type="button" onclick="saveLocation()" class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold" data-i18n="btn_save_loc">Save Location</button>
+                        <button id="locSubmitBtn" type="button" onclick="saveLocation()" class="btn btn-primary" data-i18n="btn_save_loc">Save Location</button>
                         <button id="locCancelBtn" type="button" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg font-semibold" data-i18n="btn_cancel_edit">Cancel Edit</button>
                     </div>
                 </form>
@@ -1753,7 +1757,7 @@
                         <textarea id="mrNotes" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" rows="2" placeholder="e.g. Apply pre-rainy season"></textarea>
                     </div>
                     <div class="md:col-span-2 flex gap-3">
-                        <button id="mrSubmitBtn" type="button" onclick="saveManuringRound()" class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold" data-i18n="btn_save_round">Save Round</button>
+                        <button id="mrSubmitBtn" type="button" onclick="saveManuringRound()" class="btn btn-primary" data-i18n="btn_save_round">Save Round</button>
                         <button id="mrCancelBtn" type="button" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg font-semibold" data-i18n="btn_cancel_edit">Cancel Edit</button>
                     </div>
                 </form>
@@ -1889,7 +1893,7 @@
                     </div>
                     <div class="md:col-span-2 flex gap-3">
                         <button id="fmSubmitBtn" type="button" onclick="saveFieldMaintRound()"
-                            class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold">Save Round</button>
+                            class="btn btn-primary">Save Round</button>
                         <button id="fmCancelBtn" type="button" onclick="cancelEditFieldMaintRound()"
                             class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg font-semibold">Cancel Edit</button>
                     </div>
@@ -2008,7 +2012,7 @@
                     <div class="flex items-end gap-2">
                         <button type="button" onclick="saveMaintClaim()"
                             id="mpSaveBtn" data-i18n="mp_btn_save"
-                            class="flex-1 bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold">
+                            class="flex-1 btn btn-primary" style="justify-content:center">
                             Save Claim
                         </button>
                         <button type="button" onclick="cancelEditMaintClaim()"
@@ -2129,7 +2133,7 @@
                 <div class="flex gap-2">
                     <button type="button" onclick="saveChemIngredient()"
                         id="ciSaveBtn" data-i18n="ci_btn_save"
-                        class="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg font-semibold">
+                        class="btn btn-primary">
                         Save Ingredient
                     </button>
                     <button type="button" onclick="cancelEditChemIngredient()"
@@ -2336,7 +2340,7 @@
                 </div>
             </div>
             <div class="md:col-span-2 flex gap-3">
-                <button type="button" onclick="saveEditTransaction()" class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold" data-i18n="btn_save_changes">Save Changes</button>
+                <button id="editTxnSaveBtn" type="button" onclick="saveEditTransaction()" class="btn btn-primary" data-i18n="btn_save_changes">Save Changes</button>
                 <button type="button" onclick="closeEditTxnModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg font-semibold" data-i18n="btn_cancel">Cancel</button>
             </div>
         </form>
@@ -2441,6 +2445,31 @@ function loadEstateData(estate) {
     lastKnownIds.opp_fieldmaint_rounds  = new Set(fieldMaintRounds.map(r => r.id));
     lastKnownIds.opp_maint_claims       = new Set(maintClaims.map(r => r.id));
     lastKnownIds.opp_chem_ingredients   = new Set(chemIngredients.map(r => r.id));
+}
+
+// Show a spinner + disable a save button while an operation is in flight.
+function btnLoad(btn, label) {
+    if (!btn) return;
+    btn.disabled = true;
+    btn.dataset.origHtml = btn.innerHTML;
+    btn.innerHTML = '<span class="save-spinner"></span>' + (label || 'Saving…');
+}
+// Restore a save button to its pre-loading state.
+function btnDone(btn) {
+    if (!btn) return;
+    btn.disabled = false;
+    if (btn.dataset.origHtml !== undefined) {
+        btn.innerHTML = btn.dataset.origHtml;
+        delete btn.dataset.origHtml;
+    }
+}
+// For save operations that complete synchronously (instant localStorage writes),
+// btnLoad()+btnDone() back-to-back never gets painted by the browser — JS blocks
+// the render until it yields. btnLoadThen() shows the spinner, yields so it
+// actually paints, then runs `work` after a short delay so it's visible.
+function btnLoadThen(btn, work, label) {
+    btnLoad(btn, label);
+    setTimeout(work, 300);
 }
 
 // Persist a key back to localStorage AND sync to Supabase.
@@ -2737,12 +2766,14 @@ function saveItem() {
     if (!category) { alert('Please select a Category.'); return; }
     if (!baseUnit) { alert('Please enter a Base Unit (e.g. kg, litre, pcs).'); return; }
 
+    const itemSubmitBtn = document.getElementById('itemSubmitBtn');
+    btnLoadThen(itemSubmitBtn, () => {
     if (editingItemId) {
         const idx = items.findIndex(i => String(i.id) === String(editingItemId));
-        if (idx < 0) { editingItemId = null; return; }
+        if (idx < 0) { editingItemId = null; btnDone(itemSubmitBtn); return; }
         const oldName = items[idx].name;
         if (items.some((i, j) => j !== idx && i.name.toLowerCase() === name.toLowerCase())) {
-            alert('Another item with that name already exists.'); return;
+            alert('Another item with that name already exists.'); btnDone(itemSubmitBtn); return;
         }
         items[idx] = { ...items[idx], name, category,
                        baseUnit, packageUnit, qtyPerUnit, threshold,
@@ -2752,10 +2783,11 @@ function saveItem() {
             save(STORAGE_KEYS.transactions, transactions);
         }
         save(STORAGE_KEYS.items, items);
+        btnDone(itemSubmitBtn);
         cancelEditItem();
     } else {
         if (items.some(i => i.name.toLowerCase() === name.toLowerCase())) {
-            alert('An item with that name already exists.'); return;
+            alert('An item with that name already exists.'); btnDone(itemSubmitBtn); return;
         }
         const itemCode = generateItemCode();
         items.push({ id: Date.now(), itemCode, name, category,
@@ -2769,8 +2801,10 @@ function saveItem() {
         document.getElementById('itemQtyPerUnit').value  = '';
         document.getElementById('itemThreshold').value   = '';
         document.getElementById('itemDefaultUnitBase').checked = true;
+        btnDone(itemSubmitBtn);
     }
     refreshAll();
+    });
 }
 
 // Render existing items table
@@ -2873,14 +2907,17 @@ function saveLocation() {
         area: parseFloat(document.getElementById('locArea').value) || 0,
         numPalms: parseInt(document.getElementById('locPalms').value, 10) || 0
     };
+    const locSubmitBtn = document.getElementById('locSubmitBtn');
+    btnLoadThen(locSubmitBtn, () => {
 
     if (editingLocId) {
         // ===== UPDATE EXISTING =====
         const idx = locations.findIndex(x => x.id === editingLocId);
-        if (idx < 0) { editingLocId = null; return; }
+        if (idx < 0) { editingLocId = null; btnDone(locSubmitBtn); return; }
         // Block name collision with OTHER locations
         if (locations.some(l => l.id !== editingLocId && l.name.toLowerCase() === formLoc.name.toLowerCase())) {
             alert('Another location with that name already exists.');
+            btnDone(locSubmitBtn);
             return;
         }
         const oldName = locations[idx].name;
@@ -2890,11 +2927,13 @@ function saveLocation() {
             transactions.forEach(t => { if (t.location === oldName) t.location = formLoc.name; });
             save(STORAGE_KEYS.transactions, transactions);
         }
+        btnDone(locSubmitBtn);
         cancelEditLocation();
     } else {
         // ===== CREATE NEW (existing logic) =====
         if (locations.some(l => l.name.toLowerCase() === formLoc.name.toLowerCase())) {
             alert('A location with that name already exists.');
+            btnDone(locSubmitBtn);
             return;
         }
         locations.push({ id: Date.now(), ...formLoc });
@@ -2902,6 +2941,8 @@ function saveLocation() {
     }
     save(STORAGE_KEYS.locations, locations);
     refreshAll();
+    btnDone(locSubmitBtn);
+    });
 }
 
 // Render location grid
@@ -2994,6 +3035,10 @@ function saveTransaction() {
     if (!item) { alert('Please select a valid item.'); return; }
 
     const txnType  = document.getElementById('txnType').value;
+    const txnSaveBtn = document.getElementById('txnSaveBtn');
+    btnLoad(txnSaveBtn);
+    setTimeout(() => {
+    try {
 
     /* ============ NEW: MULTI-ROW PATH FOR OUT TRANSACTIONS ============ */
     if (txnType === 'Out') {
@@ -3132,6 +3177,11 @@ function saveTransaction() {
     clearTxnPicture();
     alert('Transaction recorded successfully.');
     refreshAll();
+
+    } finally {
+        btnDone(txnSaveBtn);
+    }
+    }, 300);
 }
 
 /* -----------------------------------------------------------------
@@ -3269,6 +3319,9 @@ function saveManuringRound() {
         alert('Selected fertilizer not found. Please re-select.'); return;
     }
 
+    const mrSubmitBtn = document.getElementById('mrSubmitBtn');
+    btnLoadThen(mrSubmitBtn, () => {
+
     // ── Build round object ───────────────────────────────────────────
     const formRound = {
         name:             roundName,
@@ -3285,7 +3338,7 @@ function saveManuringRound() {
     // ── Create or update ─────────────────────────────────────────────
     if (editingRoundId) {
         const idx = manuringRounds.findIndex(x => String(x.id) === String(editingRoundId));
-        if (idx < 0) { editingRoundId = null; return; }
+        if (idx < 0) { editingRoundId = null; btnDone(mrSubmitBtn); return; }
         const oldName = manuringRounds[idx].name;
         manuringRounds[idx] = { id: manuringRounds[idx].id, ...formRound };
         if (oldName !== formRound.name) {
@@ -3295,6 +3348,7 @@ function saveManuringRound() {
             });
             save(STORAGE_KEYS.transactions, transactions);
         }
+        btnDone(mrSubmitBtn);
         cancelEditRound();
     } else {
         manuringRounds.push({ id: Date.now(), ...formRound });
@@ -3316,14 +3370,15 @@ function saveManuringRound() {
     renderRoundProgress();
 
     // Show success feedback inline (no alert needed)
-    const btn = document.getElementById('mrSubmitBtn');
-    const orig = btn.textContent;
-    btn.textContent = '✅ Saved!';
-    btn.style.background = '#15803d';
+    btnDone(mrSubmitBtn);
+    const orig = mrSubmitBtn.textContent;
+    mrSubmitBtn.textContent = '✅ Saved!';
+    mrSubmitBtn.style.background = '#15803d';
     setTimeout(() => {
-        btn.textContent = orig;
-        btn.style.background = '';
+        mrSubmitBtn.textContent = orig;
+        mrSubmitBtn.style.background = '';
     }, 1500);
+    });
 }
 
 // Total palms across every registered block (used for budget calc when no blocks specified)
@@ -5432,6 +5487,9 @@ function saveEditTransaction() {
     const idx = transactions.findIndex(x => x.id === id);
     if (idx < 0) { closeEditTxnModal(); return; }
 
+    const editTxnSaveBtn = document.getElementById('editTxnSaveBtn');
+    btnLoadThen(editTxnSaveBtn, () => {
+
     const txnType  = document.getElementById('editTxnType').value;
     const category = document.getElementById('editTxnCategory').value;
     const t        = transactions[idx];
@@ -5490,9 +5548,11 @@ function saveEditTransaction() {
     };
 
     save(STORAGE_KEYS.transactions, transactions);
+    btnDone(editTxnSaveBtn);
     closeEditTxnModal();
     alert('Transaction updated successfully.');
     refreshAll();
+    });
 }
 
 // Close modal when clicking the backdrop
@@ -7232,8 +7292,8 @@ async function openEditUserModal(id) {
                     </div>
                 </div>
                 <div class="flex gap-3 pt-2">
-                    <button onclick="saveEditUser()"
-                        class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold">Save Changes</button>
+                    <button id="saveEditUserBtn" onclick="saveEditUser()"
+                        class="btn btn-primary">Save Changes</button>
                     <button onclick="document.getElementById('editUserModal').remove()"
                         class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-semibold">Cancel</button>
                 </div>
@@ -7261,8 +7321,8 @@ async function saveEditUser() {
     if (!name)                          { alert('Name is required.'); return; }
     if (!isAdmin && estates.length === 0) { alert('Please select at least one Estate.'); return; }
 
-    const saveBtn = document.querySelector('#editUserModal button[onclick="saveEditUser()"]');
-    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
+    const saveBtn = document.getElementById('saveEditUserBtn');
+    btnLoad(saveBtn, 'Saving…');
 
     try {
         const users = await fetchUsersFromSupabase();
@@ -7298,7 +7358,7 @@ async function saveEditUser() {
         console.error('[Supabase] saveEditUser failed', err);
         alert('Could not save changes — ' + (err.message || 'please check your connection and try again.'));
     } finally {
-        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Changes'; }
+        btnDone(saveBtn);
     }
 }
 
@@ -7505,15 +7565,18 @@ function saveFieldMaintRound() {
     if (!name) { alert('Please enter a Round Name.'); return; }
 
     const today = new Date().toISOString().slice(0, 10);
+    const fmSubmitBtn = document.getElementById('fmSubmitBtn');
+    btnLoadThen(fmSubmitBtn, () => {
 
     if (editingFmRoundId) {
         // UPDATE existing round
         const idx = fieldMaintRounds.findIndex(r => String(r.id) === String(editingFmRoundId));
-        if (idx < 0) { editingFmRoundId = null; return; }
+        if (idx < 0) { editingFmRoundId = null; btnDone(fmSubmitBtn); return; }
         fieldMaintRounds[idx] = {
             ...fieldMaintRounds[idx],  // preserve id and createdAt
             name, blocks, notes, targetPeriod, maintType
         };
+        btnDone(fmSubmitBtn);
         cancelEditFieldMaintRound();
     } else {
         // CREATE new round
@@ -7531,11 +7594,12 @@ function saveFieldMaintRound() {
     renderFieldMaintRounds();
 
     // Brief success feedback on the button
-    const btn  = document.getElementById('fmSubmitBtn');
-    const orig = btn.textContent;
-    btn.textContent      = '✅ Saved!';
-    btn.style.background = '#15803d';
-    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 1500);
+    btnDone(fmSubmitBtn);
+    const orig = fmSubmitBtn.textContent;
+    fmSubmitBtn.textContent      = '✅ Saved!';
+    fmSubmitBtn.style.background = '#15803d';
+    setTimeout(() => { fmSubmitBtn.textContent = orig; fmSubmitBtn.style.background = ''; }, 1500);
+    });
 }
 
 /** Pre-fill the form to edit an existing round. */
@@ -7689,14 +7753,29 @@ function saveMaintClaim() {
     const round = fieldMaintRounds.find(r => String(r.id) === String(roundId));
     if (!round) { alert('Selected round not found.'); return; }
 
+    const mpSaveBtn = document.getElementById('mpSaveBtn');
+
+    // Resolve which path we're on (and confirm overwrite) before showing the spinner.
     if (editId) {
         const idx = maintClaims.findIndex(c => String(c.id) === String(editId));
         if (idx < 0) { cancelEditMaintClaim(); return; }
+    } else {
+        const existing = maintClaims.findIndex(c =>
+            String(c.roundId) === String(roundId) &&
+            c.blockName === blockName && c.month === month
+        );
+        if (existing >= 0 && !confirm(`A claim for "${round.name}" / "${blockName}" in ${month} already exists. Update it?`)) return;
+    }
+
+    btnLoadThen(mpSaveBtn, () => {
+    if (editId) {
+        const idx = maintClaims.findIndex(c => String(c.id) === String(editId));
         maintClaims[idx] = {
             ...maintClaims[idx],
             roundId: round.id, roundName: round.name,
             blockName, claimedArea, month
         };
+        btnDone(mpSaveBtn);
         cancelEditMaintClaim();
     } else {
         const existing = maintClaims.findIndex(c =>
@@ -7704,12 +7783,12 @@ function saveMaintClaim() {
             c.blockName === blockName && c.month === month
         );
         if (existing >= 0) {
-            if (!confirm(`A claim for "${round.name}" / "${blockName}" in ${month} already exists. Update it?`)) return;
             maintClaims[existing].claimedArea = claimedArea;
         } else {
             maintClaims.push({ id: Date.now(), roundId: round.id, roundName: round.name,
                                blockName, claimedArea, month });
         }
+        btnDone(mpSaveBtn);
         document.getElementById('mpClaimedArea').value = '';
         document.getElementById('mpRound').value       = '';
         document.getElementById('mpBlock').value       = '';
@@ -7719,12 +7798,12 @@ function saveMaintClaim() {
     save(STORAGE_KEYS.maintClaims, maintClaims);
     renderMaintProgressTables();
 
-    const btn = document.getElementById('mpSaveBtn');
-    if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = '✅ Saved!'; btn.style.background = '#15803d';
-        setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 1500);
+    if (mpSaveBtn) {
+        const orig = mpSaveBtn.textContent;
+        mpSaveBtn.textContent = '✅ Saved!'; mpSaveBtn.style.background = '#15803d';
+        setTimeout(() => { mpSaveBtn.textContent = orig; mpSaveBtn.style.background = ''; }, 1500);
     }
+    });
 }
 
 /** Pre-fill the claim form for editing */
@@ -7782,19 +7861,28 @@ function saveChemIngredient() {
     const item = items.find(i => String(i.id) === String(itemId));
     if (!item) { alert('Selected chemical not found.'); return; }
 
+    const ciSaveBtn = document.getElementById('ciSaveBtn');
+
+    if (editId) {
+        const idx = chemIngredients.findIndex(c => String(c.id) === String(editId));
+        if (idx < 0) { cancelEditChemIngredient(); return; }
+    }
+
+    btnLoadThen(ciSaveBtn, () => {
     if (editId) {
         // ── UPDATE existing ingredient ──
         const idx = chemIngredients.findIndex(c => String(c.id) === String(editId));
-        if (idx < 0) { cancelEditChemIngredient(); return; }
         chemIngredients[idx] = {
             ...chemIngredients[idx],
             name, itemId: item.id, itemName: item.name, unit, maxDosage, density
         };
+        btnDone(ciSaveBtn);
         cancelEditChemIngredient();
     } else {
         // ── CREATE new ingredient ──
         chemIngredients.push({ id: Date.now(), name, itemId: item.id, itemName: item.name,
                                unit, maxDosage, density });
+        btnDone(ciSaveBtn);
         document.getElementById('ciName').value      = '';
         document.getElementById('ciItem').value      = '';
         document.getElementById('ciMaxDosage').value = '';
@@ -7804,6 +7892,7 @@ function saveChemIngredient() {
     save(STORAGE_KEYS.chemIngredients, chemIngredients);
     renderCiTable();
     renderMaintProgressTables();
+    });
 }
 
 /** Pre-fill the chemical ingredient form for editing */
@@ -8426,8 +8515,8 @@ function applyFilterChemBlock() {
         var session = loadSession();
         if(!session)       return showErr('Session expired. Please log in again.');
 
-        var saveBtn = document.querySelector('#changePasswordModal button[onclick="submitChangePassword()"]');
-        if (saveBtn) saveBtn.disabled = true;
+        var saveBtn = document.getElementById('cpSaveBtn');
+        btnLoad(saveBtn, 'Saving…');
 
         try {
             // All users (including Super Admin) authenticate via Supabase Auth.
@@ -8446,7 +8535,7 @@ function applyFilterChemBlock() {
             console.error('[Supabase] change password failed', err);
             showErr('Could not change password — please check your connection and try again.');
         } finally {
-            if (saveBtn) saveBtn.disabled = false;
+            btnDone(saveBtn);
         }
     };
     // On load, populate avatar from existing session
