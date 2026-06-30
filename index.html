@@ -704,6 +704,33 @@
         .login-help        { margin-bottom:8px; }
         .login-footer      { padding-top:10px; }
     }
+
+    /* Stock Ledger — professional pivot-style ledger table:
+       Item / Detail (Qty In, Qty Out, Balance) rows × Month columns,
+       with the Item and Detail columns frozen while scrolling sideways. */
+    #ledgerTable        { border-collapse:collapse; border:1px solid #C8E6C9; }
+    #ledgerTable th, #ledgerTable td { border:1px solid #E2EFE3; }
+    #ledgerTable thead th {
+        position:sticky; top:0; z-index:2;
+        background:#DCFCE7; color:#166534;
+        font-size:11.5px; text-transform:uppercase; letter-spacing:.04em;
+        border-bottom:2px solid #A5D6A7;
+    }
+    #ledgerTable th.ledger-col-item, #ledgerTable th.ledger-col-detail { z-index:3; left:0; }
+    #ledgerTable th.ledger-col-item   { left:0; min-width:150px; }
+    #ledgerTable th.ledger-col-detail { left:150px; min-width:120px; }
+    #ledgerTable td.ledger-item-cell, #ledgerTable td.ledger-detail-cell { position:sticky; background:#fff; z-index:1; }
+    #ledgerTable td.ledger-item-cell   { left:0; min-width:150px; vertical-align:middle; font-weight:700; color:#1B5E20; border-right:2px solid #C8E6C9; }
+    #ledgerTable td.ledger-detail-cell { left:150px; min-width:120px; color:#374151; font-weight:600; border-right:2px solid #C8E6C9; }
+    #ledgerTable td.ledger-num { font-variant-numeric:tabular-nums; white-space:nowrap; }
+    #ledgerTable tbody tr.ledger-group-alt { background:#F8FBF8; }
+    #ledgerTable tr.ledger-group-alt td.ledger-item-cell,
+    #ledgerTable tr.ledger-group-alt td.ledger-detail-cell { background:#F8FBF8; }
+    #ledgerTable tr.ledger-row-in   td.ledger-num { color:#15803d; }
+    #ledgerTable tr.ledger-row-out  td.ledger-num { color:#dc2626; }
+    #ledgerTable tr.ledger-row-balance td { font-weight:800; background:#F1F8F2; }
+    #ledgerTable tr.ledger-row-balance.ledger-group-alt td { background:#EAF5EB; }
+    #ledgerTable tr.ledger-closing-row td { border-bottom:2px solid #A5D6A7; }
     </style>
 </head>
 <body>
@@ -893,6 +920,7 @@
             <button data-target="items"         class="nav-item">               <span class="nav-icon">&#128230;</span><span class="sb-label" data-i18n="sb_lbl_items">Item File</span></button>
             <button data-target="transactions"  class="nav-item">        <span class="nav-icon">&#128260;</span><span class="sb-label" data-i18n="sb_lbl_transactions">Stock Transaction</span></button>
             <button data-target="summary"       class="nav-item">             <span class="nav-icon">&#128209;</span><span class="sb-label" data-i18n="sb_lbl_summary">Stock Summary</span></button>
+            <button data-target="ledger"         class="nav-item">             <span class="nav-icon">&#128210;</span><span class="sb-label" data-i18n="sb_lbl_ledger">Stock Ledger</span></button>
             <button data-target="locations"     class="nav-item">           <span class="nav-icon">&#128205;</span><span class="sb-label" data-i18n="sb_lbl_locations">Location Area</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;">Field Operations</p>
             <button data-target="manuring"      class="nav-item">            <span class="nav-icon">&#127807;</span><span class="sb-label" data-i18n="sb_lbl_manuring">Manuring Program</span></button>
@@ -1589,6 +1617,57 @@
                             </tr>
                         </thead>
                         <tbody id="summaryBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ PAGE 5b: STOCK LEDGER ============ -->
+        <section id="ledger" class="page-section">
+            <h2 class="text-3xl font-bold mb-6" data-i18n="nav_ledger">Stock Ledger</h2>
+            <!-- Filters -->
+            <div class="bg-white p-6 rounded-xl shadow mb-6">
+                <h3 class="text-lg font-bold mb-3" data-i18n="summary_filters">Filters</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold mb-1" data-i18n="col_category">Category</label>
+                        <select id="filterLedgerCategory" class="w-full border border-green-300 rounded p-2 bg-white" onchange="refreshLedgerItemDropdown(true)">
+                            <option value="" data-i18n="opt_all">All</option>
+                            <option value="Fertilizer" data-i18n="cat_fertilizer">Fertilizer</option>
+                            <option value="Chemical" data-i18n="cat_chemical">Chemical</option>
+                            <option value="Oil Palm Seedling" data-i18n="cat_seedling">Oil Palm Seedling</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1" data-i18n="col_item_name">Item Name</label>
+                        <select id="filterLedgerItem" class="w-full border border-green-300 rounded p-2 bg-white">
+                            <option value="" data-i18n="opt_all">All</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1" data-i18n="ledger_lbl_year">Year</label>
+                        <select id="filterLedgerYear" class="w-full border border-green-300 rounded p-2 bg-white">
+                            <option value="" data-i18n="opt_all">All</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-4 flex gap-3">
+                    <button id="applyLedgerFilterBtn" class="bg-green-800 hover:bg-green-900 text-white px-5 py-2 rounded-lg font-semibold" data-i18n="btn_apply_filters">Apply Filters</button>
+                    <button id="clearLedgerFilterBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-lg font-semibold" data-i18n="btn_clear">Clear</button>
+                    <button id="exportLedgerBtn" class="ml-auto bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-2 rounded-lg font-semibold" data-i18n="btn_export">⬇️ Export to Excel</button>
+                </div>
+            </div>
+
+            <!-- Ledger table: Item / Detail (Qty In, Qty Out, Balance) rows × Month columns.
+                 Header and body are both built in JS (renderLedger) since the
+                 set of month columns varies with the data and filters. -->
+            <div class="bg-white p-6 rounded-xl shadow">
+                <div class="overflow-auto" style="max-height:600px;">
+                    <table id="ledgerTable" class="min-w-full text-sm">
+                        <thead class="bg-green-100 text-green-800">
+                            <tr id="ledgerHeadRow"></tr>
+                        </thead>
+                        <tbody id="ledgerBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -3685,6 +3764,10 @@ function populateItemDropdowns() {
     // Stock summary filter dropdown — populate via shared filter function
     filterSummaryItemsByCategory();
 
+    // Stock ledger filter dropdowns — preserve current selections on refresh
+    refreshLedgerItemDropdown(false);
+    populateLedgerYearDropdown();
+
     // Manuring program: only Fertilizer items — preserve current selection
     const mrSel       = document.getElementById('mrFertilizer');
     const mrPrevVal   = mrSel.value;
@@ -3986,6 +4069,311 @@ document.getElementById('exportExcelBtn').addEventListener('click', () => {
     XLSX.utils.book_append_sheet(wb, ws, 'Stock Summary');
     const stamp = new Date().toISOString().slice(0,10);
     XLSX.writeFile(wb, `stock_summary_${stamp}.xlsx`);
+});
+
+/* -----------------------------------------------------------------
+   STOCK LEDGER - monthly movement + running balance per item
+   ----------------------------------------------------------------- */
+let currentFilteredLedgerPivot = { itemList: [], months: [] }; // tracks what's visible for the export button
+
+/**
+ * Re-filters the Item Name dropdown when the Stock Ledger category changes.
+ * @param {boolean} resetSelection - true when called from the category
+ *   onchange handler (clears the item pick); false when called from a
+ *   routine refresh, where the current selection should be preserved.
+ */
+function refreshLedgerItemDropdown(resetSelection) {
+    const selectedCat = document.getElementById('filterLedgerCategory').value;
+    const filterSel    = document.getElementById('filterLedgerItem');
+    const prevVal       = filterSel.value;
+
+    const filtered = selectedCat
+        ? items.filter(i => i.category === selectedCat)
+        : items;
+
+    filterSel.innerHTML = '<option value="">All</option>' +
+        filtered.map(i => `<option value="${i.name}">${i.name}</option>`).join('');
+
+    if (!resetSelection && prevVal && filtered.some(i => i.name === prevVal)) {
+        filterSel.value = prevVal;
+    }
+}
+
+function populateLedgerYearDropdown() {
+    const yearSel = document.getElementById('filterLedgerYear');
+    if (!yearSel) return;
+    const prevVal = yearSel.value;
+    const years = [...new Set(transactions.map(t => (t.date || '').slice(0, 4)).filter(Boolean))]
+        .sort().reverse();
+    yearSel.innerHTML = '<option value="">All</option>' +
+        years.map(y => `<option value="${y}">${y}</option>`).join('');
+    if (prevVal && years.includes(prevVal)) yearSel.value = prevVal;
+}
+
+function formatLedgerMonth(yearMonth) {
+    const [y, m] = yearMonth.split('-');
+    const names = ['January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
+    return `${names[parseInt(m, 10) - 1] || m} ${y}`;
+}
+
+/**
+ * Builds one row per item per calendar month that had any stock movement,
+ * with a running balance carried forward across that item's full history.
+ * @param {boolean} applyFilters - when true (default), restricts the result
+ *   to the current Category/Item/Year filter selections. Pass false to get
+ *   every item's complete, unfiltered monthly history — used by the Stock
+ *   Ledger pivot below, which needs the full history to carry balances
+ *   forward correctly even into months it isn't currently displaying.
+ */
+function getLedgerRows(applyFilters) {
+    if (applyFilters === undefined) applyFilters = true;
+    const cat  = applyFilters ? document.getElementById('filterLedgerCategory').value : '';
+    const itm  = applyFilters ? document.getElementById('filterLedgerItem').value     : '';
+    const year = applyFilters ? document.getElementById('filterLedgerYear').value     : '';
+
+    const groups = {}; // key: "itemId|YYYY-MM"
+    transactions.forEach(t => {
+        const month = (t.date || '').slice(0, 7);
+        if (!month) return;
+        const key = `${t.itemId}|${month}`;
+        if (!groups[key]) {
+            groups[key] = { itemId: t.itemId, itemName: t.itemName, category: t.category,
+                             unit: t.unit, month, received: 0, issued: 0 };
+        }
+        if (t.type === 'In' || t.type === 'Adj') groups[key].received += t.qty;
+        else if (t.type === 'Out')               groups[key].issued  += t.qty;
+    });
+
+    const rows = Object.values(groups).sort((a, b) =>
+        String(a.itemId).localeCompare(String(b.itemId)) || a.month.localeCompare(b.month));
+
+    // Running balance, carried forward in chronological order per item
+    const runningBalance = {};
+    rows.forEach(r => {
+        const opening = runningBalance[r.itemId] || 0;
+        r.balance = opening + r.received - r.issued;
+        runningBalance[r.itemId] = r.balance;
+    });
+
+    return rows.filter(r => {
+        if (cat  && r.category !== cat)        return false;
+        if (itm  && r.itemName !== itm)        return false;
+        if (year && !r.month.startsWith(year)) return false;
+        return true;
+    });
+}
+
+// Right-aligned numeric format with thousands separators, e.g. 12,345.00
+function formatLedgerQty(qty) {
+    return Number(qty).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// Item ordering for the Stock Ledger: Fertilizer, then Chemical, then
+// Oil Palm Seedling (any other/unknown category sorts after all of these).
+const LEDGER_CATEGORY_ORDER = ['Fertilizer', 'Chemical', 'Oil Palm Seedling'];
+function ledgerCategoryRank(cat) {
+    const idx = LEDGER_CATEGORY_ORDER.indexOf(cat);
+    return idx === -1 ? LEDGER_CATEGORY_ORDER.length : idx;
+}
+
+// Builds the inclusive list of 'YYYY-MM' strings from startYM to endYM, so
+// the ledger can show every month in a range — including ones with zero
+// movement — instead of only months that happen to have a transaction.
+function enumerateLedgerMonths(startYM, endYM) {
+    const months = [];
+    let [y, m] = startYM.split('-').map(Number);
+    const [endY, endM] = endYM.split('-').map(Number);
+    while (y < endY || (y === endY && m <= endM)) {
+        months.push(`${y}-${String(m).padStart(2, '0')}`);
+        m++;
+        if (m > 12) { m = 1; y++; }
+    }
+    return months;
+}
+
+/**
+ * Reshapes the per-item-month ledger data into a pivot: one row per item
+ * (kept if it matches the Category/Item filters, ordered Fertilizer →
+ * Chemical → Oil Palm Seedling), one column per month. Months always form a
+ * continuous range — Jan–Dec of the selected Year, or the full span of the
+ * item's history when no Year is selected — so a month with no movement
+ * still gets its own column instead of being skipped. Each item gets a
+ * `series` array aligned to the returned `months`, with the Balance carried
+ * forward into any month that had no movement for that item.
+ */
+function buildLedgerPivot() {
+    const cat  = document.getElementById('filterLedgerCategory').value;
+    const itm  = document.getElementById('filterLedgerItem').value;
+    const year = document.getElementById('filterLedgerYear').value;
+
+    // Full, unfiltered per-item-month history (correct running balance)
+    const allRows = getLedgerRows(false);
+
+    const byItem = {};
+    allRows.forEach(r => {
+        if (!byItem[r.itemId]) {
+            const itemRec = items.find(i => String(i.id) === String(r.itemId));
+            byItem[r.itemId] = { itemId: r.itemId, itemName: r.itemName, category: r.category,
+                                  unit: r.unit,
+                                  packageUnit: itemRec ? (itemRec.packageUnit || '') : '',
+                                  qtyPerUnit:  itemRec ? (parseFloat(itemRec.qtyPerUnit) || 0) : 0,
+                                  monthsMap: {}, sortedMonths: [] };
+        }
+        byItem[r.itemId].monthsMap[r.month] = { received: r.received, issued: r.issued, balance: r.balance };
+        byItem[r.itemId].sortedMonths.push(r.month); // already chronological from getLedgerRows
+    });
+
+    let itemList = Object.values(byItem).filter(it => {
+        if (cat && it.category !== cat) return false;
+        if (itm && it.itemName !== itm) return false;
+        return true;
+    }).sort((a, b) =>
+        ledgerCategoryRank(a.category) - ledgerCategoryRank(b.category) ||
+        String(a.itemName).localeCompare(String(b.itemName)));
+
+    // Month columns: a continuous range, not just months with movement.
+    let months;
+    if (year) {
+        months = enumerateLedgerMonths(`${year}-01`, `${year}-12`);
+    } else if (allRows.length > 0) {
+        const allMonths = allRows.map(r => r.month);
+        months = enumerateLedgerMonths(allMonths.reduce((a, b) => a < b ? a : b),
+                                        allMonths.reduce((a, b) => a > b ? a : b));
+    } else {
+        months = [];
+    }
+
+    // Build each item's per-month series aligned to `months`, carrying the
+    // balance forward through any month with no movement.
+    itemList.forEach(it => {
+        let lastBalance = 0, idx = 0;
+        it.series = months.map(m => {
+            while (idx < it.sortedMonths.length && it.sortedMonths[idx] <= m) {
+                lastBalance = it.monthsMap[it.sortedMonths[idx]].balance;
+                idx++;
+            }
+            const known = it.monthsMap[m];
+            return known
+                ? { received: known.received, issued: known.issued, balance: known.balance }
+                : { received: 0, issued: 0, balance: lastBalance };
+        });
+    });
+
+    return { itemList, months };
+}
+
+// Formats a base-unit quantity for display, with the package-unit
+// equivalent shown alongside it (smaller, muted) when the item defines a
+// packageUnit + qtyPerUnit conversion — e.g. "200.00 kg (4.00 bag)".
+function formatLedgerDualQty(baseQty, it) {
+    const baseHtml = `${formatLedgerQty(baseQty)} ${it.unit}`;
+    if (it.packageUnit && it.qtyPerUnit > 0) {
+        const pkgQty = baseQty / it.qtyPerUnit;
+        return `${baseHtml} <span class="text-gray-400 text-xs">(${formatLedgerQty(pkgQty)} ${it.packageUnit})</span>`;
+    }
+    return baseHtml;
+}
+
+// Plain-text equivalent of formatLedgerDualQty for the Excel export (no HTML).
+function formatLedgerDualQtyPlain(baseQty, it) {
+    const baseStr = `${baseQty.toFixed(2)} ${it.unit}`;
+    if (it.packageUnit && it.qtyPerUnit > 0) {
+        const pkgQty = baseQty / it.qtyPerUnit;
+        return `${baseStr} (${pkgQty.toFixed(2)} ${it.packageUnit})`;
+    }
+    return baseStr;
+}
+
+function renderLedger() {
+    const pivot = buildLedgerPivot();
+    currentFilteredLedgerPivot = pivot;
+    const { itemList, months } = pivot;
+
+    const headRow = document.getElementById('ledgerHeadRow');
+    const body    = document.getElementById('ledgerBody');
+    if (!headRow || !body) return;
+
+    const d = I18N[currentLang] || I18N['en'];
+
+    headRow.innerHTML =
+        `<th class="px-3 py-2 text-left ledger-col-item">${d.col_item}</th>` +
+        `<th class="px-3 py-2 text-left ledger-col-detail">${d.col_detail}</th>` +
+        months.map(m => `<th class="px-3 py-2 text-right">${formatLedgerMonth(m)}</th>`).join('');
+
+    body.innerHTML = '';
+    if (itemList.length === 0 || months.length === 0) {
+        body.innerHTML = `<tr><td colspan="${2 + months.length}" class="px-3 py-4 text-center text-gray-500">No stock movement recorded for the selected filters.</td></tr>`;
+        return;
+    }
+
+    const DETAIL_ROWS = [
+        { key: 'received', label: d.col_qty_in,  rowClass: 'ledger-row-in' },
+        { key: 'issued',   label: d.col_qty_out, rowClass: 'ledger-row-out' },
+        { key: 'balance',  label: d.col_balance, rowClass: 'ledger-row-balance' },
+    ];
+
+    itemList.forEach((it, itemIdx) => {
+        const altClass = itemIdx % 2 === 1 ? 'ledger-group-alt' : '';
+        DETAIL_ROWS.forEach((detail, rowIdx) => {
+            const tr = document.createElement('tr');
+            const isLastRow = rowIdx === DETAIL_ROWS.length - 1;
+            tr.className = [altClass, detail.rowClass, isLastRow ? 'ledger-closing-row' : '']
+                .filter(Boolean).join(' ');
+
+            const itemCellHtml = rowIdx === 0
+                ? `<td class="px-3 py-2 ledger-item-cell" rowspan="${DETAIL_ROWS.length}">${it.itemName}</td>`
+                : '';
+
+            const valueCellsHtml = it.series.map(s =>
+                `<td class="px-3 py-2 text-right ledger-num">${formatLedgerDualQty(s[detail.key], it)}</td>`
+            ).join('');
+
+            tr.innerHTML = `
+                ${itemCellHtml}
+                <td class="px-3 py-2 ledger-detail-cell">${detail.label}</td>
+                ${valueCellsHtml}`;
+            body.appendChild(tr);
+        });
+    });
+}
+
+document.getElementById('applyLedgerFilterBtn').addEventListener('click', renderLedger);
+document.getElementById('clearLedgerFilterBtn').addEventListener('click', () => {
+    document.getElementById('filterLedgerCategory').value = '';
+    document.getElementById('filterLedgerYear').value     = '';
+    refreshLedgerItemDropdown(true);
+    renderLedger();
+});
+
+// Export the currently filtered ledger pivot to Excel via SheetJS, mirroring
+// the on-screen Item / Detail / Month layout.
+document.getElementById('exportLedgerBtn').addEventListener('click', () => {
+    const { itemList, months } = currentFilteredLedgerPivot;
+    if (itemList.length === 0 || months.length === 0) {
+        alert('No data to export.');
+        return;
+    }
+    const detailLabels = [
+        { key: 'received', label: 'Quantity In' },
+        { key: 'issued',   label: 'Quantity Out' },
+        { key: 'balance',  label: 'Balance' },
+    ];
+    const rows = [];
+    itemList.forEach(it => {
+        detailLabels.forEach(detail => {
+            const row = { Item: it.itemName, Category: it.category, Detail: detail.label };
+            months.forEach((m, i) => {
+                row[formatLedgerMonth(m)] = formatLedgerDualQtyPlain(it.series[i][detail.key], it);
+            });
+            rows.push(row);
+        });
+    });
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Stock Ledger');
+    const stamp = new Date().toISOString().slice(0,10);
+    XLSX.writeFile(wb, `stock_ledger_${stamp}.xlsx`);
 });
 
 /* -----------------------------------------------------------------
@@ -5026,6 +5414,7 @@ function refreshAll() {
     renderLiveStock();
     renderLiveStockChart();
     renderSummary();
+    renderLedger();
     renderDashboard();
     renderManuringRounds();
     renderManuringHistory();
@@ -5590,6 +5979,7 @@ const I18N = {
         nav_items:           '📦 Item File',
         nav_transactions:    '🔄 Stock Transaction',
         nav_summary:         '📑 Stock Summary',
+        nav_ledger:          '📒 Stock Ledger',
         nav_locations:       '📍 Location Area',
         nav_manuring:        '🌱 Manuring Program',
         nav_roundprogress:   '📈 Manuring Progress',
@@ -5597,6 +5987,7 @@ const I18N = {
         sb_lbl_items:        'Item File',
         sb_lbl_transactions: 'Stock Transaction',
         sb_lbl_summary:      'Stock Summary',
+        sb_lbl_ledger:       'Stock Ledger',
         sb_lbl_locations:    'Location Area',
         sb_lbl_manuring:     'Manuring Program',
         sb_lbl_roundprogress:'Manuring Progress',
@@ -5632,6 +6023,8 @@ const I18N = {
         col_action:          'Action',
         col_min_threshold:   'Min Threshold',
         col_round:           'Round',
+        col_detail:          'Detail',
+        ledger_lbl_year:     'Year',
         sum_lbl_qty_in:      'Qty In',
         sum_lbl_qty_out:     'Qty Out',
         btn_view:            '🖼 View',
@@ -5845,6 +6238,7 @@ const I18N = {
         nav_items:           '📦 Fail Item',
         nav_transactions:    '🔄 Transaksi Stok',
         nav_summary:         '📑 Ringkasan Stok',
+        nav_ledger:          '📒 Lejar Stok',
         nav_locations:       '📍 Kawasan Lokasi',
         nav_manuring:        '🌱 Program Pembajaan',
         nav_roundprogress:   '📈 Kemajuan Pembajaan',
@@ -5852,6 +6246,7 @@ const I18N = {
         sb_lbl_items:        'Fail Item',
         sb_lbl_transactions: 'Transaksi Stok',
         sb_lbl_summary:      'Ringkasan Stok',
+        sb_lbl_ledger:       'Lejar Stok',
         sb_lbl_locations:    'Kawasan Lokasi',
         sb_lbl_manuring:     'Program Pembajaan',
         sb_lbl_roundprogress:'Kemajuan Pembajaan',
@@ -5887,6 +6282,8 @@ const I18N = {
         col_action:          'Tindakan',
         col_min_threshold:   'Had Minimum',
         col_round:           'Pusingan',
+        col_detail:          'Butiran',
+        ledger_lbl_year:     'Tahun',
         sum_lbl_qty_in:      'Jum Masuk',
         sum_lbl_qty_out:     'Jum Keluar',
         btn_view:            '🖼 Lihat',
@@ -6193,6 +6590,7 @@ const ALL_SECTIONS = [
     { id: 'items',          label: '📦 Item File' },
     { id: 'transactions',   label: '🔄 Stock Transaction' },
     { id: 'summary',        label: '📑 Stock Summary' },
+    { id: 'ledger',         label: '📒 Stock Ledger' },
     { id: 'locations',      label: '📍 Location Area' },
     { id: 'manuring',       label: '🌱 Manuring Program' },
     { id: 'roundprogress',  label: '📈 Manuring Progress' },
@@ -6715,6 +7113,8 @@ const VIEW_LOCK_SAFE_ACTIONS = [
 const VIEW_LOCK_ALLOWED_FIELD_IDS = [
     // Stock Summary filters
     'filterCategory', 'filterItem', 'filterType', 'filterFrom', 'filterTo',
+    // Stock Ledger filters
+    'filterLedgerCategory', 'filterLedgerItem', 'filterLedgerYear',
     // Manuring Progress search
     'filterRpRound', 'filterRpBlock',
     // Maintenance Progress search
@@ -6814,13 +7214,15 @@ function _applyViewOnlyLockNow(sectionId) {
         if (!btn.classList.contains('view-locked-field')) btn.classList.add('view-locked-field');
     });
 
-    // Export button uses addEventListener (no onclick attribute) so it passes
-    // through isSafeAction undetected — disable it explicitly for view-only users.
-    const exportBtn = section.querySelector('#exportExcelBtn');
-    if (exportBtn) {
-        if (!exportBtn.disabled) exportBtn.disabled = true;
-        if (!exportBtn.classList.contains('view-locked-field')) exportBtn.classList.add('view-locked-field');
-    }
+    // Export buttons use addEventListener (no onclick attribute) so they pass
+    // through isSafeAction undetected — disable them explicitly for view-only users.
+    ['#exportExcelBtn', '#exportLedgerBtn'].forEach(sel => {
+        const exportBtn = section.querySelector(sel);
+        if (exportBtn) {
+            if (!exportBtn.disabled) exportBtn.disabled = true;
+            if (!exportBtn.classList.contains('view-locked-field')) exportBtn.classList.add('view-locked-field');
+        }
+    });
 
     // Friendly read-only banner at the top of the section — only inserted
     // if not already present, so re-runs don't keep removing/re-adding it.
