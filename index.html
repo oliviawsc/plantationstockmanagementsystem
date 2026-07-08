@@ -1502,7 +1502,7 @@
                     <div id="txnMaintWrap" class="md:col-span-2 hidden bg-orange-50 border-2 border-dashed border-orange-400 p-4 rounded-lg">
                         <label class="block text-sm font-semibold mb-1"><span data-i18n="txn_lbl_maint_round">🔧 Maintenance Round</span> <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
                         <select id="txnMaintRound" class="w-full border border-orange-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500">
-                            <option value="" data-i18n="select_none_na">-- None / Not Applicable --</option>
+                            <option value="" data-i18n="select_maint_round">-- Select a Maintenance Round --</option>
                         </select>
                         <p class="text-xs text-orange-700 mt-2 italic" data-i18n="txn_maint_round_hint">
                             🔧 Link this Out transaction to a Maintenance Round if applicable. Define rounds in the <b>Maintenance Program</b> page.
@@ -1578,9 +1578,9 @@
                         <label class="block text-xs font-semibold mb-1" data-i18n="txn_lbl_type">Type</label>
                         <select id="filterType" class="w-full border border-green-300 rounded p-2 bg-white">
                             <option value="" data-i18n="opt_all">All</option>
-                            <option value="In">In</option>
-                            <option value="Out">Out</option>
-                            <option value="Adj">Adj</option>
+                            <option value="In" data-i18n="txn_type_in">In</option>
+                            <option value="Out" data-i18n="txn_type_out">Out</option>
+                            <option value="Adj" data-i18n="txn_type_adj">Adj</option>
                         </select>
                     </div>
                     <div>
@@ -3009,7 +3009,8 @@ function deleteLocation(id) {
    submission can split one item across multiple blocks in a day.
    ----------------------------------------------------------------- */
 function buildLocationOptionsHtml() {
-    return '<option value="None/Storage">None/Storage</option>' +
+    const d = I18N[currentLang] || I18N['en'];
+    return `<option value="None/Storage">${d.opt_none_storage}</option>` +
         locations.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
 }
 
@@ -3024,10 +3025,11 @@ function addTxnRow() {
     const unitLabel = defUnit === 'package' ? pkgUnit : baseUnit;
 
     const tr = document.createElement('tr');
+    const _dRow = I18N[currentLang] || I18N['en'];
     tr.className = 'border-b border-blue-100';
     tr.innerHTML = `
         <td class="px-3 py-2">
-            <span class="em-row-label">Quantity</span>
+            <span class="em-row-label">${_dRow.col_qty}</span>
             <div class="flex gap-1 items-center">
                 <input type="number" min="0" step="0.001" class="txn-row-qty w-24 border border-blue-300 rounded p-1"
                     oninput="updateRowConversion(this)" />
@@ -3037,10 +3039,10 @@ function addTxnRow() {
             <p class="txn-row-conv text-xs text-green-700 mt-1 italic"></p>
         </td>
         <td class="px-3 py-2">
-            <span class="em-row-label">Location (Block)</span>
+            <span class="em-row-label">${_dRow.txn_col_location_block}</span>
             <select class="txn-row-loc w-full border border-blue-300 rounded p-1 bg-white">${buildLocationOptionsHtml()}</select>
         </td>
-        <td class="px-3 py-2"><button type="button" class="text-red-600 hover:underline text-sm" onclick="this.closest('tr').remove()">&#10005; Remove</button></td>`;
+        <td class="px-3 py-2"><button type="button" class="text-red-600 hover:underline text-sm" onclick="this.closest('tr').remove()">${_dRow.btn_remove}</button></td>`;
     tbody.appendChild(tr);
 }
 document.getElementById('txnAddRowBtn').addEventListener('click', addTxnRow);
@@ -3213,14 +3215,15 @@ function updateManuringVisibility() {
     const wrap    = document.getElementById('txnManuringWrap');
     const sel     = document.getElementById('txnManuringRound');
 
+    const d = I18N[currentLang] || I18N['en'];
     if (item && item.category === 'Fertilizer' && txnType === 'Out') {
         wrap.classList.remove('hidden');
         // Populate dropdown filtered to this fertilizer
         const matchingRounds = manuringRounds.filter(r => r.fertilizerItemId === item.id);
         if (matchingRounds.length === 0) {
-            sel.innerHTML = '<option value="">⚠️ No rounds defined for this fertilizer - add one in Manuring Program</option>';
+            sel.innerHTML = `<option value="">${d.txn_no_rounds_defined}</option>`;
         } else {
-            sel.innerHTML = '<option value="">-- Select a Manuring Round --</option>' +
+            sel.innerHTML = `<option value="">${d.select_round}</option>` +
                 matchingRounds.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
         }
     } else {
@@ -3235,7 +3238,7 @@ function updateManuringVisibility() {
         maintWrap.classList.remove('hidden');
         // Preserve current selection while repopulating
         const prevMaintVal = maintSel.value;
-        maintSel.innerHTML = '<option value="">-- None / Not Applicable --</option>' +
+        maintSel.innerHTML = `<option value="">${d.select_maint_round}</option>` +
             fieldMaintRounds.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
         if (prevMaintVal) maintSel.value = prevMaintVal;
     } else {
@@ -3796,7 +3799,8 @@ function filterTxnItemsByCategory() {
         ? items.filter(i => i.category === selectedCat)
         : items;
 
-    txnSel.innerHTML = '<option value="">-- Select Item --</option>' +
+    const d = I18N[currentLang] || I18N['en'];
+    txnSel.innerHTML = `<option value="">${d.select_item}</option>` +
         filtered.map(i => `<option value="${i.id}">${i.name}</option>`).join('');
 
     // Restore previous selection if it still exists in the filtered list
@@ -3810,7 +3814,8 @@ function filterTxnItemsByCategory() {
 function populateLocationDropdowns() {
     const sel = document.getElementById('txnLocation');
     if (!sel) return;
-    sel.innerHTML = '<option value="None/Storage">None/Storage</option>' +
+    const d = I18N[currentLang] || I18N['en'];
+    sel.innerHTML = `<option value="None/Storage">${d.opt_none_storage}</option>` +
         locations.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
 }
 
@@ -5727,7 +5732,8 @@ function openEditTxnModal(id) {
 
     // Populate location dropdown and pre-select current value
     const locSel = document.getElementById('editTxnLocation');
-    locSel.innerHTML = '<option value="None/Storage">None/Storage</option>' +
+    const _dLoc = I18N[currentLang] || I18N['en'];
+    locSel.innerHTML = `<option value="None/Storage">${_dLoc.opt_none_storage}</option>` +
         locations.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
     locSel.value = t.location;
 
@@ -6050,6 +6056,7 @@ const I18N = {
         select_item:         '-- Select Item --',
         select_type:         '-- Select Type --',
         select_round:        '-- Select a Manuring Round --',
+        txn_no_rounds_defined: '⚠️ No rounds defined for this fertilizer - add one in Manuring Program',
         select_fertilizer:   '-- Select Fertilizer --',
         opt_all:             'All',
         opt_none_storage:    'None/Storage',
@@ -6309,6 +6316,7 @@ const I18N = {
         select_item:         '-- Pilih Item --',
         select_type:         '-- Pilih Jenis --',
         select_round:        '-- Pilih Pusingan Pembajaan --',
+        txn_no_rounds_defined: '⚠️ Tiada pusingan ditakrifkan untuk baja ini - tambah dalam Program Pembajaan',
         select_fertilizer:   '-- Pilih Baja --',
         opt_all:             'Semua',
         opt_none_storage:    'Tiada/Stor',
@@ -6572,6 +6580,12 @@ function setLang(lang) {
     // I18N dict in JS, not [data-i18n] attributes, so they need an
     // explicit re-render on language switch like Stock Summary above.
     if (typeof renderLedger === 'function') renderLedger();
+
+    // Repopulate JS-built dropdowns whose placeholder text comes from the
+    // i18n dict (not data-i18n attributes) so they update on language switch.
+    if (typeof populateLocationDropdowns === 'function') populateLocationDropdowns();
+    if (typeof filterTxnItemsByCategory === 'function') filterTxnItemsByCategory();
+    if (typeof updateManuringVisibility === 'function') updateManuringVisibility();
 }
 /* =================================================================
    AUTH SYSTEM
