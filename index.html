@@ -1850,8 +1850,8 @@
                                 <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
                                 <th class="px-3 py-2 text-left" data-i18n="manuring_lbl_fertilizer">Fertilizer</th>
                                 <th class="px-3 py-2 text-left" data-i18n="col_block">Block</th>
-                                <th data-i18n="rp_col_applied_bags" class="px-3 py-2 text-right">Applied (bags)</th>
-                                <th data-i18n="rp_col_budgeted_bags" class="px-3 py-2 text-right">Budgeted (bags)</th>
+                                <th data-i18n="col_total_applied" class="px-3 py-2 text-right">Total Applied</th>
+                                <th data-i18n="col_budgeted" class="px-3 py-2 text-right">Budgeted</th>
                                 <th class="px-3 py-2 text-right" data-i18n="col_pct_applied">% Applied</th>
                             </tr>
                         </thead>
@@ -3423,6 +3423,13 @@ function getKgPerUnit(round) {
     return (item && parseFloat(item.qtyPerUnit) > 0) ? parseFloat(item.qtyPerUnit) : 1;
 }
 
+// Returns the package unit label for a round's fertilizer (e.g. "bags", "MT").
+// Falls back to "bags" when the item has no packageUnit set.
+function getRoundPkgUnit(round) {
+    const item = items.find(i => String(i.id) === String(round.fertilizerItemId));
+    return (item && item.packageUnit) ? item.packageUnit : 'bags';
+}
+
 // Budgeted Fertilizer Needed = (Selected Blocks' Palms × kg/palm) ÷ kg per unit
 // kg per unit comes from the fertilizer item's Qty/Unit field in Item File
 function calcRoundBudget(round) {
@@ -3493,7 +3500,8 @@ function renderManuringRounds() {
         const palmsUsed = r.blocks && r.blocks.length > 0
             ? getPalmsForBlocks(r.blocks).toLocaleString()
             : getTotalPalms().toLocaleString();
-        const kgLabel = `<span class="text-xs text-gray-400">(${r.kgPerPalm || 0} kg/palm × ${palmsUsed} palms ÷ ${getKgPerUnit(r)} kg/${r.unit || 'unit'})</span>`;
+        const pkgUnit = getRoundPkgUnit(r);
+        const kgLabel = `<span class="text-xs text-gray-400">(${r.kgPerPalm || 0} kg/palm × ${palmsUsed} palms ÷ ${getKgPerUnit(r)} kg/${pkgUnit})</span>`;
 
         // Transactions linked to this round
         const roundTxns = transactions
@@ -3516,7 +3524,7 @@ function renderManuringRounds() {
             <td class="px-3 py-2 text-xs text-gray-500">${r.targetPeriod || '—'}</td>
             <td class="px-3 py-2">${blocksHtml}</td>
             <td class="px-3 py-2 text-right">
-                <b>${Math.round(budget)}</b> bags<br/>${kgLabel}
+                <b>${Math.round(budget)}</b> ${pkgUnit}<br/>${kgLabel}
             </td>
             <td class="px-3 py-2 text-gray-600 italic text-sm">${r.notes || '-'}</td>
             <td class="px-3 py-2 whitespace-nowrap">
@@ -3545,14 +3553,18 @@ function renderManuringRounds() {
                 <p class="text-xs text-gray-400 italic">No transactions recorded for this round yet.</p>
             </td>`;
         } else {
-            const txnRows = roundTxns.map(t => `
+            const kgPerUnitSub = getKgPerUnit(r);
+            const txnRows = roundTxns.map(t => {
+                const pkgQty = kgPerUnitSub > 0 ? (parseFloat(t.qty) / kgPerUnitSub) : parseFloat(t.qty);
+                return `
                 <tr style="border-bottom:1px solid #d1fae5;">
                     <td class="px-3 py-1.5 text-xs">${t.date}</td>
                     <td class="px-3 py-1.5 text-xs font-medium text-green-700">${t.location || '-'}</td>
-                    <td class="px-3 py-1.5 text-xs text-right font-semibold">${parseFloat(t.qty).toFixed(2)}</td>
+                    <td class="px-3 py-1.5 text-xs text-right font-semibold">${pkgQty.toFixed(2)} ${pkgUnit}</td>
                     <td class="px-3 py-1.5 text-xs text-gray-500">${t.ref || '-'}</td>
                     <td class="px-3 py-1.5 text-xs text-gray-400">${t.remarks || '-'}</td>
-                </tr>`).join('');
+                </tr>`;
+            }).join('');
 
             subContent = `<td colspan="7" style="padding:0 0 12px 32px; background:#f0fdf4;">
                 <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
@@ -3560,7 +3572,7 @@ function renderManuringRounds() {
                         <tr style="background:#dcfce7;color:#166534;">
                             <th class="px-3 py-1.5 text-left">${currentLang==='ms'?'Tarikh':'Date'}</th>
                             <th class="px-3 py-1.5 text-left">${currentLang==='ms'?'Blok / Lokasi':'Block / Location'}</th>
-                            <th class="px-3 py-1.5 text-right">${currentLang==='ms'?'Kuantiti Digunakan (beg)':'Qty Applied (bags)'}</th>
+                            <th class="px-3 py-1.5 text-right">${currentLang==='ms'?`Kuantiti Digunakan (${pkgUnit})`:`Qty Applied (${pkgUnit})`}</th>
                             <th class="px-3 py-1.5 text-left">${currentLang==='ms'?'Ref / No. DO':'Ref / DO'}</th>
                             <th class="px-3 py-1.5 text-left">${currentLang==='ms'?'Catatan':'Remarks'}</th>
                         </tr>
@@ -3662,6 +3674,7 @@ function renderRoundProgress() {
             const totalApplied = calcRoundTotalApplied(r.id);
             const budget       = calcRoundBudget(r);
             const kgPerUnit    = getKgPerUnit(r);
+            const pkgUnit      = getRoundPkgUnit(r);
             const appliedBags  = kgPerUnit > 0 ? totalApplied / kgPerUnit : totalApplied;
             let pctCell        = '<span class="text-gray-400">N/A</span>';
             if (budget > 0) {
@@ -3681,8 +3694,8 @@ function renderRoundProgress() {
             tr.innerHTML = `
                 <td class="px-3 py-2 font-semibold">🌱 ${r.name}</td>
                 <td class="px-3 py-2">${r.fertilizerName}</td>
-                <td class="px-3 py-2 text-right">${Math.round(appliedBags)} bags</td>
-                <td class="px-3 py-2 text-right">${Math.round(budget)} bags</td>
+                <td class="px-3 py-2 text-right">${Math.round(appliedBags)} ${pkgUnit}</td>
+                <td class="px-3 py-2 text-right">${Math.round(budget)} ${pkgUnit}</td>
                 <td class="px-3 py-2 text-right">${pctCell}</td>`;
             body.appendChild(tr);
         });
@@ -3725,8 +3738,9 @@ function renderRoundProgress() {
     }
 
     blockRows.forEach(({ r, blockName, applied, budget }) => {
-        // Convert applied from base unit (kg) to package unit (bags)
+        // Convert applied from base unit (kg) to package unit
         const kgPerUnit   = getKgPerUnit(r);
+        const pkgUnit     = getRoundPkgUnit(r);
         const appliedBags = kgPerUnit > 0 ? applied / kgPerUnit : applied;
         let pctCell = '<span class="text-gray-400">N/A</span>';
         if (budget > 0) {
@@ -3753,8 +3767,8 @@ function renderRoundProgress() {
             <td class="px-3 py-2">
                 <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">${blockName}</span>
             </td>
-            <td class="px-3 py-2 text-right font-semibold">${Math.round(appliedBags)}</td>
-            <td class="px-3 py-2 text-right">${Math.round(budget)}</td>
+            <td class="px-3 py-2 text-right font-semibold">${Math.round(appliedBags)} ${pkgUnit}</td>
+            <td class="px-3 py-2 text-right">${Math.round(budget)} ${pkgUnit}</td>
             <td class="px-3 py-2">${pctCell}</td>`;
         blockBody.appendChild(tr);
     });
@@ -4494,8 +4508,8 @@ function renderManuringPctChart() {
     }
     empty.classList.add('hidden');
 
-    var MN    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var MFull = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var MN    = I18N[currentLang]['months_short'];
+    var MFull = I18N[currentLang]['months_full'];
 
     var roundData = rounds.map(function(r){
         var tp          = r.targetPeriod || r.targetperiod || '';
@@ -4503,6 +4517,7 @@ function renderManuringPctChart() {
         var tpLabel     = tpMIdx>=0 ? MN[tpMIdx]+' '+tp.slice(0,4) : '--';
         var budget      = calcRoundBudget(r);
         var kgPerUnit   = getKgPerUnit(r);
+        var pkgUnit     = getRoundPkgUnit(r);
         var appliedKg   = calcRoundTotalApplied(r.id);
         var appliedBags = kgPerUnit>0 ? appliedKg/kgPerUnit : appliedKg;
         var pct         = budget>0 ? Math.round((appliedBags/budget)*100) : null;
@@ -4520,7 +4535,7 @@ function renderManuringPctChart() {
         return { id:r.id, name:r.name, tpLabel:tpLabel, tpMIdx:tpMIdx,
                  budget:Math.round(budget), applied:Math.round(appliedBags),
                  budgetRaw:budget, appliedRaw:appliedBags,
-                 pct:pct, fertilizer:r.fertilizerName||'--', monthlyBags:monthlyBags };
+                 pct:pct, fertilizer:r.fertilizerName||'--', monthlyBags:monthlyBags, pkgUnit:pkgUnit };
     });
 
     cardBox.innerHTML = '';
@@ -4546,7 +4561,7 @@ function renderManuringPctChart() {
                 +'<div style="flex:1;height:5px;background:#E2E8F0;border-radius:99px;overflow:hidden;">'
                     +'<div style="width:'+barW+'%;height:100%;background:'+barColor+';border-radius:99px;"></div>'
                 +'</div>'
-                +'<span style="font-size:10px;color:#64748B;white-space:nowrap;">'+d.applied+' / '+d.budget+' bags</span>'
+                +'<span style="font-size:10px;color:#64748B;white-space:nowrap;">'+d.applied+' / '+d.budget+' '+d.pkgUnit+'</span>'
             +'</div>'
             +'</div>';
 
@@ -4611,7 +4626,7 @@ function renderManuringPctChart() {
                                     var bags=rData.monthlyBags[i];
                                     var cv=cumPct[i];
                                     if(!bags||bags<=0) return I18N[currentLang]['dash_lbl_no_data'];
-                                    var lines=[I18N[currentLang]['dash_lbl_applied']+Math.round(bags)+I18N[currentLang]['dash_lbl_bags']];
+                                    var lines=[I18N[currentLang]['dash_lbl_applied']+Math.round(bags)+' '+rData.pkgUnit];
                                     if(cv!=null) lines.push(I18N[currentLang]['dash_lbl_cumulative']+cv+'%');
                                     if(i===rData.tpMIdx) lines.push(I18N[currentLang]['dash_lbl_target_month']);
                                     return lines;
@@ -4619,7 +4634,7 @@ function renderManuringPctChart() {
                             }}
                         },
                         scales:{
-                            x:{grid:{display:false},ticks:{font:{size:8},maxRotation:0}},
+                            x:{grid:{display:false},ticks:{font:{size:8},maxRotation:0,autoSkip:false}},
                             y:{beginAtZero:true,max:100,
                                ticks:{font:{size:8},callback:function(v){return v+'%';},maxTicksLimit:5},
                                grid:{color:'rgba(241,245,249,.8)'},
@@ -4716,8 +4731,8 @@ function renderMaintPctTracker() {
     }
     empty.classList.add('hidden');
 
-    var MN    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var MFull = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var MN    = I18N[currentLang]['months_short'];
+    var MFull = I18N[currentLang]['months_full'];
 
     var roundData = rounds.map(function(r){
         var tp      = r.targetPeriod || r.targetperiod || '';
@@ -6102,6 +6117,8 @@ const I18N = {
         dash_chem_tracker_subtitle:  'Usage per Ha vs Max Dosage — by Maintenance Round',
         dash_lbl_year:                'Year:',
         dash_lbl_tracking_year:       'Tracking Year: ',
+        months_short: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+        months_full:  ['January','February','March','April','May','June','July','August','September','October','November','December'],
         dash_no_manuring_rounds:      'No manuring rounds found. Add rounds in the Manuring Program section.',
         dash_no_maint_rounds:         'No maintenance rounds found. Add rounds in the Maintenance Program section.',
         dash_no_chem_usage:           'No chemical usage data yet. Link chemical transactions to maintenance rounds.',
@@ -6362,6 +6379,8 @@ const I18N = {
         dash_chem_tracker_subtitle:  'Penggunaan per Ha vs Dos Maksimum — mengikut Pusingan Penyelenggaraan',
         dash_lbl_year:                'Tahun:',
         dash_lbl_tracking_year:       'Tahun Penjejakan: ',
+        months_short: ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'],
+        months_full:  ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'],
         dash_no_manuring_rounds:      'Tiada pusingan pembajaan dijumpai. Tambah pusingan dalam bahagian Program Pembajaan.',
         dash_no_maint_rounds:         'Tiada pusingan penyelenggaraan dijumpai. Tambah pusingan dalam bahagian Program Penyelenggaraan.',
         dash_no_chem_usage:           'Tiada data penggunaan kimia lagi. Kaitkan transaksi kimia dengan pusingan penyelenggaraan.',
@@ -6586,6 +6605,13 @@ function setLang(lang) {
     if (typeof populateLocationDropdowns === 'function') populateLocationDropdowns();
     if (typeof filterTxnItemsByCategory === 'function') filterTxnItemsByCategory();
     if (typeof updateManuringVisibility === 'function') updateManuringVisibility();
+
+    // Re-render dashboard tracker cards — month labels, card header text, and
+    // chart tooltips are built from the i18n dict at render time, so they need
+    // a full rebuild when the language changes.
+    if (typeof renderManuringPctChart === 'function') renderManuringPctChart();
+    if (typeof renderMaintPctTracker === 'function') renderMaintPctTracker();
+    if (typeof renderChemUsageTracker === 'function') renderChemUsageTracker();
 }
 /* =================================================================
    AUTH SYSTEM
