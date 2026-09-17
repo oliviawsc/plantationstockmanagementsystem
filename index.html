@@ -1027,10 +1027,6 @@
                 <button id="topCollapseBtn" aria-label="Toggle sidebar" title="Toggle sidebar"
                     style="display:none;width:28px;height:28px;flex-shrink:0;border-radius:7px;border:1px solid #D1FAE5;background:#F0FDF4;color:#2E7D32;font-size:13px;cursor:pointer;align-items:center;justify-content:center;transition:background .13s;"
                     onmouseover="this.style.background='#D1FAE5'" onmouseout="this.style.background='#F0FDF4'">&#9776;</button>
-                <button id="estateBackBtn" onclick="navToSection('estate_hub')"
-                    style="display:none;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;border:1px solid #A5D6A7;background:#E8F5E9;color:#1B5E20;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">
-                    &#8592; Home
-                </button>
                 <span id="topEstateLabel" style="font-size:13px;font-weight:600;color:#1B5E20;background:#E8F5E9;padding:5px 14px;border-radius:99px;border:1px solid #A5D6A7;white-space:nowrap;display:none;"></span>
             </div>
             <!-- Centre: empty -->
@@ -7379,13 +7375,7 @@ function bootApp(session) {
     renderUsersTable();
 }
 
-function syncEstateBackBtn() {
-    const btn = document.getElementById('estateBackBtn');
-    if (!btn) return;
-    const onHub = !!document.querySelector('#estate_hub.active');
-    const show  = document.body.classList.contains('estate-mobile') && !onHub;
-    btn.style.display = show ? 'flex' : 'none';
-}
+function syncEstateBackBtn() { /* no-op: back button removed, bottom nav used instead */ }
 
 function navToSection(sectionId) {
     // Hard guard: estate_hub is ONLY for estate-mobile users.
