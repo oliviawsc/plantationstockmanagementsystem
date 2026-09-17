@@ -9314,8 +9314,8 @@ function renderFertRecord() {
             const totalOutPkg = kgPerUnit > 0 ? totalOutKg / kgPerUnit : totalOutKg;
             const balPkg      = kgPerUnit > 0 ? row.lastBal / kgPerUnit : row.lastBal;
             const balStyle    = balPkg < 0 ? 'color:#dc2626;font-weight:700;' : 'font-weight:600;';
-            return `<tr style="border-bottom:1px solid #f0fdf4;" onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background=''">
-                <td style="padding:5px 8px;font-size:13px;white-space:nowrap;">${row.dt}</td>
+            return `<tr style="border-bottom:1px solid #f0fdf4;" onmouseover="this.style.background='#f0fdf4';this.cells[0].style.background='#f0fdf4'" onmouseout="this.style.background='';this.cells[0].style.background='#fff'">
+                <td style="padding:5px 8px;font-size:13px;white-space:nowrap;position:sticky;left:0;z-index:1;background:#fff;">${row.dt}</td>
                 <td style="padding:5px 8px;text-align:right;font-size:13px;color:#15803d;">${qtyInPkg > 0 ? qtyInPkg.toFixed(2) : '<span style="color:#d1d5db;">-</span>'}</td>
                 ${blockCells}
                 <td style="padding:5px 8px;text-align:right;font-size:13px;font-weight:600;">${totalOutPkg > 0 ? totalOutPkg.toFixed(2) : '<span style="color:#d1d5db;">-</span>'}</td>
@@ -9329,7 +9329,7 @@ function renderFertRecord() {
             <table style="min-width:100%;font-size:13px;border-collapse:collapse;">
                 <thead style="background:#dcfce7;color:#166534;">
                     <tr>
-                        <th rowspan="2" style="padding:6px 8px;text-align:left;border:1px solid #bbf7d0;">${d.col_date || 'Date'}</th>
+                        <th rowspan="2" style="padding:6px 8px;text-align:left;border:1px solid #bbf7d0;position:sticky;left:0;z-index:3;background:#dcfce7;">${d.col_date || 'Date'}</th>
                         <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #bbf7d0;">${d.fr_col_qty_in || 'Quantity In'}</th>
                         <th colspan="${roundBlocks.length}" style="padding:6px 8px;text-align:center;background:#fef9c3;color:#92400e;border:1px solid #fde68a;">${d.fr_col_qty_out || 'Quantity Out'}</th>
                         <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #bbf7d0;">${d.fr_col_total_out || 'Total Quantity Out'}</th>
@@ -9684,8 +9684,8 @@ function renderChemRecord() {
             const totalOut = dynamicBlocks.reduce((s, b) => s + (row.blockOuts[b] || 0), 0);
             const bal = row.lastBal;
             const balStyle = bal < 0 ? 'color:#dc2626;font-weight:700;' : 'font-weight:600;';
-            return `<tr style="border-bottom:1px solid #eff6ff;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background=''">
-                <td style="padding:5px 8px;font-size:13px;white-space:nowrap;">${row.dt}</td>
+            return `<tr style="border-bottom:1px solid #eff6ff;" onmouseover="this.style.background='#eff6ff';this.cells[0].style.background='#eff6ff'" onmouseout="this.style.background='';this.cells[0].style.background='#fff'">
+                <td style="padding:5px 8px;font-size:13px;white-space:nowrap;position:sticky;left:0;z-index:1;background:#fff;">${row.dt}</td>
                 <td style="padding:5px 8px;text-align:right;font-size:13px;color:#1d4ed8;">${row.qtyIn > 0 ? row.qtyIn.toFixed(2) : '<span style="color:#d1d5db;">-</span>'}</td>
                 ${blockCells}
                 <td style="padding:5px 8px;text-align:right;font-size:13px;font-weight:600;">${totalOut > 0 ? totalOut.toFixed(2) : '<span style="color:#d1d5db;">-</span>'}</td>
@@ -9699,7 +9699,7 @@ function renderChemRecord() {
             <table style="min-width:100%;font-size:13px;border-collapse:collapse;">
                 <thead style="background:#dbeafe;color:#1e40af;">
                     <tr>
-                        <th rowspan="2" style="padding:6px 8px;text-align:left;border:1px solid #bfdbfe;">${d.col_date || 'Date'}</th>
+                        <th rowspan="2" style="padding:6px 8px;text-align:left;border:1px solid #bfdbfe;position:sticky;left:0;z-index:3;background:#dbeafe;">${d.col_date || 'Date'}</th>
                         <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #bfdbfe;">${d.fr_col_qty_in || 'Quantity In'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
                         <th colspan="${dynamicBlocks.length || 1}" style="padding:6px 8px;text-align:center;background:#fef3c7;color:#92400e;border:1px solid #fde68a;">${d.fr_col_qty_out || 'Quantity Out'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
                         <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #bfdbfe;">${d.fr_col_total_out || 'Total Quantity Out'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
@@ -9982,8 +9982,8 @@ function renderPlantRecord() {
             const totalOut = dynamicBlocks.reduce((s, b) => s + (row.blockOuts[b] || 0), 0);
             const bal = row.lastBal;
             const balStyle = bal < 0 ? 'color:#dc2626;font-weight:700;' : 'font-weight:600;';
-            return `<tr style="border-bottom:1px solid #fef9c3;" onmouseover="this.style.background='#fefce8'" onmouseout="this.style.background=''">
-                <td style="padding:5px 8px;font-size:13px;white-space:nowrap;">${row.dt}</td>
+            return `<tr style="border-bottom:1px solid #fef9c3;" onmouseover="this.style.background='#fefce8';this.cells[0].style.background='#fefce8'" onmouseout="this.style.background='';this.cells[0].style.background='#fff'">
+                <td style="padding:5px 8px;font-size:13px;white-space:nowrap;position:sticky;left:0;z-index:1;background:#fff;">${row.dt}</td>
                 <td style="padding:5px 8px;text-align:right;font-size:13px;color:#b45309;">${row.qtyIn > 0 ? row.qtyIn.toFixed(2) : '<span style="color:#d1d5db;">-</span>'}</td>
                 ${blockCells}
                 <td style="padding:5px 8px;text-align:right;font-size:13px;font-weight:600;">${totalOut > 0 ? totalOut.toFixed(2) : '<span style="color:#d1d5db;">-</span>'}</td>
@@ -9997,7 +9997,7 @@ function renderPlantRecord() {
             <table style="min-width:100%;font-size:13px;border-collapse:collapse;">
                 <thead style="background:#fef3c7;color:#92400e;">
                     <tr>
-                        <th rowspan="2" style="padding:6px 8px;text-align:left;border:1px solid #fde68a;">${d.col_date || 'Date'}</th>
+                        <th rowspan="2" style="padding:6px 8px;text-align:left;border:1px solid #fde68a;position:sticky;left:0;z-index:3;background:#fef3c7;">${d.col_date || 'Date'}</th>
                         <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #fde68a;">${d.pr_col_penerimaan || 'Quantity In'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
                         <th colspan="${dynamicBlocks.length || 1}" style="padding:6px 8px;text-align:center;background:#d97706;color:#fff;border:1px solid #b45309;">${d.pr_col_pengeluaran || 'Quantity Out'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
                         <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #fde68a;">${d.pr_col_jumlah || 'Total Quantity Out'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
