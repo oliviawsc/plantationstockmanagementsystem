@@ -277,8 +277,53 @@
         body.estate-mobile #estateAppBanner { display: flex !important; }
         /* Push header bar below the banner */
         body.estate-mobile #topHeaderBar { top: 38px !important; left: 0 !important; }
-        /* Extend main content padding to clear both banner + header */
-        body.estate-mobile #mainWrapper { padding-top: 94px; }
+        /* Extend main content padding to clear both banner + header + bottom nav */
+        body.estate-mobile #mainWrapper { padding-top: 94px; padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+
+        /* ── Mobile bottom nav bar ── */
+        #mobileBottomNav { display: none; }
+        body.estate-mobile #mobileBottomNav {
+            display: flex;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #fff;
+            border-top: 1.5px solid #E2E8F0;
+            z-index: 200;
+            box-shadow: 0 -2px 16px rgba(0,0,0,.10);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        .mnav-item {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 3px; border: none; background: transparent;
+            cursor: pointer; padding: 8px 4px 6px;
+            color: #94A3B8; font-family: Inter,sans-serif;
+            transition: color 0.15s; -webkit-tap-highlight-color: transparent;
+        }
+        .mnav-item.active { color: #166534; }
+        .mnav-item .mnav-icon { font-size: 22px; line-height: 1; }
+        .mnav-item .mnav-label { font-size: 10px; font-weight: 600; letter-spacing: .01em; }
+        .mnav-item.active .mnav-label { color: #166534; }
+
+        /* ── Record tab strip (inside record sections, estate-mobile only) ── */
+        .mobile-record-tabs { display: none; }
+        body.estate-mobile .mobile-record-tabs {
+            display: flex; gap: 0;
+            margin-bottom: 18px; background: #F1F5F9;
+            border-radius: 12px; padding: 4px;
+        }
+        .mrec-tab {
+            flex: 1; border: none; background: transparent;
+            border-radius: 9px; padding: 9px 6px;
+            font-size: 12px; font-weight: 600; color: #64748B;
+            cursor: pointer; font-family: Inter,sans-serif;
+            white-space: nowrap; transition: all 0.15s;
+            -webkit-tap-highlight-color: transparent; text-align: center;
+        }
+        .mrec-tab.active {
+            background: #fff; color: #166534;
+            box-shadow: 0 1px 4px rgba(0,0,0,.10);
+        }
 
         /* Estate hub card */
         .estate-card {
@@ -2169,6 +2214,12 @@
 
         <!-- ============ PAGE 11: FERTILIZER APPLICATION RECORD ============ -->
         <section id="fertrecord" class="page-section">
+            <!-- Mobile record tab strip (estate-mobile only) -->
+            <div class="mobile-record-tabs">
+                <button class="mrec-tab active" onclick="navToSection('fertrecord')">📋 Fertilizer</button>
+                <button class="mrec-tab" onclick="navToSection('chemrecord')">⚗️ Chemical</button>
+                <button class="mrec-tab" onclick="navToSection('plantrecord')">🌱 Planting</button>
+            </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_fertrecord">&#128203; Fertilizer Application Record</h2>
             <p class="text-sm text-green-700 mb-6" data-i18n="page_fertrecord_sub">Daily fertilizer transactions by block and manuring round — track quantity in, quantity out, and running balance per fertilizer.</p>
 
@@ -2215,6 +2266,12 @@
 
         <!-- ============ PAGE: CHEMICAL APPLICATION RECORD ============ -->
         <section id="chemrecord" class="page-section">
+            <!-- Mobile record tab strip (estate-mobile only) -->
+            <div class="mobile-record-tabs">
+                <button class="mrec-tab" onclick="navToSection('fertrecord')">📋 Fertilizer</button>
+                <button class="mrec-tab active" onclick="navToSection('chemrecord')">⚗️ Chemical</button>
+                <button class="mrec-tab" onclick="navToSection('plantrecord')">🌱 Planting</button>
+            </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_chemrecord">&#9879;&#65039; Chemical Application Record</h2>
             <p class="text-sm text-blue-700 mb-6" data-i18n="page_chemrecord_sub">Daily chemical transactions by block — track quantity in, quantity out, and running balance per chemical item.</p>
 
@@ -2261,6 +2318,12 @@
 
         <!-- ============ PAGE: FIELD PLANTING RECORD ============ -->
         <section id="plantrecord" class="page-section">
+            <!-- Mobile record tab strip (estate-mobile only) -->
+            <div class="mobile-record-tabs">
+                <button class="mrec-tab" onclick="navToSection('fertrecord')">📋 Fertilizer</button>
+                <button class="mrec-tab" onclick="navToSection('chemrecord')">⚗️ Chemical</button>
+                <button class="mrec-tab active" onclick="navToSection('plantrecord')">🌱 Planting</button>
+            </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_plantrecord">🌱 Field Planting Record</h2>
             <p class="text-sm text-amber-700 mb-6" data-i18n="page_plantrecord_sub">Daily seedling transactions by block — track quantity in, quantity out, and running balance per seedling item.</p>
 
@@ -6251,6 +6314,11 @@ const I18N = {
         hub_ops_line2:       'Seedling',
         hub_summary:         'Stock Summary',
         hub_view_report:     'View Report',
+        /* Mobile bottom nav */
+        mnav_home:           'Home',
+        mnav_records:        'View Record',
+        mnav_summary:        'Stock Summary',
+        mnav_dashboard:      'Dashboard',
         view_only_banner:    '&#128065; You have <b>View Only</b> access to this section. Editing is disabled.',
         /* Stock Transaction */
         txn_form_title:      'Record Stock Movement',
@@ -6555,6 +6623,11 @@ const I18N = {
         hub_ops_line2:       'Sawit',
         hub_summary:         'Ringkasan Stok',
         hub_view_report:     'Lihat Laporan',
+        /* Mobile bottom nav */
+        mnav_home:           'Utama',
+        mnav_records:        'Lihat Rekod',
+        mnav_summary:        'Ringkasan Stok',
+        mnav_dashboard:      'Dashboard',
         view_only_banner:    '&#128065; Anda mempunyai akses <b>Lihat Sahaja</b> untuk bahagian ini. Penyuntingan dinyahaktifkan.',
         /* Stock Transaction */
         txn_form_title:      'Rekod Pergerakan Stok',
@@ -7375,7 +7448,40 @@ function navToSection(sectionId) {
     }
 
     if (typeof applyViewOnlyLock === 'function') applyViewOnlyLock(sectionId);
+    updateMobileBottomNav(sectionId);
     refreshAll();
+}
+
+// ── Mobile bottom nav helpers ────────────────────────────────────────
+const MOBILE_RECORD_SECTIONS = ['fertrecord', 'chemrecord', 'plantrecord'];
+
+function mobileNavTo(dest) {
+    if (dest === 'home') {
+        navToSection('estate_hub');
+    } else if (dest === 'records') {
+        const last = sessionStorage.getItem('opp_last_record_tab') || 'fertrecord';
+        navToSection(last);
+    } else if (dest === 'summary') {
+        navToSection('summary');
+    } else if (dest === 'dashboard') {
+        navToSection('dashboard');
+    }
+}
+
+function updateMobileBottomNav(sectionId) {
+    if (!document.body.classList.contains('estate-mobile')) return;
+    const isRecord = MOBILE_RECORD_SECTIONS.includes(sectionId);
+    const map = {
+        mnavHome:     sectionId === 'estate_hub',
+        mnavRecords:  isRecord,
+        mnavSummary:  sectionId === 'summary',
+        mnavDashboard: sectionId === 'dashboard',
+    };
+    Object.entries(map).forEach(([id, active]) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('active', active);
+    });
+    if (isRecord) sessionStorage.setItem('opp_last_record_tab', sectionId);
 }
 
 // ── Apply nav & section visibility based on session ────────────────
@@ -10438,5 +10544,26 @@ function populateChemFilters() {
     };
 })();
 </script>
+
+<!-- ── Mobile bottom nav bar (estate-mobile only) ── -->
+<nav id="mobileBottomNav">
+    <button class="mnav-item" id="mnavHome" onclick="mobileNavTo('home')">
+        <span class="mnav-icon">🏠</span>
+        <span class="mnav-label" data-i18n="mnav_home">Home</span>
+    </button>
+    <button class="mnav-item" id="mnavRecords" onclick="mobileNavTo('records')">
+        <span class="mnav-icon">📋</span>
+        <span class="mnav-label" data-i18n="mnav_records">View Record</span>
+    </button>
+    <button class="mnav-item" id="mnavSummary" onclick="mobileNavTo('summary')">
+        <span class="mnav-icon">📑</span>
+        <span class="mnav-label" data-i18n="mnav_summary">Stock Summary</span>
+    </button>
+    <button class="mnav-item" id="mnavDashboard" onclick="mobileNavTo('dashboard')">
+        <span class="mnav-icon">📊</span>
+        <span class="mnav-label" data-i18n="mnav_dashboard">Dashboard</span>
+    </button>
+</nav>
+
 </body>
 </html>
