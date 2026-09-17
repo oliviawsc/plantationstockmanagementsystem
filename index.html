@@ -2189,6 +2189,57 @@
             </div>
         </section>
 
+        <!-- ============ MOBILE VIEW RECORD HUB (estate-mobile only) ============ -->
+        <section id="mobile_viewrecord" class="page-section">
+            <div style="min-height:100vh;background:linear-gradient(160deg,#F0FDF4 0%,#E8F5E9 40%,#F8FAFC 100%);padding-bottom:48px;">
+                <div style="padding:28px 20px 20px;">
+                    <h2 data-i18n="mnav_records" style="font-size:26px;font-weight:800;color:#0F172A;letter-spacing:-.3px;font-family:Inter,sans-serif;">View Record</h2>
+                </div>
+                <div style="padding:0 16px;display:flex;flex-direction:column;gap:14px;">
+
+                    <!-- Fertilizer Application Record -->
+                    <button class="estate-card" onclick="navToSection('fertrecord')"
+                        style="flex-direction:row;justify-content:flex-start;padding:20px 22px;gap:18px;border-radius:18px;">
+                        <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#16a34a,#166534);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(22,163,74,.25);">
+                            <span style="font-size:26px;">&#128203;</span>
+                        </div>
+                        <div style="text-align:left;flex:1;">
+                            <div data-i18n="sb_lbl_fertrecord" style="font-size:15px;font-weight:700;color:#0F172A;margin-bottom:3px;">Fertilizer Application Record</div>
+                            <div style="font-size:11px;color:#16a34a;background:#DCFCE7;display:inline-block;padding:3px 10px;border-radius:99px;font-weight:600;" data-i18n="hub_view_report">View Report</div>
+                        </div>
+                        <span style="font-size:22px;color:#A5D6A7;">&#8250;</span>
+                    </button>
+
+                    <!-- Chemical Application Record -->
+                    <button class="estate-card" onclick="navToSection('chemrecord')"
+                        style="flex-direction:row;justify-content:flex-start;padding:20px 22px;gap:18px;border-radius:18px;">
+                        <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#2563eb,#1d4ed8);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(37,99,235,.25);">
+                            <span style="font-size:26px;">&#9879;&#65039;</span>
+                        </div>
+                        <div style="text-align:left;flex:1;">
+                            <div data-i18n="sb_lbl_chemrecord" style="font-size:15px;font-weight:700;color:#0F172A;margin-bottom:3px;">Chemical Application Record</div>
+                            <div style="font-size:11px;color:#2563eb;background:#DBEAFE;display:inline-block;padding:3px 10px;border-radius:99px;font-weight:600;" data-i18n="hub_view_report">View Report</div>
+                        </div>
+                        <span style="font-size:22px;color:#BFDBFE;">&#8250;</span>
+                    </button>
+
+                    <!-- Field Planting Record -->
+                    <button class="estate-card" onclick="navToSection('plantrecord')"
+                        style="flex-direction:row;justify-content:flex-start;padding:20px 22px;gap:18px;border-radius:18px;">
+                        <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#d97706,#b45309);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(217,119,6,.25);">
+                            <span style="font-size:26px;">&#127807;</span>
+                        </div>
+                        <div style="text-align:left;flex:1;">
+                            <div data-i18n="sb_lbl_plantrecord" style="font-size:15px;font-weight:700;color:#0F172A;margin-bottom:3px;">Field Planting Record</div>
+                            <div style="font-size:11px;color:#b45309;background:#FEF3C7;display:inline-block;padding:3px 10px;border-radius:99px;font-weight:600;" data-i18n="hub_view_report">View Report</div>
+                        </div>
+                        <span style="font-size:22px;color:#FCD34D;">&#8250;</span>
+                    </button>
+
+                </div>
+            </div>
+        </section>
+
         <!-- ============ PAGE 11: FERTILIZER APPLICATION RECORD ============ -->
         <section id="fertrecord" class="page-section">
             <!-- Mobile record tab strip (estate-mobile only) -->
@@ -7385,8 +7436,8 @@ function navToSection(sectionId) {
     }
 
     // Permission guard: applies to every call path (sidebar, estate hub cards, direct calls).
-    // estate_hub itself is always allowed — it's the estate-mobile home screen.
-    if (sectionId !== 'estate_hub') {
+    // estate_hub and mobile_viewrecord are always allowed — they're estate-mobile hub screens.
+    if (sectionId !== 'estate_hub' && sectionId !== 'mobile_viewrecord') {
         const _gs = loadSession();
         if (_gs && _gs.role !== 'superadmin' && getSectionAccess(_gs, sectionId) === 'none') {
             return; // silently block — caller has no access to this section
@@ -7405,8 +7456,9 @@ function navToSection(sectionId) {
 
     syncEstateBackBtn(); // show ← Home when away from hub, hide when on hub
 
-    // Hub page is static — skip data refresh when landing on it.
+    // Hub pages are static — skip data refresh when landing on them.
     // Clear the category freeze so it doesn't persist across sessions.
+    if (sectionId === 'mobile_viewrecord') { updateMobileBottomNav(sectionId); return; }
     if (sectionId === 'estate_hub') {
         const catSel = document.getElementById('txnCategory');
         if (catSel) {
@@ -7430,8 +7482,7 @@ function mobileNavTo(dest) {
     if (dest === 'home') {
         navToSection('estate_hub');
     } else if (dest === 'records') {
-        const last = sessionStorage.getItem('opp_last_record_tab') || 'fertrecord';
-        navToSection(last);
+        navToSection('mobile_viewrecord');
     } else if (dest === 'summary') {
         navToSection('summary');
     } else if (dest === 'dashboard') {
@@ -7441,18 +7492,17 @@ function mobileNavTo(dest) {
 
 function updateMobileBottomNav(sectionId) {
     if (!document.body.classList.contains('estate-mobile')) return;
-    const isRecord = MOBILE_RECORD_SECTIONS.includes(sectionId);
+    const isRecord = MOBILE_RECORD_SECTIONS.includes(sectionId) || sectionId === 'mobile_viewrecord';
     const map = {
-        mnavHome:     sectionId === 'estate_hub',
-        mnavRecords:  isRecord,
-        mnavSummary:  sectionId === 'summary',
+        mnavHome:      sectionId === 'estate_hub',
+        mnavRecords:   isRecord,
+        mnavSummary:   sectionId === 'summary',
         mnavDashboard: sectionId === 'dashboard',
     };
     Object.entries(map).forEach(([id, active]) => {
         const el = document.getElementById(id);
         if (el) el.classList.toggle('active', active);
     });
-    if (isRecord) sessionStorage.setItem('opp_last_record_tab', sectionId);
 }
 
 // ── Apply nav & section visibility based on session ────────────────
