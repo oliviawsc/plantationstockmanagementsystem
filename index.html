@@ -1354,20 +1354,7 @@
                 <!-- Module cards -->
                 <div style="padding:0 16px;display:flex;flex-direction:column;gap:14px;">
 
-                    <!-- Dashboard — full-width horizontal -->
-                    <button id="estateHubDashCard" class="estate-card" onclick="navToSection('dashboard')"
-                        style="flex-direction:row;justify-content:flex-start;padding:20px 22px;gap:18px;border-radius:18px;">
-                        <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#2E7D32,#43A047);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(46,125,50,.3);">
-                            <span style="font-size:26px;">&#128202;</span>
-                        </div>
-                        <div style="text-align:left;flex:1;">
-                            <div data-i18n="hub_dashboard" style="font-size:17px;font-weight:700;color:#0F172A;margin-bottom:3px;">Dashboard</div>
-                            <div data-i18n="hub_dash_sub" style="font-size:12px;color:#64748B;">Overview &amp; stock charts</div>
-                        </div>
-                        <span style="font-size:22px;color:#A5D6A7;">&#8250;</span>
-                    </button>
-
-                    <!-- 2×2 grid: Fertilizer, Chemical, Oil Palm Seedling, Stock Summary -->
+                    <!-- 2×2 grid (then centred single): Fertilizer, Chemical, Oil Palm Seedling -->
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
 
                         <!-- Fertilizer -->
@@ -1388,25 +1375,19 @@
                             <span data-i18n="hub_record_stock" style="font-size:11px;color:#2563eb;background:#DBEAFE;padding:3px 10px;border-radius:99px;font-weight:600;">Record Stock</span>
                         </button>
 
-                        <!-- Oil Palm Seedling -->
-                        <button id="estateHubOPSCard" class="estate-card" onclick="navToEstateModule('Oil Palm Seedling')">
-                            <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#d97706,#b45309);display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 14px rgba(217,119,6,.25);">
-                                <span style="font-size:28px;">&#127807;</span>
+                        <!-- Oil Palm Seedling — spans full width -->
+                        <button id="estateHubOPSCard" class="estate-card" onclick="navToEstateModule('Oil Palm Seedling')"
+                            style="grid-column:1/-1;flex-direction:row;justify-content:flex-start;padding:20px 22px;gap:18px;border-radius:18px;">
+                            <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#d97706,#b45309);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(217,119,6,.25);">
+                                <span style="font-size:26px;">&#127807;</span>
                             </div>
-                            <div style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:5px;line-height:1.3;">
-                                <span data-i18n="hub_ops_line1">Oil Palm</span><br>
-                                <span data-i18n="hub_ops_line2">Seedling</span>
+                            <div style="text-align:left;flex:1;">
+                                <div style="font-size:17px;font-weight:700;color:#0F172A;margin-bottom:3px;">
+                                    <span data-i18n="hub_ops_line1">Oil Palm</span> <span data-i18n="hub_ops_line2">Seedling</span>
+                                </div>
+                                <span data-i18n="hub_record_stock" style="font-size:11px;color:#b45309;background:#FEF3C7;padding:3px 10px;border-radius:99px;font-weight:600;">Record Stock</span>
                             </div>
-                            <span data-i18n="hub_record_stock" style="font-size:11px;color:#b45309;background:#FEF3C7;padding:3px 10px;border-radius:99px;font-weight:600;">Record Stock</span>
-                        </button>
-
-                        <!-- Stock Summary -->
-                        <button id="estateHubSumCard" class="estate-card" onclick="navToSection('summary')">
-                            <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#1B5E20,#2E7D32);display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 14px rgba(46,125,50,.28);">
-                                <span style="font-size:28px;">&#128209;</span>
-                            </div>
-                            <div data-i18n="hub_summary" style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:5px;line-height:1.3;">Stock Summary</div>
-                            <span data-i18n="hub_view_report" style="font-size:11px;color:#1B5E20;background:#DCFCE7;padding:3px 10px;border-radius:99px;font-weight:600;">View Report</span>
+                            <span style="font-size:22px;color:#FCD34D;">&#8250;</span>
                         </button>
 
                     </div>
