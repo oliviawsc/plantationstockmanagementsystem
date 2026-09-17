@@ -7840,6 +7840,11 @@ function normalisePermissions(perms) {
 
 function getSectionAccess(session, sectionId) {
     if (!session || session.role === 'superadmin') return 'edit';
+    // Estate users always have view access to the record sections
+    if (session.role === 'estate_user' && ['fertrecord', 'chemrecord', 'plantrecord'].includes(sectionId)) {
+        const perms = normalisePermissions(session.permissions);
+        return perms[sectionId] || 'view';
+    }
     const perms = normalisePermissions(session.permissions);
     return perms[sectionId] || 'none';
 }
