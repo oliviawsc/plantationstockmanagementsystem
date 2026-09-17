@@ -7840,10 +7840,22 @@ function normalisePermissions(perms) {
 
 function getSectionAccess(session, sectionId) {
     if (!session || session.role === 'superadmin') return 'edit';
-    // Estate users always have view access to the record sections
-    if (session.role === 'estate_user' && ['fertrecord', 'chemrecord', 'plantrecord'].includes(sectionId)) {
+    if (session.role === 'estate_user') {
         const perms = normalisePermissions(session.permissions);
-        return perms[sectionId] || 'view';
+        // Core mobile sections always have a minimum access level so estate users
+        // can use the hub cards and bottom nav without needing explicit permission grants.
+        // Admin-set permissions can raise (or lower) these defaults.
+        const estateDefaults = {
+            transactions: 'edit',  // estate hub cards — needs edit to record stock
+            summary:      'view',  // Stock Summary bottom nav
+            dashboard:    'view',  // Dashboard bottom nav
+            fertrecord:   'view',  // View Record tab
+            chemrecord:   'view',  // View Record tab
+            plantrecord:  'view',  // View Record tab
+        };
+        if (sectionId in estateDefaults) {
+            return perms[sectionId] || estateDefaults[sectionId];
+        }
     }
     const perms = normalisePermissions(session.permissions);
     return perms[sectionId] || 'none';
@@ -10592,4 +10604,4 @@ function populateChemFilters() {
 </nav>
 
 </body>
-</html><!-- deploy 2026-09-17 16:19:33 -->
+</html>
