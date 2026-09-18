@@ -277,8 +277,16 @@
         body.estate-mobile #estateAppBanner { display: flex !important; }
         /* Push header bar below the banner */
         body.estate-mobile #topHeaderBar { top: 38px !important; left: 0 !important; }
-        /* Extend main content padding to clear both banner + header + bottom nav */
-        body.estate-mobile #mainWrapper { padding-top: 94px; padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+        /* Extend main content padding to clear both banner + header + bottom nav.
+           Override mobile flex/overflow so the BODY scrolls (not #mainWrapper) —
+           this keeps the fixed bottom nav stable on iOS Safari. */
+        body.estate-mobile #appLayout { display: block; }
+        body.estate-mobile #mainWrapper {
+            padding-top: 94px;
+            padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+            overflow-y: visible !important; /* override @media overflow-y:auto */
+            height: auto !important;        /* override flex-set height */
+        }
 
         /* ── Mobile bottom nav bar ── */
         #mobileBottomNav { display: none; }
@@ -291,6 +299,9 @@
             z-index: 200;
             box-shadow: 0 -2px 16px rgba(0,0,0,.10);
             padding-bottom: env(safe-area-inset-bottom, 0px);
+            /* Force GPU compositing layer — prevents iOS fixed-position jitter */
+            -webkit-transform: translate3d(0,0,0);
+            transform: translate3d(0,0,0);
         }
         .mnav-item {
             flex: 1; display: flex; flex-direction: column;
