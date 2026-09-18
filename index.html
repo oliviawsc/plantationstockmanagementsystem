@@ -2387,8 +2387,8 @@
 
             <!-- Filters -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <div class="grid grid-cols-1 gap-3 mb-4">
-                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex-1 min-w-0 bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
                         <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_round">Manuring Round</p>
                         <div class="px-2.5 pb-1.5">
                             <select id="fertRecordRound" onchange="renderFertRecord()"
@@ -2397,20 +2397,20 @@
                             </select>
                         </div>
                     </div>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                    <button type="button" onclick="renderFertRecord()"
-                        class="bg-green-800 hover:bg-green-900 text-white px-5 py-2 rounded-lg font-semibold"
-                        data-i18n="btn_apply_filters">Apply Filters</button>
-                    <button type="button" onclick="clearFertRecord()"
-                        class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-lg font-semibold"
-                        data-i18n="btn_clear">Clear</button>
-                    <button type="button" onclick="printFertRecord()"
-                        class="ml-auto bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg font-semibold"
-                        data-i18n="btn_print_pdf">&#128438; Print / PDF</button>
-                    <button type="button" onclick="exportFertRecord()"
-                        class="bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-2 rounded-lg font-semibold"
-                        data-i18n="btn_export">&#11015;&#65039; Export to Excel</button>
+                    <div class="flex flex-wrap gap-2 flex-shrink-0">
+                        <button type="button" onclick="renderFertRecord()"
+                            class="bg-green-800 hover:bg-green-900 text-white px-5 py-2 rounded-lg font-semibold"
+                            data-i18n="btn_apply_filters">Apply Filters</button>
+                        <button type="button" onclick="clearFertRecord()"
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-lg font-semibold"
+                            data-i18n="btn_clear">Clear</button>
+                        <button type="button" onclick="printFertRecord()"
+                            class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg font-semibold"
+                            data-i18n="btn_print_pdf">&#128438; Print / PDF</button>
+                        <button type="button" onclick="exportFertRecord()"
+                            class="bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-2 rounded-lg font-semibold"
+                            data-i18n="btn_export">&#11015;&#65039; Export to Excel</button>
+                    </div>
                 </div>
             </div>
 
@@ -2431,8 +2431,8 @@
 
             <!-- Filters -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <div class="grid grid-cols-1 gap-3 mb-4">
-                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex-1 min-w-0 bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
                         <p class="text-xs font-bold text-blue-900 px-2.5 pt-2 pb-0.5" data-i18n="cr_lbl_item">Chemical Item</p>
                         <div class="px-2.5 pb-1.5">
                             <select id="chemRecordItem" onchange="renderChemRecord()"
@@ -2441,20 +2441,20 @@
                             </select>
                         </div>
                     </div>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                    <button type="button" onclick="renderChemRecord()"
-                        class="bg-blue-800 hover:bg-blue-900 text-white px-5 py-2 rounded-lg font-semibold"
-                        data-i18n="btn_apply_filters">Apply Filters</button>
-                    <button type="button" onclick="clearChemRecord()"
-                        class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-lg font-semibold"
-                        data-i18n="btn_clear">Clear</button>
-                    <button type="button" onclick="printChemRecord()"
-                        class="ml-auto bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg font-semibold"
-                        data-i18n="btn_print_pdf">&#128438; Print / PDF</button>
-                    <button type="button" onclick="exportChemRecord()"
-                        class="bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-2 rounded-lg font-semibold"
-                        data-i18n="btn_export">&#11015;&#65039; Export to Excel</button>
+                    <div class="flex flex-wrap gap-2 flex-shrink-0">
+                        <button type="button" onclick="renderChemRecord()"
+                            class="bg-blue-800 hover:bg-blue-900 text-white px-5 py-2 rounded-lg font-semibold"
+                            data-i18n="btn_apply_filters">Apply Filters</button>
+                        <button type="button" onclick="clearChemRecord()"
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-lg font-semibold"
+                            data-i18n="btn_clear">Clear</button>
+                        <button type="button" onclick="printChemRecord()"
+                            class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg font-semibold"
+                            data-i18n="btn_print_pdf">&#128438; Print / PDF</button>
+                        <button type="button" onclick="exportChemRecord()"
+                            class="bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-2 rounded-lg font-semibold"
+                            data-i18n="btn_export">&#11015;&#65039; Export to Excel</button>
+                    </div>
                 </div>
             </div>
 
@@ -2475,8 +2475,8 @@
 
             <!-- Filters -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <div class="grid grid-cols-1 gap-3 mb-4">
-                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex-1 min-w-0 bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
                         <p class="text-xs font-bold text-amber-900 px-2.5 pt-2 pb-0.5" data-i18n="pr_lbl_item">Seedling Item</p>
                         <div class="px-2.5 pb-1.5">
                             <select id="plantRecordItem" onchange="renderPlantRecord()"
@@ -2485,19 +2485,15 @@
                             </select>
                         </div>
                     </div>
-                </div>
-                <div class="flex flex-wrap justify-between gap-2">
-                    <div class="flex flex-wrap gap-2">
+                    <div class="flex flex-wrap gap-2 flex-shrink-0">
                         <button onclick="renderPlantRecord()"
-                            class="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700 text-sm font-semibold" data-i18n="btn_apply_filters">Apply Filters</button>
+                            class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-lg font-semibold" data-i18n="btn_apply_filters">Apply Filters</button>
                         <button onclick="clearPlantRecord()"
-                            class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 text-sm font-semibold" data-i18n="btn_clear">Clear</button>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-lg font-semibold" data-i18n="btn_clear">Clear</button>
                         <button onclick="printPlantRecord()"
-                            class="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800 text-sm font-semibold" data-i18n="btn_print_pdf">&#128438; Print / PDF</button>
+                            class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg font-semibold" data-i18n="btn_print_pdf">&#128438; Print / PDF</button>
                         <button onclick="exportPlantRecord()"
-                            class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 text-sm font-semibold" data-i18n="btn_export_excel">&#128196; Export to Excel</button>
+                            class="bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-2 rounded-lg font-semibold" data-i18n="btn_export_excel">&#128196; Export to Excel</button>
                     </div>
                 </div>
             </div>
