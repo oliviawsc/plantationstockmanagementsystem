@@ -2886,11 +2886,55 @@ function save(key, data) {
     syncToSupabase(key, data);
 }
 
-// Push the current array for `key` into the matching Supabase table:
-//   - upsert every row currently in `data` (tagged with activeEstate)
-//   - delete rows whose ids existed before but are no longer in `data`
-async function syncToSupabase(key, data) {
-    if (!activeEstate) return; // never sync without an estate
+// ── Offline sync queue ──────────────────────────────────────────────
+// When a Supabase write fails because the device is offline, we save the
+// (key, estate) pair to a persistent queue in localStorage.  When the
+// browser fires the `online` event we drain the queue, reading the
+// latest localStorage snapshot for each key and pushing it to Supabase.
+
+const SYNC_QUEUE_KEY = 'opp_sync_queue';
+
+function _loadSyncQueue() {
+    try { return JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY)) || []; } catch { return []; }
+}
+function _saveSyncQueue(q) {
+    try { localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(q)); } catch {}
+}
+
+function _queueSync(key, estate) {
+    const q = _loadSyncQueue();
+    if (!q.find(e => e.key === key && e.estate === estate)) {
+        q.push({ key, estate });
+        _saveSyncQueue(q);
+    }
+    showSyncQueued();
+}
+
+async function drainSyncQueue() {
+    const q = _loadSyncQueue();
+    if (q.length === 0) return;
+
+    const remaining = [];
+    for (const entry of q) {
+        const estateKey = `${entry.key}::${entry.estate}`;
+        let data;
+        try { data = JSON.parse(localStorage.getItem(estateKey)) || []; } catch { data = []; }
+        const ok = await _executeSyncForEstate(entry.key, entry.estate, data);
+        if (!ok) remaining.push(entry);
+    }
+
+    _saveSyncQueue(remaining);
+
+    if (remaining.length === 0 && q.length > 0) {
+        showSyncSuccess('Offline data has been saved to the server.');
+    } else if (remaining.length > 0) {
+        showSyncError(`${remaining.length} item(s) still pending — will retry when online.`);
+    }
+}
+
+// Internal: attempt one sync for a given estate (may differ from activeEstate
+// when draining the queue after an estate switch).
+async function _executeSyncForEstate(key, estate, data) {
     const table = key;
     try {
         const currentIds  = new Set(data.map(r => r.id));
@@ -2901,45 +2945,92 @@ async function syncToSupabase(key, data) {
             const { error: delErr } = await supabaseClient
                 .from(table).delete().in('id', removedIds);
             if (delErr) {
+                if (!navigator.onLine) return false;
                 console.error(`[Supabase] delete ${table}`, delErr);
                 showSyncError(`Delete failed on ${table}: ${delErr.message}`);
-                return;
+                return false;
             }
         }
 
         if (data.length > 0) {
-            // Tag every row with the active estate so queries can filter by it
-            const tagged = data.map(r => ({ ...r, estate: activeEstate }));
+            const tagged = data.map(r => ({ ...r, estate }));
             const { error: upErr } = await supabaseClient
                 .from(table).upsert(tagged, { onConflict: 'id' });
             if (upErr) {
+                if (!navigator.onLine) return false;
                 console.error(`[Supabase] upsert ${table}`, upErr);
                 showSyncError(`Save failed on ${table}: ${upErr.message}`);
-                return;
+                return false;
             }
         }
 
         lastKnownIds[table] = currentIds;
+        return true;
     } catch (err) {
         console.error(`[Supabase] sync error for ${table}`, err);
-        showSyncError(`Sync error on ${table}: ${err.message}`);
+        return false;
     }
 }
 
+// Push the current array for `key` into the matching Supabase table:
+//   - upsert every row currently in `data` (tagged with activeEstate)
+//   - delete rows whose ids existed before but are no longer in `data`
+//   - if offline or network fails, queue the operation for retry on reconnect
+async function syncToSupabase(key, data) {
+    if (!activeEstate) return;
+
+    // Immediately queue without attempting if we know we're offline
+    if (!navigator.onLine) {
+        _queueSync(key, activeEstate);
+        return;
+    }
+
+    const ok = await _executeSyncForEstate(key, activeEstate, data);
+    if (!ok) {
+        // Could be a transient network failure — queue for retry
+        _queueSync(key, activeEstate);
+    }
+}
+
+// Drain the queue whenever the browser reports it is back online
+window.addEventListener('online', () => {
+    drainSyncQueue();
+});
+
 /** Show a non-blocking red toast at the top-right when a Supabase sync fails */
 function showSyncError(msg) {
+    _showToast('⚠️ Sync Error: ' + msg, '#dc2626', 8000);
+}
+
+/** Show a yellow toast when data is queued for later sync */
+function showSyncQueued() {
+    // Avoid stacking multiple identical toasts
+    if (document.getElementById('syncQueuedToast')) return;
+    const t = _showToast('📶 Offline — data saved locally and will sync when reconnected.', '#b45309', 0);
+    if (t) t.id = 'syncQueuedToast';
+}
+
+/** Show a green toast when queued data successfully syncs */
+function showSyncSuccess(msg) {
+    const old = document.getElementById('syncQueuedToast');
+    if (old) old.remove();
+    _showToast('✅ ' + msg, '#166534', 6000);
+}
+
+function _showToast(msg, bg, autoDismissMs) {
     const toast = document.createElement('div');
-    toast.textContent = '⚠️ Supabase Sync Error: ' + msg;
+    toast.textContent = msg;
     toast.style.cssText = [
         'position:fixed', 'top:16px', 'right:16px', 'z-index:9999',
-        'background:#dc2626', 'color:#fff', 'font-size:13px', 'font-weight:600',
+        `background:${bg}`, 'color:#fff', 'font-size:13px', 'font-weight:600',
         'padding:10px 16px', 'border-radius:8px', 'box-shadow:0 4px 12px rgba(0,0,0,.3)',
         'max-width:360px', 'line-height:1.4', 'cursor:pointer'
     ].join(';');
     toast.title = 'Click to dismiss';
     toast.onclick = () => toast.remove();
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 8000);
+    if (autoDismissMs > 0) setTimeout(() => toast.remove(), autoDismissMs);
+    return toast;
 }
 
 // Pull the full dataset down from Supabase on boot, replacing in-memory
@@ -8509,6 +8600,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     } catch (e) {
         console.warn('[Auth] Could not refresh session from Supabase Auth', e);
+    }
+
+    // If there are pending offline writes from a previous session, try to
+    // sync them now that the page has loaded (and presumably is online).
+    if (navigator.onLine) {
+        drainSyncQueue();
     }
 });
 /* =================================================================
