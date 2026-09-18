@@ -2387,7 +2387,7 @@
 
             <!-- Filters -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                <div class="grid grid-cols-1 gap-3 mb-4">
                     <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
                         <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_round">Manuring Round</p>
                         <div class="px-2.5 pb-1.5">
@@ -2396,24 +2396,6 @@
                                 <option value="" data-i18n="fr_select_round">-- Select a Round --</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('fertRecordFrom')">
-                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_from">Date From</p>
-                        <div class="flex items-center gap-1.5 text-green-800 px-2.5 pb-2">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                            <span id="fertRecordFromDisplay" class="text-xs truncate">Select date</span>
-                        </div>
-                        <input id="fertRecordFrom" type="date" onchange="updateDateDisplay('fertRecordFrom')"
-                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
-                    </div>
-                    <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('fertRecordTo')">
-                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_to">Date To</p>
-                        <div class="flex items-center gap-1.5 text-green-800 px-2.5 pb-2">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                            <span id="fertRecordToDisplay" class="text-xs truncate">Select date</span>
-                        </div>
-                        <input id="fertRecordTo" type="date" onchange="updateDateDisplay('fertRecordTo')"
-                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -2449,7 +2431,7 @@
 
             <!-- Filters -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                <div class="grid grid-cols-1 gap-3 mb-4">
                     <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
                         <p class="text-xs font-bold text-blue-900 px-2.5 pt-2 pb-0.5" data-i18n="cr_lbl_item">Chemical Item</p>
                         <div class="px-2.5 pb-1.5">
@@ -2458,24 +2440,6 @@
                                 <option value="" data-i18n="cr_select_item">-- Select a Chemical Item --</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('chemRecordFrom')">
-                        <p class="text-xs font-bold text-blue-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_from">Date From</p>
-                        <div class="flex items-center gap-1.5 text-blue-800 px-2.5 pb-2">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                            <span id="chemRecordFromDisplay" class="text-xs truncate">Select date</span>
-                        </div>
-                        <input id="chemRecordFrom" type="date" onchange="updateDateDisplay('chemRecordFrom')"
-                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
-                    </div>
-                    <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('chemRecordTo')">
-                        <p class="text-xs font-bold text-blue-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_to">Date To</p>
-                        <div class="flex items-center gap-1.5 text-blue-800 px-2.5 pb-2">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                            <span id="chemRecordToDisplay" class="text-xs truncate">Select date</span>
-                        </div>
-                        <input id="chemRecordTo" type="date" onchange="updateDateDisplay('chemRecordTo')"
-                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -2511,7 +2475,7 @@
 
             <!-- Filters -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                <div class="grid grid-cols-1 gap-3 mb-4">
                     <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
                         <p class="text-xs font-bold text-amber-900 px-2.5 pt-2 pb-0.5" data-i18n="pr_lbl_item">Seedling Item</p>
                         <div class="px-2.5 pb-1.5">
@@ -2520,24 +2484,6 @@
                                 <option value="" data-i18n="pr_select_item">-- Select a Seedling Item --</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('plantRecordFrom')">
-                        <p class="text-xs font-bold text-amber-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_from">Date From</p>
-                        <div class="flex items-center gap-1.5 text-amber-800 px-2.5 pb-2">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                            <span id="plantRecordFromDisplay" class="text-xs truncate">Select date</span>
-                        </div>
-                        <input id="plantRecordFrom" type="date" onchange="updateDateDisplay('plantRecordFrom')"
-                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
-                    </div>
-                    <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('plantRecordTo')">
-                        <p class="text-xs font-bold text-amber-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_to">Date To</p>
-                        <div class="flex items-center gap-1.5 text-amber-800 px-2.5 pb-2">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                            <span id="plantRecordToDisplay" class="text-xs truncate">Select date</span>
-                        </div>
-                        <input id="plantRecordTo" type="date" onchange="updateDateDisplay('plantRecordTo')"
-                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
                 </div>
                 <div class="flex flex-wrap justify-between gap-2">
@@ -5991,8 +5937,7 @@ function updateDateDisplay(id) {
 function refreshAllDateDisplays() {
     ['dashFrom','dashTo','filterFrom','filterTo',
      'ledgerFrom','ledgerTo',
-     'fertRecordFrom','fertRecordTo','chemRecordFrom','chemRecordTo',
-     'plantRecordFrom','plantRecordTo'].forEach(updateDateDisplay);
+     ].forEach(updateDateDisplay);
 }
 
 /** Re-renders all three category charts. Called from refreshAll(). */
@@ -7912,11 +7857,11 @@ const VIEW_LOCK_ALLOWED_FIELD_IDS = [
     // Chemical Usage filters
     'filterChemRound', 'filterChemIngredient', 'filterChemBlockRound', 'filterChemBlock', 'filterChemBlockIngredient',
     // Fertilizer Application Record filters
-    'fertRecordRound', 'fertRecordFrom', 'fertRecordTo',
+    'fertRecordRound',
     // Chemical Application Record filters
-    'chemRecordItem', 'chemRecordFrom', 'chemRecordTo',
+    'chemRecordItem',
     // Field Planting Record filters
-    'plantRecordItem', 'plantRecordFrom', 'plantRecordTo',
+    'plantRecordItem',
     // Dashboard date filter
     'dashFrom', 'dashTo',
 ];
@@ -9796,13 +9741,7 @@ function _getFertRecordPivotData() {
 
 function clearFertRecord() {
     const roundSel = document.getElementById('fertRecordRound');
-    const fromInp  = document.getElementById('fertRecordFrom');
-    const toInp    = document.getElementById('fertRecordTo');
     if (roundSel) roundSel.value = '';
-    if (fromInp)  fromInp.value  = '';
-    if (toInp)    toInp.value    = '';
-    updateDateDisplay('fertRecordFrom');
-    updateDateDisplay('fertRecordTo');
     renderFertRecord();
 }
 
@@ -10090,13 +10029,7 @@ function renderChemRecord() {
 
 function clearChemRecord() {
     const itemSel = document.getElementById('chemRecordItem');
-    const fromInp = document.getElementById('chemRecordFrom');
-    const toInp   = document.getElementById('chemRecordTo');
     if (itemSel) itemSel.value = '';
-    if (fromInp) fromInp.value = '';
-    if (toInp)   toInp.value   = '';
-    updateDateDisplay('chemRecordFrom');
-    updateDateDisplay('chemRecordTo');
     renderChemRecord();
 }
 
@@ -10390,13 +10323,7 @@ function renderPlantRecord() {
 
 function clearPlantRecord() {
     const itemSel = document.getElementById('plantRecordItem');
-    const fromInp = document.getElementById('plantRecordFrom');
-    const toInp   = document.getElementById('plantRecordTo');
     if (itemSel) itemSel.value = '';
-    if (fromInp) fromInp.value = '';
-    if (toInp)   toInp.value   = '';
-    updateDateDisplay('plantRecordFrom');
-    updateDateDisplay('plantRecordTo');
     renderPlantRecord();
 }
 
