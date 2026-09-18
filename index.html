@@ -9534,18 +9534,22 @@ function renderFertRecord() {
 
     // Header info
     const headerHtml = `
-        <table class="w-full text-sm mb-3" style="border-collapse:collapse;">
-            <tr>
-                <td style="padding:3px 6px;font-weight:600;color:#555;white-space:nowrap;">${d.fr_lbl_round || 'Manuring Round'}:</td>
-                <td style="padding:3px 6px;font-weight:700;" colspan="3">${round.name}</td>
-                <td style="padding:3px 6px;font-weight:600;color:#555;text-align:right;white-space:nowrap;">${d.fr_lbl_kgperpalm || 'kg Per Palm'}:</td>
-                <td style="padding:3px 6px;font-weight:700;text-align:right;">${round.kgPerPalm || 0} Kg</td>
-            </tr>
-            <tr>
-                <td style="padding:3px 6px;font-weight:600;color:#555;">Item:</td>
-                <td style="padding:3px 6px;font-weight:700;" colspan="5">${round.fertilizerName || (fertItem && fertItem.name) || '-'}</td>
-            </tr>
-        </table>`;
+        <div style="margin-bottom:12px;">
+            <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:6px 16px;margin-bottom:6px;">
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:12px;font-weight:600;color:#555;">${d.fr_lbl_round || 'Manuring Round'}:</div>
+                    <div style="font-size:13px;font-weight:700;word-break:break-word;">${round.name}</div>
+                </div>
+                <div style="flex-shrink:0;text-align:right;">
+                    <div style="font-size:12px;font-weight:600;color:#555;">${d.fr_lbl_kgperpalm || 'kg Per Palm'}:</div>
+                    <div style="font-size:13px;font-weight:700;">${round.kgPerPalm || 0} Kg</div>
+                </div>
+            </div>
+            <div>
+                <span style="font-size:12px;font-weight:600;color:#555;">Item: </span>
+                <span style="font-size:13px;font-weight:700;word-break:break-word;">${round.fertilizerName || (fertItem && fertItem.name) || '-'}</span>
+            </div>
+        </div>`;
 
     // Summary pivot
     const sumColHdrs = blockSummary.map(b =>
@@ -9953,12 +9957,10 @@ function renderChemRecord() {
 
     // Header
     const headerHtml = `
-        <table class="w-full text-sm mb-3" style="border-collapse:collapse;">
-            <tr>
-                <td style="padding:3px 6px;font-weight:600;color:#555;">Item:</td>
-                <td style="padding:3px 6px;font-weight:700;">${item.name}</td>
-            </tr>
-        </table>`;
+        <div style="margin-bottom:12px;">
+            <span style="font-size:12px;font-weight:600;color:#555;">Item: </span>
+            <span style="font-size:13px;font-weight:700;word-break:break-word;">${item.name}</span>
+        </div>`;
 
     // Status / BF line
     const statusHtml = `<div style="display:flex;justify-content:flex-end;margin-bottom:14px;padding:6px 2px;border-bottom:1px solid #f0f0f0;">
@@ -10253,12 +10255,10 @@ function renderPlantRecord() {
 
     // Header
     const headerHtml = `
-        <table class="w-full text-sm mb-3" style="border-collapse:collapse;">
-            <tr>
-                <td style="padding:3px 6px;font-weight:600;color:#555;">Item:</td>
-                <td style="padding:3px 6px;font-weight:700;">${item.name}</td>
-            </tr>
-        </table>`;
+        <div style="margin-bottom:12px;">
+            <span style="font-size:12px;font-weight:600;color:#555;">Item: </span>
+            <span style="font-size:13px;font-weight:700;word-break:break-word;">${item.name}</span>
+        </div>`;
 
     // Bring Forward line
     const statusHtml = `<div style="display:flex;justify-content:flex-end;margin-bottom:14px;padding:6px 2px;border-bottom:1px solid #f0f0f0;">
