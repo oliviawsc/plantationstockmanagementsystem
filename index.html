@@ -1688,26 +1688,32 @@
             <div class="bg-white p-6 rounded-xl shadow mb-6">
                 <h3 class="text-lg font-bold mb-3" data-i18n="summary_filters">Filters</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold mb-1" data-i18n="col_category">Category</label>
-                        <select id="filterLedgerCategory" class="w-full border border-green-300 rounded p-2 bg-white" onchange="refreshLedgerItemDropdown(true)">
-                            <option value="" data-i18n="opt_all">All</option>
-                            <option value="Fertilizer" data-i18n="cat_fertilizer">Fertilizer</option>
-                            <option value="Chemical" data-i18n="cat_chemical">Chemical</option>
-                            <option value="Oil Palm Seedling" data-i18n="cat_seedling">Oil Palm Seedling</option>
-                        </select>
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="col_category">Category</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterLedgerCategory" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer" onchange="refreshLedgerItemDropdown(true)">
+                                <option value="" data-i18n="opt_all">All</option>
+                                <option value="Fertilizer" data-i18n="cat_fertilizer">Fertilizer</option>
+                                <option value="Chemical" data-i18n="cat_chemical">Chemical</option>
+                                <option value="Oil Palm Seedling" data-i18n="cat_seedling">Oil Palm Seedling</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold mb-1" data-i18n="col_item_name">Item Name</label>
-                        <select id="filterLedgerItem" class="w-full border border-green-300 rounded p-2 bg-white">
-                            <option value="" data-i18n="opt_all">All</option>
-                        </select>
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="col_item_name">Item Name</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterLedgerItem" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="" data-i18n="opt_all">All</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold mb-1" data-i18n="ledger_lbl_year">Year</label>
-                        <select id="filterLedgerYear" class="w-full border border-green-300 rounded p-2 bg-white">
-                            <option value="" data-i18n="opt_all">All</option>
-                        </select>
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="ledger_lbl_year">Year</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterLedgerYear" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="" data-i18n="opt_all">All</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="mt-4 flex gap-3">
@@ -1868,15 +1874,23 @@
             <div class="bg-white p-6 rounded-xl shadow mb-8">
                 <h3 class="text-xl font-bold mb-2" data-i18n="rp_title_a">a) Manuring Progress by Round</h3>
                 <p class="text-xs text-green-700 mb-2">% Applied per round = Qty Applied (that round) ÷ Budgeted Fertilizer Needed (that round)</p>
-                <div style="display:flex;gap:10px;margin-bottom:12px;">
-                    <select id="filterRpRound" onchange="applyFilterRpRound()"
-                        class="flex-1 border border-green-300 rounded p-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-green-600">
-                        <option value="">— All Rounds —</option>
-                    </select>
-                    <select id="filterRpFertilizer" onchange="applyFilterRpRound()"
-                        class="flex-1 border border-green-300 rounded p-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-green-600">
-                        <option value="">— All Fertilizers —</option>
-                    </select>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="col_round">Round</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterRpRound" onchange="applyFilterRpRound()" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="">— All Rounds —</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="manuring_lbl_fertilizer">Fertilizer</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterRpFertilizer" onchange="applyFilterRpRound()" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="">— All Fertilizers —</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
@@ -1898,19 +1912,31 @@
             <div class="bg-white p-6 rounded-xl shadow mb-8">
                 <h3 class="text-xl font-bold mb-2" data-i18n="rp_title_b">b) Manuring Progress by Block</h3>
                 <p class="text-xs text-green-700 mb-2">% Applied per block = Qty Applied (that block) ÷ Budgeted Fertilizer Needed (that block)</p>
-                <div style="display:flex;gap:10px;margin-bottom:12px;">
-                    <select id="filterRpBlockRound" onchange="applyFilterRpBlock()"
-                        class="flex-1 border border-green-300 rounded p-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-green-600">
-                        <option value="">— All Rounds —</option>
-                    </select>
-                    <select id="filterRpBlockFertilizer" onchange="applyFilterRpBlock()"
-                        class="flex-1 border border-green-300 rounded p-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-green-600">
-                        <option value="">— All Fertilizers —</option>
-                    </select>
-                    <select id="filterRpBlock" onchange="applyFilterRpBlock()"
-                        class="flex-1 border border-green-300 rounded p-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-green-600">
-                        <option value="">— All Blocks —</option>
-                    </select>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="col_round">Round</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterRpBlockRound" onchange="applyFilterRpBlock()" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="">— All Rounds —</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="manuring_lbl_fertilizer">Fertilizer</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterRpBlockFertilizer" onchange="applyFilterRpBlock()" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="">— All Fertilizers —</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="col_block">Block</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterRpBlock" onchange="applyFilterRpBlock()" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="">— All Blocks —</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
@@ -2014,11 +2040,15 @@
             <div class="bg-white p-6 rounded-xl shadow mb-6">
                 <h3 class="text-xl font-bold mb-2" data-i18n="mp_title_a">a) Maintenance Progress by Round</h3>
                 <p class="text-xs text-green-700 mb-2" data-i18n="mp_sub_a">% Progress = Total Claimed Area ÷ Total Block Area of selected blocks in the round</p>
-                <div style="margin-bottom:12px;">
-                    <select id="filterMpRound" onchange="applyFilterMpRound()"
-                        class="w-full border border-green-300 rounded p-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-green-600">
-                        <option value="">— All Rounds —</option>
-                    </select>
+                <div class="mb-3">
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="col_round">Round</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterMpRound" onchange="applyFilterMpRound()" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="">— All Rounds —</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
@@ -2039,15 +2069,23 @@
             <div class="bg-white p-6 rounded-xl shadow mb-6">
                 <h3 class="text-xl font-bold mb-2" data-i18n="mp_title_b">b) Maintenance Progress by Block</h3>
                 <p class="text-xs text-green-700 mb-2" data-i18n="mp_sub_b">% Progress = Claimed Area ÷ Block Area × 100</p>
-                <div style="display:flex;gap:10px;margin-bottom:12px;">
-                    <select id="filterMpBlockRound" onchange="applyFilterMpBlock()"
-                        class="flex-1 border border-green-300 rounded p-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-green-600">
-                        <option value="">— All Rounds —</option>
-                    </select>
-                    <select id="filterMpBlock" onchange="applyFilterMpBlock()"
-                        class="flex-1 border border-green-300 rounded p-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-green-600">
-                        <option value="">— All Blocks —</option>
-                    </select>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="col_round">Round</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterMpBlockRound" onchange="applyFilterMpBlock()" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="">— All Rounds —</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="col_block">Block</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterMpBlock" onchange="applyFilterMpBlock()" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="">— All Blocks —</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
@@ -2120,15 +2158,23 @@
             <div class="bg-white p-6 rounded-xl shadow mb-6">
                 <h3 class="text-xl font-bold mb-2" data-i18n="mp_title_c">a) Chemical Usage per HA by Round</h3>
                 <p class="text-xs text-green-700 mb-2" data-i18n="mp_sub_c">Usage / Ha = Total Qty Used ÷ Total Claimed Area (Ha). Highlighted red if exceeding max dosage.</p>
-                <div style="display:flex;gap:10px;margin-bottom:12px;">
-                    <select id="filterChemRound" onchange="applyFilterChemRound()"
-                        class="flex-1 border border-orange-300 rounded p-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
-                        <option value="">— All Rounds —</option>
-                    </select>
-                    <select id="filterChemIngredient" onchange="applyFilterChemRound()"
-                        class="flex-1 border border-orange-300 rounded p-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
-                        <option value="">— All Ingredients —</option>
-                    </select>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-orange-900 px-2.5 pt-2 pb-0.5" data-i18n="col_round">Round</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterChemRound" onchange="applyFilterChemRound()" class="w-full text-xs text-orange-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="">— All Rounds —</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-orange-900 px-2.5 pt-2 pb-0.5" data-i18n="ci_lbl_name">Ingredient</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterChemIngredient" onchange="applyFilterChemRound()" class="w-full text-xs text-orange-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="">— All Ingredients —</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
@@ -2153,19 +2199,31 @@
             <div class="bg-white p-6 rounded-xl shadow mb-6">
                 <h3 class="text-xl font-bold mb-2" data-i18n="mp_title_d">b) Chemical Usage per HA by Block</h3>
                 <p class="text-xs text-green-700 mb-2" data-i18n="mp_sub_d">Usage / Ha = Total Qty Used (that block) ÷ Claimed Area (Ha) for that block. Highlighted red if exceeding max dosage.</p>
-                <div style="display:flex;gap:10px;margin-bottom:12px;">
-                    <select id="filterChemBlockRound" onchange="applyFilterChemBlock()"
-                        class="flex-1 border border-orange-300 rounded p-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
-                        <option value="">— All Rounds —</option>
-                    </select>
-                    <select id="filterChemBlock" onchange="applyFilterChemBlock()"
-                        class="flex-1 border border-orange-300 rounded p-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
-                        <option value="">— All Blocks —</option>
-                    </select>
-                    <select id="filterChemBlockIngredient" onchange="applyFilterChemBlock()"
-                        class="flex-1 border border-orange-300 rounded p-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
-                        <option value="">— All Ingredients —</option>
-                    </select>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-orange-900 px-2.5 pt-2 pb-0.5" data-i18n="col_round">Round</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterChemBlockRound" onchange="applyFilterChemBlock()" class="w-full text-xs text-orange-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="">— All Rounds —</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-orange-900 px-2.5 pt-2 pb-0.5" data-i18n="col_block">Block</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterChemBlock" onchange="applyFilterChemBlock()" class="w-full text-xs text-orange-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="">— All Blocks —</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-orange-900 px-2.5 pt-2 pb-0.5" data-i18n="ci_lbl_name">Ingredient</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterChemBlockIngredient" onchange="applyFilterChemBlock()" class="w-full text-xs text-orange-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="">— All Ingredients —</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
