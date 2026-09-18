@@ -2525,8 +2525,8 @@
 <!-- =================================================================
      EDIT TRANSACTION MODAL
      ================================================================= -->
-<div id="editTxnModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center flex">
-    <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg mx-4 max-h-screen overflow-y-auto">
+<div id="editTxnModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center flex" style="z-index:300">
+    <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg mx-4 overflow-y-auto" style="max-height:calc(100vh - 32px);padding-bottom:max(24px,env(safe-area-inset-bottom,0px))">
         <h3 class="text-xl font-bold mb-4 text-green-800" data-i18n="modal_edit_title">✏️ Edit Transaction</h3>
         <form id="editTxnForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input type="hidden" id="editTxnId" />
