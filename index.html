@@ -1601,29 +1601,36 @@
             <div class="bg-white p-6 rounded-xl shadow mb-6">
                 <h3 class="text-lg font-bold mb-3" data-i18n="summary_filters">Filters</h3>
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold mb-1" data-i18n="col_category">Category</label>
-                        <select id="filterCategory" class="w-full border border-green-300 rounded p-2 bg-white" onchange="filterSummaryItemsByCategory()">
-                            <option value="" data-i18n="opt_all">All</option>
-                            <option value="Fertilizer" data-i18n="cat_fertilizer">Fertilizer</option>
-                            <option value="Chemical" data-i18n="cat_chemical">Chemical</option>
-                            <option value="Oil Palm Seedling" data-i18n="cat_seedling">Oil Palm Seedling</option>
-                        </select>
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="col_category">Category</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterCategory" onchange="filterSummaryItemsByCategory()"
+                                class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="" data-i18n="opt_all">All</option>
+                                <option value="Fertilizer" data-i18n="cat_fertilizer">Fertilizer</option>
+                                <option value="Chemical" data-i18n="cat_chemical">Chemical</option>
+                                <option value="Oil Palm Seedling" data-i18n="cat_seedling">Oil Palm Seedling</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold mb-1" data-i18n="col_item_name">Item Name</label>
-                        <select id="filterItem" class="w-full border border-green-300 rounded p-2 bg-white">
-                            <option value="" data-i18n="opt_all">All</option>
-                        </select>
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="col_item_name">Item Name</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterItem" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="" data-i18n="opt_all">All</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold mb-1" data-i18n="txn_lbl_type">Type</label>
-                        <select id="filterType" class="w-full border border-green-300 rounded p-2 bg-white">
-                            <option value="" data-i18n="opt_all">All</option>
-                            <option value="In" data-i18n="txn_type_in">In</option>
-                            <option value="Out" data-i18n="txn_type_out">Out</option>
-                            <option value="Adj" data-i18n="txn_type_adj">Adj</option>
-                        </select>
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="txn_lbl_type">Type</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="filterType" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="" data-i18n="opt_all">All</option>
+                                <option value="In" data-i18n="txn_type_in">In</option>
+                                <option value="Out" data-i18n="txn_type_out">Out</option>
+                                <option value="Adj" data-i18n="txn_type_adj">Adj</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('filterFrom')">
                         <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="filter_date_from">Date From</p>
@@ -2311,13 +2318,15 @@
 
             <!-- Filters -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div>
-                        <label class="block text-sm font-semibold mb-1" data-i18n="fr_lbl_round">Manuring Round</label>
-                        <select id="fertRecordRound" onchange="renderFertRecord()"
-                            class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
-                            <option value="" data-i18n="fr_select_round">-- Select a Round --</option>
-                        </select>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_round">Manuring Round</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="fertRecordRound" onchange="renderFertRecord()"
+                                class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="" data-i18n="fr_select_round">-- Select a Round --</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('fertRecordFrom')">
                         <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_from">Date From</p>
@@ -2371,13 +2380,15 @@
 
             <!-- Filters -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div>
-                        <label class="block text-sm font-semibold mb-1" data-i18n="cr_lbl_item">Chemical Item</label>
-                        <select id="chemRecordItem" onchange="renderChemRecord()"
-                            class="w-full border border-blue-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
-                            <option value="" data-i18n="cr_select_item">-- Select a Chemical Item --</option>
-                        </select>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-blue-900 px-2.5 pt-2 pb-0.5" data-i18n="cr_lbl_item">Chemical Item</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="chemRecordItem" onchange="renderChemRecord()"
+                                class="w-full text-xs text-blue-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="" data-i18n="cr_select_item">-- Select a Chemical Item --</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('chemRecordFrom')">
                         <p class="text-xs font-bold text-blue-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_from">Date From</p>
@@ -2431,13 +2442,15 @@
 
             <!-- Filters -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div>
-                        <label class="block text-sm font-semibold mb-1" data-i18n="pr_lbl_item">Seedling Item</label>
-                        <select id="plantRecordItem" onchange="renderPlantRecord()"
-                            class="w-full border border-amber-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-amber-600">
-                            <option value="" data-i18n="pr_select_item">-- Select a Seedling Item --</option>
-                        </select>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
+                        <p class="text-xs font-bold text-amber-900 px-2.5 pt-2 pb-0.5" data-i18n="pr_lbl_item">Seedling Item</p>
+                        <div class="px-2.5 pb-1.5">
+                            <select id="plantRecordItem" onchange="renderPlantRecord()"
+                                class="w-full text-xs text-amber-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                                <option value="" data-i18n="pr_select_item">-- Select a Seedling Item --</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('plantRecordFrom')">
                         <p class="text-xs font-bold text-amber-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_from">Date From</p>
