@@ -779,6 +779,23 @@
     </style>
 </head>
 <body>
+<!-- Pre-auth flash prevention: hide the login overlay immediately (synchronous,
+     runs before any element is painted) if a valid session is cached in
+     sessionStorage. The overlay is restored on logout or if Supabase rejects
+     the cached session. Without this the login form glitches through on refresh. -->
+<script>
+(function () {
+    try {
+        var raw = sessionStorage.getItem('opp_auth_session');
+        if (raw && JSON.parse(raw)) {
+            var st = document.createElement('style');
+            st.id = 'pre-auth-hide';
+            st.textContent = '#authOverlay{display:none!important}';
+            document.head.appendChild(st);
+        }
+    } catch (e) {}
+})();
+</script>
 <!-- ================================================================
      AUTH OVERLAY
      ================================================================ -->
@@ -7305,6 +7322,9 @@ function bootApp(session) {
         }
     }
 
+    // Remove the pre-auth flash-prevention style (no longer needed once booted)
+    const _preAuthHide = document.getElementById('pre-auth-hide');
+    if (_preAuthHide) _preAuthHide.remove();
     document.getElementById('authOverlay').style.display = 'none';
     document.getElementById('appLayout').classList.remove('hidden');
 
