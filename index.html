@@ -1180,26 +1180,26 @@
                 <p class="text-xs font-bold text-green-900 mb-2">Date Range</p>
                 <div class="flex items-center gap-2 mb-2">
                     <!-- From card -->
-                    <div class="flex-1 min-w-0 bg-gray-50 rounded-xl p-2.5 border border-gray-200 relative overflow-hidden" style="min-height:56px;">
+                    <div class="flex-1 min-w-0 bg-gray-50 rounded-xl p-2.5 border border-gray-200 relative cursor-pointer" style="min-height:56px;" onclick="openDatePicker('dashFrom')">
                         <p class="text-xs font-bold text-green-900 mb-1" data-i18n="fr_lbl_from">Date From</p>
                         <div class="flex items-center gap-1.5 text-green-800">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" flex-shrink-0 style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span id="dashFromDisplay" class="text-xs truncate">Select date</span>
                         </div>
                         <input id="dashFrom" type="date" onchange="updateDashDateDisplay()"
-                            style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1;" />
+                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
                     <!-- Arrow -->
                     <span class="text-gray-400 text-base flex-shrink-0" style="font-size:18px;">→</span>
                     <!-- To card -->
-                    <div class="flex-1 min-w-0 bg-gray-50 rounded-xl p-2.5 border border-gray-200 relative overflow-hidden" style="min-height:56px;">
+                    <div class="flex-1 min-w-0 bg-gray-50 rounded-xl p-2.5 border border-gray-200 relative cursor-pointer" style="min-height:56px;" onclick="openDatePicker('dashTo')">
                         <p class="text-xs font-bold text-green-900 mb-1" data-i18n="fr_lbl_to">Date To</p>
                         <div class="flex items-center gap-1.5 text-green-800">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span id="dashToDisplay" class="text-xs truncate">Select date</span>
                         </div>
                         <input id="dashTo" type="date" onchange="updateDashDateDisplay()"
-                            style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1;" />
+                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
                 </div>
                 <!-- Search button -->
@@ -1625,23 +1625,23 @@
                             <option value="Adj" data-i18n="txn_type_adj">Adj</option>
                         </select>
                     </div>
-                    <div class="relative overflow-hidden bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;">
+                    <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('filterFrom')">
                         <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="filter_date_from">Date From</p>
                         <div class="flex items-center gap-1.5 text-green-800 px-2.5 pb-2">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span id="filterFromDisplay" class="text-xs truncate">Select date</span>
                         </div>
                         <input id="filterFrom" type="date" onchange="updateDateDisplay('filterFrom')"
-                            style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1;" />
+                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
-                    <div class="relative overflow-hidden bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;">
+                    <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('filterTo')">
                         <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="filter_date_to">Date To</p>
                         <div class="flex items-center gap-1.5 text-green-800 px-2.5 pb-2">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span id="filterToDisplay" class="text-xs truncate">Select date</span>
                         </div>
                         <input id="filterTo" type="date" onchange="updateDateDisplay('filterTo')"
-                            style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1;" />
+                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
                 </div>
                 <div class="mt-4 flex gap-3">
@@ -2319,23 +2319,23 @@
                             <option value="" data-i18n="fr_select_round">-- Select a Round --</option>
                         </select>
                     </div>
-                    <div class="relative overflow-hidden bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;">
+                    <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('fertRecordFrom')">
                         <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_from">Date From</p>
                         <div class="flex items-center gap-1.5 text-green-800 px-2.5 pb-2">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span id="fertRecordFromDisplay" class="text-xs truncate">Select date</span>
                         </div>
                         <input id="fertRecordFrom" type="date" onchange="updateDateDisplay('fertRecordFrom')"
-                            style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1;" />
+                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
-                    <div class="relative overflow-hidden bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;">
+                    <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('fertRecordTo')">
                         <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_to">Date To</p>
                         <div class="flex items-center gap-1.5 text-green-800 px-2.5 pb-2">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span id="fertRecordToDisplay" class="text-xs truncate">Select date</span>
                         </div>
                         <input id="fertRecordTo" type="date" onchange="updateDateDisplay('fertRecordTo')"
-                            style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1;" />
+                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -2379,23 +2379,23 @@
                             <option value="" data-i18n="cr_select_item">-- Select a Chemical Item --</option>
                         </select>
                     </div>
-                    <div class="relative overflow-hidden bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;">
+                    <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('chemRecordFrom')">
                         <p class="text-xs font-bold text-blue-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_from">Date From</p>
                         <div class="flex items-center gap-1.5 text-blue-800 px-2.5 pb-2">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span id="chemRecordFromDisplay" class="text-xs truncate">Select date</span>
                         </div>
                         <input id="chemRecordFrom" type="date" onchange="updateDateDisplay('chemRecordFrom')"
-                            style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1;" />
+                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
-                    <div class="relative overflow-hidden bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;">
+                    <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('chemRecordTo')">
                         <p class="text-xs font-bold text-blue-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_to">Date To</p>
                         <div class="flex items-center gap-1.5 text-blue-800 px-2.5 pb-2">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span id="chemRecordToDisplay" class="text-xs truncate">Select date</span>
                         </div>
                         <input id="chemRecordTo" type="date" onchange="updateDateDisplay('chemRecordTo')"
-                            style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1;" />
+                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -2439,23 +2439,23 @@
                             <option value="" data-i18n="pr_select_item">-- Select a Seedling Item --</option>
                         </select>
                     </div>
-                    <div class="relative overflow-hidden bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;">
+                    <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('plantRecordFrom')">
                         <p class="text-xs font-bold text-amber-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_from">Date From</p>
                         <div class="flex items-center gap-1.5 text-amber-800 px-2.5 pb-2">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span id="plantRecordFromDisplay" class="text-xs truncate">Select date</span>
                         </div>
                         <input id="plantRecordFrom" type="date" onchange="updateDateDisplay('plantRecordFrom')"
-                            style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1;" />
+                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
-                    <div class="relative overflow-hidden bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;">
+                    <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('plantRecordTo')">
                         <p class="text-xs font-bold text-amber-900 px-2.5 pt-2 pb-0.5" data-i18n="fr_lbl_to">Date To</p>
                         <div class="flex items-center gap-1.5 text-amber-800 px-2.5 pb-2">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span id="plantRecordToDisplay" class="text-xs truncate">Select date</span>
                         </div>
                         <input id="plantRecordTo" type="date" onchange="updateDateDisplay('plantRecordTo')"
-                            style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1;" />
+                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
                 </div>
                 <div class="flex flex-wrap justify-between gap-2">
@@ -5748,6 +5748,17 @@ function renderDashboardFilters() {
     renderChemUsageTracker();
 }
 
+/** Open the native date picker for an input by id — works on desktop and iOS. */
+function openDatePicker(id) {
+    var inp = document.getElementById(id);
+    if (!inp) return;
+    try { inp.showPicker(); } catch(e) { inp.focus(); inp.click(); }
+}
+
+function _datePlaceholder() {
+    return currentLang === 'ms' ? 'Pilih tarikh' : 'Select date';
+}
+
 /** Updates the visible date labels in the custom dashboard date picker cards. */
 function updateDashDateDisplay() {
     ['From', 'To'].forEach(function (which) {
@@ -5756,7 +5767,7 @@ function updateDashDateDisplay() {
         if (!el) return;
         el.textContent = val
             ? new Date(val + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-            : 'Select date';
+            : _datePlaceholder();
     });
 }
 
@@ -5776,7 +5787,14 @@ function updateDateDisplay(id) {
     if (!el) return;
     el.textContent = val
         ? new Date(val + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-        : 'Select date';
+        : _datePlaceholder();
+}
+
+/** Refresh all card-style date picker display spans after a language switch. */
+function refreshAllDateDisplays() {
+    ['dashFrom','dashTo','filterFrom','filterTo',
+     'fertRecordFrom','fertRecordTo','chemRecordFrom','chemRecordTo',
+     'plantRecordFrom','plantRecordTo'].forEach(updateDateDisplay);
 }
 
 /** Re-renders all three category charts. Called from refreshAll(). */
@@ -7032,6 +7050,9 @@ function setLang(lang) {
     // Keep nav button tooltips (used when the sidebar is collapsed to icons
     // only) in sync with whichever language is currently active.
     refreshNavTooltips();
+
+    // Re-render card-style date picker placeholders in the new language.
+    refreshAllDateDisplays();
 
     // Highlight the active language button using inline styles
     var enBtn = document.getElementById('langEN');
