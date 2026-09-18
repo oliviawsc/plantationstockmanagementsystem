@@ -1176,20 +1176,24 @@
 
 
             <!-- Dashboard Date Filter -->
-            <div class="bg-white p-4 rounded-xl shadow mb-6 flex flex-wrap items-end gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1" data-i18n="fr_lbl_from">Date From</label>
-                    <input id="dashFrom" type="date" onchange="renderDashboardFilters()"
-                        class="border border-gray-300 rounded p-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+            <div class="bg-white p-4 rounded-xl shadow mb-6">
+                <div class="flex gap-3 mb-3">
+                    <div class="flex-1 min-w-0">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1" data-i18n="fr_lbl_from">Date From</label>
+                        <input id="dashFrom" type="date" onchange="renderDashboardFilters()"
+                            class="w-full border border-gray-300 rounded p-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1" data-i18n="fr_lbl_to">Date To</label>
+                        <input id="dashTo" type="date" onchange="renderDashboardFilters()"
+                            class="w-full border border-gray-300 rounded p-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1" data-i18n="fr_lbl_to">Date To</label>
-                    <input id="dashTo" type="date" onchange="renderDashboardFilters()"
-                        class="border border-gray-300 rounded p-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <div class="flex items-center gap-3">
+                    <button onclick="document.getElementById('dashFrom').value='';document.getElementById('dashTo').value='';renderDashboardFilters();"
+                        class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 text-sm font-semibold flex-shrink-0" data-i18n="btn_clear">Clear</button>
+                    <p id="dashFilterNote" class="hidden text-xs text-blue-600 italic" data-i18n="dash_filter_note">Showing net movement for selected period</p>
                 </div>
-                <button onclick="document.getElementById('dashFrom').value='';document.getElementById('dashTo').value='';renderDashboardFilters();"
-                    class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 text-sm font-semibold" data-i18n="btn_clear">Clear</button>
-                <p id="dashFilterNote" class="hidden text-xs text-blue-600 italic self-center" data-i18n="dash_filter_note">Showing net movement for selected period</p>
             </div>
 
             <!-- Stock Level Charts — one card per category -->
