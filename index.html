@@ -1687,7 +1687,7 @@
             <!-- Filters -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
                 <h3 class="text-lg font-bold mb-3" data-i18n="summary_filters">Filters</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
                         <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="col_category">Category</p>
                         <div class="px-2.5 pb-1.5">
@@ -1707,13 +1707,23 @@
                             </select>
                         </div>
                     </div>
-                    <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
-                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="ledger_lbl_year">Year</p>
-                        <div class="px-2.5 pb-1.5">
-                            <select id="filterLedgerYear" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
-                                <option value="" data-i18n="opt_all">All</option>
-                            </select>
+                    <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('ledgerFrom')">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="filter_date_from">Date From</p>
+                        <div class="flex items-center gap-1.5 text-green-800 px-2.5 pb-2">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            <span id="ledgerFromDisplay" class="text-xs truncate">Select date</span>
                         </div>
+                        <input id="ledgerFrom" type="date" onchange="updateDateDisplay('ledgerFrom')"
+                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
+                    </div>
+                    <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('ledgerTo')">
+                        <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="filter_date_to">Date To</p>
+                        <div class="flex items-center gap-1.5 text-green-800 px-2.5 pb-2">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            <span id="ledgerToDisplay" class="text-xs truncate">Select date</span>
+                        </div>
+                        <input id="ledgerTo" type="date" onchange="updateDateDisplay('ledgerTo')"
+                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
                 </div>
                 <div class="mt-4 flex gap-3">
@@ -4184,7 +4194,6 @@ function populateItemDropdowns() {
 
     // Stock ledger filter dropdowns — preserve current selections on refresh
     refreshLedgerItemDropdown(false);
-    populateLedgerYearDropdown();
 
     // Manuring program: only Fertilizer items — preserve current selection
     const mrSel       = document.getElementById('mrFertilizer');
@@ -4537,16 +4546,6 @@ function refreshLedgerItemDropdown(resetSelection) {
     }
 }
 
-function populateLedgerYearDropdown() {
-    const yearSel = document.getElementById('filterLedgerYear');
-    if (!yearSel) return;
-    const prevVal = yearSel.value;
-    const years = [...new Set(transactions.map(t => (t.date || '').slice(0, 4)).filter(Boolean))]
-        .sort().reverse();
-    yearSel.innerHTML = '<option value="">All</option>' +
-        years.map(y => `<option value="${y}">${y}</option>`).join('');
-    if (prevVal && years.includes(prevVal)) yearSel.value = prevVal;
-}
 
 function formatLedgerMonth(yearMonth) {
     const [y, m] = yearMonth.split('-');
@@ -4568,7 +4567,8 @@ function getLedgerRows(applyFilters) {
     if (applyFilters === undefined) applyFilters = true;
     const cat  = applyFilters ? document.getElementById('filterLedgerCategory').value : '';
     const itm  = applyFilters ? document.getElementById('filterLedgerItem').value     : '';
-    const year = applyFilters ? document.getElementById('filterLedgerYear').value     : '';
+    const from = applyFilters ? ((document.getElementById('ledgerFrom') || {}).value || '') : '';
+    const to   = applyFilters ? ((document.getElementById('ledgerTo')   || {}).value || '') : '';
 
     const groups = {}; // key: "itemId|YYYY-MM"
     transactions.forEach(t => {
@@ -4595,9 +4595,10 @@ function getLedgerRows(applyFilters) {
     });
 
     return rows.filter(r => {
-        if (cat  && r.category !== cat)        return false;
-        if (itm  && r.itemName !== itm)        return false;
-        if (year && !r.month.startsWith(year)) return false;
+        if (cat  && r.category !== cat)         return false;
+        if (itm  && r.itemName !== itm)         return false;
+        if (from && r.month < from.slice(0, 7)) return false;
+        if (to   && r.month > to.slice(0, 7))   return false;
         return true;
     });
 }
@@ -4643,7 +4644,8 @@ function enumerateLedgerMonths(startYM, endYM) {
 function buildLedgerPivot() {
     const cat  = document.getElementById('filterLedgerCategory').value;
     const itm  = document.getElementById('filterLedgerItem').value;
-    const year = document.getElementById('filterLedgerYear').value;
+    const from = ((document.getElementById('ledgerFrom') || {}).value || '');
+    const to   = ((document.getElementById('ledgerTo')   || {}).value || '');
 
     // Full, unfiltered per-item-month history (correct running balance)
     const allRows = getLedgerRows(false);
@@ -4672,8 +4674,11 @@ function buildLedgerPivot() {
 
     // Month columns: a continuous range, not just months with movement.
     let months;
-    if (year) {
-        months = enumerateLedgerMonths(`${year}-01`, `${year}-12`);
+    if (from || to) {
+        const allMonths = allRows.length > 0 ? allRows.map(r => r.month) : [];
+        const startYM = from ? from.slice(0, 7) : (allMonths.length ? allMonths.reduce((a, b) => a < b ? a : b) : '');
+        const endYM   = to   ? to.slice(0, 7)   : (allMonths.length ? allMonths.reduce((a, b) => a > b ? a : b) : '');
+        months = (startYM && endYM) ? enumerateLedgerMonths(startYM, endYM) : [];
     } else if (allRows.length > 0) {
         const allMonths = allRows.map(r => r.month);
         months = enumerateLedgerMonths(allMonths.reduce((a, b) => a < b ? a : b),
@@ -4779,7 +4784,10 @@ function renderLedger() {
 document.getElementById('applyLedgerFilterBtn').addEventListener('click', renderLedger);
 document.getElementById('clearLedgerFilterBtn').addEventListener('click', () => {
     document.getElementById('filterLedgerCategory').value = '';
-    document.getElementById('filterLedgerYear').value     = '';
+    var lf = document.getElementById('ledgerFrom'); if (lf) lf.value = '';
+    var lt = document.getElementById('ledgerTo');   if (lt) lt.value = '';
+    updateDateDisplay('ledgerFrom');
+    updateDateDisplay('ledgerTo');
     refreshLedgerItemDropdown(true);
     renderLedger();
 });
@@ -5864,6 +5872,7 @@ function updateDateDisplay(id) {
 /** Refresh all card-style date picker display spans after a language switch. */
 function refreshAllDateDisplays() {
     ['dashFrom','dashTo','filterFrom','filterTo',
+     'ledgerFrom','ledgerTo',
      'fertRecordFrom','fertRecordTo','chemRecordFrom','chemRecordTo',
      'plantRecordFrom','plantRecordTo'].forEach(updateDateDisplay);
 }
@@ -7777,7 +7786,7 @@ const VIEW_LOCK_ALLOWED_FIELD_IDS = [
     // Stock Summary filters
     'filterCategory', 'filterItem', 'filterType', 'filterFrom', 'filterTo',
     // Stock Ledger filters
-    'filterLedgerCategory', 'filterLedgerItem', 'filterLedgerYear',
+    'filterLedgerCategory', 'filterLedgerItem', 'ledgerFrom', 'ledgerTo',
     // Manuring Progress filters
     'filterRpRound', 'filterRpFertilizer', 'filterRpBlockRound', 'filterRpBlockFertilizer', 'filterRpBlock',
     // Maintenance Progress filters
