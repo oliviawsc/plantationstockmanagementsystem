@@ -9349,7 +9349,7 @@ function renderFertRecord() {
     const blockHdrs = roundBlocks.map(b => {
         const loc   = locations.find(l => l.name === b);
         const palms = loc ? (parseInt(loc.numPalms, 10) || 0) : 0;
-        return `<th style="padding:5px 8px;text-align:right;border:1px solid #dcfce7;min-width:80px;position:sticky;top:34px;z-index:2;background:#dcfce7;">${b}<br/><span style="font-weight:400;font-size:11px;">${palms.toLocaleString()} palms</span></th>`;
+        return `<th style="padding:5px 8px;text-align:right;border:1px solid #dcfce7;min-width:80px;background:#dcfce7;">${b}<br/><span style="font-weight:400;font-size:11px;">${palms.toLocaleString()} palms</span></th>`;
     }).join('');
     const totalPalmsStr = totalPalms.toLocaleString() + ' palms';
 
@@ -9381,13 +9381,13 @@ function renderFertRecord() {
     const detailHtml = `
         <div style="overflow:auto;max-height:420px;">
             <table style="min-width:100%;font-size:13px;border-collapse:collapse;">
-                <thead style="background:#dcfce7;color:#166534;">
+                <thead style="position:sticky;top:0;z-index:3;background:#dcfce7;color:#166534;">
                     <tr>
-                        <th rowspan="2" style="padding:6px 8px;text-align:left;border:1px solid #bbf7d0;position:sticky;top:0;left:0;z-index:4;background:#dcfce7;">${d.col_date || 'Date'}</th>
-                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #bbf7d0;position:sticky;top:0;z-index:2;background:#dcfce7;">${d.fr_col_qty_in || 'Quantity In'}</th>
-                        <th colspan="${roundBlocks.length}" style="padding:6px 8px;text-align:center;background:#fef9c3;color:#92400e;border:1px solid #fde68a;position:sticky;top:0;z-index:2;">${d.fr_col_qty_out || 'Quantity Out'}</th>
-                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #bbf7d0;position:sticky;top:0;z-index:2;background:#dcfce7;">${d.fr_col_total_out || 'Total Quantity Out'}</th>
-                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #bbf7d0;position:sticky;top:0;z-index:2;background:#dcfce7;">${d.col_balance || 'Balance'}</th>
+                        <th rowspan="2" style="padding:6px 8px;text-align:left;border:1px solid #bbf7d0;position:sticky;left:0;z-index:4;background:#dcfce7;">${d.col_date || 'Date'}</th>
+                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #bbf7d0;background:#dcfce7;">${d.fr_col_qty_in || 'Quantity In'}</th>
+                        <th colspan="${roundBlocks.length}" style="padding:6px 8px;text-align:center;background:#fef9c3;color:#92400e;border:1px solid #fde68a;">${d.fr_col_qty_out || 'Quantity Out'}</th>
+                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #bbf7d0;background:#dcfce7;">${d.fr_col_total_out || 'Total Quantity Out'}</th>
+                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #bbf7d0;background:#dcfce7;">${d.col_balance || 'Balance'}</th>
                     </tr>
                     <tr>
                         ${blockHdrs}
@@ -9723,7 +9723,7 @@ function renderChemRecord() {
     const blockHdrs = dynamicBlocks.map(b => {
         const loc  = locations.find(l => l.name === b);
         const area = loc ? (parseFloat(loc.area) || 0).toFixed(2) : '—';
-        return `<th style="padding:5px 8px;text-align:right;border:1px solid #dbeafe;min-width:80px;position:sticky;top:34px;z-index:2;background:#dbeafe;">${b}<br/><span style="font-weight:400;font-size:11px;">${area} Ha</span></th>`;
+        return `<th style="padding:5px 8px;text-align:right;border:1px solid #dbeafe;min-width:80px;background:#dbeafe;">${b}<br/><span style="font-weight:400;font-size:11px;">${area} Ha</span></th>`;
     }).join('');
 
     let detailRows = '';
@@ -9751,15 +9751,15 @@ function renderChemRecord() {
     const detailHtml = `
         <div style="overflow:auto;max-height:420px;">
             <table style="min-width:100%;font-size:13px;border-collapse:collapse;">
-                <thead style="background:#dbeafe;color:#1e40af;">
+                <thead style="position:sticky;top:0;z-index:3;background:#dbeafe;color:#1e40af;">
                     <tr>
-                        <th rowspan="2" style="padding:6px 8px;text-align:left;border:1px solid #bfdbfe;position:sticky;top:0;left:0;z-index:4;background:#dbeafe;">${d.col_date || 'Date'}</th>
-                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #bfdbfe;position:sticky;top:0;z-index:2;background:#dbeafe;">${d.fr_col_qty_in || 'Quantity In'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
-                        <th colspan="${dynamicBlocks.length || 1}" style="padding:6px 8px;text-align:center;background:#fef3c7;color:#92400e;border:1px solid #fde68a;position:sticky;top:0;z-index:2;">${d.fr_col_qty_out || 'Quantity Out'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
-                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #bfdbfe;position:sticky;top:0;z-index:2;background:#dbeafe;">${d.fr_col_total_out || 'Total Quantity Out'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
-                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #bfdbfe;position:sticky;top:0;z-index:2;background:#dbeafe;">${d.col_balance || 'Balance'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
+                        <th rowspan="2" style="padding:6px 8px;text-align:left;border:1px solid #bfdbfe;position:sticky;left:0;z-index:4;background:#dbeafe;">${d.col_date || 'Date'}</th>
+                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #bfdbfe;background:#dbeafe;">${d.fr_col_qty_in || 'Quantity In'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
+                        <th colspan="${dynamicBlocks.length || 1}" style="padding:6px 8px;text-align:center;background:#fef3c7;color:#92400e;border:1px solid #fde68a;">${d.fr_col_qty_out || 'Quantity Out'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
+                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #bfdbfe;background:#dbeafe;">${d.fr_col_total_out || 'Total Quantity Out'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
+                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #bfdbfe;background:#dbeafe;">${d.col_balance || 'Balance'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
                     </tr>
-                    <tr>${dynamicBlocks.length ? blockHdrs : '<th style="border:1px solid #dbeafe;padding:5px 8px;position:sticky;top:34px;z-index:2;background:#dbeafe;">—</th>'}</tr>
+                    <tr>${dynamicBlocks.length ? blockHdrs : '<th style="border:1px solid #dbeafe;padding:5px 8px;background:#dbeafe;">—</th>'}</tr>
                 </thead>
                 <tbody>${detailRows}</tbody>
             </table>
@@ -10021,7 +10021,7 @@ function renderPlantRecord() {
     // Pivot table
     const nCols = 2 + dynamicBlocks.length + 2;
     const blockHdrs = dynamicBlocks.map(b =>
-        `<th style="padding:5px 8px;text-align:right;border:1px solid #fde68a;min-width:80px;position:sticky;top:34px;z-index:2;background:#fef3c7;">${b}</th>`
+        `<th style="padding:5px 8px;text-align:right;border:1px solid #fde68a;min-width:80px;background:#fef3c7;">${b}</th>`
     ).join('');
 
     let detailRows = '';
@@ -10049,15 +10049,15 @@ function renderPlantRecord() {
     const detailHtml = `
         <div style="overflow:auto;max-height:420px;">
             <table style="min-width:100%;font-size:13px;border-collapse:collapse;">
-                <thead style="background:#fef3c7;color:#92400e;">
+                <thead style="position:sticky;top:0;z-index:3;background:#fef3c7;color:#92400e;">
                     <tr>
-                        <th rowspan="2" style="padding:6px 8px;text-align:left;border:1px solid #fde68a;position:sticky;top:0;left:0;z-index:4;background:#fef3c7;">${d.col_date || 'Date'}</th>
-                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #fde68a;position:sticky;top:0;z-index:2;background:#fef3c7;">${d.pr_col_penerimaan || 'Quantity In'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
-                        <th colspan="${dynamicBlocks.length || 1}" style="padding:6px 8px;text-align:center;background:#d97706;color:#fff;border:1px solid #b45309;position:sticky;top:0;z-index:2;">${d.pr_col_pengeluaran || 'Quantity Out'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
-                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #fde68a;position:sticky;top:0;z-index:2;background:#fef3c7;">${d.pr_col_jumlah || 'Total Quantity Out'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
-                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #fde68a;position:sticky;top:0;z-index:2;background:#fef3c7;">${d.col_balance || 'Balance'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
+                        <th rowspan="2" style="padding:6px 8px;text-align:left;border:1px solid #fde68a;position:sticky;left:0;z-index:4;background:#fef3c7;">${d.col_date || 'Date'}</th>
+                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #fde68a;background:#fef3c7;">${d.pr_col_penerimaan || 'Quantity In'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
+                        <th colspan="${dynamicBlocks.length || 1}" style="padding:6px 8px;text-align:center;background:#d97706;color:#fff;border:1px solid #b45309;">${d.pr_col_pengeluaran || 'Quantity Out'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
+                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #fde68a;background:#fef3c7;">${d.pr_col_jumlah || 'Total Quantity Out'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
+                        <th rowspan="2" style="padding:6px 8px;text-align:right;border:1px solid #fde68a;background:#fef3c7;">${d.col_balance || 'Balance'}<br/><span style="font-weight:400;font-size:11px;">(${unit})</span></th>
                     </tr>
-                    <tr>${dynamicBlocks.length ? blockHdrs : '<th style="border:1px solid #fde68a;padding:5px 8px;position:sticky;top:34px;z-index:2;background:#fef3c7;">—</th>'}</tr>
+                    <tr>${dynamicBlocks.length ? blockHdrs : '<th style="border:1px solid #fde68a;padding:5px 8px;background:#fef3c7;">—</th>'}</tr>
                 </thead>
                 <tbody>${detailRows}</tbody>
             </table>
