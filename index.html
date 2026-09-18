@@ -2910,25 +2910,50 @@ function _queueSync(key, estate) {
     showSyncQueued();
 }
 
+let _drainInProgress = false;
+
 async function drainSyncQueue() {
-    const q = _loadSyncQueue();
-    if (q.length === 0) return;
+    if (_drainInProgress) return;
+    if (_loadSyncQueue().length === 0) return;
 
-    const remaining = [];
-    for (const entry of q) {
-        const estateKey = `${entry.key}::${entry.estate}`;
-        let data;
-        try { data = JSON.parse(localStorage.getItem(estateKey)) || []; } catch { data = []; }
-        const ok = await _executeSyncForEstate(entry.key, entry.estate, data);
-        if (!ok) remaining.push(entry);
-    }
+    _drainInProgress = true;
+    // Three attempts: immediately, then after 4 s, then after 10 s.
+    // This handles the common case where the browser fires 'online' a
+    // second or two before the network is stable enough for Supabase.
+    const retryDelays = [0, 4000, 10000];
+    try {
+        for (let attempt = 0; attempt < retryDelays.length; attempt++) {
+            if (retryDelays[attempt] > 0) {
+                await new Promise(r => setTimeout(r, retryDelays[attempt]));
+            }
+            if (!navigator.onLine) return; // went offline again — wait for next 'online' event
 
-    _saveSyncQueue(remaining);
+            const current = _loadSyncQueue();
+            if (current.length === 0) return; // already cleared (e.g. another tab)
 
-    if (remaining.length === 0 && q.length > 0) {
-        showSyncSuccess('Offline data has been saved to the server.');
-    } else if (remaining.length > 0) {
-        showSyncError(`${remaining.length} item(s) still pending — will retry when online.`);
+            const remaining = [];
+            for (const entry of current) {
+                const estateKey = `${entry.key}::${entry.estate}`;
+                let data;
+                try { data = JSON.parse(localStorage.getItem(estateKey)) || []; } catch { data = []; }
+                const ok = await _executeSyncForEstate(entry.key, entry.estate, data);
+                if (!ok) remaining.push(entry);
+            }
+            _saveSyncQueue(remaining);
+
+            if (remaining.length === 0) {
+                showSyncSuccess('Offline data has been saved to the server.');
+                return;
+            }
+            // Some failed — loop back and retry after delay
+        }
+        // All attempts exhausted
+        const final = _loadSyncQueue();
+        if (final.length > 0) {
+            showSyncError(`${final.length} pending item(s) could not sync. Will retry next time you come online.`);
+        }
+    } finally {
+        _drainInProgress = false;
     }
 }
 
@@ -2992,9 +3017,10 @@ async function syncToSupabase(key, data) {
     }
 }
 
-// Drain the queue whenever the browser reports it is back online
+// Drain the queue whenever the browser reports it is back online.
+// A 2-second delay lets the connection stabilise before we hit Supabase.
 window.addEventListener('online', () => {
-    drainSyncQueue();
+    setTimeout(() => drainSyncQueue(), 2000);
 });
 
 /** Show a non-blocking red toast at the top-right when a Supabase sync fails */
