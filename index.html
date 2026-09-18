@@ -797,7 +797,7 @@
 <script>
 (function () {
     try {
-        var raw = sessionStorage.getItem('opp_auth_session');
+        var raw = localStorage.getItem('opp_auth_session');
         if (raw && JSON.parse(raw)) {
             var st = document.createElement('style');
             st.id = 'pre-auth-hide';
@@ -7291,9 +7291,9 @@ function buildRoleOptions(selectedValue) {
 // Local cache only — instant render while Supabase request is pending.
 function loadUsersCache()    { try { return JSON.parse(localStorage.getItem(AUTH_KEYS.users)) || []; } catch { return []; } }
 function saveUsersCache(u)   { localStorage.setItem(AUTH_KEYS.users, JSON.stringify(u)); }
-function loadSession()       { try { return JSON.parse(sessionStorage.getItem(AUTH_KEYS.session)) || null; } catch { return null; } }
-function saveSession(s)      { sessionStorage.setItem(AUTH_KEYS.session, JSON.stringify(s)); }
-function clearSession()      { sessionStorage.removeItem(AUTH_KEYS.session); }
+function loadSession()       { try { return JSON.parse(localStorage.getItem(AUTH_KEYS.session)) || null; } catch { return null; } }
+function saveSession(s)      { localStorage.setItem(AUTH_KEYS.session, JSON.stringify(s)); }
+function clearSession()      { localStorage.removeItem(AUTH_KEYS.session); }
 
 // Convert a Supabase row (snake_case) <-> the app's in-memory user shape (camelCase).
 // Note: password_hash is preserved in round-trips but is no longer used for auth
