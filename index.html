@@ -1213,7 +1213,7 @@
                                 <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
                             </svg>
                         </div>
-                        <span class="home-card-title">Dashboard</span>
+                        <span class="home-card-title" data-i18n="home_card_dashboard">Dashboard</span>
                     </button>
                     <!-- Stock Records -->
                     <button class="home-card" onclick="navigateToSection('transactions')">
@@ -1223,7 +1223,7 @@
                                 <polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
                             </svg>
                         </div>
-                        <span class="home-card-title">Stock Records</span>
+                        <span class="home-card-title" data-i18n="home_card_stock_records">Stock Records</span>
                     </button>
                     <!-- Field Operations -->
                     <button class="home-card" onclick="navigateToSection('roundprogress')">
@@ -1233,7 +1233,7 @@
                                 <path d="M12 12c0-5 5-9 10-9 0 5-4 9-10 9z"/>
                             </svg>
                         </div>
-                        <span class="home-card-title">Field Operations</span>
+                        <span class="home-card-title" data-i18n="home_card_field_ops">Field Operations</span>
                     </button>
                     <!-- Reports -->
                     <button class="home-card" onclick="navigateToSection('fertrecord')">
@@ -1243,7 +1243,7 @@
                                 <line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>
                             </svg>
                         </div>
-                        <span class="home-card-title">Reports</span>
+                        <span class="home-card-title" data-i18n="home_card_reports">Reports</span>
                     </button>
                     <!-- Settings (superadmin only) -->
                     <button class="home-card hidden" id="homeCardSettings" onclick="navigateToSection('settings')">
@@ -1253,7 +1253,7 @@
                                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
                             </svg>
                         </div>
-                        <span class="home-card-title">Settings</span>
+                        <span class="home-card-title" data-i18n="home_card_settings">Settings</span>
                         <span class="home-card-badge">Super Admin</span>
                     </button>
                     <!-- User Management (superadmin only) -->
@@ -1265,7 +1265,7 @@
                                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                             </svg>
                         </div>
-                        <span class="home-card-title">User Management</span>
+                        <span class="home-card-title" data-i18n="home_card_user_mgmt">User Management</span>
                         <span class="home-card-badge">Super Admin</span>
                     </button>
                 </div>
@@ -6820,6 +6820,12 @@ const I18N = {
         hub_welcome_lbl:     'Welcome',
         hub_dashboard:       'Dashboard',
         hub_dash_sub:        'Overview &amp; stock charts',
+        home_card_dashboard:     'Dashboard',
+        home_card_stock_records: 'Stock Records',
+        home_card_field_ops:     'Field Operations',
+        home_card_reports:       'Reports',
+        home_card_settings:      'Settings',
+        home_card_user_mgmt:     'User Management',
         hub_record_stock:    'Record Stock',
         hub_ops_line1:       'Oil Palm',
         hub_ops_line2:       'Seedling',
@@ -7134,6 +7140,12 @@ const I18N = {
         hub_welcome_lbl:     'Selamat Datang',
         hub_dashboard:       'Papan Hitam',
         hub_dash_sub:        'Gambaran &amp; carta stok',
+        home_card_dashboard:     'Papan Pemuka',
+        home_card_stock_records: 'Rekod Stok',
+        home_card_field_ops:     'Operasi Ladang',
+        home_card_reports:       'Laporan',
+        home_card_settings:      'Tetapan',
+        home_card_user_mgmt:     'Pengurusan Pengguna',
         hub_record_stock:    'Rekod Stok',
         hub_ops_line1:       'Anak Pokok',
         hub_ops_line2:       'Sawit',
