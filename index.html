@@ -1085,8 +1085,17 @@
                     onmouseover="this.style.background='#D1FAE5'" onmouseout="this.style.background='#F0FDF4'">&#9776;</button>
                 <span id="topEstateLabel" style="font-size:13px;font-weight:600;color:#1B5E20;background:#E8F5E9;padding:5px 14px;border-radius:99px;border:1px solid #A5D6A7;white-space:nowrap;display:none;"></span>
             </div>
-            <!-- Centre: empty -->
-            <div style="flex:1;"></div>
+            <!-- Centre: estate selector -->
+            <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <select id="headerEstate"
+                        onchange="document.getElementById('sidebarEstate').value=this.value;document.getElementById('sidebarEstateVisible').value=this.value;onSidebarEstateChange();"
+                        style="padding:6px 12px;border:1px solid #A5D6A7;border-radius:8px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;color:#1B5E20;background:#F0FDF4;outline:none;cursor:pointer;max-width:220px;">
+                        <option value="">— Select Estate —</option>
+                    </select>
+                </div>
+            </div>
             <!-- Right: avatar + dropdown -->
             <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;position:relative;">
                 <button id="avatarBtn" onclick="toggleAvatarDropdown(event)"
@@ -7991,6 +8000,8 @@ function bootApp(session) {
     // with the user's permitted estates — never show estates they aren't
     // assigned to, even though those options exist statically in HTML.
     if (estateSelectVisible) estateSelectVisible.innerHTML = estateOptionsHtml;
+    const headerEstateEl = document.getElementById('headerEstate');
+    if (headerEstateEl) headerEstateEl.innerHTML = estateOptionsHtml;
 
     // Resume the estate the user had selected before the page reloaded
     // (session.estate, persisted by onSidebarEstateChange) if it's still one
@@ -8002,6 +8013,7 @@ function bootApp(session) {
         : (allowedEstates.length > 0 ? allowedEstates[0] : '');
     estateSelect.value = defaultEstate;
     if (estateSelectVisible) estateSelectVisible.value = defaultEstate;
+    if (headerEstateEl) headerEstateEl.value = defaultEstate;
 
     activeEstate = defaultEstate;
 
@@ -11227,12 +11239,14 @@ function populateChemFilters() {
         // sync the hidden select from the visible one (in case called externally)
         var vis = document.getElementById('sidebarEstateVisible');
         var hid = document.getElementById('sidebarEstate');
+        var hdr = document.getElementById('headerEstate');
         if(vis && hid && vis.value !== hid.value) hid.value = vis.value;
         _origOnEstate();
         var estate = hid ? hid.value : '';
         updateTopEstateLabel(estate);
-        // keep visible select in sync
+        // keep all selects in sync
         if(vis && estate) vis.value = estate;
+        if(hdr && estate) hdr.value = estate;
     };
     var colBtn = document.getElementById('sidebarCollapseBtn');
     if(colBtn) colBtn.onclick = toggleSidebarCollapse;
