@@ -7549,11 +7549,11 @@ async function renderEstatesList() {
                             <td class="px-3 py-2 text-gray-400 tabular-nums">${i + 1}</td>
                             <td class="px-3 py-2 font-medium" id="estate-name-${i}">🌴 ${e}</td>
                             <td class="px-3 py-2 whitespace-nowrap" id="estate-actions-${i}">
-                                <button data-action="edit" data-idx="${i}"
+                                <button onclick="startEditEstate(${i})"
                                     class="text-blue-600 hover:text-blue-800 text-xs font-semibold border border-blue-200 hover:bg-blue-50 px-2 py-1 rounded mr-1">
                                     ✏️ Edit
                                 </button>
-                                <button data-action="delete" data-idx="${i}"
+                                <button onclick="deleteEstateByIdx(${i})"
                                     class="text-red-600 hover:text-red-800 text-xs font-semibold border border-red-200 hover:bg-red-50 px-2 py-1 rounded">
                                     🗑 Delete
                                 </button>
@@ -7562,17 +7562,17 @@ async function renderEstatesList() {
                 </tbody>
             </table>
         </div>`;
-
-    // Attach event listeners after DOM is built — avoids all inline-onclick quoting issues
-    GLOBAL_ESTATES.forEach((e, i) => {
-        const editBtn   = container.querySelector(`[data-action="edit"][data-idx="${i}"]`);
-        const deleteBtn = container.querySelector(`[data-action="delete"][data-idx="${i}"]`);
-        if (editBtn)   editBtn.addEventListener('click', () => startEditEstate(e, i));
-        if (deleteBtn) deleteBtn.addEventListener('click', () => deleteEstate(e));
-    });
 }
 
-function startEditEstate(oldName, idx) {
+function deleteEstateByIdx(idx) {
+    const name = GLOBAL_ESTATES[idx];
+    if (name === undefined) return;
+    deleteEstate(name);
+}
+
+function startEditEstate(idx) {
+    const oldName     = GLOBAL_ESTATES[idx];
+    if (oldName === undefined) return;
     const nameCell    = document.getElementById(`estate-name-${idx}`);
     const actionsCell = document.getElementById(`estate-actions-${idx}`);
     if (!nameCell || !actionsCell) return;
