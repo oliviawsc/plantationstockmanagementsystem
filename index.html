@@ -932,6 +932,9 @@
             <button data-target="useradmin" id="navUserAdmin" class="nav-item hidden">
                 <span class="nav-icon">&#128100;</span><span class="sb-label" data-i18n="sb_lbl_useradmin">User Management</span>
             </button>
+            <button data-target="settings" id="navSettings" class="nav-item hidden">
+                <span class="nav-icon">&#9881;&#65039;</span><span class="sb-label" data-i18n="sb_lbl_settings">Settings</span>
+            </button>
         </nav>
 
         <!-- Footer -->
@@ -2209,17 +2212,7 @@
                     <div class="md:col-span-2" id="regEstatesSection">
                         <label class="block text-sm font-semibold mb-2">Estates <span class="text-red-500">*</span> <span class="text-gray-400 font-normal text-xs">(select one or more)</span></label>
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="regEstatesGrid">
-                            <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="reg-estate-cb accent-green-700 w-4 h-4" value="Mega Jutamas (Suai)" /> Mega Jutamas (Suai)</label>
-                            <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="reg-estate-cb accent-green-700 w-4 h-4" value="Ulu Niah Estate" /> Ulu Niah Estate</label>
-                            <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="reg-estate-cb accent-green-700 w-4 h-4" value="MJM Plantation 1" /> MJM Plantation 1</label>
-                            <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="reg-estate-cb accent-green-700 w-4 h-4" value="MJM Plantation 2" /> MJM Plantation 2</label>
-                            <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="reg-estate-cb accent-green-700 w-4 h-4" value="MJM Plantation 3" /> MJM Plantation 3</label>
-                            <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="reg-estate-cb accent-green-700 w-4 h-4" value="Estet Seri Mawar" /> Estet Seri Mawar</label>
-                            <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="reg-estate-cb accent-green-700 w-4 h-4" value="Meridian Palma" /> Meridian Palma</label>
-                            <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="reg-estate-cb accent-green-700 w-4 h-4" value="Mono Gaya" /> Mono Gaya</label>
-                            <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="reg-estate-cb accent-green-700 w-4 h-4" value="Sungai Mak Plantation" /> Sungai Mak Plantation</label>
-                            <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="reg-estate-cb accent-green-700 w-4 h-4" value="Gama Menang" /> Gama Menang</label>
-                            <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="reg-estate-cb accent-green-700 w-4 h-4" value="Elewsun" /> Elewsun</label>
+                            <!-- Populated dynamically from GLOBAL_ESTATES on boot and after any Settings change -->
                         </div>
                     </div>
                     <!-- Section access (hidden for admin role) -->
@@ -2266,7 +2259,43 @@
             </div>
         </section>
 
-    
+        <!-- ================================================================
+             SETTINGS (super admin only)
+             ================================================================ -->
+        <section id="settings" class="page-section">
+            <h2 class="text-3xl font-bold mb-2">⚙️ Settings</h2>
+            <p class="text-sm text-green-700 mb-6">Manage global application settings. Only accessible to Super Admin.</p>
+
+            <!-- Estate Management -->
+            <div class="bg-white p-6 rounded-xl shadow mb-8">
+                <h3 class="text-xl font-bold mb-1">🌴 Estate Management</h3>
+                <p class="text-xs text-gray-400 mb-5">Add or remove estates. Estates appear in all dropdowns and user assignment forms across the system.</p>
+
+                <!-- Add new estate form -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6 items-end">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold mb-1">New Estate Name <span class="text-red-500">*</span></label>
+                        <input id="newEstateName" type="text" placeholder="e.g. Ladang Baharu"
+                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600"
+                            onkeydown="if(event.key==='Enter')addEstate()" />
+                    </div>
+                    <div>
+                        <button onclick="addEstate()"
+                            class="w-full bg-green-800 hover:bg-green-900 text-white px-5 py-2 rounded-lg font-semibold">
+                            ➕ Add Estate
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Estates table -->
+                <h4 class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">Current Estates</h4>
+                <div id="estatesListContainer">
+                    <p class="text-sm text-gray-400 italic">Loading…</p>
+                </div>
+            </div>
+        </section>
+
+
         </main>
     </div><!-- end mainWrapper -->
 </div><!-- end appLayout -->
@@ -2662,7 +2691,7 @@ navButtons.forEach(btn => {
         // Authoritative permission check — blocks navigation to inaccessible sections.
         const session = loadSession();
         if (session && session.role !== 'superadmin') {
-            if (target === 'useradmin') return; // never accessible to non-superadmins
+            if (target === 'useradmin' || target === 'settings') return; // never accessible to non-superadmins
             const access = typeof getSectionAccess === 'function' ? getSectionAccess(session, target) : 'none';
             if (access === 'none') {
                 alert('You do not have permission to access this section.');
@@ -2688,6 +2717,9 @@ navButtons.forEach(btn => {
             renderCiTable();
             renderChemByRound();
             renderChemByBlock();
+        }
+        if (target === 'settings') {
+            renderEstatesList();
         }
         // Enforce view-only lock for this section based on the user's
         // permissions — runs LAST, after every render call above, so any
@@ -6019,6 +6051,7 @@ const I18N = {
         sb_lbl_maintprogress:'Maintenance Progress',
         sb_lbl_chemusage:    'Chemical Usage',
         sb_lbl_useradmin:    'User Management',
+        sb_lbl_settings:     'Settings',
         nav_livestock:       'Live Stock Listing',
         lang_label:          'Language / Bahasa',
         logged_in_as:        'Logged in as:',
@@ -6281,6 +6314,7 @@ const I18N = {
         sb_lbl_maintprogress:'Kemajuan Penyelenggaraan',
         sb_lbl_chemusage:    'Penggunaan Kimia',
         sb_lbl_useradmin:    'Pengurusan Pengguna',
+        sb_lbl_settings:     'Tetapan',
         nav_livestock:       'Senarai Stok Semasa',
         lang_label:          'Bahasa / Language',
         logged_in_as:        'Log masuk sebagai:',
@@ -6816,6 +6850,114 @@ async function deleteUserFromSupabase(id) {
     if (error) throw error;
 }
 
+// ══════════════════════════════════════════════════════════════════════
+// ESTATE MANAGEMENT
+// ══════════════════════════════════════════════════════════════════════
+
+// Global list — seeded with hardcoded defaults so the app works even
+// before the async Supabase fetch completes.
+let GLOBAL_ESTATES = ['Mega Jutamas (Suai)','Ulu Niah Estate','MJM Plantation 1','MJM Plantation 2',
+    'MJM Plantation 3','Estet Seri Mawar','Meridian Palma','Mono Gaya',
+    'Sungai Mak Plantation','Gama Menang','Elewsun'];
+
+async function loadEstatesFromSupabase() {
+    try {
+        const { data, error } = await supabaseClient.from('opp_estates').select('name').order('id');
+        if (error) throw error;
+        if (data && data.length > 0) GLOBAL_ESTATES = data.map(r => r.name);
+    } catch (e) {
+        console.warn('Could not load estates from Supabase, using defaults:', e.message);
+    }
+}
+
+function refreshEstateSidebar(session) {
+    if (!session) return;
+    const isSA = session.role === 'superadmin';
+    const allowed = isSA
+        ? GLOBAL_ESTATES
+        : (session.estates && session.estates.length > 0 ? session.estates : []);
+    const html = '<option value="">— Select estate —</option>' +
+        allowed.map(e => `<option value="${e}">${e}</option>`).join('');
+    const sel  = document.getElementById('sidebarEstate');
+    const selV = document.getElementById('sidebarEstateVisible');
+    if (sel)  { sel.innerHTML  = html; if (activeEstate && allowed.includes(activeEstate)) sel.value  = activeEstate; }
+    if (selV) { selV.innerHTML = html; if (activeEstate && allowed.includes(activeEstate)) selV.value = activeEstate; }
+}
+
+function populateRegEstatesGrid() {
+    const grid = document.getElementById('regEstatesGrid');
+    if (!grid) return;
+    grid.innerHTML = GLOBAL_ESTATES.map(e =>
+        `<label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="reg-estate-cb accent-green-700 w-4 h-4" value="${e}" /> ${e}</label>`
+    ).join('');
+}
+
+async function renderEstatesList() {
+    const container = document.getElementById('estatesListContainer');
+    if (!container) return;
+    container.innerHTML = '<p class="text-sm text-gray-400 italic">Loading…</p>';
+    await loadEstatesFromSupabase();
+    populateRegEstatesGrid();
+    refreshEstateSidebar(loadSession());
+    if (GLOBAL_ESTATES.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-400 italic">No estates found.</p>';
+        return;
+    }
+    container.innerHTML = `
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="bg-green-100 text-green-800">
+                    <tr>
+                        <th class="px-3 py-2 text-left">#</th>
+                        <th class="px-3 py-2 text-left">Estate Name</th>
+                        <th class="px-3 py-2 text-left">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${GLOBAL_ESTATES.map((e, i) => `
+                        <tr class="border-b border-gray-100 hover:bg-green-50">
+                            <td class="px-3 py-2 text-gray-400 tabular-nums">${i + 1}</td>
+                            <td class="px-3 py-2 font-medium">🌴 ${e}</td>
+                            <td class="px-3 py-2">
+                                <button onclick="deleteEstate(${JSON.stringify(e)})"
+                                    class="text-red-600 hover:text-red-800 text-xs font-semibold border border-red-200 hover:bg-red-50 px-2 py-1 rounded">
+                                    🗑 Delete
+                                </button>
+                            </td>
+                        </tr>`).join('')}
+                </tbody>
+            </table>
+        </div>`;
+}
+
+async function addEstate() {
+    const input = document.getElementById('newEstateName');
+    const name  = input.value.trim();
+    if (!name) { alert('Please enter an estate name.'); return; }
+    if (GLOBAL_ESTATES.map(e => e.toLowerCase()).includes(name.toLowerCase())) {
+        alert('An estate with that name already exists.'); return;
+    }
+    try {
+        const { error } = await supabaseClient.from('opp_estates').insert({ name });
+        if (error) throw error;
+        input.value = '';
+        await renderEstatesList();
+    } catch (e) {
+        alert('Error adding estate: ' + e.message);
+    }
+}
+
+async function deleteEstate(name) {
+    if (!confirm(`Delete estate "${name}"?\n\nThis removes it from the selector and user assignment. Existing stock records linked to this estate are not deleted. This cannot be undone.`)) return;
+    try {
+        const { error } = await supabaseClient.from('opp_estates').delete().eq('name', name);
+        if (error) throw error;
+        await renderEstatesList();
+    } catch (e) {
+        alert('Error deleting estate: ' + e.message);
+    }
+}
+
 // ── Login attempt ──────────────────────────────────────────────────
 async function attemptLogin() {
     const email    = document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -6960,11 +7102,8 @@ function bootApp(session) {
     const estateSelectVisible = document.getElementById('sidebarEstateVisible');
     const isSuperAdmin = session.role === 'superadmin';
 
-    const ALL_ESTATES = ['Mega Jutamas (Suai)','Ulu Niah Estate','MJM Plantation 1','MJM Plantation 2',
-        'MJM Plantation 3','Estet Seri Mawar','Meridian Palma','Mono Gaya',
-        'Sungai Mak Plantation','Gama Menang','Elewsun'];
     const allowedEstates = isSuperAdmin
-        ? ALL_ESTATES
+        ? GLOBAL_ESTATES
         : (session.estates && session.estates.length > 0 ? session.estates : []);
 
     const estateOptionsHtml = '<option value="">— Select estate —</option>' +
@@ -7001,6 +7140,13 @@ function bootApp(session) {
 
     // Update app title
     updateAppTitle(activeEstate);
+
+    // Load estates from Supabase asynchronously so dropdowns and checkboxes
+    // stay in sync with whatever the super admin has configured in Settings.
+    loadEstatesFromSupabase().then(() => {
+        refreshEstateSidebar(session);
+        populateRegEstatesGrid();
+    });
 
     // Update sidebar user info
     // Update sidebar user info (elements removed from sidebar — guard safely)
@@ -7130,13 +7276,14 @@ function navToSection(sectionId) {
 function applyNavPermissions(session) {
     const isSuperAdmin = session.role === 'superadmin';
 
-    // Show/hide User Management nav
+    // Show/hide admin-only nav items
     document.getElementById('navUserAdmin').classList.toggle('hidden', !isSuperAdmin);
+    document.getElementById('navSettings').classList.toggle('hidden', !isSuperAdmin);
 
-    // Show/hide each nav button based on permissions (useradmin is superadmin-only)
+    // Show/hide each nav button based on permissions (useradmin/settings are superadmin-only)
     document.querySelectorAll('[data-target]').forEach(btn => {
         const target = btn.getAttribute('data-target');
-        if (target === 'useradmin') return; // handled above
+        if (target === 'useradmin' || target === 'settings') return; // handled above
 
         const access = getSectionAccess(session, target);
         const allowed = isSuperAdmin || access === 'view' || access === 'edit';
@@ -7643,11 +7790,7 @@ async function openEditUserModal(id) {
     const userEstates = user.estates || (user.estate ? [user.estate] : []);
     const userPerms   = normalisePermissions(user.permissions);
 
-    const ALL_ESTATES = ['Mega Jutamas (Suai)','Ulu Niah Estate','MJM Plantation 1','MJM Plantation 2',
-        'MJM Plantation 3','Estet Seri Mawar','Meridian Palma','Mono Gaya',
-        'Sungai Mak Plantation','Gama Menang','Elewsun'];
-
-    const estateChecks = ALL_ESTATES.map(e => `
+    const estateChecks = GLOBAL_ESTATES.map(e => `
         <label class="flex items-center gap-2 text-sm cursor-pointer">
             <input type="checkbox" class="edit-estate-cb accent-green-700 w-4 h-4" value="${e}"
                 ${userEstates.includes(e) ? 'checked' : ''} />
@@ -7791,6 +7934,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Populate the Account Type select in the register form from the ROLES constant
     const regRoleEl = document.getElementById('regRole');
     if (regRoleEl) regRoleEl.innerHTML = buildRoleOptions('user_estate');
+
+    // Populate estate checkboxes in the register form from the global list
+    populateRegEstatesGrid();
 
     renderPermissionCheckboxes();
     // Apply saved language preference regardless of login state
