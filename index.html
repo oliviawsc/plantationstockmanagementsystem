@@ -1498,10 +1498,6 @@
                         <p id="txnQtyConversion" class="text-xs text-green-700 mt-1 italic hidden"></p>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1" data-i18n="col_ref">Ref / DO No.</label>
-                        <input id="txnRef" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="text" placeholder="e.g. DO-2026-0142" />
-                    </div>
-                    <div>
                         <label class="block text-sm font-semibold mb-1" data-i18n="col_date">Date</label>
                         <input id="txnDate" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="date" />
                     </div>
@@ -2858,10 +2854,6 @@
                     <option value="None/Storage" data-i18n="opt_none_storage">None/Storage</option>
                 </select>
             </div>
-            <div>
-                <label class="block text-sm font-semibold mb-1" data-i18n="col_ref">Ref / DO No.</label>
-                <input id="editTxnRef" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="text" />
-            </div>
             <div id="editTxnManuringWrap" class="md:col-span-2 hidden bg-green-50 border border-green-300 rounded p-3">
                 <label class="block text-sm font-semibold mb-1"><span data-i18n="txn_lbl_round">Manuring Round</span> <span class="text-gray-400 font-normal text-xs">(Optional)</span></label>
                 <select id="editTxnManuringRound" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
@@ -3800,7 +3792,6 @@ function saveTransaction() {
 
         // Persist one transaction per row
         const baseDate    = document.getElementById('txnDate').value;
-        const baseRef     = document.getElementById('txnRef').value.trim();
         const baseRemarks = document.getElementById('txnRemarks').value.trim();
         const baseId      = Date.now();
         const pictureData = getTxnPictureBase64();
@@ -3818,7 +3809,6 @@ function saveTransaction() {
                 inputQty: r.inputQty,
                 inputUnit: r.inputUnit,
                 location: r.loc,
-                ref: baseRef,
                 remarks: baseRemarks,
                 manuringRoundId: manuringRoundId,
                 manuringRoundName: manuringRoundName,
@@ -3866,7 +3856,6 @@ function saveTransaction() {
         inputQty: rawQty,
         inputUnit: enteredUnit,
         location: location,
-        ref: document.getElementById('txnRef').value.trim(),
         remarks: document.getElementById('txnRemarks').value.trim(),
         manuringRoundId: null,
         manuringRoundName: null,
@@ -4260,7 +4249,6 @@ function renderManuringRounds() {
                     <td class="px-3 py-1.5 text-xs">${t.date}</td>
                     <td class="px-3 py-1.5 text-xs font-medium text-green-700">${t.location || '-'}</td>
                     <td class="px-3 py-1.5 text-xs text-right font-semibold">${pkgQty.toFixed(2)} ${pkgUnit}</td>
-                    <td class="px-3 py-1.5 text-xs text-gray-500">${t.ref || '-'}</td>
                     <td class="px-3 py-1.5 text-xs text-gray-400">${t.remarks || '-'}</td>
                 </tr>`;
             }).join('');
@@ -4272,7 +4260,6 @@ function renderManuringRounds() {
                             <th class="px-3 py-1.5 text-left">${currentLang==='ms'?'Tarikh':'Date'}</th>
                             <th class="px-3 py-1.5 text-left">${currentLang==='ms'?'Blok / Lokasi':'Block / Location'}</th>
                             <th class="px-3 py-1.5 text-right">${currentLang==='ms'?`Kuantiti Digunakan (${pkgUnit})`:`Qty Applied (${pkgUnit})`}</th>
-                            <th class="px-3 py-1.5 text-left">${currentLang==='ms'?'Ref / No. DO':'Ref / DO'}</th>
                             <th class="px-3 py-1.5 text-left">${currentLang==='ms'?'Catatan':'Remarks'}</th>
                         </tr>
                     </thead>
@@ -4325,8 +4312,7 @@ function renderManuringHistory() {
             <td class="px-3 py-2 font-semibold">${t.manuringRoundName}</td>
             <td class="px-3 py-2">${t.location}</td>
             <td class="px-3 py-2">${t.itemName}</td>
-            <td class="px-3 py-2 font-bold">${t.qty} ${t.unit}</td>
-            <td class="px-3 py-2">${t.ref || '-'}</td>`;
+            <td class="px-3 py-2 font-bold">${t.qty} ${t.unit}</td>`;
         body.appendChild(tr);
     });
 }
@@ -4798,7 +4784,6 @@ document.getElementById('exportExcelBtn').addEventListener('click', () => {
         Type: t.type,
         Quantity: parseFloat(t.qty).toFixed(2),
         Unit: t.unit,
-        Reference: t.ref,
         Location: t.location,
         'Manuring Round': t.manuringRoundName || '',
         Remarks: t.remarks,
@@ -6466,7 +6451,6 @@ function openEditTxnModal(id) {
     document.getElementById('editTxnItemName').value = t.itemName;
     document.getElementById('editTxnType').value     = t.type;
     document.getElementById('editTxnDate').value     = t.date;
-    document.getElementById('editTxnRef').value      = t.ref || '';
     document.getElementById('editTxnRemarks').value  = t.remarks || '';
 
     // Look up item to determine defaultQtyUnit
@@ -6642,7 +6626,6 @@ function saveEditTransaction() {
         type:              txnType,
         qty:               finalQty,
         location:          document.getElementById('editTxnLocation').value,
-        ref:               document.getElementById('editTxnRef').value.trim(),
         remarks:           document.getElementById('editTxnRemarks').value.trim(),
         picture:           newPicture,
         manuringRoundId,
