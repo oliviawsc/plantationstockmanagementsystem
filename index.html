@@ -7674,8 +7674,13 @@ function refreshEstateSidebar(session) {
         allowed.map(e => `<option value="${e}">${e}</option>`).join('');
     const sel  = document.getElementById('sidebarEstate');
     const selV = document.getElementById('sidebarEstateVisible');
+    const topLbl = document.getElementById('topEstateLabel');
     if (sel)  { sel.innerHTML  = html; if (activeEstate && allowed.includes(activeEstate)) sel.value  = activeEstate; }
     if (selV) { selV.innerHTML = html; if (activeEstate && allowed.includes(activeEstate)) selV.value = activeEstate; }
+    if (topLbl && topLbl.tagName === 'SELECT') {
+        topLbl.innerHTML = html;
+        if (activeEstate && allowed.includes(activeEstate)) topLbl.value = activeEstate;
+    }
 }
 
 function populateRegEstatesGrid() {
