@@ -1302,9 +1302,8 @@
                 <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-600">
                     <div class="flex items-center gap-2 mb-1">
                         <span class="inline-block w-3 h-3 rounded-sm flex-shrink-0" style="background:#16a34a"></span>
-                        <h3 class="text-lg font-bold text-green-800" data-i18n="cat_fertilizer">Fertilizer</h3>
+                        <h3 class="text-lg font-bold text-green-800" data-i18n="cat_fertilizer">Balance Fertilizer</h3>
                     </div>
-                    <p class="text-xs text-gray-400 mb-4" data-i18n="chart_sub_fertilizer">On Hand quantity for all fertilizer items</p>
                     <div id="chartFertilizerWrap" style="min-height:100px;">
                         <canvas id="chartFertilizer"></canvas>
                     </div>
@@ -1315,9 +1314,8 @@
                 <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-600">
                     <div class="flex items-center gap-2 mb-1">
                         <span class="inline-block w-3 h-3 rounded-sm flex-shrink-0" style="background:#2563eb"></span>
-                        <h3 class="text-lg font-bold text-blue-800" data-i18n="cat_chemical">Chemical</h3>
+                        <h3 class="text-lg font-bold text-blue-800" data-i18n="cat_chemical">Balance Chemical</h3>
                     </div>
-                    <p class="text-xs text-gray-400 mb-1" data-i18n="chart_sub_chemical">On Hand quantity for all chemical items — red bars indicate low stock</p>
                     <!-- Chemical legend -->
                     <div class="flex flex-wrap gap-3 mb-4 text-xs font-medium">
                         <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-sm" style="background:#2563eb"></span> <span data-i18n="chart_ok">OK</span></span>
@@ -1334,9 +1332,8 @@
                 <div class="bg-white p-6 rounded-xl shadow border-l-4 border-pink-600">
                     <div class="flex items-center gap-2 mb-1">
                         <span class="inline-block w-3 h-3 rounded-sm flex-shrink-0" style="background:#db2777"></span>
-                        <h3 class="text-lg font-bold text-pink-800" data-i18n="cat_seedling">Oil Palm Seedling</h3>
+                        <h3 class="text-lg font-bold text-pink-800" data-i18n="cat_seedling">Balance Oil Palm Seedlings</h3>
                     </div>
-                    <p class="text-xs text-gray-400 mb-4" data-i18n="chart_sub_seedling">On Hand quantity for oil palm seedling</p>
                     <div id="chartSeedlingWrap" style="min-height:100px;">
                         <canvas id="chartSeedling"></canvas>
                     </div>
@@ -5906,7 +5903,7 @@ const stockChartInstances = { Fertilizer: null, Chemical: null, 'Oil Palm Seedli
  * @param {string} emptyId   - id of the empty-state <p>
  * @param {string} barColour - default bar hex colour
  */
-function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour, fromDate, toDate) {
+function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour, fromDate, toDate, axisLabel) {
     const canvas   = document.getElementById(canvasId);
     const wrap     = document.getElementById(wrapId);
     const emptyMsg = document.getElementById(emptyId);
@@ -6081,8 +6078,8 @@ function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour, from
                     grid: { color: '#d1fae5' },
                     ticks: { color: '#374151', font: { size: 11 } },
                     title: {
-                        display: true,
-                        text: currentLang === 'ms' ? 'Kuantiti (Stok Semasa)' : 'Quantity (On Hand)',
+                        display: !!(axisLabel || currentLang === 'ms'),
+                        text: axisLabel || (currentLang === 'ms' ? 'Kuantiti (Stok Semasa)' : ''),
                         color: '#166534',
                         font: { size: 11, weight: 'bold' }
                     }
@@ -6170,8 +6167,8 @@ function renderLiveStockChart() {
     const noteEl = document.getElementById('dashFilterNote');
     if (noteEl) noteEl.classList.add('hidden'); // note shown only when a custom date is selected
     // null fromDate = all history; asAt = upper bound
-    buildCategoryChart('Fertilizer',        'chartFertilizer', 'chartFertilizerWrap', 'chartFertilizerEmpty', '#16a34a', null, asAt);
-    buildCategoryChart('Chemical',          'chartChemical',   'chartChemicalWrap',   'chartChemicalEmpty',   '#2563eb', null, asAt);
+    buildCategoryChart('Fertilizer',        'chartFertilizer', 'chartFertilizerWrap', 'chartFertilizerEmpty', '#16a34a', null, asAt, 'Bags');
+    buildCategoryChart('Chemical',          'chartChemical',   'chartChemicalWrap',   'chartChemicalEmpty',   '#2563eb', null, asAt, 'Jar/Can');
     buildCategoryChart('Oil Palm Seedling', 'chartSeedling',   'chartSeedlingWrap',   'chartSeedlingEmpty',   '#db2777', null, asAt);
 }
 
