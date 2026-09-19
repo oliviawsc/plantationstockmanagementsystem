@@ -1283,41 +1283,22 @@
             </div>
 
 
-            <!-- Dashboard Date Filter -->
+            <!-- Dashboard As at Date Filter -->
             <div class="bg-white rounded-xl shadow mb-6 p-3">
-                <p class="text-xs font-bold text-green-900 mb-2">Date Range</p>
-                <div class="flex items-center gap-2 mb-2">
-                    <!-- From card -->
-                    <div class="flex-1 min-w-0 bg-gray-50 rounded-xl p-2.5 border border-gray-200 relative cursor-pointer" style="min-height:56px;" onclick="openDatePicker('dashFrom')">
-                        <p class="text-xs font-bold text-green-900 mb-1" data-i18n="fr_lbl_from">Date From</p>
+                <p class="text-xs font-bold text-green-900 mb-2">As at Date</p>
+                <div class="mb-2">
+                    <div class="bg-gray-50 rounded-xl p-2.5 border border-gray-200 relative cursor-pointer" style="min-height:56px;" onclick="openDatePicker('dashAsAt')">
+                        <p class="text-xs font-bold text-green-900 mb-1">As at</p>
                         <div class="flex items-center gap-1.5 text-green-800">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                            <span id="dashFromDisplay" class="text-xs truncate">Select date</span>
+                            <span id="dashAsAtDisplay" class="text-xs truncate">Select date</span>
                         </div>
-                        <input id="dashFrom" type="date" onchange="updateDashDateDisplay()"
-                            style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
-                    </div>
-                    <!-- Arrow -->
-                    <span class="text-gray-400 text-base flex-shrink-0" style="font-size:18px;">→</span>
-                    <!-- To card -->
-                    <div class="flex-1 min-w-0 bg-gray-50 rounded-xl p-2.5 border border-gray-200 relative cursor-pointer" style="min-height:56px;" onclick="openDatePicker('dashTo')">
-                        <p class="text-xs font-bold text-green-900 mb-1" data-i18n="fr_lbl_to">Date To</p>
-                        <div class="flex items-center gap-1.5 text-green-800">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                            <span id="dashToDisplay" class="text-xs truncate">Select date</span>
-                        </div>
-                        <input id="dashTo" type="date" onchange="updateDashDateDisplay()"
+                        <input id="dashAsAt" type="date" onchange="updateDashDateDisplay();renderDashboardFilters();"
                             style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
                 </div>
-                <!-- Search button -->
-                <button onclick="renderDashboardFilters()"
-                    class="w-full bg-gray-100 hover:bg-gray-200 text-gray-500 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <span data-i18n="btn_search">Search</span>
-                </button>
-                <p id="dashFilterNote" class="hidden text-xs text-blue-600 italic mt-1.5 text-center" data-i18n="dash_filter_note">Showing net movement for selected period</p>
-                <button onclick="clearDashFilter()" class="w-full text-center text-xs text-gray-400 hover:text-gray-600 mt-1 py-0.5" data-i18n="btn_clear">Clear</button>
+                <p id="dashFilterNote" class="hidden text-xs text-blue-600 italic mt-1.5 text-center">Showing stock balance as at selected date</p>
+                <button onclick="clearDashFilter()" class="w-full text-center text-xs text-gray-400 hover:text-gray-600 mt-1 py-0.5">Clear</button>
             </div>
 
             <!-- Stock Level Charts — one card per category -->
@@ -5209,15 +5190,12 @@ function renderManuringPctChart() {
     var cardBox  = document.getElementById('manuringPctCards');
     if (!empty || !cardBox) return;
 
-    var dashFrom = (document.getElementById('dashFrom') || {}).value || '';
-    var dashTo   = (document.getElementById('dashTo')   || {}).value || '';
+    var asAt         = getDashAsAt();
     var currentYear  = String(new Date().getFullYear());
-    var selectedYear = dashFrom ? dashFrom.slice(0,4) : (dashTo ? dashTo.slice(0,4) : currentYear);
-    var fromMonth    = dashFrom ? dashFrom.slice(0,7) : (selectedYear + '-01');
-    var toMonth      = dashTo   ? dashTo.slice(0,7)   : (selectedYear + '-12');
-    if (yearLbl) yearLbl.textContent = (dashFrom || dashTo)
-        ? (fromMonth + ' — ' + toMonth)
-        : (I18N[currentLang]['dash_lbl_tracking_year'] + selectedYear);
+    var selectedYear = asAt ? asAt.slice(0,4) : currentYear;
+    var fromMonth    = selectedYear + '-01';
+    var toMonth      = asAt ? asAt.slice(0,7) : (selectedYear + '-12');
+    if (yearLbl) yearLbl.textContent = I18N[currentLang]['dash_lbl_tracking_year'] + selectedYear;
 
     var rounds = manuringRounds.filter(function(r){
         var tp = r.targetPeriod || r.targetperiod || '';
@@ -5425,15 +5403,12 @@ function renderMaintPctTracker() {
     var cardBox  = document.getElementById('maintPctTrackerCards');
     if (!empty || !cardBox) return;
 
-    var dashFrom = (document.getElementById('dashFrom') || {}).value || '';
-    var dashTo   = (document.getElementById('dashTo')   || {}).value || '';
+    var asAt         = getDashAsAt();
     var currentYear  = String(new Date().getFullYear());
-    var selectedYear = dashFrom ? dashFrom.slice(0,4) : (dashTo ? dashTo.slice(0,4) : currentYear);
-    var fromMonth    = dashFrom ? dashFrom.slice(0,7) : (selectedYear + '-01');
-    var toMonth      = dashTo   ? dashTo.slice(0,7)   : (selectedYear + '-12');
-    if (yearLbl) yearLbl.textContent = (dashFrom || dashTo)
-        ? (fromMonth + ' — ' + toMonth)
-        : (I18N[currentLang]['dash_lbl_tracking_year'] + selectedYear);
+    var selectedYear = asAt ? asAt.slice(0,4) : currentYear;
+    var fromMonth    = selectedYear + '-01';
+    var toMonth      = asAt ? asAt.slice(0,7) : (selectedYear + '-12');
+    if (yearLbl) yearLbl.textContent = I18N[currentLang]['dash_lbl_tracking_year'] + selectedYear;
 
     var rounds = fieldMaintRounds.filter(function(r){
         var tp = r.targetPeriod || r.targetperiod || '';
@@ -5669,16 +5644,13 @@ function renderChemUsageTracker() {
         return;
     }
 
-    /* Derive date range from dashboard filter */
-    var dashFrom = (document.getElementById('dashFrom') || {}).value || '';
-    var dashTo   = (document.getElementById('dashTo')   || {}).value || '';
+    /* Derive date range from dashboard As at Date filter */
+    var asAt         = getDashAsAt();
     var currentYear  = String(new Date().getFullYear());
-    var selectedYear = dashFrom ? dashFrom.slice(0,4) : (dashTo ? dashTo.slice(0,4) : currentYear);
-    var fromMonth    = dashFrom ? dashFrom.slice(0,7) : (selectedYear + '-01');
-    var toMonth      = dashTo   ? dashTo.slice(0,7)   : (selectedYear + '-12');
-    if (yearLbl) yearLbl.textContent = (dashFrom || dashTo)
-        ? (fromMonth + ' — ' + toMonth)
-        : (I18N[currentLang]['dash_lbl_tracking_year'] + selectedYear);
+    var selectedYear = asAt ? asAt.slice(0,4) : currentYear;
+    var fromMonth    = selectedYear + '-01';
+    var toMonth      = asAt ? asAt.slice(0,7) : (selectedYear + '-12');
+    if (yearLbl) yearLbl.textContent = I18N[currentLang]['dash_lbl_tracking_year'] + selectedYear;
 
     /* Aggregate claims by roundId — only rounds whose Target Period falls within the date range */
     var roundMap = {};
@@ -6156,23 +6128,22 @@ function _datePlaceholder() {
     return currentLang === 'ms' ? 'Pilih tarikh' : 'Select date';
 }
 
-/** Updates the visible date labels in the custom dashboard date picker cards. */
+/** Updates the visible date label in the As at Date picker card. */
 function updateDashDateDisplay() {
-    ['From', 'To'].forEach(function (which) {
-        var val = (document.getElementById('dash' + which) || {}).value || '';
-        var el  = document.getElementById('dash' + which + 'Display');
-        if (!el) return;
-        el.textContent = val
-            ? new Date(val + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-            : _datePlaceholder();
-    });
+    var val = (document.getElementById('dashAsAt') || {}).value || '';
+    var el  = document.getElementById('dashAsAtDisplay');
+    if (!el) return;
+    if (val) {
+        el.textContent = new Date(val + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    } else {
+        var today = new Date();
+        el.textContent = 'Today (' + today.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ')';
+    }
 }
 
 function clearDashFilter() {
-    ['From', 'To'].forEach(function (which) {
-        var inp = document.getElementById('dash' + which);
-        if (inp) inp.value = '';
-    });
+    var inp = document.getElementById('dashAsAt');
+    if (inp) inp.value = '';
     updateDashDateDisplay();
     renderDashboardFilters();
 }
@@ -6189,20 +6160,25 @@ function updateDateDisplay(id) {
 
 /** Refresh all card-style date picker display spans after a language switch. */
 function refreshAllDateDisplays() {
-    ['dashFrom','dashTo','filterFrom','filterTo',
-     'ledgerFrom','ledgerTo',
-     ].forEach(updateDateDisplay);
+    updateDashDateDisplay();
+    ['filterFrom','filterTo','ledgerFrom','ledgerTo'].forEach(updateDateDisplay);
+}
+
+/** Returns the effective "as at" date for the dashboard — selected date or today. */
+function getDashAsAt() {
+    const sel = (document.getElementById('dashAsAt') || {}).value || '';
+    return sel || new Date().toISOString().slice(0, 10);
 }
 
 /** Re-renders all three category charts. Called from refreshAll(). */
 function renderLiveStockChart() {
-    const from = (document.getElementById('dashFrom') || {}).value || '';
-    const to   = (document.getElementById('dashTo')   || {}).value || '';
+    const asAt   = getDashAsAt();
     const noteEl = document.getElementById('dashFilterNote');
-    if (noteEl) noteEl.classList.toggle('hidden', !from && !to);
-    buildCategoryChart('Fertilizer',        'chartFertilizer', 'chartFertilizerWrap', 'chartFertilizerEmpty', '#16a34a', from, to);
-    buildCategoryChart('Chemical',          'chartChemical',   'chartChemicalWrap',   'chartChemicalEmpty',   '#2563eb', from, to);
-    buildCategoryChart('Oil Palm Seedling', 'chartSeedling',   'chartSeedlingWrap',   'chartSeedlingEmpty',   '#db2777', from, to);
+    if (noteEl) noteEl.classList.add('hidden'); // note shown only when a custom date is selected
+    // null fromDate = all history; asAt = upper bound
+    buildCategoryChart('Fertilizer',        'chartFertilizer', 'chartFertilizerWrap', 'chartFertilizerEmpty', '#16a34a', null, asAt);
+    buildCategoryChart('Chemical',          'chartChemical',   'chartChemicalWrap',   'chartChemicalEmpty',   '#2563eb', null, asAt);
+    buildCategoryChart('Oil Palm Seedling', 'chartSeedling',   'chartSeedlingWrap',   'chartSeedlingEmpty',   '#db2777', null, asAt);
 }
 
 /* -----------------------------------------------------------------
@@ -6217,6 +6193,7 @@ function refreshAll() {
     renderMrBlocksGrid();
     renderFmBlocksGrid();
     renderLiveStock();
+    updateDashDateDisplay();
     renderLiveStockChart();
     renderSummary();
     renderLedger();
