@@ -893,18 +893,17 @@
 
             <!-- Email -->
             <div class="login-field">
-                <label class="login-label" for="loginEmail">Email Address</label>
+                <label class="login-label" for="loginEmail">User ID</label>
                 <div class="login-input-wrap">
                     <span class="login-icon-left">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="4" width="20" height="16" rx="2"/>
-                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
                         </svg>
                     </span>
-                    <input id="loginEmail" type="email" class="login-input"
-                        placeholder="Enter your email"
+                    <input id="loginEmail" type="text" class="login-input"
+                        placeholder="Enter your User ID"
                         onkeydown="if(event.key==='Enter')attemptLogin()"
-                        autocomplete="email"/>
+                        autocomplete="username"/>
                 </div>
             </div>
 
@@ -1139,7 +1138,7 @@
                 </div>
                 <div style="background:#F8FAFC;border-radius:10px;padding:14px 16px;border:1px solid #E2E8F0;">
                     <div style="margin-bottom:10px;">
-                        <div style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#94A3B8;margin-bottom:3px;">Email</div>
+                        <div style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#94A3B8;margin-bottom:3px;">User ID</div>
                         <div id="profileEmail" style="font-size:13.5px;font-weight:500;color:#0F172A;"></div>
                     </div>
                     <div>
@@ -2389,7 +2388,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-semibold mb-1">User ID <span class="text-red-500">*</span></label>
-                            <input id="regEmail" type="text" placeholder="e.g. ahmad.ali@company.com"
+                            <input id="regEmail" type="text" placeholder="e.g. ahmad.ali or admin01"
                                 class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                         </div>
                         <div>
@@ -7548,6 +7547,12 @@ const SUPER_ADMIN = {
     role:  'superadmin',
 };
 
+// Convert a plain User ID to Supabase Auth email format.
+// If the input already contains '@' (e.g. Super Admin's real email), it is returned as-is.
+function toAuthEmail(userId) {
+    return userId.includes('@') ? userId : userId + '@psms.local';
+}
+
 // All account types available in the system.
 // 'superadmin' = Super Admin — full access, no custom permissions needed.
 // 'hq_user'    = HQ User — website interface, custom permissions.
@@ -7896,15 +7901,18 @@ async function deleteEstate(name) {
 
 // ── Login attempt ──────────────────────────────────────────────────
 async function attemptLogin() {
-    const email    = document.getElementById('loginEmail').value.trim().toLowerCase();
+    const rawId    = document.getElementById('loginEmail').value.trim().toLowerCase();
     const password = document.getElementById('loginPassword').value;
     const errEl    = document.getElementById('loginError');
 
     errEl.classList.add('hidden');
     errEl.textContent = '';
 
-    if (!email)    { showLoginError('Please enter your email.'); return; }
+    if (!rawId)    { showLoginError('Please enter your User ID.'); return; }
     if (!password) { showLoginError('Please enter your password.'); return; }
+
+    // Convert plain User ID → Supabase Auth email; real emails pass through unchanged.
+    const email = toAuthEmail(rawId);
 
     const loginBtn    = document.getElementById('loginBtn');
     const loginBtnTxt = document.getElementById('loginBtnText');
@@ -7920,12 +7928,12 @@ async function attemptLogin() {
         const { data: authData, error: authError } =
             await supabaseClient.auth.signInWithPassword({ email, password });
         if (authError) {
-            showLoginError(authError.message || 'Incorrect email or password.');
+            showLoginError(authError.message || 'Incorrect User ID or password.');
             return;
         }
 
-        // Super Admin is identified by email; no opp_users record required.
-        if (email === SUPER_ADMIN.email) {
+        // Super Admin is identified by their email address.
+        if (rawId === SUPER_ADMIN.email || email === SUPER_ADMIN.email) {
             const session = {
                 email:       SUPER_ADMIN.email,
                 name:        SUPER_ADMIN.name,
@@ -8644,31 +8652,32 @@ function showUserListPanel() {
 
 async function registerUser() {
     const name     = document.getElementById('regName').value.trim();
-    const email    = document.getElementById('regEmail').value.trim().toLowerCase();
+    const rawId    = document.getElementById('regEmail').value.trim().toLowerCase();
     const password = (document.getElementById('regPassword') || {}).value || '';
-    const role     = 'estate_user'; // default role; can be changed via edit
+    const role     = 'estate_user';
     const estates  = [];
     const perms    = {};
 
-    if (!name || !email)             { alert('Please fill in Full Name and User ID.'); return; }
-    if (password.length < 6)         { alert('Password must be at least 6 characters.'); return; }
-    if (email === SUPER_ADMIN.email) { alert('That User ID belongs to the Super Admin.'); return; }
+    if (!name || !rawId)                   { alert('Please fill in Full Name and User ID.'); return; }
+    if (password.length < 6)               { alert('Password must be at least 6 characters.'); return; }
+
+    // Convert plain User ID to Supabase Auth email format
+    const email = toAuthEmail(rawId);
+
+    if (email === SUPER_ADMIN.email)       { alert('That User ID is reserved for the Super Admin.'); return; }
 
     const regBtn = document.querySelector('#registerUserPanel button[onclick="registerUser()"]');
     if (regBtn) { regBtn.disabled = true; regBtn.textContent = 'Saving…'; }
 
     try {
-        // Step 1: Create Supabase Auth account if a password was provided
-        if (password) {
-            const { error: authError } = await supabaseClient.auth.signUp({ email, password, options: { data: { name } } });
-            if (authError) {
-                const alreadyExists = authError.message && (
-                    authError.message.toLowerCase().includes('already registered') ||
-                    authError.message.toLowerCase().includes('already been registered')
-                );
-                if (!alreadyExists) throw authError;
-                // Already in Auth — continue to create/update the profile
-            }
+        // Step 1: Create Supabase Auth account
+        const { error: authError } = await supabaseClient.auth.signUp({ email, password, options: { data: { name } } });
+        if (authError) {
+            const alreadyExists = authError.message && (
+                authError.message.toLowerCase().includes('already registered') ||
+                authError.message.toLowerCase().includes('already been registered')
+            );
+            if (!alreadyExists) throw authError;
         }
 
         // Step 2: Create or update the opp_users profile
@@ -8689,7 +8698,7 @@ async function registerUser() {
         if (pwEl) pwEl.value = '';
 
         await renderUsersTable();
-        showUserListPanel(); // Return to list after successful registration
+        showUserListPanel();
     } catch (err) {
         console.error('[Supabase] registerUser failed', err);
         alert('Could not register user — ' + (err.message || 'please check your connection and try again.'));
@@ -8737,10 +8746,11 @@ function buildUserRow(u) {
             : `<span class="text-gray-400 text-xs">Dashboard only</span>`;
     }
 
+    const displayId = (u.email || '').replace(/@psms\.local$/, '');
     return `
     <tr class="border-b border-green-50">
         <td class="px-3 py-2 font-semibold">${u.name}</td>
-        <td class="px-3 py-2 text-sm text-gray-600">${u.email}</td>
+        <td class="px-3 py-2 text-sm text-gray-600">${displayId}</td>
         <td class="px-3 py-2">${roleBadge}</td>
         <td class="px-3 py-2">${estatesHtml}</td>
         <td class="px-3 py-2">${permsHtml}</td>
@@ -11230,7 +11240,7 @@ function populateChemFilters() {
         if(aname)  aname.textContent  = name || email;
         if(arole)  arole.textContent  = roleLabel;
         if(dname)  dname.textContent  = name || email;
-        if(demail) demail.textContent = email;
+        if(demail) demail.textContent = email.replace(/@psms\.local$/, '');
     }
     window.toggleAvatarDropdown = function(e){
         e.stopPropagation();
@@ -11261,7 +11271,7 @@ function populateChemFilters() {
         if(el('profileAvatarCircle')) el('profileAvatarCircle').textContent = initials;
         if(el('profileName'))        el('profileName').textContent        = name;
         if(el('profileRole'))        el('profileRole').textContent        = roleLabel;
-        if(el('profileEmail'))       el('profileEmail').textContent       = email;
+        if(el('profileEmail'))       el('profileEmail').textContent       = email.replace(/@psms\.local$/, '');
         if(el('profileRoleDetail'))  el('profileRoleDetail').textContent  = roleLabel;
         var m = el('profileModal');
         if(m){ m.style.display='flex'; }
