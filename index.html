@@ -991,11 +991,9 @@
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:6px 8px 3px;">Overview</p>
             <button data-target="dashboard"     class="nav-item active">    <span class="nav-icon">&#128202;</span><span class="sb-label" data-i18n="sb_lbl_dashboard">Dashboard</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;">Stock</p>
-            <button data-target="items"         id="navItems"     class="nav-item">               <span class="nav-icon">&#128230;</span><span class="sb-label" data-i18n="sb_lbl_items">Item File</span></button>
             <button data-target="transactions"  class="nav-item">        <span class="nav-icon">&#128260;</span><span class="sb-label" data-i18n="sb_lbl_transactions">Stock Transaction</span></button>
             <button data-target="summary"       class="nav-item">             <span class="nav-icon">&#128209;</span><span class="sb-label" data-i18n="sb_lbl_summary">Stock Summary</span></button>
             <button data-target="ledger"         class="nav-item">             <span class="nav-icon">&#128210;</span><span class="sb-label" data-i18n="sb_lbl_ledger">Stock Ledger</span></button>
-            <button data-target="locations"     id="navLocations" class="nav-item">           <span class="nav-icon">&#128205;</span><span class="sb-label" data-i18n="sb_lbl_locations">Location Area</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;">Field Operations</p>
             <button data-target="manuring"      id="navManuring"  class="nav-item">            <span class="nav-icon">&#127807;</span><span class="sb-label" data-i18n="sb_lbl_manuring">Manuring Program</span></button>
             <button data-target="roundprogress" class="nav-item">       <span class="nav-icon">&#128200;</span><span class="sb-label" data-i18n="sb_lbl_roundprogress">Manuring Progress</span></button>
@@ -8025,8 +8023,6 @@ function applyNavPermissions(session) {
     // Show/hide admin-only nav items (setup pages now consolidated in Settings)
     document.getElementById('navUserAdmin').classList.toggle('hidden', !isSuperAdmin);
     document.getElementById('navSettings').classList.toggle('hidden', !isSuperAdmin);
-    document.getElementById('navItems').classList.toggle('hidden', !isSuperAdmin);
-    document.getElementById('navLocations').classList.toggle('hidden', !isSuperAdmin);
     document.getElementById('navManuring').classList.toggle('hidden', !isSuperAdmin);
     document.getElementById('navFieldmaint').classList.toggle('hidden', !isSuperAdmin);
 
