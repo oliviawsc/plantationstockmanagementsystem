@@ -961,11 +961,7 @@
 
     <!-- MOBILE TOP BAR -->
     <div id="mobileTopBar">
-        <button id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Open menu">
-            <span></span><span></span><span></span>
-        </button>
         <h1 id="mobileAppTitle" style="font-size:15px;font-weight:800;letter-spacing:-0.2px;"><span style="color:#fff;">Palm</span><span style="color:#A5D6A7;">Inventory</span></h1>
-<div style="width:32px;"></div>
     </div>
 
     <!-- SIDEBAR BACKDROP -->
@@ -1090,8 +1086,15 @@
             </div>
             <!-- Centre: empty -->
             <div style="flex:1;"></div>
-            <!-- Right: avatar + dropdown -->
-            <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;position:relative;">
+            <!-- Right: language toggle + avatar + dropdown -->
+            <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;gap:10px;position:relative;">
+                <!-- Language toggle -->
+                <div id="topLangToggle" style="display:flex;align-items:center;border-radius:8px;overflow:hidden;border:1px solid #D1FAE5;flex-shrink:0;">
+                    <button id="topLangEN" onclick="setLang('en')"
+                        style="padding:5px 11px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:Inter,sans-serif;background:#2E7D32;color:#fff;transition:background .13s;">EN</button>
+                    <button id="topLangMS" onclick="setLang('ms')"
+                        style="padding:5px 11px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:Inter,sans-serif;background:#F0FDF4;color:#2E7D32;transition:background .13s;">BM</button>
+                </div>
                 <button id="avatarBtn" onclick="toggleAvatarDropdown(event)"
                     style="display:flex;align-items:center;gap:9px;padding:5px 10px 5px 6px;border-radius:99px;border:1px solid #D1FAE5;background:#F0FDF4;cursor:pointer;font-family:Inter,sans-serif;transition:background .13s;"
                     onmouseover="this.style.background='#D1FAE5'" onmouseout="this.style.background='#F0FDF4'">
@@ -7442,6 +7445,17 @@ function setLang(lang) {
     if (hubMsBtn) {
         hubMsBtn.style.background = lang === 'ms' ? '#2E7D32' : '#fff';
         hubMsBtn.style.color      = lang === 'ms' ? '#fff'    : '#2E7D32';
+    }
+    // Sync top header language toggle
+    var topEnBtn = document.getElementById('topLangEN');
+    var topMsBtn = document.getElementById('topLangMS');
+    if (topEnBtn) {
+        topEnBtn.style.background = lang === 'en' ? '#2E7D32' : '#F0FDF4';
+        topEnBtn.style.color      = lang === 'en' ? '#fff'    : '#2E7D32';
+    }
+    if (topMsBtn) {
+        topMsBtn.style.background = lang === 'ms' ? '#2E7D32' : '#F0FDF4';
+        topMsBtn.style.color      = lang === 'ms' ? '#fff'    : '#2E7D32';
     }
 
     // Re-render summary table so data-label attributes and action buttons
