@@ -100,6 +100,16 @@
         .page-section{display:none}
         .page-section.active{display:block}
 
+        /* Home mode — hide sidebar, stretch header */
+        #appLayout.home-mode > #sidebar { display:none !important; }
+        #appLayout.home-mode #topHeaderBar { left:0 !important; }
+
+        /* Hub tab bars (Stock / Field Ops / Reports sub-navigation) */
+        .htab-bar{display:flex;gap:2px;border-bottom:2px solid #E5E7EB;margin-bottom:24px;overflow-x:auto;flex-shrink:0}
+        .htab-btn{padding:9px 20px;border:none;background:transparent;font-size:13px;font-weight:600;color:#6B7280;cursor:pointer;white-space:nowrap;font-family:Inter,sans-serif;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;border-radius:0}
+        .htab-btn:hover{color:#2E7D32}
+        .htab-btn.active{color:#2E7D32;border-bottom-color:#2E7D32}
+
         /* Home card grid */
         .home-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
         @media(max-width:640px){.home-card-grid{grid-template-columns:repeat(2,1fr);gap:14px}}
@@ -1063,8 +1073,14 @@
 
         <!-- Top bar (desktop: shows collapse toggle; mobile: shows hamburger menu toggle) -->
         <div id="topHeaderBar">
-            <!-- Left: collapse toggle + estate name pill / estate back button -->
+            <!-- Left: home button + collapse toggle + estate name pill -->
             <div style="flex:1;display:flex;align-items:center;gap:10px;">
+                <button id="topHomeBtn" onclick="navigateToSection('home')" title="Go to Home"
+                    style="display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:8px;border:1px solid #D1FAE5;background:#F0FDF4;color:#1B5E20;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;flex-shrink:0;transition:background .13s;"
+                    onmouseover="this.style.background='#D1FAE5'" onmouseout="this.style.background='#F0FDF4'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    Home
+                </button>
                 <button id="topCollapseBtn" aria-label="Toggle sidebar" title="Toggle sidebar"
                     style="display:none;width:28px;height:28px;flex-shrink:0;border-radius:7px;border:1px solid #D1FAE5;background:#F0FDF4;color:#2E7D32;font-size:13px;cursor:pointer;align-items:center;justify-content:center;transition:background .13s;"
                     onmouseover="this.style.background='#D1FAE5'" onmouseout="this.style.background='#F0FDF4'">&#9776;</button>
@@ -1215,7 +1231,7 @@
                         <span class="home-card-title">Field Operations</span>
                     </button>
                     <!-- Reports -->
-                    <button class="home-card" onclick="navigateToSection('summary')">
+                    <button class="home-card" onclick="navigateToSection('fertrecord')">
                         <div class="home-card-icon">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
@@ -1457,6 +1473,11 @@
 
         <!-- ============ PAGE 3: STOCK TRANSACTION ============ -->
         <section id="transactions" class="page-section">
+            <div class="htab-bar">
+                <button class="htab-btn active" onclick="navigateToSection('transactions')">Stock Transaction</button>
+                <button class="htab-btn" onclick="navigateToSection('summary')">Stock Summary</button>
+                <button class="htab-btn" onclick="navigateToSection('ledger')">Ledger</button>
+            </div>
             <h2 class="text-3xl font-bold mb-6" data-i18n="nav_transactions">Stock Transaction</h2>
             <div class="bg-white p-6 rounded-xl shadow">
                 <h3 class="text-xl font-bold mb-4" data-i18n="txn_form_title">Record Stock Movement</h3>
@@ -1603,6 +1624,11 @@
 
         <!-- ============ PAGE 5: STOCK SUMMARY (Audit Trail) ============ -->
         <section id="summary" class="page-section">
+            <div class="htab-bar">
+                <button class="htab-btn" onclick="navigateToSection('transactions')">Stock Transaction</button>
+                <button class="htab-btn active" onclick="navigateToSection('summary')">Stock Summary</button>
+                <button class="htab-btn" onclick="navigateToSection('ledger')">Ledger</button>
+            </div>
             <h2 class="text-3xl font-bold mb-6" data-i18n="nav_summary">Stock Summary (Audit Trail)</h2>
             <!-- Filters -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
@@ -1690,6 +1716,11 @@
 
         <!-- ============ PAGE 5b: STOCK LEDGER ============ -->
         <section id="ledger" class="page-section">
+            <div class="htab-bar">
+                <button class="htab-btn" onclick="navigateToSection('transactions')">Stock Transaction</button>
+                <button class="htab-btn" onclick="navigateToSection('summary')">Stock Summary</button>
+                <button class="htab-btn active" onclick="navigateToSection('ledger')">Ledger</button>
+            </div>
             <h2 class="text-3xl font-bold mb-6" data-i18n="nav_ledger">Stock Ledger</h2>
             <!-- Filters -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
@@ -1780,6 +1811,11 @@
 
         <!-- ============ PAGE 8: MANURING PROGRESS SUMMARY ============ -->
         <section id="roundprogress" class="page-section">
+            <div class="htab-bar">
+                <button class="htab-btn active" onclick="navigateToSection('roundprogress')">Manuring Progress</button>
+                <button class="htab-btn" onclick="navigateToSection('maintprogress')">Maintenance Progress</button>
+                <button class="htab-btn" onclick="navigateToSection('chemusage')">Chemical Usage</button>
+            </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="nav_roundprogress">Manuring Progress Summary</h2>
             <p class="text-sm text-green-700 mb-6" data-i18n="progress_subtitle">Track fertilizer application progress across manuring rounds and blocks. Compare actual quantities applied against the budgeted fertilizer requirement.</p>
 
@@ -1879,6 +1915,11 @@
 
         <!-- ============ PAGE 10: MAINTENANCE PROGRESS & CHEMICAL USAGE ============ -->
         <section id="maintprogress" class="page-section">
+            <div class="htab-bar">
+                <button class="htab-btn" onclick="navigateToSection('roundprogress')">Manuring Progress</button>
+                <button class="htab-btn active" onclick="navigateToSection('maintprogress')">Maintenance Progress</button>
+                <button class="htab-btn" onclick="navigateToSection('chemusage')">Chemical Usage</button>
+            </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_maintprogress">📊 Maintenance Progress</h2>
             <p class="text-sm text-green-700 mb-6" data-i18n="page_maintprogress_sub">Track field maintenance progress by round and block. Record claimed maintenance area and monitor completion against planned block coverage.</p>
 
@@ -1997,6 +2038,11 @@
 
         <!-- ============ PAGE: CHEMICAL USAGE ============ -->
         <section id="chemusage" class="page-section">
+            <div class="htab-bar">
+                <button class="htab-btn" onclick="navigateToSection('roundprogress')">Manuring Progress</button>
+                <button class="htab-btn" onclick="navigateToSection('maintprogress')">Maintenance Progress</button>
+                <button class="htab-btn active" onclick="navigateToSection('chemusage')">Chemical Usage</button>
+            </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_chemusage">&#x2697;&#xFE0F; Chemical Usage</h2>
             <p class="text-sm text-green-700 mb-6" data-i18n="page_chemusage_sub">View chemical usage per hectare by round and block. Manage active ingredient definitions and maximum dosage rates.</p>
 
@@ -2152,6 +2198,11 @@
                 <button class="mrec-tab" onclick="navToSection('chemrecord')">⚗️ Chemical</button>
                 <button class="mrec-tab" onclick="navToSection('plantrecord')">🌱 Planting</button>
             </div>
+            <div class="htab-bar">
+                <button class="htab-btn active" onclick="navigateToSection('fertrecord')">Fertilizer Record</button>
+                <button class="htab-btn" onclick="navigateToSection('chemrecord')">Chemical Record</button>
+                <button class="htab-btn" onclick="navigateToSection('plantrecord')">Field Planting Record</button>
+            </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_fertrecord">&#128203; Fertilizer Application Record</h2>
             <p class="text-sm text-green-700 mb-6" data-i18n="page_fertrecord_sub">Daily fertilizer transactions by block and manuring round — track quantity in, quantity out, and running balance per fertilizer.</p>
 
@@ -2196,6 +2247,11 @@
                 <button class="mrec-tab active" onclick="navToSection('chemrecord')">⚗️ Chemical</button>
                 <button class="mrec-tab" onclick="navToSection('plantrecord')">🌱 Planting</button>
             </div>
+            <div class="htab-bar">
+                <button class="htab-btn" onclick="navigateToSection('fertrecord')">Fertilizer Record</button>
+                <button class="htab-btn active" onclick="navigateToSection('chemrecord')">Chemical Record</button>
+                <button class="htab-btn" onclick="navigateToSection('plantrecord')">Field Planting Record</button>
+            </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_chemrecord">&#9879;&#65039; Chemical Application Record</h2>
             <p class="text-sm text-blue-700 mb-6" data-i18n="page_chemrecord_sub">Daily chemical transactions by block — track quantity in, quantity out, and running balance per chemical item.</p>
 
@@ -2239,6 +2295,11 @@
                 <button class="mrec-tab" onclick="navToSection('fertrecord')">📋 Fertilizer</button>
                 <button class="mrec-tab" onclick="navToSection('chemrecord')">⚗️ Chemical</button>
                 <button class="mrec-tab active" onclick="navToSection('plantrecord')">🌱 Planting</button>
+            </div>
+            <div class="htab-bar">
+                <button class="htab-btn" onclick="navigateToSection('fertrecord')">Fertilizer Record</button>
+                <button class="htab-btn" onclick="navigateToSection('chemrecord')">Chemical Record</button>
+                <button class="htab-btn active" onclick="navigateToSection('plantrecord')">Field Planting Record</button>
             </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_plantrecord">🌱 Field Planting Record</h2>
             <p class="text-sm text-amber-700 mb-6" data-i18n="page_plantrecord_sub">Daily seedling transactions by block — track quantity in, quantity out, and running balance per seedling item.</p>
@@ -3241,6 +3302,9 @@ navButtons.forEach(btn => {
             }
         }
 
+        // Toggle home-mode (hides sidebar on home page)
+        const _layout = document.getElementById('appLayout');
+        if (_layout) _layout.classList.toggle('home-mode', target === 'home');
         // toggle nav active class
         navButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
@@ -7894,6 +7958,9 @@ function bootApp(session) {
             document.querySelectorAll('.nav-item[data-target]').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('data-target') === lastSectionId);
             });
+            // Ensure home-mode is off when resuming a non-home section
+            const _layout2 = document.getElementById('appLayout');
+            if (_layout2) _layout2.classList.toggle('home-mode', lastSectionId === 'home');
         } else {
             const home = document.getElementById('home');
             if (home) {
@@ -7901,6 +7968,8 @@ function bootApp(session) {
                 document.querySelectorAll('.nav-item[data-target]').forEach(btn => {
                     btn.classList.toggle('active', btn.getAttribute('data-target') === 'home');
                 });
+                const _layout = document.getElementById('appLayout');
+                if (_layout) _layout.classList.add('home-mode');
             }
         }
     }
@@ -11211,9 +11280,14 @@ function navigateToSection(target) {
     const session = loadSession();
     if (session && session.role !== 'superadmin') {
         if (['useradmin','settings','items','locations','manuring','fieldmaint'].includes(target)) return;
-        const access = typeof getSectionAccess === 'function' ? getSectionAccess(session, target) : 'none';
-        if (access === 'none') { alert('You do not have permission to access this section.'); return; }
+        if (target !== 'home') {
+            const access = typeof getSectionAccess === 'function' ? getSectionAccess(session, target) : 'none';
+            if (access === 'none') { alert('You do not have permission to access this section.'); return; }
+        }
     }
+    // Toggle home-mode (hides sidebar on home page)
+    const layout = document.getElementById('appLayout');
+    if (layout) layout.classList.toggle('home-mode', target === 'home');
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
     const navBtn = document.querySelector('.nav-item[data-target="' + target + '"]');
     if (navBtn) navBtn.classList.add('active');
