@@ -1284,11 +1284,16 @@
 
 
             <!-- Dashboard As at Date Filter -->
-            <div style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-radius:16px;padding:14px 18px;margin-bottom:24px;box-shadow:0 4px 16px rgba(27,94,32,.25);">
-                <p style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">As at Date</p>
-                <input id="dashAsAt" type="date" onchange="renderDashboardFilters();"
-                    style="width:100%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:9px 12px;font-size:14px;font-weight:600;color:#fff;outline:none;cursor:pointer;font-family:Inter,sans-serif;color-scheme:dark;" />
-                <p id="dashFilterNote" class="hidden" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:6px;font-style:italic;"></p>
+            <div class="bg-white rounded-xl shadow mb-6 p-3 flex items-center gap-3 flex-wrap">
+                <span class="text-xs font-bold text-green-900 flex-shrink-0">As at Date</span>
+                <div class="relative cursor-pointer bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 flex items-center gap-2 flex-shrink-0" onclick="openDatePicker('dashAsAt')">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:#1B5E20"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span id="dashAsAtDisplay" class="text-xs font-semibold text-green-800 whitespace-nowrap">Select date</span>
+                    <input id="dashAsAt" type="date" onchange="updateDashDateDisplay();renderDashboardFilters();"
+                        style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
+                </div>
+                <button onclick="clearDashFilter()" class="text-xs text-gray-400 hover:text-gray-600 flex-shrink-0">Clear</button>
+                <p id="dashFilterNote" class="hidden text-xs text-blue-600 italic">Showing stock balance as at selected date</p>
             </div>
 
             <!-- Stock Level Charts — one card per category -->
@@ -6118,11 +6123,23 @@ function _datePlaceholder() {
     return currentLang === 'ms' ? 'Pilih tarikh' : 'Select date';
 }
 
-function updateDashDateDisplay() { /* no-op: native input shows its own value */ }
+/** Updates the visible date label in the As at Date picker card. */
+function updateDashDateDisplay() {
+    var val = (document.getElementById('dashAsAt') || {}).value || '';
+    var el  = document.getElementById('dashAsAtDisplay');
+    if (!el) return;
+    if (val) {
+        el.textContent = new Date(val + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    } else {
+        var today = new Date();
+        el.textContent = 'Today (' + today.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ')';
+    }
+}
 
 function clearDashFilter() {
     var inp = document.getElementById('dashAsAt');
     if (inp) inp.value = '';
+    updateDashDateDisplay();
     renderDashboardFilters();
 }
 
@@ -6171,9 +6188,7 @@ function refreshAll() {
     renderMrBlocksGrid();
     renderFmBlocksGrid();
     renderLiveStock();
-    // Default the As at Date to today if not already set
-    var dashAsAtEl = document.getElementById('dashAsAt');
-    if (dashAsAtEl && !dashAsAtEl.value) dashAsAtEl.value = new Date().toISOString().slice(0,10);
+    updateDashDateDisplay();
     renderLiveStockChart();
     renderSummary();
     renderLedger();
