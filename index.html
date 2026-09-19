@@ -7550,7 +7550,7 @@ const SUPER_ADMIN = {
 // Convert a plain User ID to Supabase Auth email format.
 // If the input already contains '@' (e.g. Super Admin's real email), it is returned as-is.
 function toAuthEmail(userId) {
-    return userId.includes('@') ? userId : userId + '@psms.local';
+    return userId.includes('@') ? userId : userId + '@psms.app';
 }
 
 // All account types available in the system.
@@ -8746,7 +8746,7 @@ function buildUserRow(u) {
             : `<span class="text-gray-400 text-xs">Dashboard only</span>`;
     }
 
-    const displayId = (u.email || '').replace(/@psms\.local$/, '');
+    const displayId = (u.email || '').replace(/@psms\.app$/, '');
     return `
     <tr class="border-b border-green-50">
         <td class="px-3 py-2 font-semibold">${u.name}</td>
@@ -11240,7 +11240,7 @@ function populateChemFilters() {
         if(aname)  aname.textContent  = name || email;
         if(arole)  arole.textContent  = roleLabel;
         if(dname)  dname.textContent  = name || email;
-        if(demail) demail.textContent = email.replace(/@psms\.local$/, '');
+        if(demail) demail.textContent = email.replace(/@psms\.app$/, '');
     }
     window.toggleAvatarDropdown = function(e){
         e.stopPropagation();
@@ -11271,7 +11271,7 @@ function populateChemFilters() {
         if(el('profileAvatarCircle')) el('profileAvatarCircle').textContent = initials;
         if(el('profileName'))        el('profileName').textContent        = name;
         if(el('profileRole'))        el('profileRole').textContent        = roleLabel;
-        if(el('profileEmail'))       el('profileEmail').textContent       = email.replace(/@psms\.local$/, '');
+        if(el('profileEmail'))       el('profileEmail').textContent       = email.replace(/@psms\.app$/, '');
         if(el('profileRoleDetail'))  el('profileRoleDetail').textContent  = roleLabel;
         var m = el('profileModal');
         if(m){ m.style.display='flex'; }
