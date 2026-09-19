@@ -1451,9 +1451,9 @@
         <!-- ============ PAGE 3: STOCK TRANSACTION ============ -->
         <section id="transactions" class="page-section">
             <div class="htab-bar">
-                <button class="htab-btn active" onclick="navigateToSection('transactions')">Record Stock</button>
-                <button class="htab-btn" onclick="navigateToSection('summary')">Stock Transactions</button>
-                <button class="htab-btn" onclick="navigateToSection('ledger')">Ledger</button>
+                <button class="htab-btn active" onclick="navigateToSection('transactions')" data-i18n="tab_record_stock">Record Stock</button>
+                <button class="htab-btn" onclick="navigateToSection('summary')" data-i18n="tab_stock_transactions">Stock Transactions</button>
+                <button class="htab-btn" onclick="navigateToSection('ledger')" data-i18n="tab_stock_summary">Stock Summary</button>
             </div>
             <h2 class="text-3xl font-bold mb-6" data-i18n="nav_transactions">Record Stock</h2>
             <div class="bg-white p-6 rounded-xl shadow">
@@ -1598,9 +1598,9 @@
         <!-- ============ PAGE 5: STOCK SUMMARY (Audit Trail) ============ -->
         <section id="summary" class="page-section">
             <div class="htab-bar">
-                <button class="htab-btn" onclick="navigateToSection('transactions')">Record Stock</button>
-                <button class="htab-btn active" onclick="navigateToSection('summary')">Stock Transactions</button>
-                <button class="htab-btn" onclick="navigateToSection('ledger')">Ledger</button>
+                <button class="htab-btn" onclick="navigateToSection('transactions')" data-i18n="tab_record_stock">Record Stock</button>
+                <button class="htab-btn active" onclick="navigateToSection('summary')" data-i18n="tab_stock_transactions">Stock Transactions</button>
+                <button class="htab-btn" onclick="navigateToSection('ledger')" data-i18n="tab_stock_summary">Stock Summary</button>
             </div>
             <h2 class="text-3xl font-bold mb-6" data-i18n="nav_summary">Stock Transactions</h2>
             <!-- Filters -->
@@ -1691,9 +1691,9 @@
         <!-- ============ PAGE 5b: STOCK LEDGER ============ -->
         <section id="ledger" class="page-section">
             <div class="htab-bar">
-                <button class="htab-btn" onclick="navigateToSection('transactions')">Record Stock</button>
-                <button class="htab-btn" onclick="navigateToSection('summary')">Stock Transactions</button>
-                <button class="htab-btn active" onclick="navigateToSection('ledger')">Stock Summary</button>
+                <button class="htab-btn" onclick="navigateToSection('transactions')" data-i18n="tab_record_stock">Record Stock</button>
+                <button class="htab-btn" onclick="navigateToSection('summary')" data-i18n="tab_stock_transactions">Stock Transactions</button>
+                <button class="htab-btn active" onclick="navigateToSection('ledger')" data-i18n="tab_stock_summary">Stock Summary</button>
             </div>
             <h2 class="text-3xl font-bold mb-6" data-i18n="nav_ledger">Stock Summary</h2>
             <!-- Filters -->
@@ -6746,6 +6746,9 @@ const I18N = {
         sb_lbl_transactions: 'Record Stock',
         sb_lbl_summary:      'Stock Transactions',
         sb_lbl_ledger:       'Stock Summary',
+        tab_record_stock:    'Record Stock',
+        tab_stock_transactions: 'Stock Transactions',
+        tab_stock_summary:   'Stock Summary',
         sb_lbl_locations:    'Location Area',
         sb_lbl_manuring:     'Manuring Program',
         sb_lbl_roundprogress:'Manuring Progress',
@@ -7057,6 +7060,9 @@ const I18N = {
         sb_lbl_transactions: 'Rekod Stok',
         sb_lbl_summary:      'Transaksi Stok',
         sb_lbl_ledger:       'Ringkasan Stok',
+        tab_record_stock:    'Rekod Stok',
+        tab_stock_transactions: 'Transaksi Stok',
+        tab_stock_summary:   'Ringkasan Stok',
         sb_lbl_locations:    'Kawasan Lokasi',
         sb_lbl_manuring:     'Program Pembajaan',
         sb_lbl_roundprogress:'Kemajuan Pembajaan',
