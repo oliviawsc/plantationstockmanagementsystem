@@ -4668,18 +4668,11 @@ function renderSummary() {
          */
         function formatQty(qty) {
             if (!item || !pkgUnit || !factor) {
-                // No conversion available — just show base qty + unit
                 return `${qty} ${baseUnit}`;
             }
-            if (defUnit === 'package') {
-                const pkgQty     = (factor > 0 ? qty / factor : 0);
-                const secondaryHtml = `<span class="text-gray-400 text-xs">(${qty} ${baseUnit})</span>`;
-                return `${pkgQty.toFixed(2)} ${pkgUnit} ${secondaryHtml}`;
-            } else {
-                const pkgQty    = (factor > 0 ? qty / factor : 0);
-                const secondaryHtml = `<span class="text-gray-400 text-xs">(${pkgQty.toFixed(2)} ${pkgUnit})</span>`;
-                return `${qty} ${baseUnit} ${secondaryHtml}`;
-            }
+            // Always display in package unit only
+            const pkgQty = factor > 0 ? qty / factor : 0;
+            return `${pkgQty.toFixed(2)} ${pkgUnit}`;
         }
 
         const qtyIn  = (t.type === 'In'  || t.type === 'Adj') ? formatQty(baseQty) : '';
@@ -4699,13 +4692,10 @@ function renderSummary() {
         const balance = calcBalanceUpTo(t.itemId, t);
         // Format balance the same way
         const balanceDisplay = (() => {
-            if (!item || !pkgUnit || !factor) return `${balance} ${baseUnit}`;
-            if (defUnit === 'package') {
-                const pkgBal = factor > 0 ? balance / factor : 0;
-                return `${pkgBal.toFixed(2)} ${pkgUnit} <span class="text-gray-400 text-xs">(${parseFloat(balance).toFixed(2)} ${baseUnit})</span>`;
-            }
+            if (!item || !pkgUnit || !factor) return `${parseFloat(balance).toFixed(2)} ${baseUnit}`;
+            // Always display in package unit only
             const pkgBal = factor > 0 ? balance / factor : 0;
-            return `${parseFloat(balance).toFixed(2)} ${baseUnit} <span class="text-gray-400 text-xs">(${pkgBal.toFixed(2)} ${pkgUnit})</span>`;
+            return `${pkgBal.toFixed(2)} ${pkgUnit}`;
         })();
 
         const d = I18N[currentLang] || I18N['en'];
@@ -4993,26 +4983,22 @@ function buildLedgerPivot() {
     return { itemList, months };
 }
 
-// Formats a base-unit quantity for display, with the package-unit
-// equivalent shown alongside it (smaller, muted) when the item defines a
-// packageUnit + qtyPerUnit conversion — e.g. "200.00 kg (4.00 bag)".
+// Formats a quantity for display in package unit only (when defined).
 function formatLedgerDualQty(baseQty, it) {
-    const baseHtml = `${formatLedgerQty(baseQty)} ${it.unit}`;
     if (it.packageUnit && it.qtyPerUnit > 0) {
         const pkgQty = baseQty / it.qtyPerUnit;
-        return `${baseHtml} <span class="text-gray-400 text-xs">(${formatLedgerQty(pkgQty)} ${it.packageUnit})</span>`;
+        return `${formatLedgerQty(pkgQty)} ${it.packageUnit}`;
     }
-    return baseHtml;
+    return `${formatLedgerQty(baseQty)} ${it.unit}`;
 }
 
 // Plain-text equivalent of formatLedgerDualQty for the Excel export (no HTML).
 function formatLedgerDualQtyPlain(baseQty, it) {
-    const baseStr = `${baseQty.toFixed(2)} ${it.unit}`;
     if (it.packageUnit && it.qtyPerUnit > 0) {
         const pkgQty = baseQty / it.qtyPerUnit;
-        return `${baseStr} (${pkgQty.toFixed(2)} ${it.packageUnit})`;
+        return `${pkgQty.toFixed(2)} ${it.packageUnit}`;
     }
-    return baseStr;
+    return `${baseQty.toFixed(2)} ${it.unit}`;
 }
 
 function renderLedger() {
