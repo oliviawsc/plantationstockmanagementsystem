@@ -2335,82 +2335,77 @@
         <!-- ============ PAGE 12: USER MANAGEMENT (Super Admin only) ============ -->
         <section id="useradmin" class="page-section">
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_useradmin">👤 User Management</h2>
-            <p class="text-sm text-green-700 mb-6">Register normal users, assign their estate, and control which sections they can access.</p>
+            <p class="text-sm text-green-700 mb-6">Register users and manage their access to the system.</p>
 
-            <!-- Register new user -->
-            <div class="bg-white p-6 rounded-xl shadow mb-8">
-                <h3 class="text-xl font-bold mb-1">Register New User</h3>
-                <p class="text-xs text-gray-400 mb-4">Creates a Supabase Auth account and assigns the user's role and access. Requires <b>Email Signup</b> to be enabled in Supabase Auth settings.</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Full Name</label>
-                        <input id="regName" type="text" placeholder="e.g. Ahmad bin Ali"
-                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Email</label>
-                        <input id="regEmail" type="email" placeholder="user@estate.com"
-                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Password</label>
-                        <input id="regPassword" type="password" placeholder="Min 6 characters"
-                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold mb-1">Account Type</label>
-                        <select id="regRole" onchange="toggleRegPermissionsSection()"
-                            class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600 bg-white">
-                            <!-- Options populated by JS via buildRoleOptions() on DOMContentLoaded -->
-                        </select>
-                    </div>
-                    <!-- Estates — hidden for Admin role -->
-                    <div class="md:col-span-2" id="regEstatesSection">
-                        <label class="block text-sm font-semibold mb-2">Estates <span class="text-red-500">*</span> <span class="text-gray-400 font-normal text-xs">(select one or more)</span></label>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="regEstatesGrid">
-                            <!-- Populated dynamically from GLOBAL_ESTATES on boot and after any Settings change -->
-                        </div>
-                    </div>
-                    <!-- Section access (hidden for admin role) -->
-                    <div class="md:col-span-2" id="regPermissionsSection">
-                        <label class="block text-sm font-semibold mb-2">Sections Allowed to Access</label>
-                        <div class="border border-green-200 rounded-lg p-3 bg-green-50" id="regPermissionsGrid">
-                            <!-- Rendered by JS -->
-                        </div>
-                        <p class="text-xs text-gray-400 mt-1"><b>View</b> = read-only. <b>Edit</b> = full access.</p>
-                    </div>
-                    <!-- Admin role notice -->
-                    <div class="md:col-span-2 hidden" id="regAdminNotice">
-                        <div class="border border-purple-200 rounded-lg p-3 bg-purple-50 text-sm text-purple-800">
-                            ⭐ <b>Admin</b> has full access to all sections and all estates, including User Management.
-                        </div>
-                    </div>
-                    <div class="md:col-span-2 flex gap-3">
-                        <button onclick="registerUser()"
-                            class="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-lg font-semibold">
-                            ➕ Assign Profile
+            <!-- Panel 1: User list (shown by default) -->
+            <div id="userListPanel">
+                <div class="bg-white p-6 rounded-xl shadow">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                        <h3 class="text-xl font-bold">Registered Users</h3>
+                        <button onclick="showRegisterPanel()"
+                            style="display:flex;align-items:center;gap:7px;padding:8px 18px;background:linear-gradient(135deg,#2E7D32,#43A047);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(46,125,50,.25);"
+                            onmouseover="this.style.filter='brightness(1.07)'" onmouseout="this.style.filter='none'">
+                            ➕ Add User
                         </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-green-100 text-green-800">
+                                <tr>
+                                    <th class="px-3 py-2 text-left">Name</th>
+                                    <th class="px-3 py-2 text-left">User ID</th>
+                                    <th class="px-3 py-2 text-left">Role</th>
+                                    <th class="px-3 py-2 text-left">Estate</th>
+                                    <th class="px-3 py-2 text-left">Sections Allowed</th>
+                                    <th class="px-3 py-2 text-left">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <!-- Registered users list -->
-            <div class="bg-white p-6 rounded-xl shadow">
-                <h3 class="text-xl font-bold mb-4">Registered Users</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm">
-                        <thead class="bg-green-100 text-green-800">
-                            <tr>
-                                <th class="px-3 py-2 text-left">Name</th>
-                                <th class="px-3 py-2 text-left">Email</th>
-                                <th class="px-3 py-2 text-left">Role</th>
-                                <th class="px-3 py-2 text-left">Estate</th>
-                                <th class="px-3 py-2 text-left">Sections Allowed</th>
-                                <th data-i18n="col_action" class="px-3 py-2 text-left">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="usersTableBody"></tbody>
-                    </table>
+            <!-- Panel 2: Register new user (hidden by default) -->
+            <div id="registerUserPanel" class="hidden">
+                <div class="bg-white p-6 rounded-xl shadow" style="max-width:520px;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                        <button onclick="showUserListPanel()"
+                            style="display:flex;align-items:center;gap:5px;padding:6px 14px;border:1px solid #D1FAE5;background:#F0FDF4;color:#1B5E20;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;"
+                            onmouseover="this.style.background='#D1FAE5'" onmouseout="this.style.background='#F0FDF4'">
+                            ← Back
+                        </button>
+                        <h3 class="text-xl font-bold">Register New User</h3>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">Full Name <span class="text-red-500">*</span></label>
+                            <input id="regName" type="text" placeholder="e.g. Ahmad bin Ali"
+                                class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">User ID <span class="text-red-500">*</span></label>
+                            <input id="regEmail" type="text" placeholder="e.g. ahmad.ali@company.com"
+                                class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">Password <span class="text-red-500">*</span></label>
+                            <input id="regPassword" type="password" placeholder="Min 6 characters"
+                                class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                        </div>
+                        <!-- Hidden fields kept for JS compatibility -->
+                        <select id="regRole" style="display:none;"><option value="estate_user">estate_user</option></select>
+                        <div id="regEstatesSection" style="display:none;"><div id="regEstatesGrid"></div></div>
+                        <div id="regPermissionsSection" style="display:none;"><div id="regPermissionsGrid"></div></div>
+                        <div id="regAdminNotice" style="display:none;"></div>
+                        <div>
+                            <button onclick="registerUser()"
+                                style="width:100%;padding:10px;background:linear-gradient(135deg,#2E7D32,#43A047);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;font-family:Inter,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(46,125,50,.25);"
+                                onmouseover="this.style.filter='brightness(1.07)'" onmouseout="this.style.filter='none'">
+                                ✅ Register User
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -8555,33 +8550,33 @@ function isEditAllowed(sectionId) {
     return getSectionAccess(session, sectionId) === 'edit';
 }
 
+function showRegisterPanel() {
+    document.getElementById('userListPanel').classList.add('hidden');
+    document.getElementById('registerUserPanel').classList.remove('hidden');
+    document.getElementById('regName').value  = '';
+    document.getElementById('regEmail').value = '';
+    const pw = document.getElementById('regPassword');
+    if (pw) pw.value = '';
+}
+
+function showUserListPanel() {
+    document.getElementById('registerUserPanel').classList.add('hidden');
+    document.getElementById('userListPanel').classList.remove('hidden');
+}
+
 async function registerUser() {
     const name     = document.getElementById('regName').value.trim();
     const email    = document.getElementById('regEmail').value.trim().toLowerCase();
     const password = (document.getElementById('regPassword') || {}).value || '';
-    const role     = (document.getElementById('regRole') || {}).value || 'user';
-    const isAdmin  = role === 'superadmin';
-    const estates  = isAdmin ? [] : [...document.querySelectorAll('.reg-estate-cb:checked')].map(cb => cb.value);
+    const role     = 'estate_user'; // default role; can be changed via edit
+    const estates  = [];
+    const perms    = {};
 
-    const perms = {};
-    if (!isAdmin) {
-        ALL_SECTIONS.forEach(s => {
-            const checked = document.querySelector(`input[name="perm_reg_${s.id}"]:checked`);
-            const val = checked ? checked.value : 'none';
-            // For estate users, save 'none' explicitly on sections that have defaults so
-            // the admin's explicit "deny" can override the default in getSectionAccess.
-            if (val !== 'none' || (role === 'estate_user' && s.id in ESTATE_MOBILE_DEFAULTS)) {
-                perms[s.id] = val;
-            }
-        });
-    }
+    if (!name || !email)             { alert('Please fill in Full Name and User ID.'); return; }
+    if (password.length < 6)         { alert('Password must be at least 6 characters.'); return; }
+    if (email === SUPER_ADMIN.email) { alert('That User ID belongs to the Super Admin.'); return; }
 
-    if (!name || !email)                          { alert('Please fill in Name and Email.'); return; }
-    if (!isAdmin && estates.length === 0)         { alert('Please select at least one Estate.'); return; }
-    if (password && password.length < 6)          { alert('Password must be at least 6 characters.'); return; }
-    if (email === SUPER_ADMIN.email)              { alert('That email belongs to the Super Admin.'); return; }
-
-    const regBtn = document.querySelector('button[onclick="registerUser()"]');
+    const regBtn = document.querySelector('#registerUserPanel button[onclick="registerUser()"]');
     if (regBtn) { regBtn.disabled = true; regBtn.textContent = 'Saving…'; }
 
     try {
@@ -8614,17 +8609,14 @@ async function registerUser() {
         document.getElementById('regEmail').value = '';
         const pwEl = document.getElementById('regPassword');
         if (pwEl) pwEl.value = '';
-        if (document.getElementById('regRole')) document.getElementById('regRole').value = 'estate_user';
-        document.querySelectorAll('.reg-estate-cb').forEach(cb => cb.checked = false);
-        toggleRegPermissionsSection();
-        renderPermissionCheckboxes();
 
         await renderUsersTable();
+        showUserListPanel(); // Return to list after successful registration
     } catch (err) {
         console.error('[Supabase] registerUser failed', err);
         alert('Could not register user — ' + (err.message || 'please check your connection and try again.'));
     } finally {
-        if (regBtn) { regBtn.disabled = false; regBtn.textContent = '➕ Register User'; }
+        if (regBtn) { regBtn.disabled = false; regBtn.textContent = '✅ Register User'; }
     }
 }
 
