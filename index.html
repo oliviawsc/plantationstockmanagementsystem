@@ -100,6 +100,16 @@
         .page-section{display:none}
         .page-section.active{display:block}
 
+        /* Home card grid */
+        .home-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+        @media(max-width:640px){.home-card-grid{grid-template-columns:repeat(2,1fr);gap:14px}}
+        .home-card{background:linear-gradient(145deg,#1B5E20 0%,#2E7D32 100%);border:none;border-radius:20px;padding:32px 20px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;cursor:pointer;color:#fff;transition:transform .18s,box-shadow .18s;box-shadow:0 4px 20px rgba(27,94,32,.3);width:100%}
+        .home-card:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(27,94,32,.4)}
+        .home-card:active{transform:translateY(-1px)}
+        .home-card-icon{width:68px;height:68px;border-radius:18px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .home-card-title{font-size:15px;font-weight:700;color:#fff;text-align:center;line-height:1.3}
+        .home-card-badge{font-size:11px;font-weight:600;background:rgba(255,255,255,.18);color:#fff;padding:3px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.25)}
+
         /* Card */
         .card{background:#fff;border:1px solid #E5E7EB;border-radius:18px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.05);margin-bottom:24px}
         .dark .card{background:#16162A;border-color:#252540}
@@ -989,7 +999,8 @@
         <!-- Nav -->
         <nav style="padding:8px;flex:1;overflow-y:auto;">
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:6px 8px 3px;">Overview</p>
-            <button data-target="dashboard"     class="nav-item active">    <span class="nav-icon">&#128202;</span><span class="sb-label" data-i18n="sb_lbl_dashboard">Dashboard</span></button>
+            <button data-target="home"          class="nav-item active" id="navHome">  <span class="nav-icon">&#127968;</span><span class="sb-label">Home</span></button>
+            <button data-target="dashboard"     class="nav-item">           <span class="nav-icon">&#128202;</span><span class="sb-label" data-i18n="sb_lbl_dashboard">Dashboard</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;">Stock</p>
             <button data-target="transactions"  class="nav-item">        <span class="nav-icon">&#128260;</span><span class="sb-label" data-i18n="sb_lbl_transactions">Stock Transaction</span></button>
             <button data-target="summary"       class="nav-item">             <span class="nav-icon">&#128209;</span><span class="sb-label" data-i18n="sb_lbl_summary">Stock Summary</span></button>
@@ -1163,7 +1174,84 @@
 
 
         <!-- ============ PAGE 1: DASHBOARD ============ -->
-        <section id="dashboard" class="page-section active">
+        <!-- ═══════════════════════════════════════════════
+             HOME PAGE — clickable module cards
+        ═══════════════════════════════════════════════ -->
+        <section id="home" class="page-section active">
+            <div style="max-width:960px;margin:0 auto;padding:40px 16px 60px;">
+                <div style="text-align:center;margin-bottom:36px;">
+                    <h1 style="font-size:26px;font-weight:800;color:#1B5E20;margin-bottom:8px;">OilPalm Stock Management</h1>
+                    <p style="color:#6B7280;font-size:14px;">Select a module to get started</p>
+                </div>
+                <div class="home-card-grid">
+                    <!-- Dashboard -->
+                    <button class="home-card" onclick="navigateToSection('dashboard')">
+                        <div class="home-card-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                                <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                            </svg>
+                        </div>
+                        <span class="home-card-title">Dashboard</span>
+                    </button>
+                    <!-- Stock Records -->
+                    <button class="home-card" onclick="navigateToSection('transactions')">
+                        <div class="home-card-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                                <polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                            </svg>
+                        </div>
+                        <span class="home-card-title">Stock Records</span>
+                    </button>
+                    <!-- Field Operations -->
+                    <button class="home-card" onclick="navigateToSection('roundprogress')">
+                        <div class="home-card-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22V12"/><path d="M12 12C12 7 7 3 2 3c0 5 4 9 10 9z"/>
+                                <path d="M12 12c0-5 5-9 10-9 0 5-4 9-10 9z"/>
+                            </svg>
+                        </div>
+                        <span class="home-card-title">Field Operations</span>
+                    </button>
+                    <!-- Reports -->
+                    <button class="home-card" onclick="navigateToSection('summary')">
+                        <div class="home-card-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+                                <line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>
+                            </svg>
+                        </div>
+                        <span class="home-card-title">Reports</span>
+                    </button>
+                    <!-- Settings (superadmin only) -->
+                    <button class="home-card hidden" id="homeCardSettings" onclick="navigateToSection('settings')">
+                        <div class="home-card-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                            </svg>
+                        </div>
+                        <span class="home-card-title">Settings</span>
+                        <span class="home-card-badge">Super Admin</span>
+                    </button>
+                    <!-- User Management (superadmin only) -->
+                    <button class="home-card hidden" id="homeCardUserAdmin" onclick="navigateToSection('useradmin')">
+                        <div class="home-card-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                        </div>
+                        <span class="home-card-title">User Management</span>
+                        <span class="home-card-badge">Super Admin</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="dashboard" class="page-section">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
                 <h2 class="text-3xl font-bold" data-i18n="nav_dashboard">Dashboard</h2>
                 <button id="dashPrintBtn" onclick="printDashboard()"
@@ -3143,10 +3231,13 @@ navButtons.forEach(btn => {
         const session = loadSession();
         if (session && session.role !== 'superadmin') {
             if (['useradmin','settings','items','locations','manuring','fieldmaint'].includes(target)) return; // setup pages are superadmin-only
-            const access = typeof getSectionAccess === 'function' ? getSectionAccess(session, target) : 'none';
-            if (access === 'none') {
-                alert('You do not have permission to access this section.');
-                return;
+            if (target === 'home') { /* home is always accessible */ }
+            else {
+                const access = typeof getSectionAccess === 'function' ? getSectionAccess(session, target) : 'none';
+                if (access === 'none') {
+                    alert('You do not have permission to access this section.');
+                    return;
+                }
             }
         }
 
@@ -7804,8 +7895,13 @@ function bootApp(session) {
                 btn.classList.toggle('active', btn.getAttribute('data-target') === lastSectionId);
             });
         } else {
-            const dash = document.getElementById('dashboard');
-            if (dash) dash.classList.add('active');
+            const home = document.getElementById('home');
+            if (home) {
+                home.classList.add('active');
+                document.querySelectorAll('.nav-item[data-target]').forEach(btn => {
+                    btn.classList.toggle('active', btn.getAttribute('data-target') === 'home');
+                });
+            }
         }
     }
 
@@ -8026,10 +8122,16 @@ function applyNavPermissions(session) {
     document.getElementById('navManuring').classList.toggle('hidden', !isSuperAdmin);
     document.getElementById('navFieldmaint').classList.toggle('hidden', !isSuperAdmin);
 
+    // Show/hide admin-only home page cards
+    const homeCardSettings  = document.getElementById('homeCardSettings');
+    const homeCardUserAdmin = document.getElementById('homeCardUserAdmin');
+    if (homeCardSettings)  homeCardSettings.classList.toggle('hidden', !isSuperAdmin);
+    if (homeCardUserAdmin) homeCardUserAdmin.classList.toggle('hidden', !isSuperAdmin);
+
     // Show/hide each nav button based on permissions
     document.querySelectorAll('[data-target]').forEach(btn => {
         const target = btn.getAttribute('data-target');
-        if (['useradmin','settings','items','locations','manuring','fieldmaint'].includes(target)) return; // handled above
+        if (['home','useradmin','settings','items','locations','manuring','fieldmaint'].includes(target)) return; // handled above or always visible
 
         const access = getSectionAccess(session, target);
         const allowed = isSuperAdmin || access === 'view' || access === 'edit';
@@ -11103,6 +11205,31 @@ function populateChemFilters() {
 // ══════════════════════════════════════════════════════════════════════
 // SETTINGS TAB SWITCHING
 // ══════════════════════════════════════════════════════════════════════
+
+// ── Home page navigation helper ──────────────────────────────────────
+function navigateToSection(target) {
+    const session = loadSession();
+    if (session && session.role !== 'superadmin') {
+        if (['useradmin','settings','items','locations','manuring','fieldmaint'].includes(target)) return;
+        const access = typeof getSectionAccess === 'function' ? getSectionAccess(session, target) : 'none';
+        if (access === 'none') { alert('You do not have permission to access this section.'); return; }
+    }
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    const navBtn = document.querySelector('.nav-item[data-target="' + target + '"]');
+    if (navBtn) navBtn.classList.add('active');
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    const sec = document.getElementById(target);
+    if (sec) sec.classList.add('active');
+    sessionStorage.setItem('opp_active_section', target);
+    refreshAll();
+    if (target === 'maintprogress') renderMaintProgressDropdowns();
+    if (target === 'chemusage') { renderCiTable(); renderChemByRound(); renderChemByBlock(); }
+    if (target === 'fertrecord') renderFertRecord();
+    if (target === 'chemrecord') renderChemRecord();
+    if (target === 'plantrecord') renderPlantRecord();
+    if (target === 'settings') { renderEstatesList(); renderItemsTable(); renderManuringRounds(); renderMrBlocksGrid(); renderFieldMaintRounds(); renderFmBlocksGrid(); renderCiTable(); }
+    if (typeof applyViewOnlyLock === 'function') applyViewOnlyLock(target);
+}
 
 function switchSettingsTab(tab) {
     document.querySelectorAll('.stab-panel').forEach(p => p.classList.add('hidden'));
