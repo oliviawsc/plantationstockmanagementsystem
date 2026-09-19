@@ -7486,15 +7486,15 @@ async function deleteUserFromSupabase(id) {
 
 // Global list — seeded with hardcoded defaults so the app works even
 // before the async Supabase fetch completes.
-let GLOBAL_ESTATES = ['Mega Jutamas (Suai)','Ulu Niah Estate','MJM Plantation 1','MJM Plantation 2',
-    'MJM Plantation 3','Estet Seri Mawar','Meridian Palma','Mono Gaya',
-    'Sungai Mak Plantation','Gama Menang','Elewsun'];
+let GLOBAL_ESTATES = ['Elewsun','Estet Seri Mawar','Gama Menang','Mega Jutamas (Suai)',
+    'Meridian Palma','MJM Plantation 1','MJM Plantation 2','MJM Plantation 3',
+    'Mono Gaya','Sungai Mak Plantation','Ulu Niah Estate'];
 
 async function loadEstatesFromSupabase() {
     try {
         const { data, error } = await supabaseClient.from('opp_estates').select('name').order('name');
         if (error) throw error;
-        if (data && data.length > 0) GLOBAL_ESTATES = data.map(r => r.name);
+        if (data && data.length > 0) GLOBAL_ESTATES = data.map(r => r.name).sort((a, b) => a.localeCompare(b));
     } catch (e) {
         console.warn('Could not load estates from Supabase, using defaults:', e.message);
     }
