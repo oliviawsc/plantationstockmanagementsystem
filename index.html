@@ -7549,11 +7549,11 @@ async function renderEstatesList() {
                             <td class="px-3 py-2 text-gray-400 tabular-nums">${i + 1}</td>
                             <td class="px-3 py-2 font-medium" id="estate-name-${i}">🌴 ${e}</td>
                             <td class="px-3 py-2 whitespace-nowrap" id="estate-actions-${i}">
-                                <button onclick="startEditEstate(${JSON.stringify(e)}, ${i})"
+                                <button data-action="edit" data-idx="${i}"
                                     class="text-blue-600 hover:text-blue-800 text-xs font-semibold border border-blue-200 hover:bg-blue-50 px-2 py-1 rounded mr-1">
                                     ✏️ Edit
                                 </button>
-                                <button onclick="deleteEstate(${JSON.stringify(e)})"
+                                <button data-action="delete" data-idx="${i}"
                                     class="text-red-600 hover:text-red-800 text-xs font-semibold border border-red-200 hover:bg-red-50 px-2 py-1 rounded">
                                     🗑 Delete
                                 </button>
@@ -7562,6 +7562,14 @@ async function renderEstatesList() {
                 </tbody>
             </table>
         </div>`;
+
+    // Attach event listeners after DOM is built — avoids all inline-onclick quoting issues
+    GLOBAL_ESTATES.forEach((e, i) => {
+        const editBtn   = container.querySelector(`[data-action="edit"][data-idx="${i}"]`);
+        const deleteBtn = container.querySelector(`[data-action="delete"][data-idx="${i}"]`);
+        if (editBtn)   editBtn.addEventListener('click', () => startEditEstate(e, i));
+        if (deleteBtn) deleteBtn.addEventListener('click', () => deleteEstate(e));
+    });
 }
 
 function startEditEstate(oldName, idx) {
@@ -7569,23 +7577,35 @@ function startEditEstate(oldName, idx) {
     const actionsCell = document.getElementById(`estate-actions-${idx}`);
     if (!nameCell || !actionsCell) return;
 
-    nameCell.innerHTML = `<input id="estate-edit-input-${idx}" type="text"
-        value="${oldName.replace(/"/g, '&quot;')}"
-        class="border border-blue-300 rounded px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-        onkeydown="if(event.key==='Enter')saveEditEstate(${JSON.stringify(oldName)},${idx});if(event.key==='Escape')renderEstatesList();" />`;
+    // Replace name cell with an input
+    nameCell.innerHTML = '';
+    const inp = document.createElement('input');
+    inp.type  = 'text';
+    inp.value = oldName;
+    inp.id    = `estate-edit-input-${idx}`;
+    inp.className = 'border border-blue-300 rounded px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500';
+    inp.addEventListener('keydown', e => {
+        if (e.key === 'Enter')  saveEditEstate(oldName, idx);
+        if (e.key === 'Escape') renderEstatesList();
+    });
+    nameCell.appendChild(inp);
+    inp.focus();
+    inp.select();
 
-    actionsCell.innerHTML = `
-        <button onclick="saveEditEstate(${JSON.stringify(oldName)}, ${idx})"
-            class="text-white bg-blue-600 hover:bg-blue-700 text-xs font-semibold px-2 py-1 rounded mr-1">
-            💾 Save
-        </button>
-        <button onclick="renderEstatesList()"
-            class="text-gray-600 hover:text-gray-800 text-xs font-semibold border border-gray-300 hover:bg-gray-100 px-2 py-1 rounded">
-            ✕ Cancel
-        </button>`;
+    // Replace action cell with Save / Cancel buttons
+    actionsCell.innerHTML = '';
+    const saveBtn = document.createElement('button');
+    saveBtn.textContent = '💾 Save';
+    saveBtn.className = 'text-white bg-blue-600 hover:bg-blue-700 text-xs font-semibold px-2 py-1 rounded mr-1';
+    saveBtn.addEventListener('click', () => saveEditEstate(oldName, idx));
 
-    const inp = document.getElementById(`estate-edit-input-${idx}`);
-    if (inp) { inp.focus(); inp.select(); }
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = '✕ Cancel';
+    cancelBtn.className = 'text-gray-600 hover:text-gray-800 text-xs font-semibold border border-gray-300 hover:bg-gray-100 px-2 py-1 rounded';
+    cancelBtn.addEventListener('click', () => renderEstatesList());
+
+    actionsCell.appendChild(saveBtn);
+    actionsCell.appendChild(cancelBtn);
 }
 
 async function saveEditEstate(oldName, idx) {
