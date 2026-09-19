@@ -7545,10 +7545,14 @@ async function renderEstatesList() {
                 </thead>
                 <tbody>
                     ${GLOBAL_ESTATES.map((e, i) => `
-                        <tr class="border-b border-gray-100 hover:bg-green-50">
+                        <tr class="border-b border-gray-100 hover:bg-green-50" id="estate-row-${i}">
                             <td class="px-3 py-2 text-gray-400 tabular-nums">${i + 1}</td>
-                            <td class="px-3 py-2 font-medium">🌴 ${e}</td>
-                            <td class="px-3 py-2">
+                            <td class="px-3 py-2 font-medium" id="estate-name-${i}">🌴 ${e}</td>
+                            <td class="px-3 py-2 whitespace-nowrap" id="estate-actions-${i}">
+                                <button onclick="startEditEstate(${JSON.stringify(e)}, ${i})"
+                                    class="text-blue-600 hover:text-blue-800 text-xs font-semibold border border-blue-200 hover:bg-blue-50 px-2 py-1 rounded mr-1">
+                                    ✏️ Edit
+                                </button>
                                 <button onclick="deleteEstate(${JSON.stringify(e)})"
                                     class="text-red-600 hover:text-red-800 text-xs font-semibold border border-red-200 hover:bg-red-50 px-2 py-1 rounded">
                                     🗑 Delete
@@ -7558,6 +7562,48 @@ async function renderEstatesList() {
                 </tbody>
             </table>
         </div>`;
+}
+
+function startEditEstate(oldName, idx) {
+    const nameCell    = document.getElementById(`estate-name-${idx}`);
+    const actionsCell = document.getElementById(`estate-actions-${idx}`);
+    if (!nameCell || !actionsCell) return;
+
+    nameCell.innerHTML = `<input id="estate-edit-input-${idx}" type="text"
+        value="${oldName.replace(/"/g, '&quot;')}"
+        class="border border-blue-300 rounded px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+        onkeydown="if(event.key==='Enter')saveEditEstate(${JSON.stringify(oldName)},${idx});if(event.key==='Escape')renderEstatesList();" />`;
+
+    actionsCell.innerHTML = `
+        <button onclick="saveEditEstate(${JSON.stringify(oldName)}, ${idx})"
+            class="text-white bg-blue-600 hover:bg-blue-700 text-xs font-semibold px-2 py-1 rounded mr-1">
+            💾 Save
+        </button>
+        <button onclick="renderEstatesList()"
+            class="text-gray-600 hover:text-gray-800 text-xs font-semibold border border-gray-300 hover:bg-gray-100 px-2 py-1 rounded">
+            ✕ Cancel
+        </button>`;
+
+    const inp = document.getElementById(`estate-edit-input-${idx}`);
+    if (inp) { inp.focus(); inp.select(); }
+}
+
+async function saveEditEstate(oldName, idx) {
+    const inp = document.getElementById(`estate-edit-input-${idx}`);
+    if (!inp) return;
+    const newName = inp.value.trim();
+    if (!newName) { alert('Estate name cannot be empty.'); inp.focus(); return; }
+    if (newName === oldName) { await renderEstatesList(); return; }
+    if (GLOBAL_ESTATES.filter(e => e !== oldName).map(e => e.toLowerCase()).includes(newName.toLowerCase())) {
+        alert('An estate with that name already exists.'); inp.focus(); return;
+    }
+    try {
+        const { error } = await supabaseClient.from('opp_estates').update({ name: newName }).eq('name', oldName);
+        if (error) throw error;
+        await renderEstatesList();
+    } catch (e) {
+        alert('Error updating estate: ' + e.message);
+    }
 }
 
 async function addEstate() {
