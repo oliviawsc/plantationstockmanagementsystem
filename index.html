@@ -1006,9 +1006,9 @@
             <button data-target="home"          class="nav-item active" id="navHome">  <span class="nav-icon">&#127968;</span><span class="sb-label">Home</span></button>
             <button data-target="dashboard"     class="nav-item">           <span class="nav-icon">&#128202;</span><span class="sb-label" data-i18n="sb_lbl_dashboard">Dashboard</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;">Stock</p>
-            <button data-target="transactions"  class="nav-item">        <span class="nav-icon">&#128260;</span><span class="sb-label" data-i18n="sb_lbl_transactions">Stock Transaction</span></button>
-            <button data-target="summary"       class="nav-item">             <span class="nav-icon">&#128209;</span><span class="sb-label" data-i18n="sb_lbl_summary">Stock Summary</span></button>
-            <button data-target="ledger"         class="nav-item">             <span class="nav-icon">&#128210;</span><span class="sb-label" data-i18n="sb_lbl_ledger">Stock Ledger</span></button>
+            <button data-target="transactions"  class="nav-item">        <span class="nav-icon">&#128260;</span><span class="sb-label" data-i18n="sb_lbl_transactions">Record Stock</span></button>
+            <button data-target="summary"       class="nav-item">             <span class="nav-icon">&#128209;</span><span class="sb-label" data-i18n="sb_lbl_summary">Stock Transactions</span></button>
+            <button data-target="ledger"         class="nav-item">             <span class="nav-icon">&#128210;</span><span class="sb-label" data-i18n="sb_lbl_ledger">Stock Summary</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;">Field Operations</p>
             <button data-target="manuring"      id="navManuring"  class="nav-item">            <span class="nav-icon">&#127807;</span><span class="sb-label" data-i18n="sb_lbl_manuring">Manuring Program</span></button>
             <button data-target="roundprogress" class="nav-item">       <span class="nav-icon">&#128200;</span><span class="sb-label" data-i18n="sb_lbl_roundprogress">Manuring Progress</span></button>
@@ -1451,11 +1451,11 @@
         <!-- ============ PAGE 3: STOCK TRANSACTION ============ -->
         <section id="transactions" class="page-section">
             <div class="htab-bar">
-                <button class="htab-btn active" onclick="navigateToSection('transactions')">Stock Transaction</button>
-                <button class="htab-btn" onclick="navigateToSection('summary')">Stock Summary</button>
+                <button class="htab-btn active" onclick="navigateToSection('transactions')">Record Stock</button>
+                <button class="htab-btn" onclick="navigateToSection('summary')">Stock Transactions</button>
                 <button class="htab-btn" onclick="navigateToSection('ledger')">Ledger</button>
             </div>
-            <h2 class="text-3xl font-bold mb-6" data-i18n="nav_transactions">Stock Transaction</h2>
+            <h2 class="text-3xl font-bold mb-6" data-i18n="nav_transactions">Record Stock</h2>
             <div class="bg-white p-6 rounded-xl shadow">
                 <h3 class="text-xl font-bold mb-4" data-i18n="txn_form_title">Record Stock Movement</h3>
                 <form id="txnForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1598,11 +1598,11 @@
         <!-- ============ PAGE 5: STOCK SUMMARY (Audit Trail) ============ -->
         <section id="summary" class="page-section">
             <div class="htab-bar">
-                <button class="htab-btn" onclick="navigateToSection('transactions')">Stock Transaction</button>
-                <button class="htab-btn active" onclick="navigateToSection('summary')">Stock Summary</button>
+                <button class="htab-btn" onclick="navigateToSection('transactions')">Record Stock</button>
+                <button class="htab-btn active" onclick="navigateToSection('summary')">Stock Transactions</button>
                 <button class="htab-btn" onclick="navigateToSection('ledger')">Ledger</button>
             </div>
-            <h2 class="text-3xl font-bold mb-6" data-i18n="nav_summary">Stock Summary (Audit Trail)</h2>
+            <h2 class="text-3xl font-bold mb-6" data-i18n="nav_summary">Stock Transactions</h2>
             <!-- Filters -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
                 <h3 class="text-lg font-bold mb-3" data-i18n="summary_filters">Filters</h3>
@@ -1691,11 +1691,11 @@
         <!-- ============ PAGE 5b: STOCK LEDGER ============ -->
         <section id="ledger" class="page-section">
             <div class="htab-bar">
-                <button class="htab-btn" onclick="navigateToSection('transactions')">Stock Transaction</button>
-                <button class="htab-btn" onclick="navigateToSection('summary')">Stock Summary</button>
-                <button class="htab-btn active" onclick="navigateToSection('ledger')">Ledger</button>
+                <button class="htab-btn" onclick="navigateToSection('transactions')">Record Stock</button>
+                <button class="htab-btn" onclick="navigateToSection('summary')">Stock Transactions</button>
+                <button class="htab-btn active" onclick="navigateToSection('ledger')">Stock Summary</button>
             </div>
-            <h2 class="text-3xl font-bold mb-6" data-i18n="nav_ledger">Stock Ledger</h2>
+            <h2 class="text-3xl font-bold mb-6" data-i18n="nav_ledger">Stock Summary</h2>
             <!-- Filters -->
             <div class="bg-white p-6 rounded-xl shadow mb-6">
                 <h3 class="text-lg font-bold mb-3" data-i18n="summary_filters">Filters</h3>
@@ -6735,17 +6735,17 @@ const I18N = {
         app_subtitle:        'PalmInventory',
         nav_dashboard:       '📊 Dashboard',
         nav_items:           '📦 Item File',
-        nav_transactions:    '🔄 Stock Transaction',
-        nav_summary:         '📑 Stock Summary',
-        nav_ledger:          '📒 Stock Ledger',
+        nav_transactions:    '🔄 Record Stock',
+        nav_summary:         '📑 Stock Transactions',
+        nav_ledger:          '📒 Stock Summary',
         nav_locations:       '📍 Location Area',
         nav_manuring:        '🌱 Manuring Program',
         nav_roundprogress:   '📈 Manuring Progress',
         sb_lbl_dashboard:    'Dashboard',
         sb_lbl_items:        'Item File',
-        sb_lbl_transactions: 'Stock Transaction',
-        sb_lbl_summary:      'Stock Summary',
-        sb_lbl_ledger:       'Stock Ledger',
+        sb_lbl_transactions: 'Record Stock',
+        sb_lbl_summary:      'Stock Transactions',
+        sb_lbl_ledger:       'Stock Summary',
         sb_lbl_locations:    'Location Area',
         sb_lbl_manuring:     'Manuring Program',
         sb_lbl_roundprogress:'Manuring Progress',
@@ -6820,12 +6820,12 @@ const I18N = {
         hub_record_stock:    'Record Stock',
         hub_ops_line1:       'Oil Palm',
         hub_ops_line2:       'Seedling',
-        hub_summary:         'Stock Summary',
+        hub_summary:         'Stock Transactions',
         hub_view_report:     'View Report',
         /* Mobile bottom nav */
         mnav_home:           'Home',
         mnav_records:        'View Record',
-        mnav_summary:        'Stock Summary',
+        mnav_summary:        'Stock Transactions',
         mnav_dashboard:      'Dashboard',
         view_only_banner:    '&#128065; You have <b>View Only</b> access to this section. Editing is disabled.',
         /* Stock Transaction */
@@ -6880,8 +6880,8 @@ const I18N = {
         dash_lbl_usage:               '  Usage: ',
         dash_lbl_max_short:           '  Max  : ',
         dash_lbl_max_chart:           'Max',
-        /* Stock Summary */
-        nav_summary:         '📑 Stock Summary',
+        /* Stock Transactions */
+        nav_summary:         '📑 Stock Transactions',
         summary_filters:     'Filters',
         filter_date_from:    'Date From',
         filter_date_to:      'Date To',
@@ -7486,9 +7486,9 @@ const USERS_TABLE = 'opp_users';
 const ALL_SECTIONS = [
     { id: 'dashboard',      label: '📊 Dashboard' },
     { id: 'items',          label: '📦 Item File' },
-    { id: 'transactions',   label: '🔄 Stock Transaction' },
-    { id: 'summary',        label: '📑 Stock Summary' },
-    { id: 'ledger',         label: '📒 Stock Ledger' },
+    { id: 'transactions',   label: '🔄 Record Stock' },
+    { id: 'summary',        label: '📑 Stock Transactions' },
+    { id: 'ledger',         label: '📒 Stock Summary' },
     { id: 'locations',      label: '📍 Location Area' },
     { id: 'manuring',       label: '🌱 Manuring Program' },
     { id: 'roundprogress',  label: '📈 Manuring Progress' },
@@ -11517,7 +11517,7 @@ async function deleteSettingsBlock(id) {
     </button>
     <button class="mnav-item" id="mnavSummary" onclick="mobileNavTo('summary')">
         <span class="mnav-icon">📑</span>
-        <span class="mnav-label" data-i18n="mnav_summary">Stock Summary</span>
+        <span class="mnav-label" data-i18n="mnav_summary">Stock Transactions</span>
     </button>
     <button class="mnav-item" id="mnavDashboard" onclick="mobileNavTo('dashboard')">
         <span class="mnav-icon">📊</span>
