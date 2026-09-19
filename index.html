@@ -33,7 +33,7 @@
         #appLayout{display:flex;flex-direction:column;min-height:100vh}
         #appLayout:not(.hidden){display:flex}
         @media(min-width:768px){
-            #appLayout{flex-direction:row;align-items:stretch;--sb-w:248px}
+            #appLayout{flex-direction:row;align-items:stretch;--sb-w:0px}
             #appLayout.sidebar-collapsed{--sb-w:64px}
             #sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;width:var(--sb-w,248px);transition:width .22s cubic-bezier(.4,0,.2,1);transform:translateX(0)!important}
             #appLayout.sidebar-collapsed #sidebar{overflow-x:hidden}
@@ -100,9 +100,8 @@
         .page-section{display:none}
         .page-section.active{display:block}
 
-        /* Home mode — hide sidebar, stretch header */
-        #appLayout.home-mode > #sidebar { display:none !important; }
-        #appLayout.home-mode #topHeaderBar { left:0 !important; }
+        /* Sidebar always hidden — navigation is via home cards and tab bars */
+        #sidebar { display:none !important; }
 
         /* Hub tab bars (Stock / Field Ops / Reports sub-navigation) */
         .htab-bar{display:flex;gap:2px;border-bottom:2px solid #E5E7EB;margin-bottom:24px;overflow-x:auto;flex-shrink:0}
@@ -196,7 +195,7 @@
         .dark #hamburgerBtn span{background:rgba(255,255,255,0.75)}
 
         /* Top header bar */
-        #topHeaderBar{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:56px;flex-shrink:0;background:#fff;border-bottom:1px solid #E5E7EB;position:fixed;top:0;left:var(--sb-w,248px);right:0;z-index:90;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+        #topHeaderBar{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:56px;flex-shrink:0;background:#fff;border-bottom:1px solid #E5E7EB;position:fixed;top:0;left:0;right:0;z-index:90;box-shadow:0 1px 4px rgba(0,0,0,.04)}
         .dark #topHeaderBar{background:#16162A;border-color:#252540}
 
         /* Summary card */
