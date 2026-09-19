@@ -7547,10 +7547,16 @@ const SUPER_ADMIN = {
     role:  'superadmin',
 };
 
-// Convert a plain User ID to Supabase Auth email format.
-// If the input already contains '@' (e.g. Super Admin's real email), it is returned as-is.
+// Convert a plain User ID to an internal key used for opp_users lookup.
+// Real email addresses (containing '@') are passed through unchanged.
 function toAuthEmail(userId) {
     return userId.includes('@') ? userId : userId + '@psms.app';
+}
+
+// SHA-256 hex digest — used to store/verify passwords for non-SA users.
+async function sha256Hex(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 // All account types available in the system.
@@ -7911,9 +7917,6 @@ async function attemptLogin() {
     if (!rawId)    { showLoginError('Please enter your User ID.'); return; }
     if (!password) { showLoginError('Please enter your password.'); return; }
 
-    // Convert plain User ID → Supabase Auth email; real emails pass through unchanged.
-    const email = toAuthEmail(rawId);
-
     const loginBtn    = document.getElementById('loginBtn');
     const loginBtnTxt = document.getElementById('loginBtnText');
     const loginSpn    = document.getElementById('loginSpinner');
@@ -7924,16 +7927,10 @@ async function attemptLogin() {
     }
 
     try {
-        // All users — including the Super Admin — authenticate via Supabase Auth.
-        const { data: authData, error: authError } =
-            await supabaseClient.auth.signInWithPassword({ email, password });
-        if (authError) {
-            showLoginError(authError.message || 'Incorrect User ID or password.');
-            return;
-        }
-
-        // Super Admin is identified by their email address.
-        if (rawId === SUPER_ADMIN.email || email === SUPER_ADMIN.email) {
+        // ── Super Admin: authenticates via Supabase Auth with their real email ──
+        if (rawId === SUPER_ADMIN.email) {
+            const { error: authError } = await supabaseClient.auth.signInWithPassword({ email: rawId, password });
+            if (authError) { showLoginError('Incorrect User ID or password.'); return; }
             const session = {
                 email:       SUPER_ADMIN.email,
                 name:        SUPER_ADMIN.name,
@@ -7946,27 +7943,18 @@ async function attemptLogin() {
             return;
         }
 
-        // Regular / site-account users — load profile from opp_users.
-        let user = await fetchUserByEmail(email);
+        // ── Regular users: look up in opp_users and verify SHA-256 password hash ──
+        const email = toAuthEmail(rawId);
+        const user  = await fetchUserByEmail(email);
         if (!user) {
-            // Auth succeeded but no opp_users profile yet — auto-create a minimal one.
-            // Admin can update the role via User Management.
-            const authUser = authData.user;
-            const autoName = (authUser.user_metadata && authUser.user_metadata.name)
-                || email.split('@')[0];
-            try {
-                const newUser = {
-                    id: Date.now(), name: autoName, email,
-                    passwordHash: '', estates: [], permissions: {}, role: 'user',
-                };
-                await insertUserToSupabase(newUser);
-                user = newUser;
-            } catch (profileErr) {
-                console.error('[Auth] auto-profile creation failed', profileErr);
-                showLoginError('Account found but profile could not be created. Contact your administrator.');
-                await supabaseClient.auth.signOut();
-                return;
-            }
+            showLoginError('User ID not found. Please contact your administrator.');
+            return;
+        }
+
+        const inputHash = await sha256Hex(password);
+        if (!user.passwordHash || user.passwordHash !== inputHash) {
+            showLoginError('Incorrect User ID or password.');
+            return;
         }
 
         const session = {
@@ -7979,6 +7967,7 @@ async function attemptLogin() {
         };
         saveSession(session);
         bootApp(session);
+
     } finally {
         if (loginBtn) {
             loginBtn.disabled = false;
@@ -8658,40 +8647,29 @@ async function registerUser() {
     const estates  = [];
     const perms    = {};
 
-    if (!name || !rawId)                   { alert('Please fill in Full Name and User ID.'); return; }
-    if (password.length < 6)               { alert('Password must be at least 6 characters.'); return; }
+    if (!name || !rawId)     { alert('Please fill in Full Name and User ID.'); return; }
+    if (password.length < 6) { alert('Password must be at least 6 characters.'); return; }
 
-    // Convert plain User ID to Supabase Auth email format
     const email = toAuthEmail(rawId);
-
-    if (email === SUPER_ADMIN.email)       { alert('That User ID is reserved for the Super Admin.'); return; }
+    if (email === SUPER_ADMIN.email) { alert('That User ID is reserved for the Super Admin.'); return; }
 
     const regBtn = document.querySelector('#registerUserPanel button[onclick="registerUser()"]');
     if (regBtn) { regBtn.disabled = true; regBtn.textContent = 'Saving…'; }
 
     try {
-        // Step 1: Create Supabase Auth account
-        const { error: authError } = await supabaseClient.auth.signUp({ email, password, options: { data: { name } } });
-        if (authError) {
-            const alreadyExists = authError.message && (
-                authError.message.toLowerCase().includes('already registered') ||
-                authError.message.toLowerCase().includes('already been registered')
-            );
-            if (!alreadyExists) throw authError;
-        }
+        // Hash the password before storing (no Supabase Auth signup needed)
+        const passwordHash = await sha256Hex(password);
 
-        // Step 2: Create or update the opp_users profile
         const existing = await fetchUserByEmail(email);
         if (existing) {
-            await updateUserInSupabase({ ...existing, name, estates, permissions: perms, role });
+            await updateUserInSupabase({ ...existing, name, passwordHash, estates, permissions: perms, role });
             alert(`User "${name}" updated successfully.`);
         } else {
-            await insertUserToSupabase({ id: Date.now(), name, email, passwordHash: '', estates, permissions: perms, role });
+            await insertUserToSupabase({ id: Date.now(), name, email, passwordHash, estates, permissions: perms, role });
             alert(`User "${name}" registered successfully.`);
         }
 
         await fetchUsersFromSupabase();
-
         document.getElementById('regName').value  = '';
         document.getElementById('regEmail').value = '';
         const pwEl = document.getElementById('regPassword');
