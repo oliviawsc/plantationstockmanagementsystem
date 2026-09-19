@@ -7492,7 +7492,7 @@ let GLOBAL_ESTATES = ['Mega Jutamas (Suai)','Ulu Niah Estate','MJM Plantation 1'
 
 async function loadEstatesFromSupabase() {
     try {
-        const { data, error } = await supabaseClient.from('opp_estates').select('name').order('id');
+        const { data, error } = await supabaseClient.from('opp_estates').select('name').order('name');
         if (error) throw error;
         if (data && data.length > 0) GLOBAL_ESTATES = data.map(r => r.name);
     } catch (e) {
