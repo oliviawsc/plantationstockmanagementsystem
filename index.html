@@ -2511,268 +2511,330 @@
 
             <!-- ── Tab 2: Item Files ── -->
             <div id="stab-item-files" class="stab-panel hidden pt-6">
-                <div class="bg-white p-6 rounded-xl shadow mb-8">
-                    <h3 class="text-xl font-bold mb-4">Add New Item</h3>
-                    <form id="itemForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div id="itemCodeRow" class="md:col-span-2 hidden">
-                            <label class="block text-sm font-semibold mb-1">Item ID</label>
-                            <input id="itemCodeDisplay" type="text" readonly class="w-full border border-gray-200 rounded p-2 bg-gray-100 text-gray-500 font-mono text-sm cursor-not-allowed" />
+
+                <!-- Panel A: Register Items list (default) -->
+                <div id="itemListPanel">
+                    <div class="bg-white p-6 rounded-xl shadow">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                            <h3 class="text-xl font-bold">Register Items</h3>
+                            <button onclick="showAddItemPanel(false)" class="btn btn-primary">➕ Add Item File</button>
                         </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Item Name</label>
-                            <input id="itemName" type="text" placeholder="e.g. Glyphosate 41%" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-sm">
+                                <thead class="bg-green-100 text-green-800">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left">Item ID</th>
+                                        <th class="px-3 py-2 text-left">Item Name</th>
+                                        <th class="px-3 py-2 text-left">Category</th>
+                                        <th class="px-3 py-2 text-left">Base Unit</th>
+                                        <th class="px-3 py-2 text-left">Package Unit</th>
+                                        <th class="px-3 py-2 text-left">Qty / Package</th>
+                                        <th class="px-3 py-2 text-left">Default Input</th>
+                                        <th class="px-3 py-2 text-left">Min Threshold</th>
+                                        <th class="px-3 py-2 text-left">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="itemsTableBody"></tbody>
+                            </table>
                         </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Category</label>
-                            <select id="itemCategory" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
-                                <option value="">-- Select Category --</option>
-                                <option value="Fertilizer">Fertilizer</option>
-                                <option value="Chemical">Chemical</option>
-                                <option value="Oil Palm Seedling">Oil Palm Seedling</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Base Unit <span class="text-red-500">*</span></label>
-                            <input id="itemBaseUnit" type="text" placeholder="e.g. kg, litre, pcs" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
-                            <p class="text-xs text-gray-400 mt-1">The smallest unit of measurement.</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Package Unit</label>
-                            <input id="itemPackageUnit" type="text" placeholder="e.g. bag, jar, can, drum" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
-                            <p class="text-xs text-gray-400 mt-1">The packaging type used for stock transactions.</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Qty per Package</label>
-                            <input id="itemQtyPerUnit" type="number" min="0" step="0.001" placeholder="e.g. 25" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
-                            <p class="text-xs text-green-700 mt-1 italic">e.g. 1 bag = 25 kg. Used in Manuring Program budget calculation.</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-2">Default Qty Input in Stock Transaction</label>
-                            <div class="flex gap-6 mt-1">
-                                <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="radio" id="itemDefaultUnitBase" name="itemDefaultUnit" value="base" class="accent-green-700" checked /> Base Unit</label>
-                                <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="radio" id="itemDefaultUnitPackage" name="itemDefaultUnit" value="package" class="accent-green-700" /> Package Unit</label>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Minimum Threshold</label>
-                            <input id="itemThreshold" type="number" min="0" placeholder="0" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
-                            <p class="text-xs text-green-700 mt-1 italic">⚠️ Applies to Chemicals only.</p>
-                        </div>
-                        <div class="md:col-span-2 flex gap-3">
-                            <button id="itemSubmitBtn" type="button" onclick="saveItem()" class="btn btn-primary">Save Item</button>
-                            <button id="itemCancelBtn" type="button" onclick="cancelEditItem()" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg font-semibold">Cancel Edit</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow">
-                    <h3 class="text-xl font-bold mb-4">Existing Items</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full text-sm">
-                            <thead class="bg-green-100 text-green-800">
-                                <tr>
-                                    <th class="px-3 py-2 text-left">Item ID</th>
-                                    <th class="px-3 py-2 text-left">Item Name</th>
-                                    <th class="px-3 py-2 text-left">Category</th>
-                                    <th class="px-3 py-2 text-left">Base Unit</th>
-                                    <th class="px-3 py-2 text-left">Package Unit</th>
-                                    <th class="px-3 py-2 text-left">Qty / Package</th>
-                                    <th class="px-3 py-2 text-left">Default Input</th>
-                                    <th class="px-3 py-2 text-left">Min Threshold</th>
-                                    <th class="px-3 py-2 text-left">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="itemsTableBody"></tbody>
-                        </table>
                     </div>
                 </div>
+
+                <!-- Panel B: Add / Edit Item form (hidden by default) -->
+                <div id="addItemPanel" class="hidden">
+                    <div class="bg-white p-6 rounded-xl shadow" style="max-width:680px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                            <button onclick="cancelEditItem()" style="padding:6px 14px;border-radius:8px;border:1px solid #D1FAE5;background:#F0FDF4;color:#1B5E20;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">← Back</button>
+                            <h3 class="text-xl font-bold" id="itemFormTitle">Add New Item</h3>
+                        </div>
+                        <form id="itemForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div id="itemCodeRow" class="md:col-span-2 hidden">
+                                <label class="block text-sm font-semibold mb-1">Item ID</label>
+                                <input id="itemCodeDisplay" type="text" readonly class="w-full border border-gray-200 rounded p-2 bg-gray-100 text-gray-500 font-mono text-sm cursor-not-allowed" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Item Name</label>
+                                <input id="itemName" type="text" placeholder="e.g. Glyphosate 41%" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Category</label>
+                                <select id="itemCategory" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                                    <option value="">-- Select Category --</option>
+                                    <option value="Fertilizer">Fertilizer</option>
+                                    <option value="Chemical">Chemical</option>
+                                    <option value="Oil Palm Seedling">Oil Palm Seedling</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Base Unit <span class="text-red-500">*</span></label>
+                                <input id="itemBaseUnit" type="text" placeholder="e.g. kg, litre, pcs" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                                <p class="text-xs text-gray-400 mt-1">The smallest unit of measurement.</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Package Unit</label>
+                                <input id="itemPackageUnit" type="text" placeholder="e.g. bag, jar, can, drum" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                                <p class="text-xs text-gray-400 mt-1">The packaging type used for stock transactions.</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Qty per Package</label>
+                                <input id="itemQtyPerUnit" type="number" min="0" step="0.001" placeholder="e.g. 25" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                                <p class="text-xs text-green-700 mt-1 italic">e.g. 1 bag = 25 kg. Used in Manuring Program budget calculation.</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">Default Qty Input in Stock Transaction</label>
+                                <div class="flex gap-6 mt-1">
+                                    <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="radio" id="itemDefaultUnitBase" name="itemDefaultUnit" value="base" class="accent-green-700" checked /> Base Unit</label>
+                                    <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="radio" id="itemDefaultUnitPackage" name="itemDefaultUnit" value="package" class="accent-green-700" /> Package Unit</label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Minimum Threshold</label>
+                                <input id="itemThreshold" type="number" min="0" placeholder="0" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                                <p class="text-xs text-green-700 mt-1 italic">⚠️ Applies to Chemicals only.</p>
+                            </div>
+                            <div class="md:col-span-2 flex gap-3">
+                                <button id="itemSubmitBtn" type="button" onclick="saveItem()" class="btn btn-primary">Save Item</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
             </div>
 
             <!-- ── Tab 3: Manuring Program ── -->
             <div id="stab-manuring-prog" class="stab-panel hidden pt-6">
-                <p class="text-sm text-green-700 mb-6">Define manuring rounds. When fertilizer stock is issued (Out), the user links it to a round + block.</p>
-                <div class="bg-white p-6 rounded-xl shadow mb-8">
-                    <h3 class="text-xl font-bold mb-4" id="mrFormTitle">Add Manuring Round</h3>
-                    <form id="manuringForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Round Name</label>
-                            <input id="mrName" type="text" placeholder="e.g. Round 1 - 2026" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+
+                <!-- Panel A: Rounds list (default) -->
+                <div id="mrListPanel">
+                    <div class="bg-white p-6 rounded-xl shadow">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                            <h3 class="text-xl font-bold">Manuring Rounds</h3>
+                            <button onclick="showAddManuringPanel(false)" class="btn btn-primary">➕ Add Manuring Round</button>
                         </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Fertilizer</label>
-                            <select id="mrFertilizer" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
-                                <option value="">-- Select Fertilizer --</option>
-                            </select>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-sm">
+                                <thead class="bg-green-100 text-green-800">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left">Round</th>
+                                        <th class="px-3 py-2 text-left">Fertilizer</th>
+                                        <th class="px-3 py-2 text-left">Target Period</th>
+                                        <th class="px-3 py-2 text-left">Blocks Involved</th>
+                                        <th class="px-3 py-2 text-right">Budgeted Fertilizer Needed</th>
+                                        <th class="px-3 py-2 text-left">Notes</th>
+                                        <th class="px-3 py-2 text-left">Transactions</th>
+                                        <th class="px-3 py-2 text-left">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="manuringRoundsBody"></tbody>
+                            </table>
                         </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">kg per Palm</label>
-                            <input id="mrKgPerPalm" type="number" min="0" step="0.01" placeholder="e.g. 2" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
-                            <p class="text-xs text-green-700 mt-1 italic">Budget = (Blocks' Palms × kg/palm) ÷ Qty/Package. Set Qty/Package in Item Files.</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Target Period <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
-                            <input id="mrTargetPeriod" type="month" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
-                        </div>
-                        <div class="md:col-span-2">
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="block text-sm font-semibold">Blocks Involved <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
-                                <div class="flex gap-2">
-                                    <button type="button" onclick="mrSelectAllBlocks(true)" class="text-xs bg-green-100 hover:bg-green-200 text-green-800 font-semibold px-3 py-1 rounded">✔ Select All</button>
-                                    <button type="button" onclick="mrSelectAllBlocks(false)" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-3 py-1 rounded">✖ Clear All</button>
-                                </div>
-                            </div>
-                            <div id="mrBlocksGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 border border-green-200 rounded-lg p-3 bg-green-50">
-                                <p class="text-xs text-gray-400 col-span-full italic">No blocks registered yet. Add blocks in Estates &amp; Blocks first.</p>
-                            </div>
-                            <p class="text-xs text-green-700 mt-1 italic">If no blocks are selected, budget uses all registered blocks.</p>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-semibold mb-1">Notes</label>
-                            <textarea id="mrNotes" rows="2" placeholder="e.g. Apply pre-rainy season" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600"></textarea>
-                        </div>
-                        <div class="md:col-span-2 flex gap-3">
-                            <button id="mrSubmitBtn" type="button" onclick="saveManuringRound()" class="btn btn-primary">Save Round</button>
-                            <button id="mrCancelBtn" type="button" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg font-semibold">Cancel Edit</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow">
-                    <h3 class="text-xl font-bold mb-4">Defined Manuring Rounds</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full text-sm">
-                            <thead class="bg-green-100 text-green-800">
-                                <tr>
-                                    <th class="px-3 py-2 text-left">Round</th>
-                                    <th class="px-3 py-2 text-left">Fertilizer</th>
-                                    <th class="px-3 py-2 text-left">Target Period</th>
-                                    <th class="px-3 py-2 text-left">Blocks Involved</th>
-                                    <th class="px-3 py-2 text-right">Budgeted Fertilizer Needed</th>
-                                    <th class="px-3 py-2 text-left">Notes</th>
-                                    <th class="px-3 py-2 text-left">Transactions</th>
-                                    <th class="px-3 py-2 text-left">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="manuringRoundsBody"></tbody>
-                        </table>
                     </div>
                 </div>
+
+                <!-- Panel B: Add / Edit form (hidden by default) -->
+                <div id="mrFormPanel" class="hidden">
+                    <div class="bg-white p-6 rounded-xl shadow" style="max-width:680px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                            <button onclick="cancelEditRound()" style="padding:6px 14px;border-radius:8px;border:1px solid #D1FAE5;background:#F0FDF4;color:#1B5E20;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">← Back</button>
+                            <h3 class="text-xl font-bold" id="mrFormTitle">Add Manuring Round</h3>
+                        </div>
+                        <p class="text-sm text-green-700 mb-4">Define manuring rounds. When fertilizer stock is issued (Out), the user links it to a round + block.</p>
+                        <form id="manuringForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Round Name</label>
+                                <input id="mrName" type="text" placeholder="e.g. Round 1 - 2026" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Fertilizer</label>
+                                <select id="mrFertilizer" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                                    <option value="">-- Select Fertilizer --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">kg per Palm</label>
+                                <input id="mrKgPerPalm" type="number" min="0" step="0.01" placeholder="e.g. 2" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                                <p class="text-xs text-green-700 mt-1 italic">Budget = (Blocks' Palms × kg/palm) ÷ Qty/Package. Set Qty/Package in Item Files.</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Target Period <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
+                                <input id="mrTargetPeriod" type="month" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                            </div>
+                            <div class="md:col-span-2">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-sm font-semibold">Blocks Involved <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
+                                    <div class="flex gap-2">
+                                        <button type="button" onclick="mrSelectAllBlocks(true)" class="text-xs bg-green-100 hover:bg-green-200 text-green-800 font-semibold px-3 py-1 rounded">✔ Select All</button>
+                                        <button type="button" onclick="mrSelectAllBlocks(false)" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-3 py-1 rounded">✖ Clear All</button>
+                                    </div>
+                                </div>
+                                <div id="mrBlocksGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 border border-green-200 rounded-lg p-3 bg-green-50">
+                                    <p class="text-xs text-gray-400 col-span-full italic">No blocks registered yet. Add blocks in Estates &amp; Blocks first.</p>
+                                </div>
+                                <p class="text-xs text-green-700 mt-1 italic">If no blocks are selected, budget uses all registered blocks.</p>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-semibold mb-1">Notes</label>
+                                <textarea id="mrNotes" rows="2" placeholder="e.g. Apply pre-rainy season" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600"></textarea>
+                            </div>
+                            <div class="md:col-span-2 flex gap-3">
+                                <button id="mrSubmitBtn" type="button" onclick="saveManuringRound()" class="btn btn-primary">Save Round</button>
+                                <button id="mrCancelBtn" type="button" class="hidden" style="display:none!important"></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
             </div>
 
             <!-- ── Tab 4: Maintenance Program ── -->
             <div id="stab-maint-prog" class="stab-panel hidden pt-6">
-                <p class="text-sm text-green-700 mb-6">Define maintenance rounds for field activities. Each round specifies the blocks involved and relevant notes.</p>
-                <div class="bg-white p-6 rounded-xl shadow mb-8">
-                    <h3 class="text-xl font-bold mb-4" id="fmFormTitle">Add Maintenance Round</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Round Name <span class="text-red-500">*</span></label>
-                            <input id="fmName" type="text" placeholder="e.g. Weeding Round 1 - 2026" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+
+                <!-- Panel A: Rounds list (default) -->
+                <div id="fmListPanel">
+                    <div class="bg-white p-6 rounded-xl shadow">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                            <h3 class="text-xl font-bold">Maintenance Rounds</h3>
+                            <button onclick="showAddMaintPanel(false)" class="btn btn-primary">➕ Add Maintenance Round</button>
                         </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Type of Maintenance</label>
-                            <input id="fmMaintType" type="text" placeholder="e.g. Spraying, Weeding, Pruning" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-sm">
+                                <thead class="bg-green-100 text-green-800">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left">Round Name</th>
+                                        <th class="px-3 py-2 text-left">Type of Maintenance</th>
+                                        <th class="px-3 py-2 text-left">Target Period</th>
+                                        <th class="px-3 py-2 text-left">Blocks Involved</th>
+                                        <th class="px-3 py-2 text-left">Notes</th>
+                                        <th class="px-3 py-2 text-left">Date Created</th>
+                                        <th class="px-3 py-2 text-left">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="fmRoundsBody"></tbody>
+                            </table>
                         </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Target Period <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
-                            <input id="fmTargetPeriod" type="month" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                    </div>
+                </div>
+
+                <!-- Panel B: Add / Edit form (hidden by default) -->
+                <div id="fmFormPanel" class="hidden">
+                    <div class="bg-white p-6 rounded-xl shadow" style="max-width:680px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                            <button onclick="cancelEditFieldMaintRound()" style="padding:6px 14px;border-radius:8px;border:1px solid #D1FAE5;background:#F0FDF4;color:#1B5E20;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">← Back</button>
+                            <h3 class="text-xl font-bold" id="fmFormTitle">Add Maintenance Round</h3>
                         </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Notes</label>
-                            <textarea id="fmNotes" rows="2" placeholder="e.g. Mechanical weeding along main road" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600"></textarea>
-                        </div>
-                        <div class="md:col-span-2">
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="block text-sm font-semibold">Blocks Involved <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
-                                <div class="flex gap-2">
-                                    <button type="button" onclick="fmSelectAllBlocks(true)" class="text-xs bg-green-100 hover:bg-green-200 text-green-800 font-semibold px-3 py-1 rounded">✔ Select All</button>
-                                    <button type="button" onclick="fmSelectAllBlocks(false)" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-3 py-1 rounded">✖ Clear All</button>
+                        <p class="text-sm text-green-700 mb-4">Define maintenance rounds for field activities. Each round specifies the blocks involved and relevant notes.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Round Name <span class="text-red-500">*</span></label>
+                                <input id="fmName" type="text" placeholder="e.g. Weeding Round 1 - 2026" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Type of Maintenance</label>
+                                <input id="fmMaintType" type="text" placeholder="e.g. Spraying, Weeding, Pruning" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Target Period <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
+                                <input id="fmTargetPeriod" type="month" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Notes</label>
+                                <textarea id="fmNotes" rows="2" placeholder="e.g. Mechanical weeding along main road" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600"></textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-sm font-semibold">Blocks Involved <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
+                                    <div class="flex gap-2">
+                                        <button type="button" onclick="fmSelectAllBlocks(true)" class="text-xs bg-green-100 hover:bg-green-200 text-green-800 font-semibold px-3 py-1 rounded">✔ Select All</button>
+                                        <button type="button" onclick="fmSelectAllBlocks(false)" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-3 py-1 rounded">✖ Clear All</button>
+                                    </div>
+                                </div>
+                                <div id="fmBlocksGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 border border-green-200 rounded-lg p-3 bg-green-50">
+                                    <p class="text-xs text-gray-400 col-span-full italic">No blocks registered yet. Add blocks in Estates &amp; Blocks first.</p>
                                 </div>
                             </div>
-                            <div id="fmBlocksGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 border border-green-200 rounded-lg p-3 bg-green-50">
-                                <p class="text-xs text-gray-400 col-span-full italic">No blocks registered yet. Add blocks in Estates &amp; Blocks first.</p>
+                            <div class="md:col-span-2 flex gap-3">
+                                <button id="fmSubmitBtn" type="button" onclick="saveFieldMaintRound()" class="btn btn-primary">Save Round</button>
+                                <button id="fmCancelBtn" type="button" onclick="cancelEditFieldMaintRound()" class="hidden" style="display:none!important"></button>
                             </div>
                         </div>
-                        <div class="md:col-span-2 flex gap-3">
-                            <button id="fmSubmitBtn" type="button" onclick="saveFieldMaintRound()" class="btn btn-primary">Save Round</button>
-                            <button id="fmCancelBtn" type="button" onclick="cancelEditFieldMaintRound()" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg font-semibold">Cancel Edit</button>
-                        </div>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow">
-                    <h3 class="text-xl font-bold mb-4">Defined Maintenance Rounds</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full text-sm">
-                            <thead class="bg-green-100 text-green-800">
-                                <tr>
-                                    <th class="px-3 py-2 text-left">Round Name</th>
-                                    <th class="px-3 py-2 text-left">Type of Maintenance</th>
-                                    <th class="px-3 py-2 text-left">Target Period</th>
-                                    <th class="px-3 py-2 text-left">Blocks Involved</th>
-                                    <th class="px-3 py-2 text-left">Notes</th>
-                                    <th class="px-3 py-2 text-left">Date Created</th>
-                                    <th class="px-3 py-2 text-left">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="fmRoundsBody"></tbody>
-                        </table>
-                    </div>
-                </div>
+
             </div>
 
             <!-- ── Tab 5: Chemical Usage Limits ── -->
             <div id="stab-chem-limits" class="stab-panel hidden pt-6">
-                <div class="bg-white p-6 rounded-xl shadow">
-                    <h3 class="text-xl font-bold mb-2" id="ciFormTitle">🧪 Chemical Ingredient Setup</h3>
-                    <p class="text-xs text-green-700 mb-4">Define active ingredients and link them to chemical items. Set the maximum dosage rate per Ha for monitoring over-application.</p>
-                    <input type="hidden" id="ciEditId" value="" />
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Ingredient Name <span class="text-red-500">*</span></label>
-                            <input id="ciName" type="text" placeholder="e.g. Glyphosate" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+
+                <!-- Panel A: Ingredients list (default) -->
+                <div id="ciListPanel">
+                    <div class="bg-white p-6 rounded-xl shadow">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                            <h3 class="text-xl font-bold">Chemical Usage Limits</h3>
+                            <button onclick="showAddChemPanel(false)" class="btn btn-primary">➕ Add Chemical Ingredient</button>
                         </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Linked Chemical Item <span class="text-red-500">*</span></label>
-                            <select id="ciItem" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
-                                <option value="">-- Select Chemical --</option>
-                            </select>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-sm">
+                                <thead class="bg-blue-50 text-blue-800">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left">Ingredient</th>
+                                        <th class="px-3 py-2 text-left">Linked Chemical</th>
+                                        <th class="px-3 py-2 text-left">Unit</th>
+                                        <th class="px-3 py-2 text-right">Max Dosage / Ha</th>
+                                        <th class="px-3 py-2 text-left">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ciTableBody"></tbody>
+                            </table>
                         </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Unit</label>
-                            <select id="ciUnit" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
-                                <option value="litre">Litre / Ha</option>
-                                <option value="gram">Gram / Ha</option>
-                                <option value="ml">ml / Ha</option>
-                                <option value="kg">kg / Ha</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold mb-1">Max Dosage Rate <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
-                            <input id="ciMaxDosage" type="number" min="0" step="0.001" placeholder="e.g. 3.0" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
-                        </div>
-                        <div class="md:col-span-4">
-                            <label class="block text-sm font-semibold mb-1">Density (kg per Litre) <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
-                            <input id="ciDensity" type="number" min="0" step="0.001" placeholder="e.g. 1.05" class="w-full md:w-64 border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
-                            <p class="text-xs text-gray-400 mt-1">Needed only to convert g/kg ⇄ Litre/ml. Leave blank if the stock unit and dosage unit are the same type.</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-2 mb-6">
-                        <button type="button" onclick="saveChemIngredient()" id="ciSaveBtn" class="btn btn-primary">Save Ingredient</button>
-                        <button type="button" onclick="cancelEditChemIngredient()" id="ciCancelBtn" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg font-semibold">Cancel</button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full text-sm">
-                            <thead class="bg-blue-50 text-blue-800">
-                                <tr>
-                                    <th class="px-3 py-2 text-left">Ingredient</th>
-                                    <th class="px-3 py-2 text-left">Linked Chemical</th>
-                                    <th class="px-3 py-2 text-left">Unit</th>
-                                    <th class="px-3 py-2 text-right">Max Dosage / Ha</th>
-                                    <th class="px-3 py-2 text-left">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ciTableBody"></tbody>
-                        </table>
                     </div>
                 </div>
+
+                <!-- Panel B: Add / Edit form (hidden by default) -->
+                <div id="ciFormPanel" class="hidden">
+                    <div class="bg-white p-6 rounded-xl shadow" style="max-width:680px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                            <button onclick="cancelEditChemIngredient()" style="padding:6px 14px;border-radius:8px;border:1px solid #D1FAE5;background:#F0FDF4;color:#1B5E20;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">← Back</button>
+                            <h3 class="text-xl font-bold" id="ciFormTitle">🧪 Add Chemical Ingredient</h3>
+                        </div>
+                        <p class="text-xs text-green-700 mb-4">Define active ingredients and link them to chemical items. Set the maximum dosage rate per Ha for monitoring over-application.</p>
+                        <input type="hidden" id="ciEditId" value="" />
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Ingredient Name <span class="text-red-500">*</span></label>
+                                <input id="ciName" type="text" placeholder="e.g. Glyphosate" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Linked Chemical Item <span class="text-red-500">*</span></label>
+                                <select id="ciItem" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                                    <option value="">-- Select Chemical --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Unit</label>
+                                <select id="ciUnit" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                                    <option value="litre">Litre / Ha</option>
+                                    <option value="gram">Gram / Ha</option>
+                                    <option value="ml">ml / Ha</option>
+                                    <option value="kg">kg / Ha</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1">Max Dosage Rate <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
+                                <input id="ciMaxDosage" type="number" min="0" step="0.001" placeholder="e.g. 3.0" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-semibold mb-1">Density (kg per Litre) <span class="text-gray-400 font-normal text-xs">(optional)</span></label>
+                                <input id="ciDensity" type="number" min="0" step="0.001" placeholder="e.g. 1.05" class="w-full md:w-64 border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                                <p class="text-xs text-gray-400 mt-1">Needed only to convert g/kg ⇄ Litre/ml. Leave blank if the stock unit and dosage unit are the same type.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="saveChemIngredient()" id="ciSaveBtn" class="btn btn-primary">Save Ingredient</button>
+                            <button type="button" onclick="cancelEditChemIngredient()" id="ciCancelBtn" class="hidden" style="display:none!important"></button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
 
@@ -3353,6 +3415,19 @@ navButtons.forEach(btn => {
 // Track which item (if any) is being edited
 let editingItemId = null;
 
+function showAddItemPanel(isEdit) {
+    document.getElementById('itemListPanel').classList.add('hidden');
+    document.getElementById('addItemPanel').classList.remove('hidden');
+    const title = document.getElementById('itemFormTitle');
+    if (title) title.textContent = isEdit ? 'Edit Item' : 'Add New Item';
+    const btn = document.getElementById('itemSubmitBtn');
+    if (btn) btn.textContent = isEdit ? 'Update Item' : 'Save Item';
+}
+function showItemListPanel() {
+    document.getElementById('addItemPanel').classList.add('hidden');
+    document.getElementById('itemListPanel').classList.remove('hidden');
+}
+
 function startEditItem(id) {
     const it = items.find(i => String(i.id) === String(id));
     if (!it) return;
@@ -3362,17 +3437,13 @@ function startEditItem(id) {
     document.getElementById('itemPackageUnit').value = it.packageUnit || '';
     document.getElementById('itemQtyPerUnit').value  = it.qtyPerUnit || '';
     document.getElementById('itemThreshold').value   = it.threshold || 0;
-    // Restore default qty unit radio (fallback to 'base' for old items)
     const defVal = it.defaultQtyUnit || 'base';
     const radioEl = document.querySelector(`input[name="itemDefaultUnit"][value="${defVal}"]`);
     if (radioEl) radioEl.checked = true;
-    // Show the Item ID read-only field
     document.getElementById('itemCodeDisplay').value = it.itemCode || '—';
     document.getElementById('itemCodeRow').classList.remove('hidden');
     editingItemId = it.id;
-    document.getElementById('itemSubmitBtn').textContent = 'Update Item';
-    document.getElementById('itemCancelBtn').classList.remove('hidden');
-    document.getElementById('itemForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    showAddItemPanel(true);
 }
 
 function cancelEditItem() {
@@ -3383,13 +3454,10 @@ function cancelEditItem() {
     document.getElementById('itemPackageUnit').value = '';
     document.getElementById('itemQtyPerUnit').value  = '';
     document.getElementById('itemThreshold').value   = '';
-    // Reset default qty unit radio to base
     document.getElementById('itemDefaultUnitBase').checked = true;
-    // Hide the Item ID field
     document.getElementById('itemCodeDisplay').value = '';
     document.getElementById('itemCodeRow').classList.add('hidden');
-    document.getElementById('itemSubmitBtn').textContent = 'Save Item';
-    document.getElementById('itemCancelBtn').classList.add('hidden');
+    showItemListPanel();
 }
 
 /**
@@ -3462,14 +3530,8 @@ function saveItem() {
                      baseUnit, packageUnit, qtyPerUnit, threshold,
                      defaultQtyUnit, unit: baseUnit });
         save(STORAGE_KEYS.items, items);
-        document.getElementById('itemName').value        = '';
-        document.getElementById('itemCategory').value    = '';
-        document.getElementById('itemBaseUnit').value    = '';
-        document.getElementById('itemPackageUnit').value = '';
-        document.getElementById('itemQtyPerUnit').value  = '';
-        document.getElementById('itemThreshold').value   = '';
-        document.getElementById('itemDefaultUnitBase').checked = true;
         btnDone(itemSubmitBtn);
+        cancelEditItem();
     }
     refreshAll();
     });
@@ -3953,8 +4015,22 @@ function startEditRound(id) {
     renderMrBlocksGrid(r.blocks || []);
     editingRoundId = id;
     document.getElementById('mrSubmitBtn').textContent = 'Update Round';
-    document.getElementById('mrCancelBtn').classList.remove('hidden');
-    document.getElementById('manuringForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const mrTitle = document.getElementById('mrFormTitle');
+    if (mrTitle) mrTitle.textContent = 'Edit Manuring Round';
+    showAddManuringPanel(true);
+}
+
+function showAddManuringPanel(isEdit) {
+    document.getElementById('mrListPanel').classList.add('hidden');
+    document.getElementById('mrFormPanel').classList.remove('hidden');
+    const title = document.getElementById('mrFormTitle');
+    if (title && !isEdit) title.textContent = 'Add Manuring Round';
+    const btn = document.getElementById('mrSubmitBtn');
+    if (btn && !isEdit) btn.textContent = 'Save Round';
+}
+function showManuringListPanel() {
+    document.getElementById('mrFormPanel').classList.add('hidden');
+    document.getElementById('mrListPanel').classList.remove('hidden');
 }
 
 function cancelEditRound() {
@@ -3966,7 +4042,7 @@ function cancelEditRound() {
     document.getElementById('mrTargetPeriod').value  = '';
     document.querySelectorAll('.mr-block-cb').forEach(cb => cb.checked = false);
     document.getElementById('mrSubmitBtn').textContent = 'Save Round';
-    document.getElementById('mrCancelBtn').classList.add('hidden');
+    showManuringListPanel();
 }
 document.getElementById('mrCancelBtn').addEventListener('click', cancelEditRound);
 
@@ -4034,7 +4110,6 @@ function saveManuringRound() {
         cancelEditRound();
     } else {
         manuringRounds.push({ id: Date.now(), ...formRound });
-        // Clear form fields
         document.getElementById('mrName').value       = '';
         document.getElementById('mrKgPerPalm').value  = '';
         document.getElementById('mrNotes').value      = '';
@@ -4043,23 +4118,11 @@ function saveManuringRound() {
         document.querySelectorAll('.mr-block-cb').forEach(cb => cb.checked = false);
     }
 
-    // ── Persist & update UI directly ─────────────────────────────────
     save(STORAGE_KEYS.manuringRounds, manuringRounds);
-
-    // Directly re-render the rounds table so it updates immediately
-    // without relying on refreshAll which may be suppressed or race
     renderManuringRounds();
     renderRoundProgress();
-
-    // Show success feedback inline (no alert needed)
     btnDone(mrSubmitBtn);
-    const orig = mrSubmitBtn.textContent;
-    mrSubmitBtn.textContent = '✅ Saved!';
-    mrSubmitBtn.style.background = '#15803d';
-    setTimeout(() => {
-        mrSubmitBtn.textContent = orig;
-        mrSubmitBtn.style.background = '';
-    }, 1500);
+    showManuringListPanel();
     });
 }
 
@@ -9119,7 +9182,6 @@ function saveFieldMaintRound() {
     } else {
         // CREATE new round
         fieldMaintRounds.push({ id: Date.now(), name, blocks, notes, targetPeriod, maintType, createdAt: today });
-        // Clear form fields
         document.getElementById('fmName').value          = '';
         document.getElementById('fmNotes').value         = '';
         document.getElementById('fmTargetPeriod').value  = '';
@@ -9127,16 +9189,10 @@ function saveFieldMaintRound() {
         document.querySelectorAll('.fm-block-cb').forEach(cb => cb.checked = false);
     }
 
-    // Persist and update table immediately
     save(STORAGE_KEYS.fieldMaintRounds, fieldMaintRounds);
     renderFieldMaintRounds();
-
-    // Brief success feedback on the button
     btnDone(fmSubmitBtn);
-    const orig = fmSubmitBtn.textContent;
-    fmSubmitBtn.textContent      = '✅ Saved!';
-    fmSubmitBtn.style.background = '#15803d';
-    setTimeout(() => { fmSubmitBtn.textContent = orig; fmSubmitBtn.style.background = ''; }, 1500);
+    showMaintListPanel();
     });
 }
 
@@ -9151,10 +9207,21 @@ function startEditFmRound(id) {
     renderFmBlocksGrid(r.blocks || []);
     editingFmRoundId = id;
     document.getElementById('fmSubmitBtn').textContent = 'Update Round';
-    document.getElementById('fmCancelBtn').classList.remove('hidden');
     document.getElementById('fmFormTitle').textContent = 'Edit Maintenance Round';
-    // Scroll form into view
-    document.getElementById('fmFormTitle').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    showAddMaintPanel(true);
+}
+
+function showAddMaintPanel(isEdit) {
+    document.getElementById('fmListPanel').classList.add('hidden');
+    document.getElementById('fmFormPanel').classList.remove('hidden');
+    if (!isEdit) {
+        document.getElementById('fmFormTitle').textContent = 'Add Maintenance Round';
+        document.getElementById('fmSubmitBtn').textContent = 'Save Round';
+    }
+}
+function showMaintListPanel() {
+    document.getElementById('fmFormPanel').classList.add('hidden');
+    document.getElementById('fmListPanel').classList.remove('hidden');
 }
 
 /** Reset the form back to Add mode. */
@@ -9166,8 +9233,8 @@ function cancelEditFieldMaintRound() {
     document.getElementById('fmMaintType').value     = '';
     document.querySelectorAll('.fm-block-cb').forEach(cb => cb.checked = false);
     document.getElementById('fmSubmitBtn').textContent = 'Save Round';
-    document.getElementById('fmCancelBtn').classList.add('hidden');
     document.getElementById('fmFormTitle').textContent = 'Add Maintenance Round';
+    showMaintListPanel();
 }
 
 /** Delete a maintenance round after confirmation. */
@@ -9430,7 +9497,21 @@ function saveChemIngredient() {
     save(STORAGE_KEYS.chemIngredients, chemIngredients);
     renderCiTable();
     renderMaintProgressTables();
+    showChemListPanel();
     });
+}
+
+function showAddChemPanel(isEdit) {
+    document.getElementById('ciListPanel').classList.add('hidden');
+    document.getElementById('ciFormPanel').classList.remove('hidden');
+    if (!isEdit) {
+        document.getElementById('ciFormTitle').textContent = '🧪 Add Chemical Ingredient';
+        document.getElementById('ciSaveBtn').textContent   = 'Save Ingredient';
+    }
+}
+function showChemListPanel() {
+    document.getElementById('ciFormPanel').classList.add('hidden');
+    document.getElementById('ciListPanel').classList.remove('hidden');
 }
 
 /** Pre-fill the chemical ingredient form for editing */
@@ -9445,8 +9526,7 @@ function startEditChemIngredient(id) {
     document.getElementById('ciDensity').value         = ci.density || '';
     document.getElementById('ciFormTitle').textContent = '✏️ Edit Chemical Ingredient';
     document.getElementById('ciSaveBtn').textContent   = 'Update Ingredient';
-    document.getElementById('ciCancelBtn').classList.remove('hidden');
-    document.getElementById('ciFormTitle').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    showAddChemPanel(true);
 }
 
 /** Reset the chemical ingredient form back to Add mode */
@@ -9456,9 +9536,9 @@ function cancelEditChemIngredient() {
     document.getElementById('ciItem').value            = '';
     document.getElementById('ciMaxDosage').value       = '';
     document.getElementById('ciDensity').value         = '';
-    document.getElementById('ciFormTitle').textContent = '🧪 Chemical Ingredient Setup';
+    document.getElementById('ciFormTitle').textContent = '🧪 Add Chemical Ingredient';
     document.getElementById('ciSaveBtn').textContent   = 'Save Ingredient';
-    document.getElementById('ciCancelBtn').classList.add('hidden');
+    showChemListPanel();
 }
 
 /** Delete a chemical ingredient */
