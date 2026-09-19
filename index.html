@@ -1667,18 +1667,19 @@
             <!-- Audit table -->
             <div class="bg-white p-6 rounded-xl shadow">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm">
+                    <table class="min-w-full text-sm" style="border-collapse:collapse;">
                         <thead class="bg-green-100 text-green-800">
                             <tr>
-                                <th class="px-3 py-2 text-left" data-i18n="col_date">Date</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_item">Item</th>
-                                <th class="px-3 py-2 text-right" data-i18n="col_qty_in">Quantity In</th>
-                                <th class="px-3 py-2 text-right" data-i18n="col_qty_out">Quantity Out</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_location">Location</th>
-                                <th class="px-3 py-2 text-left">Round</th>
-                                <th class="px-3 py-2 text-right" data-i18n="col_balance">Balance</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_user">User</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_action">Action</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_date">Date</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_item">Item</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_qty_in">Quantity In</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_qty_out">Quantity Out</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_location">Location</th>
+                                <th class="px-3 py-2 text-center border border-green-200">Round</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_balance">Balance</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_user">User</th>
+                                <th class="px-3 py-2 text-center border border-green-200">Photo</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_action">Action</th>
                             </tr>
                         </thead>
                         <tbody id="summaryBody"></tbody>
@@ -4645,7 +4646,7 @@ function renderSummary() {
     if (!body) return;
     body.innerHTML = '';
     if (currentFilteredTxns.length === 0) {
-        body.innerHTML = '<tr><td colspan="9" class="px-3 py-4 text-center text-gray-500">No transactions match the current filters.</td></tr>';
+        body.innerHTML = '<tr><td colspan="10" class="px-3 py-4 text-center text-gray-500">No transactions match the current filters.</td></tr>';
         return;
     }
     currentFilteredTxns.forEach(t => {
@@ -4708,21 +4709,29 @@ function renderSummary() {
         })();
 
         const d = I18N[currentLang] || I18N['en'];
+        const cellCls = 'px-3 py-2 text-center border border-green-100';
         tr.innerHTML = `
-            <td class="px-3 py-2" data-label="${d.col_date}"><span class="sum-date-val">${t.date}</span></td>
-            <td class="px-3 py-2" data-label="${d.col_item}">${t.itemName}</td>
-            <td class="px-3 py-2 text-right text-green-700 font-semibold${!qtyIn ? ' em-empty' : ''}" data-label="${d.sum_lbl_qty_in}">${qtyIn}</td>
-            <td class="px-3 py-2 text-right text-red-600 font-semibold${!qtyOut ? ' em-empty' : ''}" data-label="${d.sum_lbl_qty_out}">${qtyOut}</td>
-            <td class="px-3 py-2" data-label="${d.col_location}">${t.location}</td>
-            <td class="px-3 py-2" data-label="${d.col_round}">${roundHtml}</td>
-            <td class="px-3 py-2 text-right font-bold" data-label="${d.col_balance}">${balanceDisplay}</td>
-            <td class="px-3 py-2" data-label="${d.col_user}">${t.user}</td>
-            <td class="px-3 py-2 flex gap-2 flex-wrap">
-                ${t.picture ? `<button class="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-semibold px-3 py-1 rounded" onclick="viewTxnPicture(${t.id})">${d.btn_view}</button>` : ''}
-                <button class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded"
-                    onclick="openEditTxnModal(${t.id})">${d.btn_edit}</button>
-                <button class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold px-3 py-1 rounded"
-                    onclick="deleteSummaryTransaction(${t.id})">${d.btn_delete}</button>
+            <td class="${cellCls}" data-label="${d.col_date}"><span class="sum-date-val">${t.date}</span></td>
+            <td class="${cellCls}" data-label="${d.col_item}">${t.itemName}</td>
+            <td class="${cellCls} text-green-700 font-semibold${!qtyIn ? ' em-empty' : ''}" data-label="${d.sum_lbl_qty_in}">${qtyIn}</td>
+            <td class="${cellCls} text-red-600 font-semibold${!qtyOut ? ' em-empty' : ''}" data-label="${d.sum_lbl_qty_out}">${qtyOut}</td>
+            <td class="${cellCls}" data-label="${d.col_location}">${t.location}</td>
+            <td class="${cellCls}" data-label="${d.col_round}">${roundHtml}</td>
+            <td class="${cellCls} font-bold" data-label="${d.col_balance}">${balanceDisplay}</td>
+            <td class="${cellCls}" data-label="${d.col_user}">${t.user}</td>
+            <td class="${cellCls}">
+                ${t.picture
+                    ? `<img src="${t.picture}" onclick="viewTxnPicture(${t.id})" title="Click to enlarge"
+                           style="width:56px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid #d1fae5;" />`
+                    : '<span class="text-gray-300 text-xs">—</span>'}
+            </td>
+            <td class="${cellCls}">
+                <div class="flex gap-2 flex-wrap justify-center">
+                    <button class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded"
+                        onclick="openEditTxnModal(${t.id})">${d.btn_edit}</button>
+                    <button class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold px-3 py-1 rounded"
+                        onclick="deleteSummaryTransaction(${t.id})">${d.btn_delete}</button>
+                </div>
             </td>`;
         body.appendChild(tr);
     });
