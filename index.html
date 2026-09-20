@@ -2191,9 +2191,9 @@
         <section id="fertrecord" class="page-section">
             <!-- Mobile record tab strip (estate-mobile only) -->
             <div class="mobile-record-tabs">
-                <button class="mrec-tab active" onclick="navToSection('fertrecord')">📋 Fertilizer</button>
-                <button class="mrec-tab" onclick="navToSection('chemrecord')">⚗️ Chemical</button>
-                <button class="mrec-tab" onclick="navToSection('plantrecord')">🌱 Planting</button>
+                <button class="mrec-tab active" onclick="navToSection('fertrecord')" data-i18n="mrec_tab_fert">📋 Fertilizer</button>
+                <button class="mrec-tab" onclick="navToSection('chemrecord')" data-i18n="mrec_tab_chem">⚗️ Chemical</button>
+                <button class="mrec-tab" onclick="navToSection('plantrecord')" data-i18n="mrec_tab_plant">🌱 Planting</button>
             </div>
             <div class="htab-bar">
                 <button class="htab-btn active" onclick="navigateToSection('fertrecord')" data-i18n="tab_fert_issuance_rec">Fertilizer Issuance Record</button>
@@ -2240,9 +2240,9 @@
         <section id="chemrecord" class="page-section">
             <!-- Mobile record tab strip (estate-mobile only) -->
             <div class="mobile-record-tabs">
-                <button class="mrec-tab" onclick="navToSection('fertrecord')">📋 Fertilizer</button>
-                <button class="mrec-tab active" onclick="navToSection('chemrecord')">⚗️ Chemical</button>
-                <button class="mrec-tab" onclick="navToSection('plantrecord')">🌱 Planting</button>
+                <button class="mrec-tab" onclick="navToSection('fertrecord')" data-i18n="mrec_tab_fert">📋 Fertilizer</button>
+                <button class="mrec-tab active" onclick="navToSection('chemrecord')" data-i18n="mrec_tab_chem">⚗️ Chemical</button>
+                <button class="mrec-tab" onclick="navToSection('plantrecord')" data-i18n="mrec_tab_plant">🌱 Planting</button>
             </div>
             <div class="htab-bar">
                 <button class="htab-btn" onclick="navigateToSection('fertrecord')" data-i18n="tab_fert_issuance_rec">Fertilizer Issuance Record</button>
@@ -2289,9 +2289,9 @@
         <section id="plantrecord" class="page-section">
             <!-- Mobile record tab strip (estate-mobile only) -->
             <div class="mobile-record-tabs">
-                <button class="mrec-tab" onclick="navToSection('fertrecord')">📋 Fertilizer</button>
-                <button class="mrec-tab" onclick="navToSection('chemrecord')">⚗️ Chemical</button>
-                <button class="mrec-tab active" onclick="navToSection('plantrecord')">🌱 Planting</button>
+                <button class="mrec-tab" onclick="navToSection('fertrecord')" data-i18n="mrec_tab_fert">📋 Fertilizer</button>
+                <button class="mrec-tab" onclick="navToSection('chemrecord')" data-i18n="mrec_tab_chem">⚗️ Chemical</button>
+                <button class="mrec-tab active" onclick="navToSection('plantrecord')" data-i18n="mrec_tab_plant">🌱 Planting</button>
             </div>
             <div class="htab-bar">
                 <button class="htab-btn" onclick="navigateToSection('fertrecord')" data-i18n="tab_fert_issuance_rec">Fertilizer Issuance Record</button>
@@ -6870,6 +6870,9 @@ const I18N = {
         mnav_records:        'View Reports',
         mnav_summary:        'Stock Transactions',
         mnav_dashboard:      'Dashboard',
+        mrec_tab_fert:       '📋 Fertilizer',
+        mrec_tab_chem:       '⚗️ Chemical',
+        mrec_tab_plant:      '🌱 Planting',
         view_only_banner:    '&#128065; You have <b>View Only</b> access to this section. Editing is disabled.',
         /* Stock Transaction */
         txn_form_title:      'Record Stock Movement',
@@ -7204,6 +7207,9 @@ const I18N = {
         mnav_records:        'Lihat Laporan',
         mnav_summary:        'Transaksi Stok',
         mnav_dashboard:      'Papan Hitam',
+        mrec_tab_fert:       '📋 Baja',
+        mrec_tab_chem:       '⚗️ Racun',
+        mrec_tab_plant:      '🌱 Bibit Sawit',
         view_only_banner:    '&#128065; Anda mempunyai akses <b>Lihat Sahaja</b> untuk bahagian ini. Penyuntingan dinyahaktifkan.',
         /* Stock Transaction */
         txn_form_title:      'Rekod Pergerakan Stok',
