@@ -338,6 +338,15 @@
         .mnav-item .mnav-label { font-size: 10px; font-weight: 600; letter-spacing: .01em; }
         .mnav-item.active .mnav-label { color: #166534; }
 
+        /* ── Field Operations tables: borders + center alignment ── */
+        #roundProgressBody td, #roundProgressBlockBody td,
+        #mpByRoundBody td, #mpByBlockBody td,
+        #chemByRoundBody td, #chemByBlockBody td {
+            border: 1px solid #D1FAE5;
+            text-align: center !important;
+        }
+        #chemByRoundBody td, #chemByBlockBody td { border-color: #FED7AA; }
+
         /* ── Record tab strip (inside record sections, estate-mobile only) ── */
         .mobile-record-tabs { display: none; }
         body.estate-mobile .mobile-record-tabs {
@@ -1818,14 +1827,14 @@
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm">
+                    <table class="min-w-full text-sm" style="border-collapse:collapse;">
                         <thead class="bg-green-100 text-green-800">
                             <tr>
-                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
-                                <th class="px-3 py-2 text-left" data-i18n="manuring_lbl_fertilizer">Fertilizer</th>
-                                <th class="px-3 py-2 text-right" data-i18n="col_total_applied">Total Applied</th>
-                                <th class="px-3 py-2 text-right" data-i18n="col_budgeted">Budgeted</th>
-                                <th class="px-3 py-2 text-right" data-i18n="col_pct_applied">% Applied</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_round">Round</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="manuring_lbl_fertilizer">Fertilizer</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_total_applied">Total Applied</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_budgeted">Budgeted</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_pct_applied">% Applied</th>
                             </tr>
                         </thead>
                         <tbody id="roundProgressBody"></tbody>
@@ -1864,15 +1873,15 @@
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm">
+                    <table class="min-w-full text-sm" style="border-collapse:collapse;">
                         <thead class="bg-green-100 text-green-800">
                             <tr>
-                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
-                                <th class="px-3 py-2 text-left" data-i18n="manuring_lbl_fertilizer">Fertilizer</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_block">Block</th>
-                                <th data-i18n="col_total_applied" class="px-3 py-2 text-right">Total Applied</th>
-                                <th data-i18n="col_budgeted" class="px-3 py-2 text-right">Budgeted</th>
-                                <th class="px-3 py-2 text-right" data-i18n="col_pct_applied">% Applied</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_round">Round</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="manuring_lbl_fertilizer">Fertilizer</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_block">Block</th>
+                                <th data-i18n="col_total_applied" class="px-3 py-2 text-center border border-green-200">Total Applied</th>
+                                <th data-i18n="col_budgeted" class="px-3 py-2 text-center border border-green-200">Budgeted</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_pct_applied">% Applied</th>
                             </tr>
                         </thead>
                         <tbody id="roundProgressBlockBody"></tbody>
@@ -1914,13 +1923,13 @@
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm">
+                    <table class="min-w-full text-sm" style="border-collapse:collapse;">
                         <thead class="bg-green-100 text-green-800">
                             <tr>
-                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_total_area">Total Block Area (Ha)</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_claimed">Total Claimed (Ha)</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_pct">% Progress</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_round">Round</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="mp_col_total_area">Total Block Area (Ha)</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="mp_col_claimed">Total Claimed (Ha)</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="mp_col_pct">% Progress</th>
                             </tr>
                         </thead>
                         <tbody id="mpByRoundBody"></tbody>
@@ -1951,15 +1960,15 @@
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm">
+                    <table class="min-w-full text-sm" style="border-collapse:collapse;">
                         <thead class="bg-green-100 text-green-800">
                             <tr>
-                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_block">Block</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_block_area">Block Area (Ha)</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_claimed_area">Claimed Area (Ha)</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_pct">% Progress</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_action">Action</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_round">Round</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_block">Block</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="mp_col_block_area">Block Area (Ha)</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="mp_col_claimed_area">Claimed Area (Ha)</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="mp_col_pct">% Progress</th>
+                                <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_action">Action</th>
                             </tr>
                         </thead>
                         <tbody id="mpByBlockBody"></tbody>
@@ -2045,17 +2054,17 @@
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm">
+                    <table class="min-w-full text-sm" style="border-collapse:collapse;">
                         <thead class="bg-orange-100 text-orange-800">
                             <tr>
-                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
-                                <th class="px-3 py-2 text-left" data-i18n="ci_lbl_name">Ingredient</th>
-                                <th class="px-3 py-2 text-left" data-i18n="ci_col_chemical">Chemical Item</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_total_qty">Total Qty Used</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_claimed">Total Claimed (Ha)</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_usage_ha">Usage / Ha</th>
-                                <th class="px-3 py-2 text-right" data-i18n="ci_col_max_dosage">Max Dosage / Ha</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_status">Status</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="col_round">Round</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="ci_lbl_name">Ingredient</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="ci_col_chemical">Chemical Item</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="mp_col_total_qty">Total Qty Used</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="mp_col_claimed">Total Claimed (Ha)</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="mp_col_usage_ha">Usage / Ha</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="ci_col_max_dosage">Max Dosage / Ha</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="col_status">Status</th>
                             </tr>
                         </thead>
                         <tbody id="chemByRoundBody"></tbody>
@@ -2094,18 +2103,18 @@
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm">
+                    <table class="min-w-full text-sm" style="border-collapse:collapse;">
                         <thead class="bg-orange-100 text-orange-800">
                             <tr>
-                                <th class="px-3 py-2 text-left" data-i18n="col_round">Round</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_block">Block</th>
-                                <th class="px-3 py-2 text-left" data-i18n="ci_lbl_name">Ingredient</th>
-                                <th class="px-3 py-2 text-left" data-i18n="ci_col_chemical">Chemical Item</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_total_qty">Total Qty Used</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_claimed_area">Claimed Area (Ha)</th>
-                                <th class="px-3 py-2 text-right" data-i18n="mp_col_usage_ha">Usage / Ha</th>
-                                <th class="px-3 py-2 text-right" data-i18n="ci_col_max_dosage">Max Dosage / Ha</th>
-                                <th class="px-3 py-2 text-left" data-i18n="col_status">Status</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="col_round">Round</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="col_block">Block</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="ci_lbl_name">Ingredient</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="ci_col_chemical">Chemical Item</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="mp_col_total_qty">Total Qty Used</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="mp_col_claimed_area">Claimed Area (Ha)</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="mp_col_usage_ha">Usage / Ha</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="ci_col_max_dosage">Max Dosage / Ha</th>
+                                <th class="px-3 py-2 text-center border border-orange-200" data-i18n="col_status">Status</th>
                             </tr>
                         </thead>
                         <tbody id="chemByBlockBody"></tbody>
