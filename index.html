@@ -8623,7 +8623,8 @@ function normalisePermissions(perms) {
 // can be distinguished from "admin never configured this section".
 const ESTATE_MOBILE_DEFAULTS = {
     transactions: 'edit',  // estate hub cards — needs edit to record stock
-    summary:      'view',  // Stock Summary bottom nav
+    summary:      'view',  // Stock Transactions bottom nav
+    ledger:       'view',  // Stock Summary tab (visible inside summary section)
     dashboard:    'view',  // Dashboard bottom nav
     fertrecord:   'view',  // View Record tab
     chemrecord:   'view',  // View Record tab
@@ -8832,7 +8833,12 @@ async function openEditUserModal(id) {
         </label>`).join('');
 
     const permsRows = ALL_SECTIONS.map(s => {
-        const cur = userPerms[s.id] || 'none';
+        const stored = userPerms[s.id];
+        const cur = stored !== undefined
+            ? stored
+            : (user.role === 'estate_user' && s.id in ESTATE_MOBILE_DEFAULTS
+                ? ESTATE_MOBILE_DEFAULTS[s.id]
+                : 'none');
         return `
         <div class="flex items-center gap-3 py-1 border-b border-green-50 last:border-0">
             <span class="text-sm flex-1">${s.label}</span>
