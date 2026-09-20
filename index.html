@@ -6835,6 +6835,7 @@ const I18N = {
         hub_view_report:     'View Report',
         /* Mobile bottom nav */
         mnav_home:           'Home',
+        mnav_record_stock:   'Record Stock',
         mnav_records:        'View Record',
         mnav_summary:        'Stock Transactions',
         mnav_dashboard:      'Dashboard',
@@ -7155,6 +7156,7 @@ const I18N = {
         hub_view_report:     'Lihat Laporan',
         /* Mobile bottom nav */
         mnav_home:           'Utama',
+        mnav_record_stock:   'Rekod Stok',
         mnav_records:        'Lihat Rekod',
         mnav_summary:        'Transaksi Stok',
         mnav_dashboard:      'Dashboard',
@@ -8204,8 +8206,8 @@ function navToSection(sectionId) {
 const MOBILE_RECORD_SECTIONS = ['fertrecord', 'chemrecord', 'plantrecord'];
 
 function mobileNavTo(dest) {
-    if (dest === 'home') {
-        navToSection('estate_hub');
+    if (dest === 'recordstock') {
+        navToSection('transactions');
     } else if (dest === 'records') {
         navToSection('mobile_viewrecord');
     } else if (dest === 'summary') {
@@ -8219,7 +8221,7 @@ function updateMobileBottomNav(sectionId) {
     if (!document.body.classList.contains('estate-mobile')) return;
     const isRecord = MOBILE_RECORD_SECTIONS.includes(sectionId) || sectionId === 'mobile_viewrecord';
     const map = {
-        mnavHome:      sectionId === 'estate_hub',
+        mnavHome:      sectionId === 'transactions',
         mnavRecords:   isRecord,
         mnavSummary:   sectionId === 'summary',
         mnavDashboard: sectionId === 'dashboard',
@@ -11527,9 +11529,9 @@ async function deleteSettingsBlock(id) {
 
 <!-- ── Mobile bottom nav bar (estate-mobile only) ── -->
 <nav id="mobileBottomNav">
-    <button class="mnav-item" id="mnavHome" onclick="mobileNavTo('home')">
-        <span class="mnav-icon">🏠</span>
-        <span class="mnav-label" data-i18n="mnav_home">Home</span>
+    <button class="mnav-item" id="mnavHome" onclick="mobileNavTo('recordstock')">
+        <span class="mnav-icon">📝</span>
+        <span class="mnav-label" data-i18n="mnav_record_stock">Record Stock</span>
     </button>
     <button class="mnav-item" id="mnavRecords" onclick="mobileNavTo('records')">
         <span class="mnav-icon">📋</span>
