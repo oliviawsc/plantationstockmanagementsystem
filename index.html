@@ -1290,14 +1290,14 @@
 
             <!-- Dashboard As at Date Filter -->
             <div class="bg-white rounded-xl shadow mb-6 p-3 flex items-center gap-3 flex-wrap">
-                <span class="text-xs font-bold text-green-900 flex-shrink-0">As at Date</span>
+                <span class="text-xs font-bold text-green-900 flex-shrink-0" data-i18n="dash_as_at_label">As at Date</span>
                 <div class="relative cursor-pointer bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 flex items-center gap-2 flex-shrink-0" onclick="openDatePicker('dashAsAt')">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:#1B5E20"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                     <span id="dashAsAtDisplay" class="text-xs font-semibold text-green-800 whitespace-nowrap">Select date</span>
                     <input id="dashAsAt" type="date" onchange="updateDashDateDisplay();renderDashboardFilters();"
                         style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                 </div>
-                <p id="dashFilterNote" class="hidden text-xs text-blue-600 italic">Showing stock balance as at selected date</p>
+                <p id="dashFilterNote" class="hidden text-xs text-blue-600 italic" data-i18n="dash_filter_note">Showing stock balance as at selected date</p>
             </div>
 
             <!-- Stock Level Charts — one card per category -->
@@ -6113,7 +6113,8 @@ function updateDashDateDisplay() {
         el.textContent = new Date(val + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     } else {
         var today = new Date();
-        el.textContent = 'Today (' + today.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ')';
+        var todayLabel = currentLang === 'ms' ? 'Hari Ini' : 'Today';
+        el.textContent = todayLabel + ' (' + today.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ')';
     }
 }
 
@@ -6868,6 +6869,8 @@ const I18N = {
         dash_bal_fertilizer:         'Balance Fertilizer',
         dash_bal_chemicals:          'Balance Chemicals',
         dash_bal_seedlings:          'Balance Oil Palm Seedlings',
+        dash_as_at_label:            'As at Date',
+        dash_filter_note:            'Showing stock balance as at selected date',
         dash_manuring_tracker_title: '🌾 Fertilizer Issuance by Round',
         dash_maint_tracker_title:    '🔧 Maintenance Progress',
         dash_chem_tracker_title:     '⚗️ Chemical Usage Tracker',
@@ -7193,6 +7196,8 @@ const I18N = {
         dash_bal_fertilizer:         'Baki Baja',
         dash_bal_chemicals:          'Baki Bahan Kimia',
         dash_bal_seedlings:          'Baki Bibit Sawit',
+        dash_as_at_label:            'Tarikh Sehingga',
+        dash_filter_note:            'Menunjukkan baki stok sehingga tarikh yang dipilih',
         dash_manuring_tracker_title: '🌾 Pengeluaran Baja Ikut Pusingan',
         dash_maint_tracker_title:    '🔧 Kemajuan Penyelenggaraan',
         dash_chem_tracker_title:     '⚗️ Penjejak Penggunaan Kimia',
