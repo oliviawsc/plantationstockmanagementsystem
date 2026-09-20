@@ -1788,9 +1788,9 @@
         <!-- ============ PAGE 8: MANURING PROGRESS SUMMARY ============ -->
         <section id="roundprogress" class="page-section">
             <div class="htab-bar">
-                <button class="htab-btn active" onclick="navigateToSection('roundprogress')">Manuring Progress</button>
-                <button class="htab-btn" onclick="navigateToSection('maintprogress')">Maintenance Progress</button>
-                <button class="htab-btn" onclick="navigateToSection('chemusage')">Chemical Usage</button>
+                <button class="htab-btn active" onclick="navigateToSection('roundprogress')" data-i18n="tab_fertilizer_issuance">Fertilizer Issuance</button>
+                <button class="htab-btn" onclick="navigateToSection('maintprogress')" data-i18n="tab_maintenance_progress">Maintenance Progress</button>
+                <button class="htab-btn" onclick="navigateToSection('chemusage')" data-i18n="tab_chemical_usage">Chemical Usage</button>
             </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="nav_roundprogress">Manuring Progress Summary</h2>
             <p class="text-sm text-green-700 mb-6" data-i18n="progress_subtitle">Track fertilizer application progress across manuring rounds and blocks. Compare actual quantities applied against the budgeted fertilizer requirement.</p>
@@ -1892,9 +1892,9 @@
         <!-- ============ PAGE 10: MAINTENANCE PROGRESS & CHEMICAL USAGE ============ -->
         <section id="maintprogress" class="page-section">
             <div class="htab-bar">
-                <button class="htab-btn" onclick="navigateToSection('roundprogress')">Manuring Progress</button>
-                <button class="htab-btn active" onclick="navigateToSection('maintprogress')">Maintenance Progress</button>
-                <button class="htab-btn" onclick="navigateToSection('chemusage')">Chemical Usage</button>
+                <button class="htab-btn" onclick="navigateToSection('roundprogress')" data-i18n="tab_fertilizer_issuance">Fertilizer Issuance</button>
+                <button class="htab-btn active" onclick="navigateToSection('maintprogress')" data-i18n="tab_maintenance_progress">Maintenance Progress</button>
+                <button class="htab-btn" onclick="navigateToSection('chemusage')" data-i18n="tab_chemical_usage">Chemical Usage</button>
             </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_maintprogress">📊 Maintenance Progress</h2>
             <p class="text-sm text-green-700 mb-6" data-i18n="page_maintprogress_sub">Track field maintenance progress by round and block. Record claimed maintenance area and monitor completion against planned block coverage.</p>
@@ -2015,9 +2015,9 @@
         <!-- ============ PAGE: CHEMICAL USAGE ============ -->
         <section id="chemusage" class="page-section">
             <div class="htab-bar">
-                <button class="htab-btn" onclick="navigateToSection('roundprogress')">Manuring Progress</button>
-                <button class="htab-btn" onclick="navigateToSection('maintprogress')">Maintenance Progress</button>
-                <button class="htab-btn active" onclick="navigateToSection('chemusage')">Chemical Usage</button>
+                <button class="htab-btn" onclick="navigateToSection('roundprogress')" data-i18n="tab_fertilizer_issuance">Fertilizer Issuance</button>
+                <button class="htab-btn" onclick="navigateToSection('maintprogress')" data-i18n="tab_maintenance_progress">Maintenance Progress</button>
+                <button class="htab-btn active" onclick="navigateToSection('chemusage')" data-i18n="tab_chemical_usage">Chemical Usage</button>
             </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_chemusage">&#x2697;&#xFE0F; Chemical Usage</h2>
             <p class="text-sm text-green-700 mb-6" data-i18n="page_chemusage_sub">View chemical usage per hectare by round and block. Manage active ingredient definitions and maximum dosage rates.</p>
@@ -6755,6 +6755,9 @@ const I18N = {
         sb_lbl_locations:    'Location Area',
         sb_lbl_manuring:     'Manuring Program',
         sb_lbl_roundprogress:'Manuring Progress',
+        tab_fertilizer_issuance:  'Fertilizer Issuance',
+        tab_maintenance_progress: 'Maintenance Progress',
+        tab_chemical_usage:       'Chemical Usage',
         sb_lbl_fieldmaint:   'Maintenance Program',
         sb_lbl_maintprogress:'Maintenance Progress',
         sb_lbl_chemusage:    'Chemical Usage',
@@ -7082,6 +7085,9 @@ const I18N = {
         sb_lbl_locations:    'Kawasan Lokasi',
         sb_lbl_manuring:     'Program Pembajaan',
         sb_lbl_roundprogress:'Kemajuan Pembajaan',
+        tab_fertilizer_issuance:  'Pengeluaran Baja',
+        tab_maintenance_progress: 'Kemajuan Penyelenggaraan',
+        tab_chemical_usage:       'Penggunaan Kimia',
         sb_lbl_fieldmaint:   'Program Penyelenggaraan',
         sb_lbl_maintprogress:'Kemajuan Penyelenggaraan',
         sb_lbl_chemusage:    'Penggunaan Kimia',
