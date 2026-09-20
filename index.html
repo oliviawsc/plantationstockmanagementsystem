@@ -2184,9 +2184,9 @@
                 <button class="mrec-tab" onclick="navToSection('plantrecord')">🌱 Planting</button>
             </div>
             <div class="htab-bar">
-                <button class="htab-btn active" onclick="navigateToSection('fertrecord')">Fertilizer Record</button>
-                <button class="htab-btn" onclick="navigateToSection('chemrecord')">Chemical Record</button>
-                <button class="htab-btn" onclick="navigateToSection('plantrecord')">Field Planting Record</button>
+                <button class="htab-btn active" onclick="navigateToSection('fertrecord')" data-i18n="tab_fert_issuance_rec">Fertilizer Issuance Record</button>
+                <button class="htab-btn" onclick="navigateToSection('chemrecord')" data-i18n="tab_chem_issuance_rec">Chemical Issuance Record</button>
+                <button class="htab-btn" onclick="navigateToSection('plantrecord')" data-i18n="tab_planting_rec">Field Planting Record</button>
             </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_fertrecord">&#128203; Fertilizer Application Record</h2>
             <p class="text-sm text-green-700 mb-6" data-i18n="page_fertrecord_sub">Daily fertilizer transactions by block and manuring round — track quantity in, quantity out, and running balance per fertilizer.</p>
@@ -2233,9 +2233,9 @@
                 <button class="mrec-tab" onclick="navToSection('plantrecord')">🌱 Planting</button>
             </div>
             <div class="htab-bar">
-                <button class="htab-btn" onclick="navigateToSection('fertrecord')">Fertilizer Record</button>
-                <button class="htab-btn active" onclick="navigateToSection('chemrecord')">Chemical Record</button>
-                <button class="htab-btn" onclick="navigateToSection('plantrecord')">Field Planting Record</button>
+                <button class="htab-btn" onclick="navigateToSection('fertrecord')" data-i18n="tab_fert_issuance_rec">Fertilizer Issuance Record</button>
+                <button class="htab-btn active" onclick="navigateToSection('chemrecord')" data-i18n="tab_chem_issuance_rec">Chemical Issuance Record</button>
+                <button class="htab-btn" onclick="navigateToSection('plantrecord')" data-i18n="tab_planting_rec">Field Planting Record</button>
             </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_chemrecord">&#9879;&#65039; Chemical Application Record</h2>
             <p class="text-sm text-blue-700 mb-6" data-i18n="page_chemrecord_sub">Daily chemical transactions by block — track quantity in, quantity out, and running balance per chemical item.</p>
@@ -2282,9 +2282,9 @@
                 <button class="mrec-tab active" onclick="navToSection('plantrecord')">🌱 Planting</button>
             </div>
             <div class="htab-bar">
-                <button class="htab-btn" onclick="navigateToSection('fertrecord')">Fertilizer Record</button>
-                <button class="htab-btn" onclick="navigateToSection('chemrecord')">Chemical Record</button>
-                <button class="htab-btn active" onclick="navigateToSection('plantrecord')">Field Planting Record</button>
+                <button class="htab-btn" onclick="navigateToSection('fertrecord')" data-i18n="tab_fert_issuance_rec">Fertilizer Issuance Record</button>
+                <button class="htab-btn" onclick="navigateToSection('chemrecord')" data-i18n="tab_chem_issuance_rec">Chemical Issuance Record</button>
+                <button class="htab-btn active" onclick="navigateToSection('plantrecord')" data-i18n="tab_planting_rec">Field Planting Record</button>
             </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_plantrecord">🌱 Field Planting Record</h2>
             <p class="text-sm text-amber-700 mb-6" data-i18n="page_plantrecord_sub">Daily seedling transactions by block — track quantity in, quantity out, and running balance per seedling item.</p>
@@ -6767,6 +6767,9 @@ const I18N = {
         tab_fertilizer_issuance:  'Fertilizer Issuance',
         tab_maintenance_progress: 'Maintenance Progress',
         tab_chemical_usage:       'Chemical Usage',
+        tab_fert_issuance_rec:    'Fertilizer Issuance Record',
+        tab_chem_issuance_rec:    'Chemical Issuance Record',
+        tab_planting_rec:         'Field Planting Record',
         sb_lbl_fieldmaint:   'Maintenance Program',
         sb_lbl_maintprogress:'Maintenance Progress',
         sb_lbl_chemusage:    'Chemical Usage',
@@ -7097,6 +7100,9 @@ const I18N = {
         tab_fertilizer_issuance:  'Pengeluaran Baja',
         tab_maintenance_progress: 'Kemajuan Penyelenggaraan',
         tab_chemical_usage:       'Penggunaan Kimia',
+        tab_fert_issuance_rec:    'Rekod Pengeluaran Baja',
+        tab_chem_issuance_rec:    'Rekod Pengeluaran Kimia',
+        tab_planting_rec:         'Rekod Penanaman Lapangan',
         sb_lbl_fieldmaint:   'Program Penyelenggaraan',
         sb_lbl_maintprogress:'Kemajuan Penyelenggaraan',
         sb_lbl_chemusage:    'Penggunaan Kimia',
