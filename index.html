@@ -7021,14 +7021,14 @@ const I18N = {
         col_date_month:      'Month',
         /* Chemical Ingredient Setup */
         ci_form_title:       '🧪 Chemical Ingredient Setup',
-        ci_lbl_name:         'Ingredient Name',
+        ci_lbl_name:         'Active Ingredient',
         ci_lbl_item:         'Linked Chemical Item',
         ci_lbl_unit:         'Unit',
         ci_lbl_dosage:       'Max Dosage Rate (optional)',
         ci_lbl_density:      'Density (kg per Litre) (optional — only needed to convert g/kg ⇄ Litre/ml)',
         ci_density_hint:     'Stock recorded in grams/kg can only be shown as Litre/Ha if you enter the chemical\'s density here (check the product label or safety data sheet). Leave blank if the stock unit and dosage unit are already the same type (e.g. both volume, or both weight).',
         ci_btn_save:         'Save Ingredient',
-        ci_col_chemical:     'Linked Chemical',
+        ci_col_chemical:     'Chemical Name',
         ci_col_max_dosage:   'Max Dosage / Ha',
         /* Fertilizer Application Record (fertrecord) */
         sb_lbl_fertrecord:        'Fertilizer Application',
@@ -7353,14 +7353,14 @@ const I18N = {
 
         /* Chemical Ingredient Setup */
         ci_form_title:       '🧪 Persediaan Bahan Aktif Kimia',
-        ci_lbl_name:         'Nama Bahan Aktif',
+        ci_lbl_name:         'Bahan Aktif',
         ci_lbl_item:         'Item Kimia Dikaitkan',
         ci_lbl_unit:         'Unit',
         ci_lbl_dosage:       'Kadar Dos Maksimum (pilihan)',
         ci_lbl_density:      'Ketumpatan (kg per Liter) (pilihan — hanya diperlukan untuk menukar g/kg ⇄ Liter/ml)',
         ci_density_hint:     'Stok yang direkod dalam gram/kg hanya boleh dipaparkan sebagai Liter/Ha jika anda masukkan ketumpatan bahan kimia di sini (semak label produk atau helaian data keselamatan). Biarkan kosong jika unit stok dan unit dos sudah jenis yang sama (cth. kedua-duanya isipadu, atau kedua-duanya berat).',
         ci_btn_save:         'Simpan Bahan Aktif',
-        ci_col_chemical:     'Kimia Dikaitkan',
+        ci_col_chemical:     'Nama Kimia',
         ci_col_max_dosage:   'Dos Maks / Ha',
         /* Fertilizer Application Record (fertrecord) */
         sb_lbl_fertrecord:        'Rekod Penaburan Baja',
@@ -9798,7 +9798,7 @@ function renderChemByRound() {
             tr.innerHTML = `
                 <td class="px-3 py-2 font-semibold">🔧 ${rm.roundName}</td>
                 <td class="px-3 py-2 font-semibold text-blue-700">${group.name}</td>
-                <td class="px-3 py-2" title="${breakdown.join(' | ').replace(/"/g, '&quot;')}">${linkedItemNames} <span class="text-gray-400" style="cursor:help;">ⓘ</span></td>
+                <td class="px-3 py-2">${linkedItemNames}</td>
                 <td class="px-3 py-2 text-right">${totalQty.toFixed(2)} ${group.unit}</td>
                 <td class="px-3 py-2 text-right">${rm.totalClaimed.toFixed(2)} Ha</td>
                 <td class="px-3 py-2 text-right font-bold">${usagePerHa.toFixed(2)} ${group.unit}/Ha</td>
@@ -9887,7 +9887,7 @@ function renderChemByBlock() {
                     <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">${c.blockName}</span>
                 </td>
                 <td class="px-3 py-2 font-semibold text-blue-700">${group.name}</td>
-                <td class="px-3 py-2" title="${breakdown.join(' | ').replace(/"/g, '&quot;')}">${linkedItemNames} <span class="text-gray-400" style="cursor:help;">ⓘ</span></td>
+                <td class="px-3 py-2">${linkedItemNames}</td>
                 <td class="px-3 py-2 text-right">${totalQty.toFixed(2)} ${group.unit}</td>
                 <td class="px-3 py-2 text-right">${claimed.toFixed(2)} Ha</td>
                 <td class="px-3 py-2 text-right font-bold">${usagePerHa.toFixed(2)} ${group.unit}/Ha</td>
