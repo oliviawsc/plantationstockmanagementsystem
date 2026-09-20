@@ -5221,14 +5221,15 @@ function renderManuringPctChart() {
         var budget      = calcRoundBudget(r);
         var kgPerUnit   = getKgPerUnit(r);
         var pkgUnit     = getRoundPkgUnit(r);
-        var appliedKg   = calcRoundTotalApplied(r.id);
+        var filteredTxns = transactions.filter(function(t){
+            return String(t.manuringRoundId)===String(r.id)&&t.type==='Out'&&t.date&&
+                   t.date.slice(0,7) >= fromMonth && t.date.slice(0,7) <= toMonth;
+        });
+        var appliedKg   = filteredTxns.reduce(function(s,t){ return s+(parseFloat(t.qty)||0); }, 0);
         var appliedBags = kgPerUnit>0 ? appliedKg/kgPerUnit : appliedKg;
         var pct         = budget>0 ? Math.round((appliedBags/budget)*100) : null;
         var monthlyBags = new Array(12).fill(0);
-        transactions.filter(function(t){
-            return String(t.manuringRoundId)===String(r.id)&&t.type==='Out'&&t.date&&
-                   t.date.slice(0,7) >= fromMonth && t.date.slice(0,7) <= toMonth;
-        }).forEach(function(t){
+        filteredTxns.forEach(function(t){
             var mi = parseInt(t.date.split('-')[1],10)-1;
             if (mi>=0&&mi<12){
                 var bags=(parseFloat(t.qty)||0)/(kgPerUnit>0?kgPerUnit:1);
