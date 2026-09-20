@@ -6876,7 +6876,7 @@ const I18N = {
         txn_col_location_block: 'Location (Block)',
         txn_breakdown_hint:  '📝 Add a row for each block where stock was applied. Each row creates a separate transaction record sharing the same Item, Date, Ref, and Round.',
         txn_round_hint:      '🌱 Required when issuing fertilizer for field application. Make sure the <b>Location</b> above is set to the target block (not Storage). Define rounds in the <b>Manuring Program</b> page.',
-        txn_round_in_hint:   '📦 Optional — link this receipt to a Manuring Round so it appears correctly in the Fertilizer Application Record.',
+        txn_round_in_hint:   '📦 Optional — link this receipt to a Manuring Round so it appears correctly in the Fertilizer Issuance Record.',
         txn_lbl_maint_round: '🔧 Maintenance Round',
         select_none_na:      '-- None / Not Applicable --',
         select_maint_round:  '-- Select a Maintenance Round --',
@@ -7045,9 +7045,9 @@ const I18N = {
         ci_col_chemical:     'Chemical Name',
         ci_col_max_dosage:   'Max Dosage / Ha',
         /* Fertilizer Application Record (fertrecord) */
-        sb_lbl_fertrecord:        'Fertilizer Application',
-        nav_fertrecord:           '📋 Fertilizer Application',
-        page_fertrecord:          '📋 Fertilizer Application Record',
+        sb_lbl_fertrecord:        'Fertilizer Issuance Record',
+        nav_fertrecord:           '📋 Fertilizer Issuance Record',
+        page_fertrecord:          '📋 Fertilizer Issuance Record',
         page_fertrecord_sub:      'Daily fertilizer transactions by block and manuring round — track quantity in, quantity out, and running balance per fertilizer.',
         fr_lbl_round:             'Manuring Round',
         fr_lbl_from:              'Date From',
@@ -7065,9 +7065,9 @@ const I18N = {
         fr_bring_forward:         'Bring Forward',
         fr_no_data:               'No fertilizer records found for the selected filters.',
         /* Chemical Application Record (chemrecord) */
-        sb_lbl_chemrecord:        'Chemical Application',
-        nav_chemrecord:           '⚗️ Chemical Application Record',
-        page_chemrecord:          '⚗️ Chemical Application Record',
+        sb_lbl_chemrecord:        'Chemical Issuance Record',
+        nav_chemrecord:           '⚗️ Chemical Issuance Record',
+        page_chemrecord:          '⚗️ Chemical Issuance Record',
         page_chemrecord_sub:      'Daily chemical transactions by block — track quantity in, quantity out, and running balance per chemical item.',
         cr_lbl_item:              'Chemical Item',
         cr_select_item:           '-- Select a Chemical Item --',
@@ -10267,7 +10267,7 @@ function exportFertRecord() {
 
     const wsRows = [];
     // Title
-    wsRows.push(['Fertilizer Application Record']);
+    wsRows.push(['Fertilizer Issuance Record']);
     wsRows.push([]);
     // Header info
     wsRows.push(['Manuring Round:', round.name, '', '', '', 'kg Per Palm:', round.kgPerPalm + ' Kg']);
@@ -10337,7 +10337,7 @@ function printFertRecord() {
 <html>
 <head>
 <meta charset="utf-8"/>
-<title>Fertilizer Application Record</title>
+<title>Fertilizer Issuance Record</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; font-size: 12px; color: #111; background: #fff; padding: 20px 24px; }
@@ -10359,7 +10359,7 @@ function printFertRecord() {
 </style>
 </head>
 <body>
-<h1>&#128203; Fertilizer Application Record</h1>
+<h1>&#128203; Fertilizer Issuance Record</h1>
 ${estateName ? `<div class="sub">${estateName}</div>` : ''}
 <div class="meta">
   <span><strong>Round:</strong> ${roundName}</span>
@@ -10597,7 +10597,7 @@ function exportChemRecord() {
     if (dateRows.length === 0) { alert('No data to export.'); return; }
 
     const wsRows = [];
-    wsRows.push(['Chemical Application Record']);
+    wsRows.push(['Chemical Issuance Record']);
     wsRows.push([]);
     wsRows.push(['Item:', item ? item.name : '']);
     wsRows.push([]);
@@ -10643,7 +10643,7 @@ function printChemRecord() {
 <html>
 <head>
 <meta charset="utf-8"/>
-<title>Chemical Application Record</title>
+<title>Chemical Issuance Record</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; font-size: 12px; color: #111; background: #fff; padding: 20px 24px; }
@@ -10658,7 +10658,7 @@ function printChemRecord() {
 </style>
 </head>
 <body>
-<h1>&#9879;&#65039; Chemical Application Record</h1>
+<h1>&#9879;&#65039; Chemical Issuance Record</h1>
 ${estateName ? `<div class="sub">${estateName}</div>` : ''}
 <div class="meta">
   <span><strong>Item:</strong> ${itemName}</span>
