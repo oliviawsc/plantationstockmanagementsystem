@@ -1307,7 +1307,7 @@
                 <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-600">
                     <div class="flex items-center gap-2 mb-1">
                         <span class="inline-block w-3 h-3 rounded-sm flex-shrink-0" style="background:#16a34a"></span>
-                        <h3 class="text-lg font-bold text-green-800">Balance Fertilizer</h3>
+                        <h3 class="text-lg font-bold text-green-800" data-i18n="dash_bal_fertilizer">Balance Fertilizer</h3>
                     </div>
                     <div id="chartFertilizerWrap" style="min-height:100px;">
                         <canvas id="chartFertilizer"></canvas>
@@ -1319,7 +1319,7 @@
                 <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-600">
                     <div class="flex items-center gap-2 mb-1">
                         <span class="inline-block w-3 h-3 rounded-sm flex-shrink-0" style="background:#2563eb"></span>
-                        <h3 class="text-lg font-bold text-blue-800">Balance Chemicals</h3>
+                        <h3 class="text-lg font-bold text-blue-800" data-i18n="dash_bal_chemicals">Balance Chemicals</h3>
                     </div>
                     <!-- Chemical legend -->
                     <div class="flex flex-wrap gap-3 mb-4 text-xs font-medium">
@@ -1337,7 +1337,7 @@
                 <div class="bg-white p-6 rounded-xl shadow border-l-4 border-pink-600">
                     <div class="flex items-center gap-2 mb-1">
                         <span class="inline-block w-3 h-3 rounded-sm flex-shrink-0" style="background:#db2777"></span>
-                        <h3 class="text-lg font-bold text-pink-800">Balance Oil Palm Seedlings</h3>
+                        <h3 class="text-lg font-bold text-pink-800" data-i18n="dash_bal_seedlings">Balance Oil Palm Seedlings</h3>
                     </div>
                     <div id="chartSeedlingWrap" style="min-height:100px;">
                         <canvas id="chartSeedling"></canvas>
@@ -6865,6 +6865,9 @@ const I18N = {
         btn_save_txn:        'Save Transaction',
         btn_add_row:         '+ Add Row',
         /* Dashboard - Progress Trackers */
+        dash_bal_fertilizer:         'Balance Fertilizer',
+        dash_bal_chemicals:          'Balance Chemicals',
+        dash_bal_seedlings:          'Balance Oil Palm Seedlings',
         dash_manuring_tracker_title: '🌾 Fertilizer Application',
         dash_maint_tracker_title:    '🔧 Maintenance Progress',
         dash_chem_tracker_title:     '⚗️ Chemical Usage Tracker',
@@ -7187,8 +7190,11 @@ const I18N = {
         btn_save_txn:        'Simpan Transaksi',
         btn_add_row:         '+ Tambah Baris',
         /* Dashboard - Progress Trackers */
-        dash_manuring_tracker_title: '🌾 Program Pembajaan — Penjejak Kemajuan',
-        dash_maint_tracker_title:    '🔧 Program Penyelenggaraan — Penjejak Kemajuan',
+        dash_bal_fertilizer:         'Baki Baja',
+        dash_bal_chemicals:          'Baki Bahan Kimia',
+        dash_bal_seedlings:          'Baki Anak Benih Kelapa Sawit',
+        dash_manuring_tracker_title: '🌾 Aplikasi Baja',
+        dash_maint_tracker_title:    '🔧 Kemajuan Penyelenggaraan',
         dash_chem_tracker_title:     '⚗️ Penjejak Penggunaan Kimia',
         dash_chem_tracker_subtitle:  'Penggunaan per Ha vs Dos Maksimum — mengikut Pusingan Penyelenggaraan',
         dash_lbl_year:                'Tahun:',
