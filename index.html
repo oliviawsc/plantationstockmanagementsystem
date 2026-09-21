@@ -1053,7 +1053,7 @@
             <button data-target="ledger"         class="nav-item">             <span class="nav-icon">&#128210;</span><span class="sb-label" data-i18n="sb_lbl_ledger">Stock Summary</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;">Field Operations</p>
             <button data-target="manuring"      id="navManuring"  class="nav-item">            <span class="nav-icon">&#127807;</span><span class="sb-label" data-i18n="sb_lbl_manuring">Manuring Program</span></button>
-            <button data-target="roundprogress" class="nav-item">       <span class="nav-icon">&#128200;</span><span class="sb-label" data-i18n="sb_lbl_roundprogress">Manuring Progress</span></button>
+            <button data-target="roundprogress" class="nav-item">       <span class="nav-icon">&#128200;</span><span class="sb-label" data-i18n="sb_lbl_roundprogress">Fertilizer Issuance</span></button>
             <button data-target="fieldmaint"    id="navFieldmaint" class="nav-item">          <span class="nav-icon">&#128295;</span><span class="sb-label" data-i18n="sb_lbl_fieldmaint">Maintenance Program</span></button>
             <button data-target="maintprogress" class="nav-item"><span class="nav-icon">&#128202;</span><span class="sb-label" data-i18n="sb_lbl_maintprogress">Maintenance Progress</span></button>
             <button data-target="chemusage"    class="nav-item">          <span class="nav-icon">&#9879;&#65039;</span><span class="sb-label" data-i18n="sb_lbl_chemusage">Chemical Usage</span></button>
@@ -1832,12 +1832,12 @@
                 <button class="htab-btn" onclick="navigateToSection('maintprogress')" data-i18n="tab_maintenance_progress">Maintenance Progress</button>
                 <button class="htab-btn" onclick="navigateToSection('chemusage')" data-i18n="tab_chemical_usage">Chemical Usage</button>
             </div>
-            <h2 class="text-3xl font-bold mb-2" data-i18n="nav_roundprogress">Manuring Progress Summary</h2>
-            <p class="text-sm text-green-700 mb-6" data-i18n="progress_subtitle">Track fertilizer application progress across manuring rounds and blocks. Compare actual quantities applied against the budgeted fertilizer requirement.</p>
+            <h2 class="text-3xl font-bold mb-2" data-i18n="nav_roundprogress">Fertilizer Issuance</h2>
+            <p class="text-sm text-green-700 mb-6" data-i18n="progress_subtitle">Track fertilizer application progress across fertilizer issuance rounds and blocks. Compare actual quantities applied against the budgeted fertilizer requirement.</p>
 
             <!-- Round progress summary - one % per round, aggregated across ALL blocks -->
             <div class="bg-white p-6 rounded-xl shadow mb-8">
-                <h3 class="text-xl font-bold mb-2" data-i18n="rp_title_a">a) Manuring Progress by Round</h3>
+                <h3 class="text-xl font-bold mb-2" data-i18n="rp_title_a">a) Fertilizer Issuance by Round</h3>
                 <p class="text-xs text-green-700 mb-2">% Applied per round = Qty Applied (that round) ÷ Budgeted Fertilizer Needed (that round)</p>
                 <div class="grid grid-cols-2 gap-3 mb-3">
                     <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
@@ -1875,7 +1875,7 @@
 
             <!-- Manuring Application History (moved from Manuring Program) -->
             <div class="bg-white p-6 rounded-xl shadow mb-8">
-                <h3 class="text-xl font-bold mb-2" data-i18n="rp_title_b">b) Manuring Progress by Block</h3>
+                <h3 class="text-xl font-bold mb-2" data-i18n="rp_title_b">b) Fertilizer Issuance by Block</h3>
                 <p class="text-xs text-green-700 mb-2">% Applied per block = Qty Applied (that block) ÷ Budgeted Fertilizer Needed (that block)</p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
                     <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
@@ -6747,7 +6747,7 @@ const I18N = {
         nav_ledger:          '📒 Stock Summary',
         nav_locations:       '📍 Location Area',
         nav_manuring:        '🌱 Manuring Program',
-        nav_roundprogress:   '📈 Manuring Progress',
+        nav_roundprogress:   '📈 Fertilizer Issuance',
         sb_lbl_dashboard:    'Dashboard',
         sb_lbl_items:        'Item File',
         sb_lbl_transactions: 'Record Stock',
@@ -6758,7 +6758,7 @@ const I18N = {
         tab_stock_summary:   'Stock Summary',
         sb_lbl_locations:    'Location Area',
         sb_lbl_manuring:     'Manuring Program',
-        sb_lbl_roundprogress:'Manuring Progress',
+        sb_lbl_roundprogress:'Fertilizer Issuance',
         tab_fertilizer_issuance:  'Fertilizer Issuance',
         tab_maintenance_progress: 'Maintenance Progress',
         tab_chemical_usage:       'Chemical Usage',
@@ -6951,7 +6951,7 @@ const I18N = {
         manuring_history_title: 'Manuring Application History',
         manuring_history_hint:  'Auto-generated from fertilizer "Out" transactions linked to a round.',
         /* Manuring Progress */
-        progress_subtitle:   'Track fertilizer application progress across manuring rounds and blocks. Compare actual quantities applied against the budgeted fertilizer requirement.',
+        progress_subtitle:   'Track fertilizer application progress across fertilizer issuance rounds and blocks. Compare actual quantities applied against the budgeted fertilizer requirement.',
         /* Edit Modal */
         modal_edit_title:    '✏️ Edit Transaction',
         btn_save_changes:    'Save Changes',
@@ -7095,7 +7095,7 @@ const I18N = {
         tab_stock_summary:   'Ringkasan Stok',
         sb_lbl_locations:    'Kawasan Lokasi',
         sb_lbl_manuring:     'Program Pembajaan',
-        sb_lbl_roundprogress:'Kemajuan Pembajaan',
+        sb_lbl_roundprogress:'Pengeluaran Baja',
         tab_fertilizer_issuance:  'Pengeluaran Baja',
         tab_maintenance_progress: 'Kemajuan Penyelenggaraan',
         tab_chemical_usage:       'Penggunaan Kimia',
