@@ -2493,13 +2493,13 @@
                         <button onclick="showAddRainfallPanel()" class="btn btn-primary">&#10133; <span data-i18n="rf_btn_add">Add Rainfall Transaction</span></button>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full text-sm">
+                        <table class="min-w-full text-sm" style="border-collapse:collapse;">
                             <thead class="bg-blue-50 text-blue-900">
                                 <tr>
-                                    <th class="px-3 py-2 text-left" data-i18n="rf_col_date">Date</th>
-                                    <th class="px-3 py-2 text-right" data-i18n="rf_col_mm">Rainfall (mm)</th>
-                                    <th class="px-3 py-2 text-center" data-i18n="rf_col_photo">Photo</th>
-                                    <th class="px-3 py-2 text-center" data-i18n="rf_col_action">Action</th>
+                                    <th class="px-3 py-2 text-center border border-blue-200" data-i18n="rf_col_date">Date</th>
+                                    <th class="px-3 py-2 text-center border border-blue-200" data-i18n="rf_col_mm">Rainfall (mm)</th>
+                                    <th class="px-3 py-2 text-center border border-blue-200" data-i18n="rf_col_photo">Photo</th>
+                                    <th class="px-3 py-2 text-center border border-blue-200" data-i18n="rf_col_action">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="rfTableBody">
@@ -11924,19 +11924,23 @@ function renderRainfallTxns() {
         tbody.innerHTML = '<tr><td colspan="4" class="text-center text-gray-400 py-8">' + noData + '</td></tr>';
         return;
     }
+    const cellCls = 'px-3 py-2 text-center border border-blue-100';
     tbody.innerHTML = rainfallTxns.map(function(r) {
         const photoCell = r.picture
-            ? '<button onclick="viewRainfallPicture(\'' + r.id + '\')" class="text-blue-600 underline text-xs">View</button>'
-            : '<span class="text-gray-300">—</span>';
-        return '<tr class="border-b border-blue-100 hover:bg-blue-50">' +
-            '<td class="px-3 py-2">' + r.date + '</td>' +
-            '<td class="px-3 py-2 text-right font-semibold">' + r.mm.toFixed(1) + '</td>' +
-            '<td class="px-3 py-2 text-center">' + photoCell + '</td>' +
-            '<td class="px-3 py-2 text-center" style="white-space:nowrap;">' +
+            ? '<img src="' + r.picture + '" onclick="viewRainfallPicture(\'' + r.id + '\')" title="Click to enlarge" ' +
+              'style="width:56px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid #BFDBFE;" />'
+            : '<span class="text-gray-300 text-xs">—</span>';
+        return '<tr class="hover:bg-blue-50">' +
+            '<td class="' + cellCls + '">' + r.date + '</td>' +
+            '<td class="' + cellCls + ' font-semibold">' + r.mm.toFixed(1) + '</td>' +
+            '<td class="' + cellCls + '">' + photoCell + '</td>' +
+            '<td class="' + cellCls + '" style="white-space:nowrap;">' +
+                '<div class="flex gap-2 flex-wrap justify-center">' +
                 '<button onclick="editRainfallTxn(\'' + r.id + '\')" ' +
-                'class="text-blue-600 hover:text-blue-800 text-xs font-semibold px-2 py-1 rounded border border-blue-200 hover:bg-blue-50 mr-1">&#9998; Edit</button>' +
+                'class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded">&#9998; Edit</button>' +
                 '<button onclick="deleteRainfallTxn(\'' + r.id + '\')" ' +
-                'class="text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-1 rounded border border-red-200 hover:bg-red-50">&#128465; Delete</button>' +
+                'class="text-xs bg-red-100 hover:bg-red-200 text-red-800 font-semibold px-3 py-1 rounded">&#128465; Delete</button>' +
+                '</div>' +
             '</td>' +
         '</tr>';
     }).join('');
