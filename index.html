@@ -12363,7 +12363,7 @@ async function saveSettingsBlock() {
             if (error) throw error;
         } else {
             const { error } = await supabaseClient.from('opp_locations')
-                .insert({ name, area, numPalms, estate: settingsBlocksEstate });
+                .insert({ id: Date.now(), name, area, numPalms, estate: settingsBlocksEstate });
             if (error) throw error;
         }
         cancelEditSettingsBlock();
