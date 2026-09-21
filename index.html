@@ -1080,6 +1080,8 @@
             <button data-target="fertrecord"   class="nav-item">          <span class="nav-icon">&#128203;</span><span class="sb-label" data-i18n="sb_lbl_fertrecord">Fertilizer Application</span></button>
             <button data-target="chemrecord"   class="nav-item">          <span class="nav-icon">&#9879;&#65039;</span><span class="sb-label" data-i18n="sb_lbl_chemrecord">Chemical Application</span></button>
             <button data-target="plantrecord"  class="nav-item">          <span class="nav-icon">&#127807;</span><span class="sb-label" data-i18n="sb_lbl_plantrecord">Field Planting Record</span></button>
+            <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;" data-i18n="sb_section_rainfall">Rainfall</p>
+            <button data-target="rainfall" class="nav-item">              <span class="nav-icon">&#127783;&#65039;</span><span class="sb-label" data-i18n="sb_lbl_rainfall">Rainfall Transactions</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;">Admin</p>
             <button data-target="settings" id="navSettings" class="nav-item hidden">
                 <span class="nav-icon">&#9881;&#65039;</span><span class="sb-label" data-i18n="sb_lbl_settings">Settings</span>
@@ -2369,6 +2371,81 @@
             <div id="plantRecordReport"></div>
         </section>
 
+        <!-- ============ PAGE 13: RAINFALL TRANSACTIONS ============ -->
+        <section id="rainfall" class="page-section">
+            <h2 class="text-3xl font-bold mb-2" data-i18n="page_rainfall">&#127783;&#65039; Rainfall Transactions</h2>
+            <p class="text-sm text-blue-700 mb-6" data-i18n="page_rainfall_sub">Record daily rainfall readings with date, amount (mm), and an optional photo.</p>
+
+            <!-- Add Rainfall Transaction Form -->
+            <div class="bg-white p-6 rounded-xl shadow mb-8 border-l-4 border-blue-500">
+                <h3 class="text-lg font-bold text-blue-800 mb-4" data-i18n="rf_add_title">Add Rainfall Transaction</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <!-- Date -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1" data-i18n="rf_lbl_date">Date</label>
+                        <input type="date" id="rfDate"
+                            class="w-full border border-blue-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    </div>
+                    <!-- Rainfall (mm) -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1" data-i18n="rf_lbl_mm">Rainfall (mm)</label>
+                        <input type="number" id="rfMm" min="0" step="0.1" placeholder="e.g. 12.5"
+                            class="w-full border border-blue-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    </div>
+                </div>
+
+                <!-- Photo -->
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2" data-i18n="rf_lbl_photo">Photo (optional)</label>
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        <button type="button" onclick="document.getElementById('rfPictureFile').click()"
+                            class="bg-blue-50 border border-blue-300 text-blue-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-100">
+                            &#128247; <span data-i18n="rf_btn_upload">Upload Photo</span>
+                        </button>
+                        <button type="button" onclick="document.getElementById('rfPictureCamera').click()"
+                            class="bg-blue-50 border border-blue-300 text-blue-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-100">
+                            &#128249; <span data-i18n="rf_btn_camera">Take Photo</span>
+                        </button>
+                        <button type="button" id="rfClearPhotoBtn" onclick="clearRainfallPicture()" style="display:none;"
+                            class="bg-red-50 border border-red-300 text-red-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-100">
+                            &#10005; <span data-i18n="rf_btn_clear_photo">Clear Photo</span>
+                        </button>
+                    </div>
+                    <input type="file" id="rfPictureFile" accept="image/*" class="hidden" onchange="previewRainfallPicture(this)" />
+                    <input type="file" id="rfPictureCamera" accept="image/*" capture="environment" class="hidden" onchange="previewRainfallPicture(this)" />
+                    <div id="rfPicturePreviewWrap" style="display:none;">
+                        <img id="rfPicturePreview" src="" alt="Preview"
+                            style="max-width:220px;max-height:160px;border-radius:8px;border:2px solid #BFDBFE;object-fit:cover;" />
+                    </div>
+                </div>
+
+                <button onclick="saveRainfallTxn()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold" data-i18n="rf_btn_save">
+                    Save Transaction
+                </button>
+            </div>
+
+            <!-- Transactions Table -->
+            <div class="bg-white p-6 rounded-xl shadow">
+                <h3 class="text-lg font-bold text-blue-800 mb-4" data-i18n="rf_table_title">Rainfall Records</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-blue-50 text-blue-900">
+                                <th class="px-3 py-2 text-left" data-i18n="rf_col_date">Date</th>
+                                <th class="px-3 py-2 text-right" data-i18n="rf_col_mm">Rainfall (mm)</th>
+                                <th class="px-3 py-2 text-center" data-i18n="rf_col_photo">Photo</th>
+                                <th class="px-3 py-2 text-center" data-i18n="rf_col_action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rfTableBody">
+                            <tr><td colspan="4" class="text-center text-gray-400 py-8" data-i18n="rf_no_data">No rainfall records yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <!-- ============ PAGE 12: USER MANAGEMENT (Super Admin only) ============ -->
         <section id="useradmin" class="page-section">
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_useradmin">👤 User Management</h2>
@@ -3017,7 +3094,8 @@ const STORAGE_KEYS = {
     manuringRounds:   'opp_manuring_rounds',
     fieldMaintRounds: 'opp_fieldmaint_rounds',
     maintClaims:      'opp_maint_claims',
-    chemIngredients:  'opp_chem_ingredients'
+    chemIngredients:  'opp_chem_ingredients',
+    rainfallTxns:     'opp_rainfall_txns'
 };
 
 // In-memory arrays — always reflect the ACTIVE estate's data
@@ -3028,6 +3106,7 @@ let manuringRounds   = [];
 let fieldMaintRounds = [];
 let maintClaims      = []; // { id, roundId, roundName, blockName, claimedArea, month }
 let chemIngredients  = []; // { id, name, itemId, itemName, unit, maxDosage }
+let rainfallTxns     = []; // { id, date, mm, picture, createdAt }
 
 // Snapshot of last-known ids per estate+table for Supabase delete sync
 const lastKnownIds = {
@@ -3037,7 +3116,8 @@ const lastKnownIds = {
     opp_manuring_rounds:    new Set(),
     opp_fieldmaint_rounds:  new Set(),
     opp_maint_claims:       new Set(),
-    opp_chem_ingredients:   new Set()
+    opp_chem_ingredients:   new Set(),
+    opp_rainfall_txns:      new Set()
 };
 
 /**
@@ -3053,6 +3133,7 @@ function loadEstateData(estate) {
     fieldMaintRounds = JSON.parse(localStorage.getItem(keys.fieldMaintRounds)) || [];
     maintClaims      = JSON.parse(localStorage.getItem(keys.maintClaims))      || [];
     chemIngredients  = JSON.parse(localStorage.getItem(keys.chemIngredients))  || [];
+    rainfallTxns     = JSON.parse(localStorage.getItem(keys.rainfallTxns))     || [];
     // Refresh id snapshots
     lastKnownIds.opp_items              = new Set(items.map(r => r.id));
     lastKnownIds.opp_locations          = new Set(locations.map(r => r.id));
@@ -3061,6 +3142,7 @@ function loadEstateData(estate) {
     lastKnownIds.opp_fieldmaint_rounds  = new Set(fieldMaintRounds.map(r => r.id));
     lastKnownIds.opp_maint_claims       = new Set(maintClaims.map(r => r.id));
     lastKnownIds.opp_chem_ingredients   = new Set(chemIngredients.map(r => r.id));
+    lastKnownIds.opp_rainfall_txns      = new Set(rainfallTxns.map(r => r.id));
 }
 
 // Show a spinner + disable a save button while an operation is in flight.
@@ -6202,6 +6284,7 @@ function refreshAll() {
     if (typeof renderFertRecord === 'function') renderFertRecord();
     if (typeof renderChemRecord === 'function') renderChemRecord();
     if (typeof renderPlantRecord === 'function') renderPlantRecord();
+    if (typeof renderRainfallTxns === 'function') renderRainfallTxns();
 }
 
 /* -----------------------------------------------------------------
@@ -7092,6 +7175,26 @@ const I18N = {
         pr_col_pengeluaran:       'Quantity Out',
         pr_col_jumlah:            'Total Quantity Out',
         pr_no_data:               'No planting records found for the selected filters.',
+        /* Rainfall */
+        sb_section_rainfall:      'Rainfall',
+        sb_lbl_rainfall:          'Rainfall Transactions',
+        nav_rainfall:             '🌧️ Rainfall Transactions',
+        page_rainfall:            '🌧️ Rainfall Transactions',
+        page_rainfall_sub:        'Record daily rainfall readings with date, amount (mm), and an optional photo.',
+        rf_add_title:             'Add Rainfall Transaction',
+        rf_lbl_date:              'Date',
+        rf_lbl_mm:                'Rainfall (mm)',
+        rf_lbl_photo:             'Photo (optional)',
+        rf_btn_upload:            'Upload Photo',
+        rf_btn_camera:            'Take Photo',
+        rf_btn_clear_photo:       'Clear Photo',
+        rf_btn_save:              'Save Transaction',
+        rf_table_title:           'Rainfall Records',
+        rf_col_date:              'Date',
+        rf_col_mm:                'Rainfall (mm)',
+        rf_col_photo:             'Photo',
+        rf_col_action:            'Action',
+        rf_no_data:               'No rainfall records yet.',
     },
 
     ms: {
@@ -7431,6 +7534,26 @@ const I18N = {
         pr_col_pengeluaran:       'Kuantiti Keluar',
         pr_col_jumlah:            'Jumlah Kuantiti Keluar',
         pr_no_data:               'Tiada rekod penanaman ditemui untuk penapis yang dipilih.',
+        /* Rainfall */
+        sb_section_rainfall:      'Hujan',
+        sb_lbl_rainfall:          'Transaksi Hujan',
+        nav_rainfall:             '🌧️ Transaksi Hujan',
+        page_rainfall:            '🌧️ Transaksi Hujan',
+        page_rainfall_sub:        'Rekod bacaan hujan harian dengan tarikh, jumlah (mm), dan foto pilihan.',
+        rf_add_title:             'Tambah Transaksi Hujan',
+        rf_lbl_date:              'Tarikh',
+        rf_lbl_mm:                'Hujan (mm)',
+        rf_lbl_photo:             'Foto (pilihan)',
+        rf_btn_upload:            'Muat Naik Foto',
+        rf_btn_camera:            'Ambil Foto',
+        rf_btn_clear_photo:       'Padam Foto',
+        rf_btn_save:              'Simpan Transaksi',
+        rf_table_title:           'Rekod Hujan',
+        rf_col_date:              'Tarikh',
+        rf_col_mm:                'Hujan (mm)',
+        rf_col_photo:             'Foto',
+        rf_col_action:            'Tindakan',
+        rf_no_data:               'Tiada rekod hujan lagi.',
     }
 };
 
@@ -11446,6 +11569,115 @@ function populateChemFilters() {
 })();
 
 // ══════════════════════════════════════════════════════════════════════
+// RAINFALL MODULE
+// ══════════════════════════════════════════════════════════════════════
+
+function previewRainfallPicture(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('rfPicturePreview').src = e.target.result;
+        document.getElementById('rfPicturePreviewWrap').style.display = '';
+        document.getElementById('rfClearPhotoBtn').style.display = '';
+    };
+    reader.readAsDataURL(input.files[0]);
+}
+
+function clearRainfallPicture() {
+    document.getElementById('rfPicturePreview').src = '';
+    document.getElementById('rfPicturePreviewWrap').style.display = 'none';
+    document.getElementById('rfClearPhotoBtn').style.display = 'none';
+    document.getElementById('rfPictureFile').value = '';
+    document.getElementById('rfPictureCamera').value = '';
+}
+
+function getRainfallPictureBase64() {
+    const img = document.getElementById('rfPicturePreview');
+    if (!img || !img.src || img.src === window.location.href) return null;
+    return img.src.startsWith('data:') ? img.src : null;
+}
+
+function saveRainfallTxn() {
+    const date = document.getElementById('rfDate').value;
+    const mm   = parseFloat(document.getElementById('rfMm').value);
+    if (!date) { alert('Please select a date.'); return; }
+    if (isNaN(mm) || mm < 0) { alert('Please enter a valid rainfall amount (mm).'); return; }
+    const picture = getRainfallPictureBase64();
+    const record = {
+        id:        Date.now(),
+        date:      date,
+        mm:        mm,
+        picture:   picture || null,
+        createdAt: new Date().toISOString().slice(0, 10)
+    };
+    rainfallTxns.push(record);
+    // Sort newest first
+    rainfallTxns.sort((a, b) => b.date.localeCompare(a.date));
+    // Persist to localStorage (estate-scoped)
+    if (!activeEstate) { alert('Please select an Estate before saving data.'); return; }
+    localStorage.setItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate, JSON.stringify(rainfallTxns));
+    // Reset form
+    document.getElementById('rfDate').value = '';
+    document.getElementById('rfMm').value = '';
+    clearRainfallPicture();
+    renderRainfallTxns();
+}
+
+function deleteRainfallTxn(id) {
+    if (!confirm('Delete this rainfall record?')) return;
+    rainfallTxns = rainfallTxns.filter(r => String(r.id) !== String(id));
+    localStorage.setItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate, JSON.stringify(rainfallTxns));
+    renderRainfallTxns();
+}
+
+function viewRainfallPicture(id) {
+    const r = rainfallTxns.find(x => String(x.id) === String(id));
+    if (!r || !r.picture) return;
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;cursor:pointer;';
+    overlay.innerHTML = '<img src="' + r.picture + '" style="max-width:92vw;max-height:88vh;border-radius:10px;box-shadow:0 8px 40px rgba(0,0,0,.5);" />';
+    overlay.onclick = () => overlay.remove();
+    document.body.appendChild(overlay);
+}
+
+function renderRainfallTxns() {
+    const tbody = document.getElementById('rfTableBody');
+    if (!tbody) return;
+    // Reload from localStorage in case estate switched
+    if (activeEstate) {
+        const stored = localStorage.getItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate);
+        rainfallTxns = stored ? JSON.parse(stored) : [];
+    }
+    if (!rainfallTxns.length) {
+        const d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
+        const noData = (d && d.rf_no_data) || 'No rainfall records yet.';
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-gray-400 py-8">' + noData + '</td></tr>';
+        return;
+    }
+    tbody.innerHTML = rainfallTxns.map(function(r) {
+        const photoCell = r.picture
+            ? '<button onclick="viewRainfallPicture(\'' + r.id + '\')" class="text-blue-600 underline text-xs">View</button>'
+            : '<span class="text-gray-300">—</span>';
+        return '<tr class="border-b border-blue-100 hover:bg-blue-50">' +
+            '<td class="px-3 py-2">' + r.date + '</td>' +
+            '<td class="px-3 py-2 text-right font-semibold">' + r.mm.toFixed(1) + '</td>' +
+            '<td class="px-3 py-2 text-center">' + photoCell + '</td>' +
+            '<td class="px-3 py-2 text-center">' +
+                '<button onclick="deleteRainfallTxn(\'' + r.id + '\')" ' +
+                'class="text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-1 rounded border border-red-200 hover:bg-red-50">&#128465; Delete</button>' +
+            '</td>' +
+        '</tr>';
+    }).join('');
+}
+
+window.previewRainfallPicture = previewRainfallPicture;
+window.clearRainfallPicture   = clearRainfallPicture;
+window.saveRainfallTxn        = saveRainfallTxn;
+window.deleteRainfallTxn      = deleteRainfallTxn;
+window.viewRainfallPicture    = viewRainfallPicture;
+window.renderRainfallTxns     = renderRainfallTxns;
+
+// ══════════════════════════════════════════════════════════════════════
 // SETTINGS TAB SWITCHING
 // ══════════════════════════════════════════════════════════════════════
 
@@ -11475,6 +11707,11 @@ function navigateToSection(target) {
     if (target === 'fertrecord') renderFertRecord();
     if (target === 'chemrecord') renderChemRecord();
     if (target === 'plantrecord') renderPlantRecord();
+    if (target === 'rainfall') {
+        const rfDate = document.getElementById('rfDate');
+        if (rfDate && !rfDate.value) rfDate.valueAsDate = new Date();
+        renderRainfallTxns();
+    }
     if (target === 'settings') { renderEstatesList(); renderItemsTable(); renderManuringRounds(); renderMrBlocksGrid(); renderFieldMaintRounds(); renderFmBlocksGrid(); renderCiTable(); }
     if (typeof applyViewOnlyLock === 'function') applyViewOnlyLock(target);
 }
