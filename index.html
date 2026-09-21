@@ -8919,13 +8919,16 @@ function normalisePermissions(perms) {
 // 'none' is saved explicitly when admin denies one of these so the default
 // can be distinguished from "admin never configured this section".
 const ESTATE_MOBILE_DEFAULTS = {
-    transactions: 'edit',  // estate hub cards — needs edit to record stock
-    summary:      'view',  // Stock Transactions bottom nav
-    ledger:       'view',  // Stock Summary tab (visible inside summary section)
-    dashboard:    'view',  // Dashboard bottom nav
-    fertrecord:   'view',  // View Record tab
-    chemrecord:   'view',  // View Record tab
-    plantrecord:  'view',  // View Record tab
+    transactions:    'edit',  // estate hub cards — needs edit to record stock
+    summary:         'view',  // Stock Transactions bottom nav
+    ledger:          'view',  // Stock Summary tab (visible inside summary section)
+    dashboard:       'view',  // Dashboard bottom nav
+    fertrecord:      'view',  // View Record tab
+    chemrecord:      'view',  // View Record tab
+    plantrecord:     'view',  // View Record tab
+    rainfall:        'edit',  // Rainfall Transactions — hub card leads here
+    rainfallreport:  'view',  // Rainfall Report tab
+    rainfallsummary: 'view',  // Summary Monthly Rainfall tab
 };
 
 function getSectionAccess(session, sectionId) {
