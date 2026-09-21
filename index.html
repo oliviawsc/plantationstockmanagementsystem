@@ -1309,6 +1309,18 @@
                         </div>
                         <span class="home-card-title" data-i18n="home_card_reports">Reports</span>
                     </button>
+                    <!-- Rainfall -->
+                    <button class="home-card" onclick="navigateToSection('rainfall')">
+                        <div class="home-card-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="8" y1="19" x2="8" y2="21"/><line x1="8" y1="13" x2="8" y2="15"/>
+                                <line x1="16" y1="19" x2="16" y2="21"/><line x1="16" y1="13" x2="16" y2="15"/>
+                                <line x1="12" y1="21" x2="12" y2="23"/><line x1="12" y1="15" x2="12" y2="17"/>
+                                <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/>
+                            </svg>
+                        </div>
+                        <span class="home-card-title" data-i18n="home_card_rainfall">Rainfall</span>
+                    </button>
                     <!-- Settings (superadmin only) -->
                     <button class="home-card hidden" id="homeCardSettings" onclick="navigateToSection('settings')">
                         <div class="home-card-icon">
@@ -6943,6 +6955,7 @@ const I18N = {
         home_card_stock_records: 'Stock Records',
         home_card_field_ops:     'Field Operations',
         home_card_reports:       'Reports',
+        home_card_rainfall:      'Rainfall',
         home_card_settings:      'Settings',
         home_card_user_mgmt:     'User Management',
         hub_record_stock:    'Record Stock',
@@ -7300,6 +7313,7 @@ const I18N = {
         home_card_stock_records: 'Rekod Stok',
         home_card_field_ops:     'Operasi Ladang',
         home_card_reports:       'Laporan',
+        home_card_rainfall:      'Hujan',
         home_card_settings:      'Tetapan',
         home_card_user_mgmt:     'Pengurusan Pengguna',
         hub_record_stock:    'Rekod Stok',
