@@ -8028,11 +8028,10 @@ function toggleLoginPw() {
 
 // ── Boot the app after successful login ────────────────────────────
 function bootApp(session) {
-    // Purge any estate-mobile state from a previous session before showing the app.
-    // This runs before appLayout becomes visible so no other role ever sees the hub.
-    document.body.classList.remove('estate-mobile');
-    // Ensure estate_hub is never the active section for non-estate users
+    // Ensure estate_hub is never the active section for non-estate users,
+    // and purge any leftover estate-mobile state from a previous session.
     if (!isEstateMobile(session)) {
+        document.body.classList.remove('estate-mobile');
         const hubSec = document.getElementById('estate_hub');
         if (hubSec) hubSec.classList.remove('active');
 
