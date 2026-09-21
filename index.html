@@ -11845,9 +11845,11 @@ function previewRainfallPicture(input) {
     if (!input.files || !input.files[0]) return;
     const reader = new FileReader();
     reader.onload = function(e) {
-        document.getElementById('rfPicturePreview').src = e.target.result;
-        document.getElementById('rfPicturePreviewWrap').style.display = '';
-        document.getElementById('rfClearPhotoBtn').style.display = '';
+        _compressImageDataUrl(e.target.result, 800, 0.6, function(compressed) {
+            document.getElementById('rfPicturePreview').src = compressed;
+            document.getElementById('rfPicturePreviewWrap').style.display = '';
+            document.getElementById('rfClearPhotoBtn').style.display = '';
+        });
     };
     reader.readAsDataURL(input.files[0]);
 }
@@ -12081,14 +12083,36 @@ function renderRainfallReport() {
 window.changeRainfallReportYear = changeRainfallReportYear;
 window.renderRainfallReport     = renderRainfallReport;
 
+// ── Shared image compression helper ─────────────────────────────────
+// Resizes and re-encodes to JPEG at reduced quality so photos from phone
+// cameras (which can be 4–10 MB) don't blow the ~5 MB localStorage quota.
+function _compressImageDataUrl(dataUrl, maxPx, quality, callback) {
+    const img = new Image();
+    img.onload = function() {
+        let w = img.width, h = img.height;
+        if (w > maxPx || h > maxPx) {
+            if (w >= h) { h = Math.round(h * maxPx / w); w = maxPx; }
+            else        { w = Math.round(w * maxPx / h); h = maxPx; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        callback(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = function() { callback(dataUrl); }; // fallback: keep original
+    img.src = dataUrl;
+}
+
 // ── Mobile-only rainfall add form ────────────────────────────────────
 function previewMobileRainfallPhoto(input) {
     if (!input.files || !input.files[0]) return;
     const reader = new FileReader();
     reader.onload = function(e) {
-        document.getElementById('mobileRfPreview').src = e.target.result;
-        document.getElementById('mobileRfPreviewWrap').style.display = '';
-        document.getElementById('mobileRfClearBtn').style.display = '';
+        _compressImageDataUrl(e.target.result, 800, 0.6, function(compressed) {
+            document.getElementById('mobileRfPreview').src = compressed;
+            document.getElementById('mobileRfPreviewWrap').style.display = '';
+            document.getElementById('mobileRfClearBtn').style.display = '';
+        });
     };
     reader.readAsDataURL(input.files[0]);
 }
@@ -12099,28 +12123,56 @@ function clearMobileRainfallPhoto() {
     document.getElementById('mobileRfFile').value = '';
     document.getElementById('mobileRfCamera').value = '';
 }
+function _doSaveMobileRainfallTxn(picture) {
+    const date = document.getElementById('mobileRfDate').value;
+    const mm   = parseFloat(document.getElementById('mobileRfMm').value);
+    if (!date) { alert('Please select a date.'); return; }
+    if (isNaN(mm) || mm < 0) { alert('Please enter a valid rainfall amount.'); return; }
+    if (!activeEstate) { alert('Please select an Estate first.'); return; }
+
+    const stored = localStorage.getItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate);
+    rainfallTxns = stored ? JSON.parse(stored) : [];
+    rainfallTxns.push({ id: Date.now(), date, mm, picture: picture || null, createdAt: new Date().toISOString().slice(0, 10) });
+    rainfallTxns.sort((a, b) => b.date.localeCompare(a.date));
+
+    try {
+        save(STORAGE_KEYS.rainfallTxns, rainfallTxns);
+    } catch (quotaErr) {
+        if (picture && (quotaErr.name === 'QuotaExceededError' || quotaErr.code === 22)) {
+            // Strip photos from all records and retry — storage is full
+            rainfallTxns = rainfallTxns.map(r => ({ ...r, picture: null }));
+            save(STORAGE_KEYS.rainfallTxns, rainfallTxns);
+            alert('Storage full — rainfall saved without photo. Please clear old data to keep photos.');
+        } else {
+            throw quotaErr;
+        }
+    }
+
+    document.getElementById('mobileRfDate').value = '';
+    document.getElementById('mobileRfMm').value = '';
+    clearMobileRainfallPhoto();
+    const d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
+    alert((d && d.rf_saved_ok) || 'Rainfall transaction saved!');
+    navToSection('estate_hub');
+}
+
 function saveMobileRainfallTxn() {
     try {
-        const date = document.getElementById('mobileRfDate').value;
-        const mm   = parseFloat(document.getElementById('mobileRfMm').value);
-        if (!date) { alert('Please select a date.'); return; }
-        if (isNaN(mm) || mm < 0) { alert('Please enter a valid rainfall amount.'); return; }
-        if (!activeEstate) { alert('Please select an Estate first.'); return; }
         const img = document.getElementById('mobileRfPreview');
-        const picture = (img && img.src && img.src.startsWith('data:')) ? img.src : null;
-        // Load latest, push new record, sort, save (also syncs to Supabase)
-        const stored = localStorage.getItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate);
-        rainfallTxns = stored ? JSON.parse(stored) : [];
-        rainfallTxns.push({ id: Date.now(), date, mm, picture, createdAt: new Date().toISOString().slice(0, 10) });
-        rainfallTxns.sort((a, b) => b.date.localeCompare(a.date));
-        save(STORAGE_KEYS.rainfallTxns, rainfallTxns);
-        // Reset form
-        document.getElementById('mobileRfDate').value = '';
-        document.getElementById('mobileRfMm').value = '';
-        clearMobileRainfallPhoto();
-        const d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
-        alert((d && d.rf_saved_ok) || 'Rainfall transaction saved!');
-        navToSection('estate_hub');
+        const raw = (img && img.src && img.src.startsWith('data:')) ? img.src : null;
+        if (raw) {
+            // Ensure the photo is compressed before saving (in case the preview
+            // was set without compression, e.g. via direct assignment in tests)
+            _compressImageDataUrl(raw, 800, 0.6, function(compressed) {
+                try { _doSaveMobileRainfallTxn(compressed); }
+                catch (err) {
+                    console.error('[saveMobileRainfallTxn]', err);
+                    alert('Error saving rainfall: ' + (err && err.message ? err.message : err));
+                }
+            });
+        } else {
+            _doSaveMobileRainfallTxn(null);
+        }
     } catch (err) {
         console.error('[saveMobileRainfallTxn]', err);
         alert('Error saving rainfall: ' + (err && err.message ? err.message : err));
