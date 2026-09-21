@@ -1082,6 +1082,7 @@
             <button data-target="plantrecord"  class="nav-item">          <span class="nav-icon">&#127807;</span><span class="sb-label" data-i18n="sb_lbl_plantrecord">Field Planting Record</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;" data-i18n="sb_section_rainfall">Rainfall</p>
             <button data-target="rainfall" class="nav-item">              <span class="nav-icon">&#127783;&#65039;</span><span class="sb-label" data-i18n="sb_lbl_rainfall">Rainfall Transactions</span></button>
+            <button data-target="rainfallreport" class="nav-item">        <span class="nav-icon">&#128200;</span><span class="sb-label" data-i18n="sb_lbl_rainfallreport">Rainfall Report</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;">Admin</p>
             <button data-target="settings" id="navSettings" class="nav-item hidden">
                 <span class="nav-icon">&#9881;&#65039;</span><span class="sb-label" data-i18n="sb_lbl_settings">Settings</span>
@@ -2473,6 +2474,31 @@
                         </button>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- ============ PAGE: RAINFALL REPORT ============ -->
+        <section id="rainfallreport" class="page-section">
+            <h2 class="text-3xl font-bold mb-2" data-i18n="page_rainfallreport">&#128200; Rainfall Report</h2>
+            <p class="text-sm text-blue-700 mb-4" data-i18n="page_rainfallreport_sub">Monthly rainfall summary by day for the selected year.</p>
+
+            <!-- Year selector -->
+            <div class="bg-white p-4 rounded-xl shadow mb-4" style="display:inline-flex;align-items:center;gap:12px;">
+                <span class="font-semibold text-sm" data-i18n="rf_rpt_year_lbl">Year:</span>
+                <button onclick="changeRainfallReportYear(-1)"
+                    style="width:30px;height:30px;border-radius:6px;border:1px solid #BFDBFE;background:#EFF6FF;color:#1e40af;font-size:16px;font-weight:700;cursor:pointer;line-height:1;">&#9664;</button>
+                <span id="rfReportYear" class="font-bold text-lg min-w-[4ch] text-center"></span>
+                <button onclick="changeRainfallReportYear(1)"
+                    style="width:30px;height:30px;border-radius:6px;border:1px solid #BFDBFE;background:#EFF6FF;color:#1e40af;font-size:16px;font-weight:700;cursor:pointer;line-height:1;">&#9654;</button>
+            </div>
+
+            <!-- Report table -->
+            <div class="bg-white rounded-xl shadow overflow-x-auto">
+                <div style="padding:16px 20px 8px;text-align:center;">
+                    <div id="rfReportTitle" style="font-weight:800;font-size:15px;letter-spacing:.04em;color:#1e3a5f;"></div>
+                </div>
+                <table id="rfReportTable" class="min-w-full text-sm border-collapse" style="border:1px solid #CBD5E1;">
+                </table>
             </div>
         </section>
 
@@ -6315,6 +6341,7 @@ function refreshAll() {
     if (typeof renderChemRecord === 'function') renderChemRecord();
     if (typeof renderPlantRecord === 'function') renderPlantRecord();
     if (typeof renderRainfallTxns === 'function') renderRainfallTxns();
+    if (typeof renderRainfallReport === 'function') renderRainfallReport();
 }
 
 /* -----------------------------------------------------------------
@@ -7209,8 +7236,15 @@ const I18N = {
         /* Rainfall */
         sb_section_rainfall:      'Rainfall',
         sb_lbl_rainfall:          'Rainfall Transactions',
+        sb_lbl_rainfallreport:    'Rainfall Report',
         nav_rainfall:             '🌧️ Rainfall Transactions',
         page_rainfall:            '🌧️ Rainfall Transactions',
+        page_rainfallreport:      '📊 Rainfall Report',
+        page_rainfallreport_sub:  'Monthly rainfall summary by day for the selected year.',
+        rf_rpt_year_lbl:          'Year',
+        rf_rpt_title:             'MONTHLY RAINFALL (MM) FOR',
+        rf_rpt_total:             'TOTAL',
+        rf_rpt_total_row:         'TOTAL',
         page_rainfall_sub:        'Record daily rainfall readings with date, amount (mm), and an optional photo.',
         rf_add_title:             'Add Rainfall Transaction',
         rf_edit_title:            'Edit Rainfall Transaction',
@@ -7571,8 +7605,15 @@ const I18N = {
         /* Rainfall */
         sb_section_rainfall:      'Hujan',
         sb_lbl_rainfall:          'Transaksi Hujan',
+        sb_lbl_rainfallreport:    'Laporan Hujan',
         nav_rainfall:             '🌧️ Transaksi Hujan',
         page_rainfall:            '🌧️ Transaksi Hujan',
+        page_rainfallreport:      '📊 Laporan Hujan',
+        page_rainfallreport_sub:  'Ringkasan hujan bulanan mengikut hari bagi tahun yang dipilih.',
+        rf_rpt_year_lbl:          'Tahun',
+        rf_rpt_title:             'HUJAN BULANAN (MM) BAGI TAHUN',
+        rf_rpt_total:             'JUMLAH',
+        rf_rpt_total_row:         'JUMLAH',
         page_rainfall_sub:        'Rekod bacaan hujan harian dengan tarikh, jumlah (mm), dan foto pilihan.',
         rf_add_title:             'Tambah Transaksi Hujan',
         rf_edit_title:            'Edit Transaksi Hujan',
@@ -11746,6 +11787,107 @@ function cancelAddRainfall() {
     renderRainfallTxns();
 }
 
+// ── Rainfall Report ─────────────────────────────────────────────────
+let rfReportYear = new Date().getFullYear();
+
+function changeRainfallReportYear(delta) {
+    rfReportYear += delta;
+    renderRainfallReport();
+}
+
+function renderRainfallReport() {
+    const yearEl = document.getElementById('rfReportYear');
+    if (!yearEl) return;
+    yearEl.textContent = rfReportYear;
+
+    const d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
+    const titlePfx = (d && d.rf_rpt_title) || 'MONTHLY RAINFALL (MM) FOR';
+    document.getElementById('rfReportTitle').textContent = titlePfx + ' ' + rfReportYear;
+
+    // Reload from localStorage
+    if (activeEstate) {
+        const stored = localStorage.getItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate);
+        rainfallTxns = stored ? JSON.parse(stored) : [];
+    }
+
+    // Build lookup: 'YYYY-MM-DD' → mm (sum if duplicates)
+    const lookup = {};
+    rainfallTxns.forEach(function(r) {
+        if (r.date && r.date.slice(0, 4) === String(rfReportYear)) {
+            lookup[r.date] = (lookup[r.date] || 0) + (r.mm || 0);
+        }
+    });
+
+    const months   = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const hdrStyle = 'background:#1e3a5f;color:#fff;font-weight:700;padding:6px 8px;text-align:center;border:1px solid #334155;white-space:nowrap;';
+    const subStyle = 'background:#1e3a5f;color:#90CAF9;font-weight:400;font-size:11px;padding:3px 8px;text-align:center;border:1px solid #334155;';
+    const cellStyle= 'padding:4px 8px;text-align:center;border:1px solid #E2E8F0;';
+    const totStyle = 'background:#EFF6FF;font-weight:700;padding:6px 8px;text-align:center;border:1px solid #CBD5E1;';
+
+    // Header rows
+    let html = '<thead>';
+    html += '<tr>';
+    html += '<th style="' + hdrStyle + '" rowspan="2">' + ((d && d.rf_col_date) || 'Date') + '</th>';
+    months.forEach(function(m) { html += '<th style="' + hdrStyle + '">' + m + '</th>'; });
+    html += '<th style="' + hdrStyle + '" rowspan="2">' + ((d && d.rf_rpt_total) || 'TOTAL') + '</th>';
+    html += '</tr>';
+    html += '<tr>';
+    months.forEach(function() { html += '<th style="' + subStyle + '">mm</th>'; });
+    html += '</tr>';
+    html += '</thead>';
+
+    // Body
+    html += '<tbody>';
+    const monthTotals = new Array(12).fill(0);
+    let grandTotal = 0;
+
+    for (let day = 1; day <= 31; day++) {
+        const rowBg = day % 2 === 0 ? 'background:#F8FAFC;' : '';
+        html += '<tr style="' + rowBg + '">';
+        html += '<td style="' + cellStyle + 'font-weight:600;">' + day + '</td>';
+        let rowTotal = 0;
+        for (let mon = 1; mon <= 12; mon++) {
+            const daysInMonth = new Date(rfReportYear, mon, 0).getDate();
+            if (day > daysInMonth) {
+                html += '<td style="' + cellStyle + 'background:#F1F5F9;color:#CBD5E1;"></td>';
+                continue;
+            }
+            const key = rfReportYear + '-' + String(mon).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+            const val = lookup[key];
+            if (val !== undefined) {
+                monthTotals[mon - 1] += val;
+                grandTotal += val;
+                rowTotal  += val;
+                const color = val > 0 ? '' : 'color:#94A3B8;';
+                html += '<td style="' + cellStyle + color + '">' + val.toFixed(2) + '</td>';
+            } else {
+                html += '<td style="' + cellStyle + 'color:#CBD5E1;"></td>';
+            }
+        }
+        const rowTotalDisp = rowTotal > 0
+            ? '<strong>' + rowTotal.toFixed(2) + '</strong>'
+            : '<span style="color:#CBD5E1;">—</span>';
+        html += '<td style="' + cellStyle + 'background:#F0F9FF;">' + rowTotalDisp + '</td>';
+        html += '</tr>';
+    }
+
+    // Totals row
+    const totalLbl = (d && d.rf_rpt_total_row) || 'TOTAL';
+    html += '<tr>';
+    html += '<td style="' + totStyle + '">' + totalLbl + '</td>';
+    monthTotals.forEach(function(t) {
+        html += '<td style="' + totStyle + '">' + (t > 0 ? t.toFixed(2) : '<span style=\'color:#CBD5E1;\'>—</span>') + '</td>';
+    });
+    html += '<td style="' + totStyle + 'background:#DBEAFE;">' + (grandTotal > 0 ? grandTotal.toFixed(2) : '—') + '</td>';
+    html += '</tr>';
+    html += '</tbody>';
+
+    document.getElementById('rfReportTable').innerHTML = html;
+}
+
+window.changeRainfallReportYear = changeRainfallReportYear;
+window.renderRainfallReport     = renderRainfallReport;
+
 window.previewRainfallPicture = previewRainfallPicture;
 window.clearRainfallPicture   = clearRainfallPicture;
 window.saveRainfallTxn        = saveRainfallTxn;
@@ -11791,6 +11933,7 @@ function navigateToSection(target) {
         if (rfDate && !rfDate.value) rfDate.valueAsDate = new Date();
         renderRainfallTxns();
     }
+    if (target === 'rainfallreport') renderRainfallReport();
     if (target === 'settings') { renderEstatesList(); renderItemsTable(); renderManuringRounds(); renderMrBlocksGrid(); renderFieldMaintRounds(); renderFmBlocksGrid(); renderCiTable(); }
     if (typeof applyViewOnlyLock === 'function') applyViewOnlyLock(target);
 }
