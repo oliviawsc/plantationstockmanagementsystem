@@ -5669,15 +5669,19 @@ function renderChemUsageTracker() {
     var toMonth      = asAt ? asAt.slice(0,7) : (selectedYear + '-12');
     if (yearLbl) yearLbl.textContent = I18N[currentLang]['dash_lbl_tracking_year'] + selectedYear;
 
-    /* Aggregate claims by roundId — only rounds whose Target Period falls within the date range */
+    /* Aggregate claims by roundId — filter by the claim's actual worked month (c.month),
+       not the round's planned targetPeriod. A round planned for Sep but worked/claimed in
+       Aug must still appear when the "as at" date is 31 Aug. Fall back to targetPeriod only
+       if the claim carries no month field. */
     var roundMap = {};
     maintClaims.forEach(function(c) {
-        var round = fieldMaintRounds.find(function(r){ return String(r.id) === String(c.roundId); });
-        var tp    = round ? (round.targetPeriod || round.targetperiod || '') : '';
-        if (!tp || tp < fromMonth || tp > toMonth) return;
+        var round      = fieldMaintRounds.find(function(r){ return String(r.id) === String(c.roundId); });
+        var tp         = round ? (round.targetPeriod || round.targetperiod || '') : '';
+        var filterMonth = c.month || tp; // actual worked month preferred
+        if (!filterMonth || filterMonth < fromMonth || filterMonth > toMonth) return;
 
         var key = String(c.roundId);
-        if (!roundMap[key]) roundMap[key] = { roundId:c.roundId, roundName:c.roundName, totalClaimed:0, targetPeriod:tp };
+        if (!roundMap[key]) roundMap[key] = { roundId:c.roundId, roundName:c.roundName, totalClaimed:0, targetPeriod:tp || filterMonth };
         roundMap[key].totalClaimed += parseFloat(c.claimedArea) || 0;
     });
     /* Sort rounds by their linked Target Period, ascending */
