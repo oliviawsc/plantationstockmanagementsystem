@@ -2389,6 +2389,7 @@
             <div class="htab-bar">
                 <button class="htab-btn active" onclick="navigateToSection('rainfall')" data-i18n="tab_rainfall_txns">Rainfall Transactions</button>
                 <button class="htab-btn" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Rainfall Report</button>
+                <button class="htab-btn" onclick="navigateToSection('rainfallsummary')" data-i18n="tab_rainfall_summary">Summary Monthly Rainfall</button>
             </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_rainfall">&#127783;&#65039; Rainfall Transactions</h2>
             <p class="text-sm text-blue-700 mb-6" data-i18n="page_rainfall_sub">Record daily rainfall readings with date, amount (mm), and an optional photo.</p>
@@ -2486,6 +2487,7 @@
             <div class="htab-bar">
                 <button class="htab-btn" onclick="navigateToSection('rainfall')" data-i18n="tab_rainfall_txns">Rainfall Transactions</button>
                 <button class="htab-btn active" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Rainfall Report</button>
+                <button class="htab-btn" onclick="navigateToSection('rainfallsummary')" data-i18n="tab_rainfall_summary">Summary Monthly Rainfall</button>
             </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_rainfallreport">&#128200; Rainfall Report</h2>
             <p class="text-sm text-blue-700 mb-4" data-i18n="page_rainfallreport_sub">Monthly rainfall summary by day for the selected year.</p>
@@ -2507,6 +2509,27 @@
                 </div>
                 <div style="overflow:auto;max-height:65vh;border-radius:0 0 12px 12px;">
                     <table id="rfReportTable" class="text-sm border-collapse" style="width:100%;border:1px solid #CBD5E1;">
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ PAGE: SUMMARY MONTHLY RAINFALL RECORD ============ -->
+        <section id="rainfallsummary" class="page-section">
+            <div class="htab-bar">
+                <button class="htab-btn" onclick="navigateToSection('rainfall')" data-i18n="tab_rainfall_txns">Rainfall Transactions</button>
+                <button class="htab-btn" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Rainfall Report</button>
+                <button class="htab-btn active" onclick="navigateToSection('rainfallsummary')" data-i18n="tab_rainfall_summary">Summary Monthly Rainfall</button>
+            </div>
+            <h2 class="text-3xl font-bold mb-2" data-i18n="page_rainfallsummary">&#128200; Summary Monthly Rainfall Record</h2>
+            <p class="text-sm text-blue-700 mb-4" data-i18n="page_rainfallsummary_sub">Annual monthly totals with year-on-year variance.</p>
+
+            <div class="bg-white rounded-xl shadow">
+                <div style="padding:16px 20px 8px;text-align:center;">
+                    <div style="font-weight:800;font-size:15px;letter-spacing:.04em;color:#1e3a5f;" data-i18n="rf_sum_title">Monthly Rainfall Record</div>
+                </div>
+                <div style="overflow:auto;max-height:65vh;border-radius:0 0 12px 12px;">
+                    <table id="rfSummaryTable" class="text-sm border-collapse" style="width:100%;border:1px solid #CBD5E1;">
                     </table>
                 </div>
             </div>
@@ -6352,6 +6375,7 @@ function refreshAll() {
     if (typeof renderPlantRecord === 'function') renderPlantRecord();
     if (typeof renderRainfallTxns === 'function') renderRainfallTxns();
     if (typeof renderRainfallReport === 'function') renderRainfallReport();
+    if (typeof renderRainfallSummary === 'function') renderRainfallSummary();
 }
 
 /* -----------------------------------------------------------------
@@ -7249,7 +7273,16 @@ const I18N = {
         sb_lbl_rainfallreport:    'Rainfall Report',
         tab_rainfall_txns:        'Rainfall Transactions',
         tab_rainfall_report:      'Rainfall Report',
+        tab_rainfall_summary:     'Summary Monthly Rainfall',
         nav_rainfall:             '🌧️ Rainfall Transactions',
+        page_rainfallsummary:     '📊 Summary Monthly Rainfall Record',
+        page_rainfallsummary_sub: 'Annual monthly totals with year-on-year variance.',
+        rf_sum_title:             'Monthly Rainfall Record',
+        rf_sum_col_year:          'Year',
+        rf_sum_col_desc:          'Description',
+        rf_sum_col_total:         'Total',
+        rf_sum_desc:              'Rainfall (mm)',
+        rf_sum_variance:          'Variance of Rainfall (mm)',
         page_rainfall:            '🌧️ Rainfall Transactions',
         page_rainfallreport:      '📊 Rainfall Report',
         page_rainfallreport_sub:  'Monthly rainfall summary by day for the selected year.',
@@ -7620,7 +7653,16 @@ const I18N = {
         sb_lbl_rainfallreport:    'Rekod Hujan',
         tab_rainfall_txns:        'Transaksi Hujan',
         tab_rainfall_report:      'Rekod Hujan',
+        tab_rainfall_summary:     'Ringkasan Hujan Bulanan',
         nav_rainfall:             '🌧️ Transaksi Hujan',
+        page_rainfallsummary:     '📊 Ringkasan Rekod Hujan Bulanan',
+        page_rainfallsummary_sub: 'Jumlah bulanan tahunan dengan varians tahun ke tahun.',
+        rf_sum_title:             'Rekod Hujan Bulanan',
+        rf_sum_col_year:          'Tahun',
+        rf_sum_col_desc:          'Keterangan',
+        rf_sum_col_total:         'Jumlah',
+        rf_sum_desc:              'Hujan (mm)',
+        rf_sum_variance:          'Varians Hujan (mm)',
         page_rainfall:            '🌧️ Transaksi Hujan',
         page_rainfallreport:      '📊 Rekod Hujan',
         page_rainfallreport_sub:  'Ringkasan hujan bulanan mengikut hari bagi tahun yang dipilih.',
@@ -11902,6 +11944,131 @@ function renderRainfallReport() {
 window.changeRainfallReportYear = changeRainfallReportYear;
 window.renderRainfallReport     = renderRainfallReport;
 
+// ── Summary Monthly Rainfall Record ─────────────────────────────────
+function renderRainfallSummary() {
+    const tbl = document.getElementById('rfSummaryTable');
+    if (!tbl) return;
+
+    // Reload from localStorage
+    if (activeEstate) {
+        const stored = localStorage.getItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate);
+        rainfallTxns = stored ? JSON.parse(stored) : [];
+    }
+
+    const d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    // Aggregate: { year: { 1..12: total_mm } }
+    const byYear = {};
+    rainfallTxns.forEach(function(r) {
+        if (!r.date) return;
+        const yr  = parseInt(r.date.slice(0, 4), 10);
+        const mon = parseInt(r.date.slice(5, 7), 10);
+        if (!byYear[yr]) byYear[yr] = {};
+        byYear[yr][mon] = (byYear[yr][mon] || 0) + (r.mm || 0);
+    });
+
+    const years = Object.keys(byYear).map(Number).sort();
+
+    if (!years.length) {
+        tbl.innerHTML = '<tbody><tr><td colspan="15" style="text-align:center;padding:24px;color:#94A3B8;">' +
+            ((d && d.rf_no_data) || 'No rainfall records yet.') + '</td></tr></tbody>';
+        return;
+    }
+
+    // Styles
+    const th  = 'background:#1e3a5f;color:#fff;font-weight:700;padding:8px 10px;text-align:center;border:1px solid #334155;white-space:nowrap;position:sticky;top:0;z-index:2;';
+    const td  = 'padding:7px 10px;text-align:center;border:1px solid #E2E8F0;';
+    const tdy = 'padding:7px 10px;text-align:center;border:1px solid #E2E8F0;font-weight:700;';
+    const tdd = 'padding:7px 10px;text-align:center;border:1px solid #E2E8F0;color:#64748B;font-style:italic;font-size:12px;';
+    const tdt = 'padding:7px 10px;text-align:center;border:1px solid #E2E8F0;font-weight:700;background:#EFF6FF;';
+
+    // Header
+    let html = '<thead><tr>';
+    html += '<th style="' + th + '">' + ((d && d.rf_sum_col_year)  || 'Year')        + '</th>';
+    html += '<th style="' + th + '">' + ((d && d.rf_sum_col_desc)  || 'Description') + '</th>';
+    months.forEach(function(m) { html += '<th style="' + th + '">' + m + '</th>'; });
+    html += '<th style="' + th + '">' + ((d && d.rf_sum_col_total) || 'Total')       + '</th>';
+    html += '</tr></thead>';
+
+    html += '<tbody>';
+    years.forEach(function(yr, idx) {
+        const bg = idx % 2 === 1 ? 'background:#F8FAFC;' : '';
+        html += '<tr style="' + bg + '">';
+        html += '<td style="' + tdy + '">' + yr + '</td>';
+        html += '<td style="' + tdd + '">' + ((d && d.rf_sum_desc) || 'Rainfall (mm)') + '</td>';
+        let rowTotal = 0;
+        for (let m = 1; m <= 12; m++) {
+            const val = byYear[yr][m];
+            if (val !== undefined) {
+                rowTotal += val;
+                html += '<td style="' + td + '">' + val.toFixed(2) + '</td>';
+            } else {
+                html += '<td style="' + td + 'color:#CBD5E1;"></td>';
+            }
+        }
+        html += '<td style="' + tdt + '">' + rowTotal.toFixed(2) + '</td>';
+        html += '</tr>';
+    });
+
+    // Variance rows: compare last two years
+    if (years.length >= 2) {
+        const prevYr = years[years.length - 2];
+        const currYr = years[years.length - 1];
+        const varLabel = ((d && d.rf_sum_variance) || 'Variance of Rainfall (mm)') +
+                         '\n(' + prevYr + ' vs ' + currYr + ')';
+
+        const varStyle  = 'background:#FEF9C3;font-weight:700;padding:7px 10px;text-align:center;border:1px solid #E2E8F0;';
+        const varNeg    = 'background:#FEE2E2;font-weight:700;padding:7px 10px;text-align:center;border:1px solid #E2E8F0;color:#B91C1C;';
+        const varPos    = 'background:#DCFCE7;font-weight:700;padding:7px 10px;text-align:center;border:1px solid #E2E8F0;color:#15803D;';
+        const varLabel0 = 'background:#FEF9C3;font-weight:700;padding:7px 10px;text-align:center;border:1px solid #E2E8F0;color:#64748B;';
+
+        // Absolute difference row
+        let absDiffTotal = 0;
+        let pctHtml = '';
+        let absHtml = '';
+        for (let m = 1; m <= 12; m++) {
+            const prev = byYear[prevYr][m] || 0;
+            const curr = byYear[currYr][m] || 0;
+            const diff = curr - prev;
+            absDiffTotal += diff;
+            const absStyle = diff < 0 ? varNeg : diff > 0 ? varPos : varLabel0;
+            absHtml += '<td style="' + absStyle + '">' + (diff >= 0 ? '+' : '') + diff.toFixed(2) + '</td>';
+            // Percentage
+            let pct = 0;
+            if (prev !== 0) pct = (diff / prev) * 100;
+            const pctStyle = pct < 0 ? varNeg : pct > 0 ? varPos : varLabel0;
+            pctHtml += '<td style="' + pctStyle + '">' + (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%</td>';
+        }
+        // Total variance
+        const totalStyle = absDiffTotal < 0 ? varNeg : absDiffTotal > 0 ? varPos : varLabel0;
+
+        // Absolute row
+        html += '<tr>';
+        html += '<td colspan="2" rowspan="2" style="background:#FEF9C3;font-weight:700;padding:8px 10px;text-align:center;border:1px solid #E2E8F0;vertical-align:middle;white-space:pre-line;">' +
+                varLabel + '</td>';
+        html += absHtml;
+        html += '<td style="' + totalStyle + '">' + (absDiffTotal >= 0 ? '+' : '') + absDiffTotal.toFixed(2) + '</td>';
+        html += '</tr>';
+
+        // Percentage row
+        let prevTotal = 0, currTotal = 0;
+        for (let m = 1; m <= 12; m++) {
+            prevTotal += byYear[prevYr][m] || 0;
+            currTotal += byYear[currYr][m] || 0;
+        }
+        const totalPct = prevTotal !== 0 ? ((currTotal - prevTotal) / prevTotal) * 100 : 0;
+        const totalPctStyle = totalPct < 0 ? varNeg : totalPct > 0 ? varPos : varLabel0;
+        html += '<tr>' + pctHtml +
+                '<td style="' + totalPctStyle + '">' + (totalPct >= 0 ? '+' : '') + totalPct.toFixed(2) + '%</td>' +
+                '</tr>';
+    }
+
+    html += '</tbody>';
+    tbl.innerHTML = html;
+}
+window.renderRainfallSummary = renderRainfallSummary;
+
 window.previewRainfallPicture = previewRainfallPicture;
 window.clearRainfallPicture   = clearRainfallPicture;
 window.saveRainfallTxn        = saveRainfallTxn;
@@ -11948,6 +12115,7 @@ function navigateToSection(target) {
         renderRainfallTxns();
     }
     if (target === 'rainfallreport') renderRainfallReport();
+    if (target === 'rainfallsummary') renderRainfallSummary();
     if (target === 'settings') { renderEstatesList(); renderItemsTable(); renderManuringRounds(); renderMrBlocksGrid(); renderFieldMaintRounds(); renderFmBlocksGrid(); renderCiTable(); }
     if (typeof applyViewOnlyLock === 'function') applyViewOnlyLock(target);
 }
