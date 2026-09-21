@@ -2631,10 +2631,10 @@
                                         <th class="px-3 py-2 text-left">Round</th>
                                         <th class="px-3 py-2 text-left">Fertilizer</th>
                                         <th class="px-3 py-2 text-left">Target Period</th>
+                                        <th class="px-3 py-2 text-center">Active</th>
                                         <th class="px-3 py-2 text-left">Blocks Involved</th>
                                         <th class="px-3 py-2 text-right">Budgeted Fertilizer Needed</th>
                                         <th class="px-3 py-2 text-left">Notes</th>
-                                        <th class="px-3 py-2 text-left">Transactions</th>
                                         <th class="px-3 py-2 text-left">Action</th>
                                     </tr>
                                 </thead>
@@ -3938,7 +3938,7 @@ function updateManuringVisibility() {
     if (item && item.category === 'Fertilizer' && (txnType === 'Out' || txnType === 'In')) {
         wrap.classList.remove('hidden');
         // Populate dropdown filtered to this fertilizer
-        const matchingRounds = manuringRounds.filter(r => r.fertilizerItemId === item.id);
+        const matchingRounds = manuringRounds.filter(r => r.fertilizerItemId === item.id && r.active !== false);
         if (matchingRounds.length === 0) {
             sel.innerHTML = `<option value="">${d.txn_no_rounds_defined}</option>`;
         } else {
@@ -4104,7 +4104,7 @@ function saveManuringRound() {
         const idx = manuringRounds.findIndex(x => String(x.id) === String(editingRoundId));
         if (idx < 0) { editingRoundId = null; btnDone(mrSubmitBtn); return; }
         const oldName = manuringRounds[idx].name;
-        manuringRounds[idx] = { id: manuringRounds[idx].id, ...formRound };
+        manuringRounds[idx] = { id: manuringRounds[idx].id, active: manuringRounds[idx].active !== false, ...formRound };
         if (oldName !== formRound.name) {
             transactions.forEach(t => {
                 if (String(t.manuringRoundId) === String(editingRoundId))
@@ -4115,7 +4115,7 @@ function saveManuringRound() {
         btnDone(mrSubmitBtn);
         cancelEditRound();
     } else {
-        manuringRounds.push({ id: Date.now(), ...formRound });
+        manuringRounds.push({ id: Date.now(), active: true, ...formRound });
         document.getElementById('mrName').value       = '';
         document.getElementById('mrKgPerPalm').value  = '';
         document.getElementById('mrNotes').value      = '';
@@ -4233,38 +4233,25 @@ function renderManuringRounds() {
             : getTotalPalms().toLocaleString();
         const pkgUnit = getRoundPkgUnit(r);
         const kgLabel = `<span class="text-xs text-gray-400">(${r.kgPerPalm || 0} kg/palm × ${palmsUsed} palms ÷ ${getKgPerUnit(r)} kg/${pkgUnit})</span>`;
+        const isActive = r.active !== false; // default true if field absent
 
-        // Transactions linked to this round
-        const roundTxns = transactions
-            .filter(t => String(t.manuringRoundId) === String(r.id) && t.type === 'Out')
-            .sort((a, b) => a.date.localeCompare(b.date));
-        const txnCount  = roundTxns.length;
-        const applied   = roundTxns.reduce((s, t) => s + (parseFloat(t.qty) || 0), 0);
-
-        // Transactions toggle button label
-        const toggleLabel = txnCount > 0
-            ? `${currentLang==='ms'?'▼ Papar':'▼ Show'} (${txnCount})`
-            : `${currentLang==='ms'?'▼ Papar':'▼ Show'} (0)`;
-
-        // ── Main round row ──
-        const mainRow    = document.createElement('tr');
-        mainRow.className = 'border-b border-green-200 hover:bg-green-50';
+        const mainRow = document.createElement('tr');
+        mainRow.className = `border-b border-green-200 hover:bg-green-50${isActive ? '' : ' opacity-60'}`;
         mainRow.innerHTML = `
             <td class="px-3 py-2 font-semibold">🌱 ${r.name}</td>
             <td class="px-3 py-2">${r.fertilizerName || '-'}</td>
             <td class="px-3 py-2 text-xs text-gray-500">${r.targetPeriod || '—'}</td>
+            <td class="px-3 py-2 text-center">
+                <input type="checkbox" ${isActive ? 'checked' : ''}
+                    style="width:16px;height:16px;accent-color:#16a34a;cursor:pointer;"
+                    onchange="toggleRoundActive('${r.id}', this.checked)"
+                    title="${isActive ? 'Active — appears in Record Stock dropdown' : 'Inactive — hidden from Record Stock dropdown'}">
+            </td>
             <td class="px-3 py-2">${blocksHtml}</td>
             <td class="px-3 py-2 text-right">
                 <b>${Math.round(budget)}</b> ${pkgUnit}<br/>${kgLabel}
             </td>
             <td class="px-3 py-2 text-gray-600 italic text-sm">${r.notes || '-'}</td>
-            <td class="px-3 py-2 whitespace-nowrap">
-                <button id="txn-toggle-${r.id}"
-                    class="text-xs ${txnCount > 0 ? 'bg-green-100 hover:bg-green-200 text-green-800' : 'bg-gray-100 text-gray-400'} font-semibold px-3 py-1 rounded"
-                    onclick="toggleRoundTxns('${r.id}')">
-                    ${toggleLabel}
-                </button>
-            </td>
             <td class="px-3 py-2 space-x-2 whitespace-nowrap">
                 <button class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-3 py-1 rounded"
                     onclick="startEditRound('${r.id}')">✏️ Edit</button>
@@ -4272,54 +4259,6 @@ function renderManuringRounds() {
                     onclick="deleteRound('${r.id}')">🗑 Delete</button>
             </td>`;
         body.appendChild(mainRow);
-
-        // ── Transaction sub-row (hidden by default) ──
-        const subRow  = document.createElement('tr');
-        subRow.id     = `txn-sub-${r.id}`;
-        subRow.style.display = 'none';
-
-        let subContent = '';
-        if (txnCount === 0) {
-            subContent = `<td colspan="7" style="padding:8px 32px 12px;">
-                <p class="text-xs text-gray-400 italic">No transactions recorded for this round yet.</p>
-            </td>`;
-        } else {
-            const kgPerUnitSub = getKgPerUnit(r);
-            const txnRows = roundTxns.map(t => {
-                const pkgQty = kgPerUnitSub > 0 ? (parseFloat(t.qty) / kgPerUnitSub) : parseFloat(t.qty);
-                return `
-                <tr style="border-bottom:1px solid #d1fae5;">
-                    <td class="px-3 py-1.5 text-xs">${t.date}</td>
-                    <td class="px-3 py-1.5 text-xs font-medium text-green-700">${t.location || '-'}</td>
-                    <td class="px-3 py-1.5 text-xs text-right font-semibold">${pkgQty.toFixed(2)} ${pkgUnit}</td>
-                    <td class="px-3 py-1.5 text-xs text-gray-400">${t.remarks || '-'}</td>
-                </tr>`;
-            }).join('');
-
-            subContent = `<td colspan="7" style="padding:0 0 12px 32px; background:#f0fdf4;">
-                <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
-                    <thead>
-                        <tr style="background:#dcfce7;color:#166534;">
-                            <th class="px-3 py-1.5 text-left">${currentLang==='ms'?'Tarikh':'Date'}</th>
-                            <th class="px-3 py-1.5 text-left">${currentLang==='ms'?'Blok / Lokasi':'Block / Location'}</th>
-                            <th class="px-3 py-1.5 text-right">${currentLang==='ms'?`Kuantiti Digunakan (${pkgUnit})`:`Qty Applied (${pkgUnit})`}</th>
-                            <th class="px-3 py-1.5 text-left">${currentLang==='ms'?'Catatan':'Remarks'}</th>
-                        </tr>
-                    </thead>
-                    <tbody>${txnRows}</tbody>
-                    <tfoot>
-                        <tr style="background:#f0fdf4;border-top:2px solid #86efac;">
-                            <td class="px-3 py-1.5 text-xs font-bold" colspan="2">${currentLang==='ms'?'Jumlah Digunakan':'Total Applied'}</td>
-                            <td class="px-3 py-1.5 text-xs font-bold text-right text-green-700">${(getKgPerUnit(r) > 0 ? applied / getKgPerUnit(r) : applied).toFixed(2)} bags</td>
-                            <td colspan="2"></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </td>`;
-        }
-
-        subRow.innerHTML = subContent;
-        body.appendChild(subRow);
     });
 }
 
@@ -4334,6 +4273,16 @@ function deleteRound(id) {
     manuringRounds = manuringRounds.filter(x => String(x.id) !== String(id));
     save(STORAGE_KEYS.manuringRounds, manuringRounds);
     refreshAll();
+}
+
+function toggleRoundActive(id, isActive) {
+    const idx = manuringRounds.findIndex(x => String(x.id) === String(id));
+    if (idx < 0) return;
+    manuringRounds[idx].active = isActive;
+    save(STORAGE_KEYS.manuringRounds, manuringRounds);
+    renderManuringRounds();
+    // Refresh any open Record Stock dropdown so the change takes effect immediately
+    updateManuringVisibility();
 }
 
 // Render the application history (fertilizer Out transactions linked to a round)
@@ -6574,10 +6523,14 @@ function toggleEditManuringWrap(t) {
 
     if (category === 'Fertilizer' && (txnType === 'Out' || txnType === 'In')) {
         wrap.classList.remove('hidden');
-        const matchingRounds = manuringRounds.filter(r => r.fertilizerItemId === (t ? t.itemId : parseInt(document.getElementById('editTxnId').value, 10)));
+        const linkedId = t && t.manuringRoundId ? String(t.manuringRoundId) : null;
+        const matchingRounds = manuringRounds.filter(r =>
+            r.fertilizerItemId === (t ? t.itemId : parseInt(document.getElementById('editTxnId').value, 10)) &&
+            (r.active !== false || String(r.id) === linkedId) // always keep already-linked round visible
+        );
         sel.innerHTML = '<option value="">-- Select a Manuring Round --</option>' +
-            matchingRounds.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
-        if (t && t.manuringRoundId) sel.value = t.manuringRoundId;
+            matchingRounds.map(r => `<option value="${r.id}">${r.name}${r.active === false ? ' (inactive)' : ''}</option>`).join('');
+        if (linkedId) sel.value = linkedId;
     } else {
         wrap.classList.add('hidden');
         sel.value = '';
