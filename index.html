@@ -3548,14 +3548,15 @@ async function loadFromSupabase() {
     if (!activeEstate) return;
     try {
         const [itemsRes, locsRes, txnsRes, roundsRes,
-               fmRoundsRes, claimsRes, chemRes] = await Promise.all([
+               fmRoundsRes, claimsRes, chemRes, rainfallRes] = await Promise.all([
             supabaseClient.from('opp_items').select('*').eq('estate', activeEstate),
             supabaseClient.from('opp_locations').select('*').eq('estate', activeEstate),
             supabaseClient.from('opp_transactions').select('*').eq('estate', activeEstate),
             supabaseClient.from('opp_manuring_rounds').select('*').eq('estate', activeEstate),
             supabaseClient.from('opp_fieldmaint_rounds').select('*').eq('estate', activeEstate),
             supabaseClient.from('opp_maint_claims').select('*').eq('estate', activeEstate),
-            supabaseClient.from('opp_chem_ingredients').select('*').eq('estate', activeEstate)
+            supabaseClient.from('opp_chem_ingredients').select('*').eq('estate', activeEstate),
+            supabaseClient.from('opp_rainfall_txns').select('*').eq('estate', activeEstate)
         ]);
 
         if (itemsRes.error)    console.error('[Supabase] load items',          itemsRes.error);
@@ -3565,6 +3566,7 @@ async function loadFromSupabase() {
         if (fmRoundsRes.error) console.error('[Supabase] load fm_rounds',      fmRoundsRes.error);
         if (claimsRes.error)   console.error('[Supabase] load maint_claims',   claimsRes.error);
         if (chemRes.error)     console.error('[Supabase] load chem_ingr',      chemRes.error);
+        if (rainfallRes.error) console.error('[Supabase] load rainfall_txns',  rainfallRes.error);
 
         if (!itemsRes.error  && itemsRes.data  !== null) items            = itemsRes.data;
         if (!locsRes.error   && locsRes.data   !== null) locations        = locsRes.data;
@@ -3573,6 +3575,7 @@ async function loadFromSupabase() {
         if (!fmRoundsRes.error && fmRoundsRes.data !== null) fieldMaintRounds = fmRoundsRes.data;
         if (!claimsRes.error && claimsRes.data !== null) maintClaims      = claimsRes.data;
         if (!chemRes.error   && chemRes.data   !== null) chemIngredients  = chemRes.data;
+        if (!rainfallRes.error && rainfallRes.data !== null) rainfallTxns = rainfallRes.data;
 
         // Cache all tables with estate-scoped localStorage keys
         const keys = getEstateKeys(activeEstate);
@@ -3583,6 +3586,7 @@ async function loadFromSupabase() {
         localStorage.setItem(keys.fieldMaintRounds, JSON.stringify(fieldMaintRounds));
         localStorage.setItem(keys.maintClaims,      JSON.stringify(maintClaims));
         localStorage.setItem(keys.chemIngredients,  JSON.stringify(chemIngredients));
+        localStorage.setItem(keys.rainfallTxns,     JSON.stringify(rainfallTxns));
 
         // Refresh lastKnownIds snapshots for all tables
         lastKnownIds.opp_items              = new Set(items.map(r => r.id));
@@ -3592,6 +3596,7 @@ async function loadFromSupabase() {
         lastKnownIds.opp_fieldmaint_rounds  = new Set(fieldMaintRounds.map(r => r.id));
         lastKnownIds.opp_maint_claims       = new Set(maintClaims.map(r => r.id));
         lastKnownIds.opp_chem_ingredients   = new Set(chemIngredients.map(r => r.id));
+        lastKnownIds.opp_rainfall_txns      = new Set(rainfallTxns.map(r => r.id));
 
         refreshAll();
         renderManuringRounds();
@@ -11861,14 +11866,14 @@ function saveRainfallTxn() {
         rainfallTxns.push({ id: Date.now(), date, mm, picture: picture || null, createdAt: new Date().toISOString().slice(0, 10) });
     }
     rainfallTxns.sort((a, b) => b.date.localeCompare(a.date));
-    localStorage.setItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate, JSON.stringify(rainfallTxns));
+    save(STORAGE_KEYS.rainfallTxns, rainfallTxns);
     cancelAddRainfall();
 }
 
 function deleteRainfallTxn(id) {
     if (!confirm('Delete this rainfall record?')) return;
     rainfallTxns = rainfallTxns.filter(r => String(r.id) !== String(id));
-    localStorage.setItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate, JSON.stringify(rainfallTxns));
+    save(STORAGE_KEYS.rainfallTxns, rainfallTxns);
     renderRainfallTxns();
 }
 
@@ -12105,12 +12110,12 @@ function saveMobileRainfallTxn() {
     if (!activeEstate) { alert('Please select an Estate first.'); return; }
     const img = document.getElementById('mobileRfPreview');
     const picture = (img && img.src && img.src.startsWith('data:')) ? img.src : null;
-    // Load latest, push new record, sort, save
+    // Load latest, push new record, sort, save (also syncs to Supabase)
     const stored = localStorage.getItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate);
-    const txns = stored ? JSON.parse(stored) : [];
-    txns.push({ id: Date.now(), date, mm, picture, createdAt: new Date().toISOString().slice(0, 10) });
-    txns.sort((a, b) => b.date.localeCompare(a.date));
-    localStorage.setItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate, JSON.stringify(txns));
+    rainfallTxns = stored ? JSON.parse(stored) : [];
+    rainfallTxns.push({ id: Date.now(), date, mm, picture, createdAt: new Date().toISOString().slice(0, 10) });
+    rainfallTxns.sort((a, b) => b.date.localeCompare(a.date));
+    save(STORAGE_KEYS.rainfallTxns, rainfallTxns);
     // Reset form
     document.getElementById('mobileRfDate').value = '';
     document.getElementById('mobileRfMm').value = '';
