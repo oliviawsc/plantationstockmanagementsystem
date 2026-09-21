@@ -3575,7 +3575,23 @@ async function loadFromSupabase() {
         if (!fmRoundsRes.error && fmRoundsRes.data !== null) fieldMaintRounds = fmRoundsRes.data;
         if (!claimsRes.error && claimsRes.data !== null) maintClaims      = claimsRes.data;
         if (!chemRes.error   && chemRes.data   !== null) chemIngredients  = chemRes.data;
-        if (!rainfallRes.error && rainfallRes.data !== null) rainfallTxns = rainfallRes.data;
+        if (!rainfallRes.error && rainfallRes.data !== null) {
+            const sbRf = rainfallRes.data;
+            // Merge: find any locally-saved records that never made it to Supabase
+            // (e.g. records saved before Supabase sync was added) and push them up.
+            const keys0 = getEstateKeys(activeEstate);
+            const localRf = JSON.parse(localStorage.getItem(keys0.rainfallTxns)) || [];
+            const sbIds = new Set(sbRf.map(r => String(r.id)));
+            const unsynced = localRf.filter(r => !sbIds.has(String(r.id)));
+            if (unsynced.length > 0) {
+                // Merge unsynced local records into Supabase dataset and push them up
+                rainfallTxns = [...sbRf, ...unsynced];
+                rainfallTxns.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+                syncToSupabase(STORAGE_KEYS.rainfallTxns, rainfallTxns);
+            } else {
+                rainfallTxns = sbRf;
+            }
+        }
 
         // Cache all tables with estate-scoped localStorage keys
         const keys = getEstateKeys(activeEstate);
