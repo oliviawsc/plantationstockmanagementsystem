@@ -11882,8 +11882,7 @@ function saveRainfallTxn() {
         if (idx !== -1) {
             rainfallTxns[idx].date    = date;
             rainfallTxns[idx].mm      = mm;
-            // Keep existing photo if no new one selected
-            if (picture) rainfallTxns[idx].picture = picture;
+            rainfallTxns[idx].picture = picture; // null when user cleared it
         }
     } else {
         rainfallTxns.push({ id: Date.now(), date, mm, picture: picture || null, createdAt: new Date().toISOString().slice(0, 10) });
