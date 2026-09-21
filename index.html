@@ -2323,7 +2323,7 @@
                         </div>
 
                         <!-- Save button -->
-                        <button onclick="saveMobileRainfallTxn()"
+                        <button type="button" id="mobileRfSaveBtn" onclick="saveMobileRainfallTxn()"
                             style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#16a34a,#166534);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;box-shadow:0 4px 14px rgba(22,163,74,.3);"
                             data-i18n="rf_btn_save">Save Transaction</button>
 
@@ -8647,6 +8647,15 @@ function navToSection(sectionId) {
     if (sectionId === 'mobile_rainfall') {
         const el = document.getElementById('mobileRfDate');
         if (el && !el.value) el.valueAsDate = new Date();
+        // The save button must always be enabled on this add form — force-enable
+        // it here after applyViewOnlyLock and refreshAll have both run, so any
+        // accidental lock from either path is overridden.
+        const saveBtn = document.getElementById('mobileRfSaveBtn');
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('view-locked-field'); }
+        const rfDate = document.getElementById('mobileRfDate');
+        if (rfDate) { rfDate.disabled = false; rfDate.classList.remove('view-locked-field'); }
+        const rfMm = document.getElementById('mobileRfMm');
+        if (rfMm) { rfMm.disabled = false; rfMm.classList.remove('view-locked-field'); }
     }
 }
 
@@ -12091,26 +12100,31 @@ function clearMobileRainfallPhoto() {
     document.getElementById('mobileRfCamera').value = '';
 }
 function saveMobileRainfallTxn() {
-    const date = document.getElementById('mobileRfDate').value;
-    const mm   = parseFloat(document.getElementById('mobileRfMm').value);
-    if (!date) { alert('Please select a date.'); return; }
-    if (isNaN(mm) || mm < 0) { alert('Please enter a valid rainfall amount.'); return; }
-    if (!activeEstate) { alert('Please select an Estate first.'); return; }
-    const img = document.getElementById('mobileRfPreview');
-    const picture = (img && img.src && img.src.startsWith('data:')) ? img.src : null;
-    // Load latest, push new record, sort, save (also syncs to Supabase)
-    const stored = localStorage.getItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate);
-    rainfallTxns = stored ? JSON.parse(stored) : [];
-    rainfallTxns.push({ id: Date.now(), date, mm, picture, createdAt: new Date().toISOString().slice(0, 10) });
-    rainfallTxns.sort((a, b) => b.date.localeCompare(a.date));
-    save(STORAGE_KEYS.rainfallTxns, rainfallTxns);
-    // Reset form
-    document.getElementById('mobileRfDate').value = '';
-    document.getElementById('mobileRfMm').value = '';
-    clearMobileRainfallPhoto();
-    const d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
-    alert((d && d.rf_saved_ok) || 'Rainfall transaction saved!');
-    navToSection('estate_hub');
+    try {
+        const date = document.getElementById('mobileRfDate').value;
+        const mm   = parseFloat(document.getElementById('mobileRfMm').value);
+        if (!date) { alert('Please select a date.'); return; }
+        if (isNaN(mm) || mm < 0) { alert('Please enter a valid rainfall amount.'); return; }
+        if (!activeEstate) { alert('Please select an Estate first.'); return; }
+        const img = document.getElementById('mobileRfPreview');
+        const picture = (img && img.src && img.src.startsWith('data:')) ? img.src : null;
+        // Load latest, push new record, sort, save (also syncs to Supabase)
+        const stored = localStorage.getItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate);
+        rainfallTxns = stored ? JSON.parse(stored) : [];
+        rainfallTxns.push({ id: Date.now(), date, mm, picture, createdAt: new Date().toISOString().slice(0, 10) });
+        rainfallTxns.sort((a, b) => b.date.localeCompare(a.date));
+        save(STORAGE_KEYS.rainfallTxns, rainfallTxns);
+        // Reset form
+        document.getElementById('mobileRfDate').value = '';
+        document.getElementById('mobileRfMm').value = '';
+        clearMobileRainfallPhoto();
+        const d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
+        alert((d && d.rf_saved_ok) || 'Rainfall transaction saved!');
+        navToSection('estate_hub');
+    } catch (err) {
+        console.error('[saveMobileRainfallTxn]', err);
+        alert('Error saving rainfall: ' + (err && err.message ? err.message : err));
+    }
 }
 window.previewMobileRainfallPhoto = previewMobileRainfallPhoto;
 window.clearMobileRainfallPhoto   = clearMobileRainfallPhoto;
