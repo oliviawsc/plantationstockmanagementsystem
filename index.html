@@ -2419,6 +2419,7 @@
                     <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
                         <button onclick="cancelAddRainfall()" style="padding:6px 14px;border-radius:8px;border:1px solid #BFDBFE;background:#EFF6FF;color:#1e40af;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">&#8592; Back</button>
                         <h3 class="text-xl font-bold" id="rfFormTitle" data-i18n="rf_add_title">Add Rainfall Transaction</h3>
+                        <input type="hidden" id="rfEditId" value="" />
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -7212,6 +7213,7 @@ const I18N = {
         page_rainfall:            '🌧️ Rainfall Transactions',
         page_rainfall_sub:        'Record daily rainfall readings with date, amount (mm), and an optional photo.',
         rf_add_title:             'Add Rainfall Transaction',
+        rf_edit_title:            'Edit Rainfall Transaction',
         rf_lbl_date:              'Date',
         rf_lbl_mm:                'Rainfall (mm)',
         rf_lbl_photo:             'Photo (optional)',
@@ -7573,6 +7575,7 @@ const I18N = {
         page_rainfall:            '🌧️ Transaksi Hujan',
         page_rainfall_sub:        'Rekod bacaan hujan harian dengan tarikh, jumlah (mm), dan foto pilihan.',
         rf_add_title:             'Tambah Transaksi Hujan',
+        rf_edit_title:            'Edit Transaksi Hujan',
         rf_lbl_date:              'Tarikh',
         rf_lbl_mm:                'Hujan (mm)',
         rf_lbl_photo:             'Foto (pilihan)',
@@ -11631,23 +11634,26 @@ function getRainfallPictureBase64() {
 }
 
 function saveRainfallTxn() {
-    const date = document.getElementById('rfDate').value;
-    const mm   = parseFloat(document.getElementById('rfMm').value);
+    const date    = document.getElementById('rfDate').value;
+    const mm      = parseFloat(document.getElementById('rfMm').value);
+    const editId  = document.getElementById('rfEditId').value;
     if (!date) { alert('Please select a date.'); return; }
     if (isNaN(mm) || mm < 0) { alert('Please enter a valid rainfall amount (mm).'); return; }
-    const picture = getRainfallPictureBase64();
-    const record = {
-        id:        Date.now(),
-        date:      date,
-        mm:        mm,
-        picture:   picture || null,
-        createdAt: new Date().toISOString().slice(0, 10)
-    };
-    rainfallTxns.push(record);
-    // Sort newest first
-    rainfallTxns.sort((a, b) => b.date.localeCompare(a.date));
-    // Persist to localStorage (estate-scoped)
     if (!activeEstate) { alert('Please select an Estate before saving data.'); return; }
+    const picture = getRainfallPictureBase64();
+    if (editId) {
+        // Update existing record
+        const idx = rainfallTxns.findIndex(r => String(r.id) === editId);
+        if (idx !== -1) {
+            rainfallTxns[idx].date    = date;
+            rainfallTxns[idx].mm      = mm;
+            // Keep existing photo if no new one selected
+            if (picture) rainfallTxns[idx].picture = picture;
+        }
+    } else {
+        rainfallTxns.push({ id: Date.now(), date, mm, picture: picture || null, createdAt: new Date().toISOString().slice(0, 10) });
+    }
+    rainfallTxns.sort((a, b) => b.date.localeCompare(a.date));
     localStorage.setItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate, JSON.stringify(rainfallTxns));
     cancelAddRainfall();
 }
@@ -11691,7 +11697,9 @@ function renderRainfallTxns() {
             '<td class="px-3 py-2">' + r.date + '</td>' +
             '<td class="px-3 py-2 text-right font-semibold">' + r.mm.toFixed(1) + '</td>' +
             '<td class="px-3 py-2 text-center">' + photoCell + '</td>' +
-            '<td class="px-3 py-2 text-center">' +
+            '<td class="px-3 py-2 text-center" style="white-space:nowrap;">' +
+                '<button onclick="editRainfallTxn(\'' + r.id + '\')" ' +
+                'class="text-blue-600 hover:text-blue-800 text-xs font-semibold px-2 py-1 rounded border border-blue-200 hover:bg-blue-50 mr-1">&#9998; Edit</button>' +
                 '<button onclick="deleteRainfallTxn(\'' + r.id + '\')" ' +
                 'class="text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-1 rounded border border-red-200 hover:bg-red-50">&#128465; Delete</button>' +
             '</td>' +
@@ -11700,12 +11708,36 @@ function renderRainfallTxns() {
 }
 
 function showAddRainfallPanel() {
+    document.getElementById('rfEditId').value = '';
+    const d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
+    document.getElementById('rfFormTitle').textContent = (d && d.rf_add_title) || 'Add Rainfall Transaction';
     document.getElementById('rfListPanel').classList.add('hidden');
     document.getElementById('rfFormPanel').classList.remove('hidden');
-    const rfDate = document.getElementById('rfDate');
-    if (rfDate && !rfDate.value) rfDate.valueAsDate = new Date();
+    document.getElementById('rfDate').value = '';
+    document.getElementById('rfMm').value = '';
+    clearRainfallPicture();
+    document.getElementById('rfDate').valueAsDate = new Date();
+}
+function editRainfallTxn(id) {
+    const r = rainfallTxns.find(x => String(x.id) === String(id));
+    if (!r) return;
+    document.getElementById('rfEditId').value = String(r.id);
+    const d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
+    document.getElementById('rfFormTitle').textContent = (d && d.rf_edit_title) || 'Edit Rainfall Transaction';
+    document.getElementById('rfDate').value = r.date;
+    document.getElementById('rfMm').value   = r.mm;
+    // Show existing photo if any
+    clearRainfallPicture();
+    if (r.picture) {
+        document.getElementById('rfPicturePreview').src = r.picture;
+        document.getElementById('rfPicturePreviewWrap').style.display = '';
+        document.getElementById('rfClearPhotoBtn').style.display = '';
+    }
+    document.getElementById('rfListPanel').classList.add('hidden');
+    document.getElementById('rfFormPanel').classList.remove('hidden');
 }
 function cancelAddRainfall() {
+    document.getElementById('rfEditId').value = '';
     document.getElementById('rfFormPanel').classList.add('hidden');
     document.getElementById('rfListPanel').classList.remove('hidden');
     document.getElementById('rfDate').value = '';
@@ -11722,6 +11754,7 @@ window.viewRainfallPicture    = viewRainfallPicture;
 window.renderRainfallTxns     = renderRainfallTxns;
 window.showAddRainfallPanel   = showAddRainfallPanel;
 window.cancelAddRainfall      = cancelAddRainfall;
+window.editRainfallTxn        = editRainfallTxn;
 
 // ══════════════════════════════════════════════════════════════════════
 // SETTINGS TAB SWITCHING
