@@ -5703,6 +5703,7 @@ function renderChemUsageTracker() {
                     return t.type === 'Out' &&
                            String(t.itemId) === String(ciRow.itemId) &&
                            t.maintRoundId &&
+                           t.date && t.date <= asAt &&   // only up to the "as at" date
                            fieldMaintRounds.some(function(r) {
                                return String(r.id) === String(t.maintRoundId) &&
                                       String(r.id) === String(rm.roundId);
