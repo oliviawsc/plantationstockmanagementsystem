@@ -2386,6 +2386,10 @@
 
         <!-- ============ PAGE 13: RAINFALL TRANSACTIONS ============ -->
         <section id="rainfall" class="page-section">
+            <div class="htab-bar">
+                <button class="htab-btn active" onclick="navigateToSection('rainfall')" data-i18n="tab_rainfall_txns">Rainfall Transactions</button>
+                <button class="htab-btn" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Rainfall Report</button>
+            </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_rainfall">&#127783;&#65039; Rainfall Transactions</h2>
             <p class="text-sm text-blue-700 mb-6" data-i18n="page_rainfall_sub">Record daily rainfall readings with date, amount (mm), and an optional photo.</p>
 
@@ -2479,6 +2483,10 @@
 
         <!-- ============ PAGE: RAINFALL REPORT ============ -->
         <section id="rainfallreport" class="page-section">
+            <div class="htab-bar">
+                <button class="htab-btn" onclick="navigateToSection('rainfall')" data-i18n="tab_rainfall_txns">Rainfall Transactions</button>
+                <button class="htab-btn active" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Rainfall Report</button>
+            </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_rainfallreport">&#128200; Rainfall Report</h2>
             <p class="text-sm text-blue-700 mb-4" data-i18n="page_rainfallreport_sub">Monthly rainfall summary by day for the selected year.</p>
 
@@ -7237,6 +7245,8 @@ const I18N = {
         sb_section_rainfall:      'Rainfall',
         sb_lbl_rainfall:          'Rainfall Transactions',
         sb_lbl_rainfallreport:    'Rainfall Report',
+        tab_rainfall_txns:        'Rainfall Transactions',
+        tab_rainfall_report:      'Rainfall Report',
         nav_rainfall:             '🌧️ Rainfall Transactions',
         page_rainfall:            '🌧️ Rainfall Transactions',
         page_rainfallreport:      '📊 Rainfall Report',
@@ -7606,6 +7616,8 @@ const I18N = {
         sb_section_rainfall:      'Hujan',
         sb_lbl_rainfall:          'Transaksi Hujan',
         sb_lbl_rainfallreport:    'Laporan Hujan',
+        tab_rainfall_txns:        'Transaksi Hujan',
+        tab_rainfall_report:      'Laporan Hujan',
         nav_rainfall:             '🌧️ Transaksi Hujan',
         page_rainfall:            '🌧️ Transaksi Hujan',
         page_rainfallreport:      '📊 Laporan Hujan',
