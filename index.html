@@ -1514,7 +1514,7 @@
                     </div>
 
                     <!-- Rainfall -->
-                    <button class="estate-card" onclick="navToSection('rainfall')"
+                    <button class="estate-card" onclick="navToSection('mobile_rainfall')"
                         style="flex-direction:row;justify-content:flex-start;padding:20px 22px;gap:18px;border-radius:18px;">
                         <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#0ea5e9,#0369a1);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(14,165,233,.28);">
                             <span style="font-size:26px;">&#127783;&#65039;</span>
@@ -2251,6 +2251,69 @@
                         <span style="font-size:22px;color:#FCD34D;">&#8250;</span>
                     </button>
 
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ MOBILE RAINFALL ADD (estate-mobile only) ============ -->
+        <section id="mobile_rainfall" class="page-section">
+            <div style="min-height:100vh;background:linear-gradient(160deg,#F0F9FF 0%,#E0F2FE 40%,#F8FAFC 100%);padding-bottom:60px;">
+
+                <!-- Back header -->
+                <div style="display:flex;align-items:center;gap:12px;padding:24px 20px 16px;">
+                    <button onclick="navToSection('estate_hub')"
+                        style="width:36px;height:36px;border-radius:10px;border:1px solid #BAE6FD;background:#E0F2FE;color:#0369a1;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">&#8592;</button>
+                    <h2 style="font-size:22px;font-weight:800;color:#0F172A;letter-spacing:-.3px;font-family:Inter,sans-serif;" data-i18n="rf_add_title">Add Rainfall Transaction</h2>
+                </div>
+
+                <!-- Form card -->
+                <div style="padding:0 16px;">
+                    <div style="background:#fff;border-radius:20px;box-shadow:0 4px 24px rgba(14,165,233,.1);padding:24px 20px;">
+
+                        <!-- Date -->
+                        <div style="margin-bottom:18px;">
+                            <label style="display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:6px;" data-i18n="rf_lbl_date">Date</label>
+                            <input type="date" id="mobileRfDate"
+                                style="width:100%;border:1.5px solid #BAE6FD;border-radius:10px;padding:10px 12px;font-size:15px;font-family:Inter,sans-serif;box-sizing:border-box;outline:none;" />
+                        </div>
+
+                        <!-- Rainfall mm -->
+                        <div style="margin-bottom:18px;">
+                            <label style="display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:6px;" data-i18n="rf_lbl_mm">Rainfall (mm)</label>
+                            <input type="number" id="mobileRfMm" min="0" step="0.1" placeholder="e.g. 12.5"
+                                style="width:100%;border:1.5px solid #BAE6FD;border-radius:10px;padding:10px 12px;font-size:15px;font-family:Inter,sans-serif;box-sizing:border-box;outline:none;" />
+                        </div>
+
+                        <!-- Photo -->
+                        <div style="margin-bottom:24px;">
+                            <label style="display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:8px;" data-i18n="rf_lbl_photo">Photo (optional)</label>
+                            <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+                                <button type="button" onclick="document.getElementById('mobileRfFile').click()"
+                                    style="flex:1;min-width:120px;padding:10px;border-radius:10px;border:1.5px solid #CBD5E1;background:#F8FAFC;color:#374151;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">
+                                    &#128247; <span data-i18n="rf_btn_upload">Upload Photo</span>
+                                </button>
+                                <button type="button" onclick="document.getElementById('mobileRfCamera').click()"
+                                    style="flex:1;min-width:120px;padding:10px;border-radius:10px;border:1.5px solid #CBD5E1;background:#F8FAFC;color:#374151;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">
+                                    &#128249; <span data-i18n="rf_btn_camera">Take Photo</span>
+                                </button>
+                            </div>
+                            <button type="button" id="mobileRfClearBtn" onclick="clearMobileRainfallPhoto()" style="display:none;padding:8px 16px;border-radius:10px;border:1.5px solid #FCA5A5;background:#FEF2F2;color:#DC2626;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;margin-bottom:10px;">
+                                &#10005; <span data-i18n="rf_btn_clear_photo">Clear Photo</span>
+                            </button>
+                            <input type="file" id="mobileRfFile" accept="image/*" style="display:none;" onchange="previewMobileRainfallPhoto(this)" />
+                            <input type="file" id="mobileRfCamera" accept="image/*" capture="environment" style="display:none;" onchange="previewMobileRainfallPhoto(this)" />
+                            <div id="mobileRfPreviewWrap" style="display:none;">
+                                <img id="mobileRfPreview" src="" alt="Preview"
+                                    style="max-width:100%;max-height:200px;border-radius:12px;border:2px solid #BAE6FD;object-fit:cover;" />
+                            </div>
+                        </div>
+
+                        <!-- Save button -->
+                        <button onclick="saveMobileRainfallTxn()"
+                            style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#0ea5e9,#0369a1);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;box-shadow:0 4px 14px rgba(14,165,233,.3);"
+                            data-i18n="rf_btn_save">Save Transaction</button>
+
+                    </div>
                 </div>
             </div>
         </section>
@@ -7322,6 +7385,7 @@ const I18N = {
         rf_col_photo:             'Photo',
         rf_col_action:            'Action',
         rf_no_data:               'No rainfall records yet.',
+        rf_saved_ok:              'Rainfall transaction saved!',
     },
 
     ms: {
@@ -7703,6 +7767,7 @@ const I18N = {
         rf_col_photo:             'Foto',
         rf_col_action:            'Tindakan',
         rf_no_data:               'Tiada rekod hujan lagi.',
+        rf_saved_ok:              'Transaksi hujan berjaya disimpan!',
     }
 };
 
@@ -8926,9 +8991,10 @@ const ESTATE_MOBILE_DEFAULTS = {
     fertrecord:      'view',  // View Record tab
     chemrecord:      'view',  // View Record tab
     plantrecord:     'view',  // View Record tab
-    rainfall:        'edit',  // Rainfall Transactions — hub card leads here
-    rainfallreport:  'view',  // Rainfall Report tab
-    rainfallsummary: 'view',  // Summary Monthly Rainfall tab
+    rainfall:         'edit',  // Rainfall Transactions desktop section
+    rainfallreport:   'view',  // Rainfall Report tab
+    rainfallsummary:  'view',  // Summary Monthly Rainfall tab
+    mobile_rainfall:  'edit',  // Mobile-only rainfall add form (hub card)
 };
 
 function getSectionAccess(session, sectionId) {
@@ -11963,6 +12029,50 @@ function renderRainfallReport() {
 window.changeRainfallReportYear = changeRainfallReportYear;
 window.renderRainfallReport     = renderRainfallReport;
 
+// ── Mobile-only rainfall add form ────────────────────────────────────
+function previewMobileRainfallPhoto(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('mobileRfPreview').src = e.target.result;
+        document.getElementById('mobileRfPreviewWrap').style.display = '';
+        document.getElementById('mobileRfClearBtn').style.display = '';
+    };
+    reader.readAsDataURL(input.files[0]);
+}
+function clearMobileRainfallPhoto() {
+    document.getElementById('mobileRfPreview').src = '';
+    document.getElementById('mobileRfPreviewWrap').style.display = 'none';
+    document.getElementById('mobileRfClearBtn').style.display = 'none';
+    document.getElementById('mobileRfFile').value = '';
+    document.getElementById('mobileRfCamera').value = '';
+}
+function saveMobileRainfallTxn() {
+    const date = document.getElementById('mobileRfDate').value;
+    const mm   = parseFloat(document.getElementById('mobileRfMm').value);
+    if (!date) { alert('Please select a date.'); return; }
+    if (isNaN(mm) || mm < 0) { alert('Please enter a valid rainfall amount.'); return; }
+    if (!activeEstate) { alert('Please select an Estate first.'); return; }
+    const img = document.getElementById('mobileRfPreview');
+    const picture = (img && img.src && img.src.startsWith('data:')) ? img.src : null;
+    // Load latest, push new record, sort, save
+    const stored = localStorage.getItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate);
+    const txns = stored ? JSON.parse(stored) : [];
+    txns.push({ id: Date.now(), date, mm, picture, createdAt: new Date().toISOString().slice(0, 10) });
+    txns.sort((a, b) => b.date.localeCompare(a.date));
+    localStorage.setItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate, JSON.stringify(txns));
+    // Reset form
+    document.getElementById('mobileRfDate').value = '';
+    document.getElementById('mobileRfMm').value = '';
+    clearMobileRainfallPhoto();
+    const d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
+    alert((d && d.rf_saved_ok) || 'Rainfall transaction saved!');
+    navToSection('estate_hub');
+}
+window.previewMobileRainfallPhoto = previewMobileRainfallPhoto;
+window.clearMobileRainfallPhoto   = clearMobileRainfallPhoto;
+window.saveMobileRainfallTxn      = saveMobileRainfallTxn;
+
 // ── Summary Monthly Rainfall Record ─────────────────────────────────
 function renderRainfallSummary() {
     const tbl = document.getElementById('rfSummaryTable');
@@ -12135,6 +12245,10 @@ function navigateToSection(target) {
     }
     if (target === 'rainfallreport') renderRainfallReport();
     if (target === 'rainfallsummary') renderRainfallSummary();
+    if (target === 'mobile_rainfall') {
+        const el = document.getElementById('mobileRfDate');
+        if (el && !el.value) el.valueAsDate = new Date();
+    }
     if (target === 'settings') { renderEstatesList(); renderItemsTable(); renderManuringRounds(); renderMrBlocksGrid(); renderFieldMaintRounds(); renderFmBlocksGrid(); renderCiTable(); }
     if (typeof applyViewOnlyLock === 'function') applyViewOnlyLock(target);
 }
