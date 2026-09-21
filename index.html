@@ -8072,7 +8072,12 @@ function bootApp(session) {
     const _preAuthHide = document.getElementById('pre-auth-hide');
     if (_preAuthHide) _preAuthHide.remove();
     document.getElementById('authOverlay').style.display = 'none';
-    document.getElementById('appLayout').classList.remove('hidden');
+    // For estate users, defer revealing appLayout until after the mobile hub is
+    // fully set up (estate-mobile class + navToSection). Revealing it here first
+    // would briefly show the desktop layout before the mobile setup completes.
+    if (!isEstateMobile(session)) {
+        document.getElementById('appLayout').classList.remove('hidden');
+    }
 
     // Populate the sidebar estate dropdown with only this user's estates
     const estateSelect = document.getElementById('sidebarEstate');
@@ -8155,6 +8160,7 @@ function bootApp(session) {
     // Estate mobile users (estate_user) get the dedicated mobile hub
     if (isEstateMobile(session)) {
         document.body.classList.add('estate-mobile');
+        document.getElementById('appLayout').classList.remove('hidden');
         // Populate greeting
         const greetNameEl = document.getElementById('estateHubGreetName');
         if (greetNameEl) greetNameEl.textContent = session.name || 'User';
