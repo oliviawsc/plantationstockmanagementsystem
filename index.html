@@ -11928,7 +11928,7 @@ function renderRainfallTxns() {
     tbody.innerHTML = rainfallTxns.map(function(r) {
         const photoCell = r.picture
             ? '<img src="' + r.picture + '" onclick="viewRainfallPicture(\'' + r.id + '\')" title="Click to enlarge" ' +
-              'style="width:56px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid #BFDBFE;" />'
+              'style="width:56px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid #BFDBFE;display:block;margin:0 auto;" />'
             : '<span class="text-gray-300 text-xs">—</span>';
         return '<tr class="hover:bg-blue-50">' +
             '<td class="' + cellCls + '">' + r.date + '</td>' +
