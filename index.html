@@ -2716,6 +2716,7 @@
                                         <th class="px-3 py-2 text-left">Round Name</th>
                                         <th class="px-3 py-2 text-left">Type of Maintenance</th>
                                         <th class="px-3 py-2 text-left">Target Period</th>
+                                        <th class="px-3 py-2 text-center">Active</th>
                                         <th class="px-3 py-2 text-left">Blocks Involved</th>
                                         <th class="px-3 py-2 text-left">Notes</th>
                                         <th class="px-3 py-2 text-left">Date Created</th>
@@ -3969,7 +3970,7 @@ function updateManuringVisibility() {
         // Preserve current selection while repopulating
         const prevMaintVal = maintSel.value;
         maintSel.innerHTML = `<option value="">${d.select_maint_round}</option>` +
-            fieldMaintRounds.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+            fieldMaintRounds.filter(r => r.active !== false).map(r => `<option value="${r.id}">${r.name}</option>`).join('');
         if (prevMaintVal) maintSel.value = prevMaintVal;
     } else {
         maintWrap.classList.add('hidden');
@@ -6492,9 +6493,13 @@ function openEditTxnModal(id) {
     const editMaintWrap = document.getElementById('editTxnMaintWrap');
     const editMaintSel  = document.getElementById('editTxnMaintRound');
     if (t.category === 'Chemical' && t.type === 'Out') {
+        const linkedMaintId = t.maintRoundId ? String(t.maintRoundId) : null;
         editMaintSel.innerHTML = '<option value="">-- Select a Maintenance Round --</option>' +
-            fieldMaintRounds.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
-        if (t.maintRoundId) editMaintSel.value = t.maintRoundId;
+            fieldMaintRounds
+                .filter(r => r.active !== false || String(r.id) === linkedMaintId)
+                .map(r => `<option value="${r.id}">${r.name}${r.active === false ? ' (inactive)' : ''}</option>`)
+                .join('');
+        if (linkedMaintId) editMaintSel.value = linkedMaintId;
         editMaintWrap.classList.remove('hidden');
     } else {
         editMaintWrap.classList.add('hidden');
@@ -9187,14 +9192,14 @@ function saveFieldMaintRound() {
         const idx = fieldMaintRounds.findIndex(r => String(r.id) === String(editingFmRoundId));
         if (idx < 0) { editingFmRoundId = null; btnDone(fmSubmitBtn); return; }
         fieldMaintRounds[idx] = {
-            ...fieldMaintRounds[idx],  // preserve id and createdAt
+            ...fieldMaintRounds[idx],  // preserve id, createdAt, active
             name, blocks, notes, targetPeriod, maintType
         };
         btnDone(fmSubmitBtn);
         cancelEditFieldMaintRound();
     } else {
         // CREATE new round
-        fieldMaintRounds.push({ id: Date.now(), name, blocks, notes, targetPeriod, maintType, createdAt: today });
+        fieldMaintRounds.push({ id: Date.now(), name, blocks, notes, targetPeriod, maintType, createdAt: today, active: true });
         document.getElementById('fmName').value          = '';
         document.getElementById('fmNotes').value         = '';
         document.getElementById('fmTargetPeriod').value  = '';
@@ -9260,6 +9265,17 @@ function deleteFmRound(id) {
     renderFieldMaintRounds();
 }
 
+/** Toggle the active flag on a maintenance round and sync immediately. */
+function toggleFmRoundActive(id, isActive) {
+    const idx = fieldMaintRounds.findIndex(x => String(x.id) === String(id));
+    if (idx < 0) return;
+    fieldMaintRounds[idx].active = isActive;
+    save(STORAGE_KEYS.fieldMaintRounds, fieldMaintRounds);
+    renderFieldMaintRounds();
+    // Refresh any open Record Stock dropdown so the change takes effect immediately
+    updateManuringVisibility();
+}
+
 /** Render the Defined Maintenance Rounds table. */
 function renderFieldMaintRounds() {
     const body = document.getElementById('fmRoundsBody');
@@ -9267,11 +9283,12 @@ function renderFieldMaintRounds() {
     body.innerHTML = '';
 
     if (fieldMaintRounds.length === 0) {
-        body.innerHTML = `<tr><td colspan="7" class="px-3 py-4 text-center text-gray-500">${currentLang==='ms'?'Tiada pusingan penyelenggaraan ditetapkan lagi.':'No maintenance rounds defined yet.'}</td></tr>`;
+        body.innerHTML = `<tr><td colspan="8" class="px-3 py-4 text-center text-gray-500">${currentLang==='ms'?'Tiada pusingan penyelenggaraan ditetapkan lagi.':'No maintenance rounds defined yet.'}</td></tr>`;
         return;
     }
 
     fieldMaintRounds.forEach(r => {
+        const isActive = r.active !== false; // default true when field absent
         const blocksHtml = r.blocks && r.blocks.length > 0
             ? r.blocks.map(b =>
                 `<span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full mr-1 mb-1">${b}</span>`
@@ -9279,11 +9296,17 @@ function renderFieldMaintRounds() {
             : `<span class="text-gray-400 text-xs italic">${currentLang==='ms'?'Semua blok':'All blocks'}</span>`;
 
         const tr = document.createElement('tr');
-        tr.className = 'border-b border-green-100 hover:bg-green-50';
+        tr.className = `border-b border-green-100 hover:bg-green-50${isActive ? '' : ' opacity-60'}`;
         tr.innerHTML = `
             <td class="px-3 py-2 font-semibold">🔧 ${r.name}</td>
             <td class="px-3 py-2">${r.maintType ? `<span class="inline-block bg-amber-100 text-amber-800 text-xs px-2 py-0.5 rounded-full font-semibold">${r.maintType}</span>` : '<span class="text-gray-400 text-xs">—</span>'}</td>
             <td class="px-3 py-2 text-xs text-gray-500">${r.targetPeriod || '—'}</td>
+            <td class="px-3 py-2 text-center">
+                <input type="checkbox" ${isActive ? 'checked' : ''}
+                    style="width:16px;height:16px;accent-color:#16a34a;cursor:pointer;"
+                    onchange="toggleFmRoundActive('${r.id}', this.checked)"
+                    title="${isActive ? 'Active — appears in Record Stock dropdown' : 'Inactive — hidden from Record Stock dropdown'}">
+            </td>
             <td class="px-3 py-2">${blocksHtml}</td>
             <td class="px-3 py-2 text-gray-600 italic text-sm">${r.notes || '—'}</td>
             <td class="px-3 py-2 text-xs text-gray-400">${r.createdAt || '—'}</td>
