@@ -12366,7 +12366,7 @@ async function saveSettingsBlock() {
         }
         cancelEditSettingsBlock();
         await renderSettingsBlocksList();
-        if (settingsBlocksEstate === activeEstate) loadData();
+        if (settingsBlocksEstate === activeEstate) { loadEstateData(activeEstate); refreshAll(); }
     } catch (e) {
         alert('Error saving block: ' + e.message);
     }
@@ -12402,7 +12402,7 @@ async function deleteSettingsBlock(id) {
         const { error } = await supabaseClient.from('opp_locations').delete().eq('id', id);
         if (error) throw error;
         await renderSettingsBlocksList();
-        if (settingsBlocksEstate === activeEstate) loadData();
+        if (settingsBlocksEstate === activeEstate) { loadEstateData(activeEstate); refreshAll(); }
     } catch (e) {
         alert('Error deleting block: ' + e.message);
     }
