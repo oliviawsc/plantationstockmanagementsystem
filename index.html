@@ -869,14 +869,22 @@
     } catch (e) {}
 })();
 </script>
-<!-- Estate-mobile flash prevention: add body class immediately so the
-     desktop sidebar/layout never flashes through on refresh for estate users. -->
+<!-- Estate-mobile flash prevention: add body class and forcibly hide
+     #appLayout until bootApp completes estate setup. Tailwind's .hidden
+     is display:none without !important, so body.estate-mobile #appLayout
+     (higher specificity) would override it and reveal the desktop layout.
+     The injected style keeps #appLayout hidden with !important until removed
+     inside bootApp once the mobile hub is fully ready. -->
 <script>
 (function () {
     try {
         var s = JSON.parse(localStorage.getItem('opp_auth_session') || 'null');
         if (s && s.role === 'estate_user') {
             document.body.classList.add('estate-mobile');
+            var st = document.createElement('style');
+            st.id = 'pre-mobile-hide';
+            st.textContent = '#appLayout{display:none!important}';
+            document.head.appendChild(st);
         }
     } catch (e) {}
 })();
@@ -8160,6 +8168,8 @@ function bootApp(session) {
     // Estate mobile users (estate_user) get the dedicated mobile hub
     if (isEstateMobile(session)) {
         document.body.classList.add('estate-mobile');
+        const _preMobileHide = document.getElementById('pre-mobile-hide');
+        if (_preMobileHide) _preMobileHide.remove();
         document.getElementById('appLayout').classList.remove('hidden');
         // Populate greeting
         const greetNameEl = document.getElementById('estateHubGreetName');
