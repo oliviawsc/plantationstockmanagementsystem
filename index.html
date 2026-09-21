@@ -869,6 +869,18 @@
     } catch (e) {}
 })();
 </script>
+<!-- Estate-mobile flash prevention: add body class immediately so the
+     desktop sidebar/layout never flashes through on refresh for estate users. -->
+<script>
+(function () {
+    try {
+        var s = JSON.parse(localStorage.getItem('opp_auth_session') || 'null');
+        if (s && s.role === 'estate_user') {
+            document.body.classList.add('estate-mobile');
+        }
+    } catch (e) {}
+})();
+</script>
 <!-- ================================================================
      AUTH OVERLAY
      ================================================================ -->
