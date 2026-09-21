@@ -1516,14 +1516,14 @@
                     <!-- Rainfall -->
                     <button class="estate-card" onclick="navToSection('mobile_rainfall')"
                         style="flex-direction:row;justify-content:flex-start;padding:20px 22px;gap:18px;border-radius:18px;">
-                        <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#0ea5e9,#0369a1);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(14,165,233,.28);">
+                        <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#16a34a,#166534);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(22,163,74,.25);">
                             <span style="font-size:26px;">&#127783;&#65039;</span>
                         </div>
                         <div style="text-align:left;flex:1;">
                             <div data-i18n="home_card_rainfall" style="font-size:17px;font-weight:700;color:#0F172A;margin-bottom:3px;">Rainfall</div>
-                            <span data-i18n="hub_add_rainfall" style="font-size:11px;color:#0369a1;background:#E0F2FE;padding:3px 10px;border-radius:99px;font-weight:600;">Add Rainfall Transaction</span>
+                            <span data-i18n="hub_add_rainfall" style="font-size:11px;color:#166534;background:#DCFCE7;padding:3px 10px;border-radius:99px;font-weight:600;">Add Rainfall Transaction</span>
                         </div>
-                        <span style="font-size:22px;color:#7DD3FC;">&#8250;</span>
+                        <span style="font-size:22px;color:#A5D6A7;">&#8250;</span>
                     </button>
 
                 </div>
@@ -2257,12 +2257,12 @@
 
         <!-- ============ MOBILE RAINFALL ADD (estate-mobile only) ============ -->
         <section id="mobile_rainfall" class="page-section">
-            <div style="min-height:100vh;background:linear-gradient(160deg,#F0F9FF 0%,#E0F2FE 40%,#F8FAFC 100%);padding-bottom:60px;">
+            <div style="min-height:100vh;background:linear-gradient(160deg,#F0FDF4 0%,#E8F5E9 40%,#F8FAFC 100%);padding-bottom:60px;">
 
                 <!-- Back header -->
                 <div style="display:flex;align-items:center;gap:12px;padding:24px 20px 16px;">
                     <button onclick="navToSection('estate_hub')"
-                        style="width:36px;height:36px;border-radius:10px;border:1px solid #BAE6FD;background:#E0F2FE;color:#0369a1;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">&#8592;</button>
+                        style="width:36px;height:36px;border-radius:10px;border:1px solid #A5D6A7;background:#DCFCE7;color:#166534;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">&#8592;</button>
                     <h2 style="font-size:22px;font-weight:800;color:#0F172A;letter-spacing:-.3px;font-family:Inter,sans-serif;" data-i18n="rf_add_title">Add Rainfall Transaction</h2>
                 </div>
 
@@ -2274,14 +2274,14 @@
                         <div style="margin-bottom:18px;">
                             <label style="display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:6px;" data-i18n="rf_lbl_date">Date</label>
                             <input type="date" id="mobileRfDate"
-                                style="width:100%;border:1.5px solid #BAE6FD;border-radius:10px;padding:10px 12px;font-size:15px;font-family:Inter,sans-serif;box-sizing:border-box;outline:none;" />
+                                style="width:100%;border:1.5px solid #A5D6A7;border-radius:10px;padding:10px 12px;font-size:15px;font-family:Inter,sans-serif;box-sizing:border-box;outline:none;" />
                         </div>
 
                         <!-- Rainfall mm -->
                         <div style="margin-bottom:18px;">
                             <label style="display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:6px;" data-i18n="rf_lbl_mm">Rainfall (mm)</label>
                             <input type="number" id="mobileRfMm" min="0" step="0.1" placeholder="e.g. 12.5"
-                                style="width:100%;border:1.5px solid #BAE6FD;border-radius:10px;padding:10px 12px;font-size:15px;font-family:Inter,sans-serif;box-sizing:border-box;outline:none;" />
+                                style="width:100%;border:1.5px solid #A5D6A7;border-radius:10px;padding:10px 12px;font-size:15px;font-family:Inter,sans-serif;box-sizing:border-box;outline:none;" />
                         </div>
 
                         <!-- Photo -->
@@ -2304,13 +2304,13 @@
                             <input type="file" id="mobileRfCamera" accept="image/*" capture="environment" style="display:none;" onchange="previewMobileRainfallPhoto(this)" />
                             <div id="mobileRfPreviewWrap" style="display:none;">
                                 <img id="mobileRfPreview" src="" alt="Preview"
-                                    style="max-width:100%;max-height:200px;border-radius:12px;border:2px solid #BAE6FD;object-fit:cover;" />
+                                    style="max-width:100%;max-height:200px;border-radius:12px;border:2px solid #A5D6A7;object-fit:cover;" />
                             </div>
                         </div>
 
                         <!-- Save button -->
                         <button onclick="saveMobileRainfallTxn()"
-                            style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#0ea5e9,#0369a1);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;box-shadow:0 4px 14px rgba(14,165,233,.3);"
+                            style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#16a34a,#166534);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;box-shadow:0 4px 14px rgba(22,163,74,.3);"
                             data-i18n="rf_btn_save">Save Transaction</button>
 
                     </div>
