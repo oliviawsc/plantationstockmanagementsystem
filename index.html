@@ -2501,12 +2501,14 @@
             </div>
 
             <!-- Report table -->
-            <div class="bg-white rounded-xl shadow overflow-x-auto">
+            <div class="bg-white rounded-xl shadow">
                 <div style="padding:16px 20px 8px;text-align:center;">
                     <div id="rfReportTitle" style="font-weight:800;font-size:15px;letter-spacing:.04em;color:#1e3a5f;"></div>
                 </div>
-                <table id="rfReportTable" class="min-w-full text-sm border-collapse" style="border:1px solid #CBD5E1;">
-                </table>
+                <div style="overflow:auto;max-height:65vh;border-radius:0 0 12px 12px;">
+                    <table id="rfReportTable" class="text-sm border-collapse" style="width:100%;border:1px solid #CBD5E1;">
+                    </table>
+                </div>
             </div>
         </section>
 
@@ -11831,8 +11833,8 @@ function renderRainfallReport() {
     });
 
     const months   = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const hdrStyle = 'background:#1e3a5f;color:#fff;font-weight:700;padding:6px 8px;text-align:center;border:1px solid #334155;white-space:nowrap;';
-    const subStyle = 'background:#1e3a5f;color:#90CAF9;font-weight:400;font-size:11px;padding:3px 8px;text-align:center;border:1px solid #334155;';
+    const hdrStyle = 'background:#1e3a5f;color:#fff;font-weight:700;padding:6px 8px;text-align:center;border:1px solid #334155;white-space:nowrap;position:sticky;top:0;z-index:2;';
+    const subStyle = 'background:#1e3a5f;color:#90CAF9;font-weight:400;font-size:11px;padding:3px 8px;text-align:center;border:1px solid #334155;position:sticky;top:33px;z-index:2;';
     const cellStyle= 'padding:4px 8px;text-align:center;border:1px solid #E2E8F0;';
     const totStyle = 'background:#EFF6FF;font-weight:700;padding:6px 8px;text-align:center;border:1px solid #CBD5E1;';
 
