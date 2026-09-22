@@ -6398,64 +6398,57 @@ function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour, from
         thresholds.push(threshDisp);
     });
 
-    const chartHeight = Math.max(100, filtered.length * 56);
-    canvas.style.height = chartHeight + 'px';
-    canvas.height = chartHeight;
+    // Fixed height; width fills the card naturally
+    canvas.style.height = '260px';
 
-    // ── Inline plugin: draw value labels at the end of each bar ──────
+    // ── Inline plugin: value labels above each bar ───────────────────
     const valueLabelPlugin = {
         id: 'valueLabels_' + canvasId,
         afterDatasetsDraw(chart) {
             const ctx = chart.ctx;
-            chart.data.datasets.forEach((dataset, dsIdx) => {
-                // Only draw labels on the main bar dataset (index 0)
-                if (dsIdx !== 0) return;
-                const meta = chart.getDatasetMeta(dsIdx);
-                meta.data.forEach((bar, idx) => {
-                    const value = dataset.data[idx];
-                    if (value === null || value === undefined) return;
-                    const x = bar.x + 6;           // just after bar end
-                    const y = bar.y;               // bar centre
-                    ctx.save();
-                    ctx.fillStyle = '#374151';
-                    ctx.font = 'bold 11px "Segoe UI", sans-serif';
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(parseFloat(value).toFixed(2), x, y);
-                    ctx.restore();
-                });
+            const meta = chart.getDatasetMeta(0);
+            meta.data.forEach((bar, idx) => {
+                const value = values[idx];
+                if (!value && value !== 0) return;
+                ctx.save();
+                ctx.fillStyle    = '#374151';
+                ctx.font         = 'bold 10px "Segoe UI", sans-serif';
+                ctx.textAlign    = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(parseFloat(value) % 1 === 0 ? value : parseFloat(value).toFixed(2), bar.x, bar.y - 2);
+                ctx.restore();
             });
         }
     };
 
-    // ── Inline plugin: draw threshold vertical lines for Chemical ────
+    // ── Inline plugin: horizontal threshold line per bar (Chemical) ──
     const thresholdLinePlugin = {
         id: 'threshLines_' + canvasId,
         afterDatasetsDraw(chart) {
             if (category !== 'Chemical') return;
             const ctx    = chart.ctx;
-            const xScale = chart.scales.x;
             const yScale = chart.scales.y;
+            const meta   = chart.getDatasetMeta(0);
             thresholds.forEach((thresh, idx) => {
                 if (!thresh || thresh <= 0) return;
-                const xPos = xScale.getPixelForValue(thresh);
-                const yTop = yScale.getPixelForValue(idx) - 18;
-                const yBot = yScale.getPixelForValue(idx) + 18;
+                const bar    = meta.data[idx];
+                if (!bar) return;
+                const yPos   = yScale.getPixelForValue(thresh);
+                const half   = (bar.width || 20) / 2;
                 ctx.save();
                 ctx.beginPath();
-                ctx.moveTo(xPos, yTop);
-                ctx.lineTo(xPos, yBot);
+                ctx.moveTo(bar.x - half, yPos);
+                ctx.lineTo(bar.x + half, yPos);
                 ctx.strokeStyle = THRESH_COLOUR;
-                ctx.lineWidth   = 2.5;
+                ctx.lineWidth   = 2;
                 ctx.setLineDash([4, 2]);
                 ctx.stroke();
-                // Small label above the line
                 ctx.setLineDash([]);
                 ctx.fillStyle    = THRESH_COLOUR;
-                ctx.font         = 'bold 9px "Segoe UI", sans-serif';
+                ctx.font         = 'bold 8.5px "Segoe UI", sans-serif';
                 ctx.textAlign    = 'center';
                 ctx.textBaseline = 'bottom';
-                ctx.fillText(thresh, xPos, yTop);
+                ctx.fillText(thresh, bar.x, yPos - 1);
                 ctx.restore();
             });
         }
@@ -6469,7 +6462,7 @@ function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour, from
             borderColor: colours,
             borderWidth: 1,
             borderRadius: 4,
-            barThickness: 22,
+            maxBarThickness: 52,
         }
     ];
 
@@ -6478,13 +6471,9 @@ function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour, from
         data: { labels, datasets },
         plugins: [valueLabelPlugin, thresholdLinePlugin],
         options: {
-            indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
-            layout: {
-                // Extra right padding so value labels don't get clipped
-                padding: { right: 40 }
-            },
+            layout: { padding: { top: 18 } },
             plugins: {
                 legend: { display: false },
                 tooltip: {
@@ -6516,25 +6505,26 @@ function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour, from
             },
             scales: {
                 x: {
-                    beginAtZero: true,
-                    grid: { color: '#d1fae5' },
-                    ticks: { color: '#374151', font: { size: 11 } },
-                    title: {
-                        display: !!(axisLabel || currentLang === 'ms'),
-                        text: axisLabel || (currentLang === 'ms' ? 'Kuantiti (Stok Semasa)' : ''),
-                        color: '#166534',
-                        font: { size: 11, weight: 'bold' }
-                    }
-                },
-                y: {
                     grid: { display: false },
                     ticks: {
                         color: '#374151',
-                        font: { size: 11 },
+                        font: { size: 10 },
+                        maxRotation: 35,
                         callback(val) {
                             const lbl = this.getLabelForValue(val);
-                            return lbl.length > 24 ? lbl.slice(0, 22) + '…' : lbl;
+                            return lbl.length > 18 ? lbl.slice(0, 16) + '…' : lbl;
                         }
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.06)' },
+                    ticks: { color: '#374151', font: { size: 10 } },
+                    title: {
+                        display: true,
+                        text: axisLabel || (currentLang === 'ms' ? 'Kuantiti' : 'Quantity'),
+                        color: '#64748B',
+                        font: { size: 10, weight: 'bold' }
                     }
                 }
             }
