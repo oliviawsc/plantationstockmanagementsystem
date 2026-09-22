@@ -4057,8 +4057,9 @@ function deleteLocation(id) {
    ----------------------------------------------------------------- */
 function buildLocationOptionsHtml() {
     const d = I18N[currentLang] || I18N['en'];
+    const sorted = locations.slice().sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { numeric: true, sensitivity: 'base' }));
     return `<option value="None/Storage">${d.opt_none_storage}</option>` +
-        locations.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
+        sorted.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
 }
 
 function addTxnRow() {
@@ -4505,7 +4506,8 @@ function renderMrBlocksGrid(checkedBlocks) {
         grid.innerHTML = '<p class="text-xs text-gray-400 col-span-full italic">No blocks registered yet. Add blocks in Location Area first.</p>';
         return;
     }
-    grid.innerHTML = locations.map(l => `
+    const sorted = locations.slice().sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { numeric: true, sensitivity: 'base' }));
+    grid.innerHTML = sorted.map(l => `
         <label class="flex items-center gap-2 text-sm cursor-pointer select-none">
             <input type="checkbox" class="mr-block-cb accent-green-700 w-4 h-4"
                 value="${l.name}"
@@ -4832,8 +4834,9 @@ function populateLocationDropdowns() {
     const sel = document.getElementById('txnLocation');
     if (!sel) return;
     const d = I18N[currentLang] || I18N['en'];
+    const sorted = locations.slice().sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { numeric: true, sensitivity: 'base' }));
     sel.innerHTML = `<option value="None/Storage">${d.opt_none_storage}</option>` +
-        locations.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
+        sorted.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
 }
 
 /* -----------------------------------------------------------------
@@ -6809,8 +6812,9 @@ function openEditTxnModal(id) {
     // Populate location dropdown and pre-select current value
     const locSel = document.getElementById('editTxnLocation');
     const _dLoc = I18N[currentLang] || I18N['en'];
+    const _sortedLoc = locations.slice().sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { numeric: true, sensitivity: 'base' }));
     locSel.innerHTML = `<option value="None/Storage">${_dLoc.opt_none_storage}</option>` +
-        locations.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
+        _sortedLoc.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
     locSel.value = t.location;
 
     // Show manuring round picker only for Fertilizer Out
@@ -9617,7 +9621,8 @@ function renderFmBlocksGrid(checkedBlocks) {
         grid.innerHTML = '<p class="text-xs text-gray-400 col-span-full italic">No blocks registered yet. Add blocks in Location Area first.</p>';
         return;
     }
-    grid.innerHTML = locations.map(l => `
+    const sorted = locations.slice().sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { numeric: true, sensitivity: 'base' }));
+    grid.innerHTML = sorted.map(l => `
         <label class="flex items-center gap-2 text-sm cursor-pointer select-none">
             <input type="checkbox" class="fm-block-cb accent-green-700 w-4 h-4"
                 value="${l.name}"
