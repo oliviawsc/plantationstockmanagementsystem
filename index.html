@@ -6246,8 +6246,30 @@ function renderRainfallChart() {
 
     if (yearsLbl) yearsLbl.textContent = lastYear + ' vs ' + curYear;
 
+    var barValueLabels = {
+        id: 'rainfallBarLabels',
+        afterDatasetsDraw: function(chart) {
+            var ctx = chart.ctx;
+            chart.data.datasets.forEach(function(dataset, di) {
+                var meta = chart.getDatasetMeta(di);
+                ctx.save();
+                ctx.font = 'bold 8.5px Inter,sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillStyle = di === 0 ? '#475569' : '#0369A1';
+                meta.data.forEach(function(bar, i) {
+                    var val = dataset.data[i];
+                    if (!val || val <= 0) return;
+                    ctx.fillText(val % 1 === 0 ? val : val.toFixed(1), bar.x, bar.y - 2);
+                });
+                ctx.restore();
+            });
+        }
+    };
+
     rainfallChartInstance = new Chart(canvas, {
         type: 'bar',
+        plugins: [barValueLabels],
         data: {
             labels: monthsShort,
             datasets: [
@@ -6272,6 +6294,7 @@ function renderRainfallChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: { top: 16 } },
             plugins: {
                 legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 14, padding: 10 } },
                 tooltip: {
