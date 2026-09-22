@@ -9752,7 +9752,8 @@ function renderFieldMaintRounds() {
         return;
     }
 
-    fieldMaintRounds.forEach(r => {
+    const sortedFmRounds = fieldMaintRounds.slice().sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }));
+    sortedFmRounds.forEach(r => {
         const isActive = r.active !== false; // default true when field absent
         const blocksHtml = r.blocks && r.blocks.length > 0
             ? r.blocks.map(b =>
