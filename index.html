@@ -10595,7 +10595,7 @@ function renderFertRecord() {
     if (roundSel) {
         const cur = roundSel.value;
         roundSel.innerHTML = `<option value="">${d.fr_select_round || '-- Select a Round --'}</option>` +
-            manuringRounds.map(r =>
+            [...manuringRounds].sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' })).map(r =>
                 `<option value="${r.id}"${String(r.id) === String(cur) ? ' selected' : ''}>${r.name}</option>`
             ).join('');
         // Auto-select first round if none selected
