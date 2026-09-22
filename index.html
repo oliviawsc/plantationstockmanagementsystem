@@ -1085,7 +1085,7 @@
             <button data-target="plantrecord"  class="nav-item">          <span class="nav-icon">&#127807;</span><span class="sb-label" data-i18n="sb_lbl_plantrecord">Field Planting Record</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;" data-i18n="sb_section_rainfall">Rainfall</p>
             <button data-target="rainfall" class="nav-item">              <span class="nav-icon">&#127783;&#65039;</span><span class="sb-label" data-i18n="sb_lbl_rainfall">Rainfall Transactions</span></button>
-            <button data-target="rainfallreport" class="nav-item">        <span class="nav-icon">&#128200;</span><span class="sb-label" data-i18n="sb_lbl_rainfallreport">Rainfall Report</span></button>
+            <button data-target="rainfallreport" class="nav-item">        <span class="nav-icon">&#128200;</span><span class="sb-label" data-i18n="sb_lbl_rainfallreport">Monthly Rainfall Report</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;">Admin</p>
             <button data-target="settings" id="navSettings" class="nav-item hidden">
                 <span class="nav-icon">&#9881;&#65039;</span><span class="sb-label" data-i18n="sb_lbl_settings">Settings</span>
@@ -2254,7 +2254,7 @@
                             <span style="font-size:26px;">&#127783;&#65039;</span>
                         </div>
                         <div style="text-align:left;flex:1;">
-                            <div data-i18n="sb_lbl_rainfallreport" style="font-size:15px;font-weight:700;color:#0F172A;margin-bottom:3px;">Rainfall Report</div>
+                            <div data-i18n="sb_lbl_rainfallreport" style="font-size:15px;font-weight:700;color:#0F172A;margin-bottom:3px;">Monthly Rainfall Report</div>
                             <div style="font-size:11px;color:#16a34a;background:#DCFCE7;display:inline-block;padding:3px 10px;border-radius:99px;font-weight:600;" data-i18n="hub_view_report">View Report</div>
                         </div>
                         <span style="font-size:22px;color:#A5D6A7;">&#8250;</span>
@@ -2472,8 +2472,8 @@
         <section id="rainfall" class="page-section">
             <div class="htab-bar">
                 <button class="htab-btn active" onclick="navigateToSection('rainfall')" data-i18n="tab_rainfall_txns">Rainfall Transactions</button>
-                <button class="htab-btn" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Rainfall Report</button>
-                <button class="htab-btn" onclick="navigateToSection('rainfallsummary')" data-i18n="tab_rainfall_summary">Summary Monthly Rainfall</button>
+                <button class="htab-btn" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Monthly Rainfall Report</button>
+                <button class="htab-btn" onclick="navigateToSection('rainfallsummary')" data-i18n="tab_rainfall_summary">Yearly Rainfall Report</button>
             </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_rainfall">&#127783;&#65039; Rainfall Transactions</h2>
             <p class="text-sm text-blue-700 mb-6" data-i18n="page_rainfall_sub">Record daily rainfall readings with date, amount (mm), and an optional photo.</p>
@@ -2597,10 +2597,10 @@
         <section id="rainfallreport" class="page-section">
             <div class="htab-bar">
                 <button class="htab-btn" onclick="navigateToSection('rainfall')" data-i18n="tab_rainfall_txns">Rainfall Transactions</button>
-                <button class="htab-btn active" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Rainfall Report</button>
-                <button class="htab-btn" onclick="navigateToSection('rainfallsummary')" data-i18n="tab_rainfall_summary">Summary Monthly Rainfall</button>
+                <button class="htab-btn active" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Monthly Rainfall Report</button>
+                <button class="htab-btn" onclick="navigateToSection('rainfallsummary')" data-i18n="tab_rainfall_summary">Yearly Rainfall Report</button>
             </div>
-            <h2 class="text-3xl font-bold mb-2" data-i18n="page_rainfallreport">&#128200; Rainfall Report</h2>
+            <h2 class="text-3xl font-bold mb-2" data-i18n="page_rainfallreport">&#128200; Monthly Rainfall Report</h2>
             <p class="text-sm text-blue-700 mb-4" data-i18n="page_rainfallreport_sub">Monthly rainfall summary by day for the selected year.</p>
 
             <!-- Year selector -->
@@ -2629,10 +2629,10 @@
         <section id="rainfallsummary" class="page-section">
             <div class="htab-bar">
                 <button class="htab-btn" onclick="navigateToSection('rainfall')" data-i18n="tab_rainfall_txns">Rainfall Transactions</button>
-                <button class="htab-btn" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Rainfall Report</button>
-                <button class="htab-btn active" onclick="navigateToSection('rainfallsummary')" data-i18n="tab_rainfall_summary">Summary Monthly Rainfall</button>
+                <button class="htab-btn" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Monthly Rainfall Report</button>
+                <button class="htab-btn active" onclick="navigateToSection('rainfallsummary')" data-i18n="tab_rainfall_summary">Yearly Rainfall Report</button>
             </div>
-            <h2 class="text-3xl font-bold mb-2" data-i18n="page_rainfallsummary">&#128200; Summary Monthly Rainfall Record</h2>
+            <h2 class="text-3xl font-bold mb-2" data-i18n="page_rainfallsummary">&#128200; Yearly Rainfall Report</h2>
             <p class="text-sm text-blue-700 mb-4" data-i18n="page_rainfallsummary_sub">Annual monthly totals with year-on-year variance.</p>
 
             <div class="bg-white rounded-xl shadow">
@@ -7409,12 +7409,12 @@ const I18N = {
         /* Rainfall */
         sb_section_rainfall:      'Rainfall',
         sb_lbl_rainfall:          'Rainfall Transactions',
-        sb_lbl_rainfallreport:    'Rainfall Report',
+        sb_lbl_rainfallreport:    'Monthly Rainfall Report',
         tab_rainfall_txns:        'Rainfall Transactions',
-        tab_rainfall_report:      'Rainfall Report',
-        tab_rainfall_summary:     'Summary Monthly Rainfall',
+        tab_rainfall_report:      'Monthly Rainfall Report',
+        tab_rainfall_summary:     'Yearly Rainfall Report',
         nav_rainfall:             '🌧️ Rainfall Transactions',
-        page_rainfallsummary:     '📊 Summary Monthly Rainfall Record',
+        page_rainfallsummary:     '📊 Yearly Rainfall Report',
         page_rainfallsummary_sub: 'Annual monthly totals with year-on-year variance.',
         rf_sum_title:             'Monthly Rainfall Record',
         rf_sum_col_year:          'Year',
@@ -7423,7 +7423,7 @@ const I18N = {
         rf_sum_desc:              'Rainfall (mm)',
         rf_sum_variance:          'Variance of Rainfall (mm)',
         page_rainfall:            '🌧️ Rainfall Transactions',
-        page_rainfallreport:      '📊 Rainfall Report',
+        page_rainfallreport:      '📊 Monthly Rainfall Report',
         page_rainfallreport_sub:  'Monthly rainfall summary by day for the selected year.',
         rf_rpt_year_lbl:          'Year',
         rf_rpt_title:             'MONTHLY RAINFALL (MM) FOR',
@@ -7791,12 +7791,12 @@ const I18N = {
         /* Rainfall */
         sb_section_rainfall:      'Hujan',
         sb_lbl_rainfall:          'Transaksi Hujan',
-        sb_lbl_rainfallreport:    'Rekod Hujan',
+        sb_lbl_rainfallreport:    'Laporan Hujan Bulanan',
         tab_rainfall_txns:        'Transaksi Hujan',
-        tab_rainfall_report:      'Rekod Hujan',
-        tab_rainfall_summary:     'Ringkasan Hujan Bulanan',
+        tab_rainfall_report:      'Laporan Hujan Bulanan',
+        tab_rainfall_summary:     'Laporan Hujan Tahunan',
         nav_rainfall:             '🌧️ Transaksi Hujan',
-        page_rainfallsummary:     '📊 Ringkasan Rekod Hujan Bulanan',
+        page_rainfallsummary:     '📊 Laporan Hujan Tahunan',
         page_rainfallsummary_sub: 'Jumlah bulanan tahunan dengan varians tahun ke tahun.',
         rf_sum_title:             'Rekod Hujan Bulanan',
         rf_sum_col_year:          'Tahun',
@@ -7805,7 +7805,7 @@ const I18N = {
         rf_sum_desc:              'Hujan (mm)',
         rf_sum_variance:          'Varians Hujan (mm)',
         page_rainfall:            '🌧️ Transaksi Hujan',
-        page_rainfallreport:      '📊 Rekod Hujan',
+        page_rainfallreport:      '📊 Laporan Hujan Bulanan',
         page_rainfallreport_sub:  'Ringkasan hujan bulanan mengikut hari bagi tahun yang dipilih.',
         rf_rpt_year_lbl:          'Tahun',
         rf_rpt_title:             'HUJAN BULANAN (MM) BAGI TAHUN',
