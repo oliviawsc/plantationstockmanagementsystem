@@ -10440,10 +10440,12 @@ function renderFertRecord() {
     const fertItem    = items.find(i => String(i.id) === String(round.fertilizerItemId));
     const itemId      = round.fertilizerItemId;
 
-    // Blocks for this round
-    const roundBlocks = (round.blocks && round.blocks.length > 0)
+    // Blocks for this round — sorted in natural numeric order
+    const roundBlocks = ((round.blocks && round.blocks.length > 0)
         ? round.blocks
-        : locations.map(l => l.name);
+        : locations.map(l => l.name))
+        .slice()
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 
     // ── Summary stats per block ────────────────────────────────────
     const blockSummary = roundBlocks.map(bName => {
@@ -10908,7 +10910,7 @@ function renderChemRecord() {
     const blockSet = new Set();
     allItemTxns.filter(t => t.type === 'Out' && t.location && t.location !== 'None/Storage')
         .forEach(t => blockSet.add(t.location));
-    const dynamicBlocks = Array.from(blockSet).sort();
+    const dynamicBlocks = Array.from(blockSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 
     // Bring Forward = balance just before fromFilter (0 if no date filter)
     let bfQty = 0;
@@ -11044,7 +11046,7 @@ function exportChemRecord() {
     const blockSet = new Set();
     allItemTxns.filter(t => t.type === 'Out' && t.location && t.location !== 'None/Storage')
         .forEach(t => blockSet.add(t.location));
-    const dynamicBlocks = Array.from(blockSet).sort();
+    const dynamicBlocks = Array.from(blockSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 
     let bfQty = 0;
     if (fromFilter) {
@@ -11206,7 +11208,7 @@ function renderPlantRecord() {
     const blockSet = new Set();
     allItemTxns.filter(t => t.type === 'Out' && t.location && t.location !== 'None/Storage')
         .forEach(t => blockSet.add(t.location));
-    const dynamicBlocks = Array.from(blockSet).sort();
+    const dynamicBlocks = Array.from(blockSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 
     // Bring Forward = balance just before fromFilter (0 if no date filter)
     let bfQty = 0;
@@ -11336,7 +11338,7 @@ function exportPlantRecord() {
     const blockSet = new Set();
     allItemTxns.filter(t => t.type === 'Out' && t.location && t.location !== 'None/Storage')
         .forEach(t => blockSet.add(t.location));
-    const dynamicBlocks = Array.from(blockSet).sort();
+    const dynamicBlocks = Array.from(blockSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 
     let bfQty = 0;
     if (fromFilter) {
