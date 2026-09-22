@@ -4107,26 +4107,26 @@ function saveTransaction() {
     setTimeout(() => {
     try {
 
+    // Manuring round capture (available for both In and Out paths)
+    let manuringRoundId   = null;
+    let manuringRoundName = null;
+    if (item.category === 'Fertilizer') {
+        const roundId = document.getElementById('txnManuringRound').value;
+        if (roundId) {
+            const round = manuringRounds.find(r => String(r.id) === String(roundId));
+            if (round) {
+                manuringRoundId   = round.id;
+                manuringRoundName = round.name;
+            }
+        }
+    }
+
     /* ============ NEW: MULTI-ROW PATH FOR OUT TRANSACTIONS ============ */
     if (txnType === 'Out') {
         const rows = Array.from(document.querySelectorAll('#txnRowsBody tr'));
         if (rows.length === 0) {
             alert('Please add at least one Application Breakdown row.');
             return;
-        }
-
-        // Manuring round capture (Fertilizer In and Out)
-        let manuringRoundId   = null;
-        let manuringRoundName = null;
-        if (item.category === 'Fertilizer') {
-            const roundId = document.getElementById('txnManuringRound').value;
-            if (roundId) {
-                const round = manuringRounds.find(r => String(r.id) === String(roundId));
-                if (round) {
-                    manuringRoundId   = round.id;
-                    manuringRoundName = round.name;
-                }
-            }
         }
 
         // Maintenance round capture (optional, for all Out transactions)
