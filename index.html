@@ -1378,49 +1378,51 @@
                 <p id="dashFilterNote" class="hidden text-xs text-blue-600 italic" data-i18n="dash_filter_note">Showing stock balance as at selected date</p>
             </div>
 
-            <!-- Stock Level Charts — one card per category -->
+            <!-- Stock Level Charts — compact card style per category -->
             <div class="grid grid-cols-1 gap-6">
 
                 <!-- Chart 1: Fertilizer -->
-                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-600">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="inline-block w-3 h-3 rounded-sm flex-shrink-0" style="background:#16a34a"></span>
-                        <h3 class="text-lg font-bold text-green-800" data-i18n="dash_bal_fertilizer">Balance Fertilizer</h3>
+                <div class="bg-white rounded-xl shadow" style="overflow:hidden;">
+                    <div style="background:linear-gradient(135deg,#14532D 0%,#16a34a 100%);padding:16px 20px 14px;">
+                        <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 2px;" data-i18n="dash_bal_fertilizer">🌿 Balance Fertilizer</h3>
+                        <p style="color:#bbf7d0;font-size:11.5px;margin:0;" data-i18n="dash_bal_fertilizer_sub">Current on-hand stock by item</p>
                     </div>
-                    <div id="chartFertilizerWrap" style="min-height:100px;">
+                    <p id="chartFertilizerEmpty" class="hidden" style="text-align:center;color:#94A3B8;padding:40px 0;font-size:13px;" data-i18n="chart_empty">No stock data to display yet.</p>
+                    <div id="chartFertilizerWrap" style="padding:16px 20px 4px;">
                         <canvas id="chartFertilizer"></canvas>
                     </div>
-                    <p id="chartFertilizerEmpty" class="hidden text-center text-gray-400 py-6 text-sm" data-i18n="chart_empty">No stock data to display yet.</p>
+                    <p id="chartFertilizerAsAt" style="text-align:right;font-size:10.5px;color:#64748B;padding:0 20px 12px;margin:0;"></p>
                 </div>
 
                 <!-- Chart 2: Chemical -->
-                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-600">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="inline-block w-3 h-3 rounded-sm flex-shrink-0" style="background:#2563eb"></span>
-                        <h3 class="text-lg font-bold text-blue-800" data-i18n="dash_bal_chemicals">Balance Chemicals</h3>
+                <div class="bg-white rounded-xl shadow" style="overflow:hidden;">
+                    <div style="background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 100%);padding:16px 20px 14px;">
+                        <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 2px;" data-i18n="dash_bal_chemicals">⚗️ Balance Chemicals</h3>
+                        <p style="color:#BFDBFE;font-size:11.5px;margin:0;" data-i18n="dash_bal_chemicals_sub">Current on-hand stock by item</p>
                     </div>
-                    <!-- Chemical legend -->
-                    <div class="flex flex-wrap gap-3 mb-4 text-xs font-medium">
-                        <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-sm" style="background:#2563eb"></span> <span data-i18n="chart_ok">OK</span></span>
-                        <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-sm" style="background:#dc2626"></span> <span data-i18n="chart_legend_low">⚠️ Low Stock</span></span>
-                        <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-sm" style="background:#f59e0b"></span> <span data-i18n="col_min_threshold">Min Threshold</span></span>
+                    <div style="display:flex;flex-wrap:wrap;gap:12px;padding:10px 20px 0;font-size:11px;font-weight:600;">
+                        <span style="display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#2563eb;"></span><span data-i18n="chart_ok">OK</span></span>
+                        <span style="display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#dc2626;"></span><span data-i18n="chart_legend_low">⚠️ Low Stock</span></span>
+                        <span style="display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#f59e0b;"></span><span data-i18n="col_min_threshold">Min Threshold</span></span>
                     </div>
-                    <div id="chartChemicalWrap" style="min-height:100px;">
+                    <p id="chartChemicalEmpty" class="hidden" style="text-align:center;color:#94A3B8;padding:40px 0;font-size:13px;" data-i18n="chart_empty">No stock data to display yet.</p>
+                    <div id="chartChemicalWrap" style="padding:16px 20px 4px;">
                         <canvas id="chartChemical"></canvas>
                     </div>
-                    <p id="chartChemicalEmpty" class="hidden text-center text-gray-400 py-6 text-sm" data-i18n="chart_empty">No stock data to display yet.</p>
+                    <p id="chartChemicalAsAt" style="text-align:right;font-size:10.5px;color:#64748B;padding:0 20px 12px;margin:0;"></p>
                 </div>
 
                 <!-- Chart 3: Oil Palm Seedling -->
-                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-pink-600">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="inline-block w-3 h-3 rounded-sm flex-shrink-0" style="background:#db2777"></span>
-                        <h3 class="text-lg font-bold text-pink-800" data-i18n="dash_bal_seedlings">Balance Oil Palm Seedlings</h3>
+                <div class="bg-white rounded-xl shadow" style="overflow:hidden;">
+                    <div style="background:linear-gradient(135deg,#831843 0%,#db2777 100%);padding:16px 20px 14px;">
+                        <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 2px;" data-i18n="dash_bal_seedlings">🌱 Balance Oil Palm Seedlings</h3>
+                        <p style="color:#FBCFE8;font-size:11.5px;margin:0;" data-i18n="dash_bal_seedlings_sub">Current on-hand stock by item</p>
                     </div>
-                    <div id="chartSeedlingWrap" style="min-height:100px;">
+                    <p id="chartSeedlingEmpty" class="hidden" style="text-align:center;color:#94A3B8;padding:40px 0;font-size:13px;" data-i18n="chart_empty">No stock data to display yet.</p>
+                    <div id="chartSeedlingWrap" style="padding:16px 20px 4px;">
                         <canvas id="chartSeedling"></canvas>
                     </div>
-                    <p id="chartSeedlingEmpty" class="hidden text-center text-gray-400 py-6 text-sm" data-i18n="chart_empty">No stock data to display yet.</p>
+                    <p id="chartSeedlingAsAt" style="text-align:right;font-size:10.5px;color:#64748B;padding:0 20px 12px;margin:0;"></p>
                 </div>
 
             </div>
@@ -6607,11 +6609,18 @@ function getDashAsAt() {
 function renderLiveStockChart() {
     const asAt   = getDashAsAt();
     const noteEl = document.getElementById('dashFilterNote');
-    if (noteEl) noteEl.classList.add('hidden'); // note shown only when a custom date is selected
-    // null fromDate = all history; asAt = upper bound
+    if (noteEl) noteEl.classList.add('hidden');
     buildCategoryChart('Fertilizer',        'chartFertilizer', 'chartFertilizerWrap', 'chartFertilizerEmpty', '#16a34a', null, asAt, 'Bags');
     buildCategoryChart('Chemical',          'chartChemical',   'chartChemicalWrap',   'chartChemicalEmpty',   '#2563eb', null, asAt, 'Jar/Can');
     buildCategoryChart('Oil Palm Seedling', 'chartSeedling',   'chartSeedlingWrap',   'chartSeedlingEmpty',   '#db2777', null, asAt);
+
+    // Populate "As at" date footer on each card
+    const asAtLabel = (currentLang === 'ms' ? 'Stok setakat: ' : 'Balance as at: ')
+        + new Date(asAt + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    ['chartFertilizerAsAt', 'chartChemicalAsAt', 'chartSeedlingAsAt'].forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = asAtLabel;
+    });
 }
 
 /* -----------------------------------------------------------------
@@ -7358,9 +7367,12 @@ const I18N = {
         alert_select_estate:      'Please select an Estate before saving data.',
         alert_no_permission:      'You do not have permission to access this section.',
         /* Dashboard - Progress Trackers */
-        dash_bal_fertilizer:         'Balance Fertilizer',
-        dash_bal_chemicals:          'Balance Chemicals',
-        dash_bal_seedlings:          'Balance Oil Palm Seedlings',
+        dash_bal_fertilizer:         '🌿 Balance Fertilizer',
+        dash_bal_fertilizer_sub:     'Current on-hand stock by item',
+        dash_bal_chemicals:          '⚗️ Balance Chemicals',
+        dash_bal_chemicals_sub:      'Current on-hand stock by item',
+        dash_bal_seedlings:          '🌱 Balance Oil Palm Seedlings',
+        dash_bal_seedlings_sub:      'Current on-hand stock by item',
         dash_as_at_label:            'As at Date',
         dash_filter_note:            'Showing stock balance as at selected date',
         dash_manuring_tracker_title: '🌾 Fertilizer Issuance by Round',
@@ -7752,9 +7764,12 @@ const I18N = {
         alert_select_estate:      'Sila pilih Estet sebelum menyimpan data.',
         alert_no_permission:      'Anda tidak mempunyai kebenaran untuk mengakses bahagian ini.',
         /* Dashboard - Progress Trackers */
-        dash_bal_fertilizer:         'Baki Baja',
-        dash_bal_chemicals:          'Baki Racun',
-        dash_bal_seedlings:          'Baki Bibit Sawit',
+        dash_bal_fertilizer:         '🌿 Baki Baja',
+        dash_bal_fertilizer_sub:     'Stok semasa mengikut item',
+        dash_bal_chemicals:          '⚗️ Baki Racun',
+        dash_bal_chemicals_sub:      'Stok semasa mengikut item',
+        dash_bal_seedlings:          '🌱 Baki Bibit Sawit',
+        dash_bal_seedlings_sub:      'Stok semasa mengikut item',
         dash_as_at_label:            'Tarikh Sehingga',
         dash_filter_note:            'Menunjukkan baki stok sehingga tarikh yang dipilih',
         dash_manuring_tracker_title: '🌾 Pengeluaran Baja Ikut Pusingan',
