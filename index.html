@@ -4549,7 +4549,8 @@ function renderManuringRounds() {
         return;
     }
 
-    manuringRounds.forEach(r => {
+    const sortedManuringRounds = manuringRounds.slice().sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }));
+    sortedManuringRounds.forEach(r => {
         const budget         = calcRoundBudget(r);
         const selectedBlocks = r.blocks && r.blocks.length > 0 ? r.blocks : ['All blocks'];
         const blocksHtml     = selectedBlocks.map(b =>
