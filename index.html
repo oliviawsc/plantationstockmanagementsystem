@@ -3375,7 +3375,7 @@ function btnLoadThen(btn, work, label) {
 function save(key, data) {
     // Guard: never write to a key scoped to an empty estate
     if (!activeEstate) {
-        alert('Please select an Estate before saving data.');
+        alert((I18N[currentLang] || I18N['en']).alert_select_estate || 'Please select an Estate before saving data.');
         return;
     }
     // key is a STORAGE_KEYS value (table name); scope it to active estate
@@ -3690,7 +3690,7 @@ navButtons.forEach(btn => {
             else {
                 const access = typeof getSectionAccess === 'function' ? getSectionAccess(session, target) : 'none';
                 if (access === 'none') {
-                    alert('You do not have permission to access this section.');
+                    alert((I18N[currentLang] || I18N['en']).alert_no_permission || 'You do not have permission to access this section.');
                     return;
                 }
             }
@@ -4099,7 +4099,8 @@ function saveTransaction() {
     const e = { target: document.getElementById('txnForm') };
     const itemIdRaw = document.getElementById('txnItem').value;
     const item   = items.find(i => String(i.id) === String(itemIdRaw));
-    if (!item) { alert('Please select a valid item.'); return; }
+    const _d = I18N[currentLang] || I18N['en'];
+    if (!item) { alert(_d.alert_select_item || 'Please select a valid item.'); return; }
 
     const txnType  = document.getElementById('txnType').value;
     const txnSaveBtn = document.getElementById('txnSaveBtn');
@@ -4125,7 +4126,7 @@ function saveTransaction() {
     if (txnType === 'Out') {
         const rows = Array.from(document.querySelectorAll('#txnRowsBody tr'));
         if (rows.length === 0) {
-            alert('Please add at least one Application Breakdown row.');
+            alert(_d.alert_add_row || 'Please add at least one Application Breakdown row.');
             return;
         }
 
@@ -4148,9 +4149,9 @@ function saveTransaction() {
             const unitEl  = row.querySelector('.txn-row-unit');
             const unitVal = unitEl ? unitEl.value : 'base';
             const loc     = row.querySelector('.txn-row-loc').value;
-            if (rawQty <= 0) { alert('Each row must have a Quantity greater than 0.'); return; }
+            if (rawQty <= 0) { alert(_d.alert_row_qty || 'Each row must have a Quantity greater than 0.'); return; }
             if (item.category === 'Fertilizer' && loc === 'None/Storage') {
-                alert('Each row must have a target Block selected (not Storage) for fertilizer Out.');
+                alert(_d.alert_row_block || 'Each row must have a target Block selected (not Storage) for fertilizer Out.');
                 return;
             }
             // Convert to base unit
@@ -4200,7 +4201,7 @@ function saveTransaction() {
         document.getElementById('txnQty').required = true;
         document.getElementById('txnLocation').required = true;
         clearTxnPicture();
-        alert(`${parsedRows.length} transaction row(s) recorded successfully.`);
+        alert(`${parsedRows.length} ${_d.alert_txn_saved_multi || 'transaction row(s) recorded successfully.'}`);
         refreshAll();
         return;
     }
@@ -4239,7 +4240,7 @@ function saveTransaction() {
     document.getElementById('txnManuringWrap').classList.add('hidden');
     document.getElementById('txnMaintWrap').classList.add('hidden');
     clearTxnPicture();
-    alert('Transaction recorded successfully.');
+    alert(_d.alert_txn_saved || 'Transaction recorded successfully.');
     refreshAll();
 
     } finally {
@@ -5093,7 +5094,7 @@ document.getElementById('clearFilterBtn').addEventListener('click', () => {
 // Export currently filtered rows to Excel via SheetJS
 document.getElementById('exportExcelBtn').addEventListener('click', () => {
     if (currentFilteredTxns.length === 0) {
-        alert('No data to export.');
+        alert((I18N[currentLang] || I18N['en']).alert_no_data_export || 'No data to export.');
         return;
     }
     const rows = currentFilteredTxns.map(t => ({
@@ -5390,7 +5391,7 @@ document.getElementById('clearLedgerFilterBtn').addEventListener('click', () => 
 document.getElementById('exportLedgerBtn').addEventListener('click', () => {
     const { itemList, months } = currentFilteredLedgerPivot;
     if (itemList.length === 0 || months.length === 0) {
-        alert('No data to export.');
+        alert((I18N[currentLang] || I18N['en']).alert_no_data_export || 'No data to export.');
         return;
     }
     const detailLabels = [
@@ -6971,7 +6972,8 @@ function saveEditTransaction() {
     save(STORAGE_KEYS.transactions, transactions);
     btnDone(editTxnSaveBtn);
     closeEditTxnModal();
-    alert('Transaction updated successfully.');
+    const _dUpd = I18N[currentLang] || I18N['en'];
+    alert(_dUpd.alert_txn_updated || 'Transaction updated successfully.');
     refreshAll();
     });
 }
@@ -7213,6 +7215,17 @@ const I18N = {
         txn_type_adj:        'Adj',
         btn_save_txn:        'Save Transaction',
         btn_add_row:         '+ Add Row',
+        alert_select_item:        'Please select a valid item.',
+        alert_add_row:            'Please add at least one Application Breakdown row.',
+        alert_row_qty:            'Each row must have a Quantity greater than 0.',
+        alert_row_block:          'Each row must have a target Block selected (not Storage) for fertilizer Out.',
+        alert_txn_saved:          'Transaction recorded successfully.',
+        alert_txn_updated:        'Transaction updated successfully.',
+        alert_txn_saved_multi:    'transaction row(s) recorded successfully.',
+        alert_no_data_export:     'No data to export.',
+        alert_delete_txn:         'Delete this transaction?',
+        alert_select_estate:      'Please select an Estate before saving data.',
+        alert_no_permission:      'You do not have permission to access this section.',
         /* Dashboard - Progress Trackers */
         dash_bal_fertilizer:         'Balance Fertilizer',
         dash_bal_chemicals:          'Balance Chemicals',
@@ -7593,6 +7606,17 @@ const I18N = {
         txn_type_adj:        'Pelarasan',
         btn_save_txn:        'Simpan Transaksi',
         btn_add_row:         '+ Tambah Baris',
+        alert_select_item:        'Sila pilih item yang sah.',
+        alert_add_row:            'Sila tambah sekurang-kurangnya satu baris Pecahan Penggunaan.',
+        alert_row_qty:            'Setiap baris mesti mempunyai Kuantiti lebih daripada 0.',
+        alert_row_block:          'Setiap baris mesti mempunyai Blok yang dipilih (bukan Stor) untuk baja Keluar.',
+        alert_txn_saved:          'Transaksi berjaya direkodkan.',
+        alert_txn_updated:        'Transaksi berjaya dikemaskini.',
+        alert_txn_saved_multi:    'baris transaksi berjaya direkodkan.',
+        alert_no_data_export:     'Tiada data untuk dieksport.',
+        alert_delete_txn:         'Padam transaksi ini?',
+        alert_select_estate:      'Sila pilih Estet sebelum menyimpan data.',
+        alert_no_permission:      'Anda tidak mempunyai kebenaran untuk mengakses bahagian ini.',
         /* Dashboard - Progress Trackers */
         dash_bal_fertilizer:         'Baki Baja',
         dash_bal_chemicals:          'Baki Racun',
