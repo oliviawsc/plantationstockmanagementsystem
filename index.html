@@ -1456,6 +1456,19 @@
                 <div id="chemUsageTrackerCards" style="display:flex;flex-wrap:wrap;gap:12px;padding:16px 24px 24px;"></div>
             </div>
 
+            <!-- Rainfall Comparison Chart -->
+            <div class="bg-white rounded-xl shadow mt-6" style="overflow:hidden;">
+                <div style="background:linear-gradient(135deg,#0C4A6E 0%,#0369A1 100%);padding:20px 24px 16px;">
+                    <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 2px;" data-i18n="dash_rainfall_chart_title">🌧️ Rainfall Comparison</h3>
+                    <p style="color:#BAE6FD;font-size:11.5px;margin:0;" data-i18n="dash_rainfall_chart_subtitle">Monthly rainfall (mm) — current year vs last year</p>
+                    <p style="color:#BAE6FD;font-size:11.5px;margin:2px 0 0;" id="rainfallChartYears"></p>
+                </div>
+                <p id="rainfallChartEmpty" class="hidden" style="text-align:center;color:#94A3B8;padding:40px 0;font-size:13px;" data-i18n="dash_no_rainfall_data">No rainfall data recorded yet.</p>
+                <div id="rainfallChartWrap" style="padding:16px 24px 24px;position:relative;height:260px;">
+                    <canvas id="rainfallChartCanvas"></canvas>
+                </div>
+            </div>
+
         </section>
 
         <!-- ============ PAGE 2: ITEM FILE ============ -->
@@ -3641,6 +3654,7 @@ async function loadFromSupabase() {
         renderManuringPctChart();
         renderMaintPctTracker();
         renderChemUsageTracker();
+        renderRainfallChart();
 
         // Silently refresh the current user's own permissions from Supabase.
         // This ensures that if an admin changes this user's access while they
@@ -5470,6 +5484,7 @@ function renderDashboard() {
     renderManuringPctChart();
     renderMaintPctTracker();
     renderChemUsageTracker();
+    renderRainfallChart();
 }
 
 
@@ -6186,6 +6201,98 @@ function renderChemUsageTracker() {
 }
 
 /* -----------------------------------------------------------------
+   RAINFALL COMPARISON CHART — Dashboard card
+   Grouped bar chart: current year vs last year by month
+   ----------------------------------------------------------------- */
+let rainfallChartInstance = null;
+
+function renderRainfallChart() {
+    var yearsLbl = document.getElementById('rainfallChartYears');
+    var empty    = document.getElementById('rainfallChartEmpty');
+    var wrap     = document.getElementById('rainfallChartWrap');
+    var canvas   = document.getElementById('rainfallChartCanvas');
+    if (!empty || !wrap || !canvas) return;
+
+    if (rainfallChartInstance) { rainfallChartInstance.destroy(); rainfallChartInstance = null; }
+
+    var d = I18N[currentLang] || I18N['en'];
+    var monthsShort = d.months_short || ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    var now        = new Date();
+    var curYear    = now.getFullYear();
+    var lastYear   = curYear - 1;
+
+    var curData  = new Array(12).fill(0);
+    var lastData = new Array(12).fill(0);
+    var hasCurData = false, hasLastData = false;
+
+    rainfallTxns.forEach(function(t) {
+        if (!t.date || t.mm == null) return;
+        var yr  = parseInt(t.date.slice(0, 4), 10);
+        var mo  = parseInt(t.date.slice(5, 7), 10) - 1; // 0-based
+        var mm  = parseFloat(t.mm) || 0;
+        if (yr === curYear)  { curData[mo]  += mm; hasCurData  = true; }
+        if (yr === lastYear) { lastData[mo] += mm; hasLastData = true; }
+    });
+
+    if (!hasCurData && !hasLastData) {
+        empty.classList.remove('hidden');
+        wrap.style.display = 'none';
+        if (yearsLbl) yearsLbl.textContent = '';
+        return;
+    }
+    empty.classList.add('hidden');
+    wrap.style.display = '';
+
+    if (yearsLbl) yearsLbl.textContent = lastYear + ' vs ' + curYear;
+
+    rainfallChartInstance = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: monthsShort,
+            datasets: [
+                {
+                    label: String(lastYear),
+                    data: lastData,
+                    backgroundColor: 'rgba(148,163,184,0.75)',
+                    borderColor:     'rgba(100,116,139,0.9)',
+                    borderWidth: 1,
+                    borderRadius: 3,
+                },
+                {
+                    label: String(curYear),
+                    data: curData,
+                    backgroundColor: 'rgba(56,189,248,0.8)',
+                    borderColor:     'rgba(2,132,199,0.9)',
+                    borderWidth: 1,
+                    borderRadius: 3,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 14, padding: 10 } },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) { return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + ' mm'; }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                y: {
+                    beginAtZero: true,
+                    ticks: { font: { size: 10 }, callback: function(v){ return v + ' mm'; } },
+                    grid: { color: 'rgba(0,0,0,0.06)' }
+                }
+            }
+        }
+    });
+}
+
+/* -----------------------------------------------------------------
    DASHBOARD PRINT
    ----------------------------------------------------------------- */
 function printDashboard() {
@@ -6416,6 +6523,7 @@ function renderDashboardFilters() {
     renderManuringPctChart();
     renderMaintPctTracker();
     renderChemUsageTracker();
+    renderRainfallChart();
 }
 
 /** Open the native date picker for an input by id — works on desktop and iOS. */
@@ -7243,6 +7351,9 @@ const I18N = {
         dash_no_manuring_rounds:      'No manuring rounds found. Add rounds in the Manuring Program section.',
         dash_no_maint_rounds:         'No maintenance rounds found. Add rounds in the Maintenance Program section.',
         dash_no_chem_usage:           'No chemical usage data yet. Link chemical transactions to maintenance rounds.',
+        dash_rainfall_chart_title:    '🌧️ Rainfall Comparison',
+        dash_rainfall_chart_subtitle: 'Monthly rainfall (mm) — current year vs last year',
+        dash_no_rainfall_data:        'No rainfall data recorded yet.',
         dash_no_target_set:           'No target set',
         dash_lbl_target:              'Target: ',
         dash_lbl_cumulative_progress: 'Cumulative Progress by Month (',
@@ -7634,6 +7745,9 @@ const I18N = {
         dash_no_manuring_rounds:      'Tiada pusingan pembajaan dijumpai. Tambah pusingan dalam bahagian Program Pembajaan.',
         dash_no_maint_rounds:         'Tiada pusingan penyelenggaraan dijumpai. Tambah pusingan dalam bahagian Program Penyelenggaraan.',
         dash_no_chem_usage:           'Tiada data penggunaan kimia lagi. Kaitkan transaksi kimia dengan pusingan penyelenggaraan.',
+        dash_rainfall_chart_title:    '🌧️ Perbandingan Hujan',
+        dash_rainfall_chart_subtitle: 'Hujan bulanan (mm) — tahun semasa vs tahun lepas',
+        dash_no_rainfall_data:        'Tiada data hujan direkodkan lagi.',
         dash_no_target_set:           'Tiada sasaran ditetapkan',
         dash_lbl_target:              'Sasaran: ',
         dash_lbl_cumulative_progress: 'Kemajuan Kumulatif mengikut Bulan (',
@@ -7959,6 +8073,7 @@ function setLang(lang) {
     if (typeof renderManuringPctChart === 'function') renderManuringPctChart();
     if (typeof renderMaintPctTracker === 'function') renderMaintPctTracker();
     if (typeof renderChemUsageTracker === 'function') renderChemUsageTracker();
+    if (typeof renderRainfallChart === 'function') renderRainfallChart();
     if (typeof renderFertRecord === 'function') renderFertRecord();
     if (typeof renderChemRecord === 'function') renderChemRecord();
     if (typeof renderPlantRecord === 'function') renderPlantRecord();
