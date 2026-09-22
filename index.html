@@ -12473,9 +12473,10 @@ async function renderSettingsBlocksList() {
     try {
         const { data, error } = await supabaseClient
             .from('opp_locations').select('*')
-            .eq('estate', settingsBlocksEstate).order('name');
+            .eq('estate', settingsBlocksEstate);
         if (error) throw error;
-        const blocks = data || [];
+        const blocks = (data || []).sort((a, b) =>
+            (a.name || '').localeCompare(b.name || '', undefined, { numeric: true, sensitivity: 'base' }));
         if (blocks.length === 0) {
             container.innerHTML = '<p class="text-sm text-gray-400 italic">No blocks registered yet for this estate. Use the form above to add the first block.</p>';
             return;
