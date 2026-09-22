@@ -6375,6 +6375,21 @@ function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour, from
     const colours    = [];
     const thresholds = [];
 
+    // Wrap a name into lines of at most `maxW` chars, splitting on word boundaries
+    function wrapName(name, maxW) {
+        if (name.length <= maxW) return name;
+        const words = name.split(/\s+/);
+        const lines = [];
+        let cur = '';
+        words.forEach(w => {
+            if (!cur) { cur = w; }
+            else if ((cur + ' ' + w).length <= maxW) { cur += ' ' + w; }
+            else { lines.push(cur); cur = w; }
+        });
+        if (cur) lines.push(cur);
+        return lines.length > 1 ? lines : name;
+    }
+
     filtered.forEach(it => {
         const raw         = (fromDate || toDate) ? calcOnHandFiltered(it.id, fromDate, toDate) : calcOnHand(it.id);
         const onHandBase  = Math.max(0, raw);
@@ -6392,7 +6407,7 @@ function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour, from
             : threshBase;
         const isLow       = category === 'Chemical' && onHandBase <= threshBase;
 
-        labels.push(it.name);
+        labels.push(wrapName(it.name, 14));
         values.push(onHand);
         colours.push(isLow ? LOW_STOCK_COLOUR : barColour);
         thresholds.push(threshDisp);
@@ -6509,8 +6524,8 @@ function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour, from
                     ticks: {
                         color: '#374151',
                         font: { size: 10 },
-                        maxRotation: 90,
-                        minRotation: 30,
+                        maxRotation: 0,
+                        minRotation: 0,
                         autoSkip: false,
                     }
                 },
