@@ -11047,7 +11047,7 @@ function renderChemRecord() {
     const itemSel = document.getElementById('chemRecordItem');
     if (itemSel) {
         const cur = itemSel.value;
-        const chemItems = items.filter(i => i.category === 'Chemical');
+        const chemItems = items.filter(i => i.category === 'Chemical').sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }));
         itemSel.innerHTML = `<option value="">${d.cr_select_item || '-- Select a Chemical Item --'}</option>` +
             chemItems.map(i =>
                 `<option value="${i.id}"${String(i.id) === String(cur) ? ' selected' : ''}>${i.name}</option>`
