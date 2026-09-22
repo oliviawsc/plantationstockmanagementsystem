@@ -4226,8 +4226,8 @@ function saveTransaction() {
         inputUnit: enteredUnit,
         location: location,
         remarks: document.getElementById('txnRemarks').value.trim(),
-        manuringRoundId: null,
-        manuringRoundName: null,
+        manuringRoundId: manuringRoundId,
+        manuringRoundName: manuringRoundName,
         picture: pictureData,
         user: (loadSession() && loadSession().name) || 'Unknown User'
     };
