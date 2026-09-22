@@ -6399,7 +6399,7 @@ function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour, from
     });
 
     // Fixed height; width fills the card naturally
-    canvas.style.height = '260px';
+    canvas.style.height = '300px';
 
     // ── Inline plugin: value labels above each bar ───────────────────
     const valueLabelPlugin = {
@@ -6509,11 +6509,9 @@ function buildCategoryChart(category, canvasId, wrapId, emptyId, barColour, from
                     ticks: {
                         color: '#374151',
                         font: { size: 10 },
-                        maxRotation: 35,
-                        callback(val) {
-                            const lbl = this.getLabelForValue(val);
-                            return lbl.length > 18 ? lbl.slice(0, 16) + '…' : lbl;
-                        }
+                        maxRotation: 90,
+                        minRotation: 30,
+                        autoSkip: false,
                     }
                 },
                 y: {
