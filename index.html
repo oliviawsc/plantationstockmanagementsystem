@@ -12093,7 +12093,6 @@ function renderRainfallReport() {
     html += '<tr>';
     html += '<th style="' + hdrStyle + '" rowspan="2">' + ((d && d.rf_col_date) || 'Date') + '</th>';
     months.forEach(function(m) { html += '<th style="' + hdrStyle + '">' + m + '</th>'; });
-    html += '<th style="' + hdrStyle + '" rowspan="2">' + ((d && d.rf_rpt_total) || 'TOTAL') + '</th>';
     html += '</tr>';
     html += '<tr>';
     months.forEach(function() { html += '<th style="' + subStyle + '">mm</th>'; });
@@ -12128,10 +12127,6 @@ function renderRainfallReport() {
                 html += '<td style="' + cellStyle + 'color:#CBD5E1;"></td>';
             }
         }
-        const rowTotalDisp = rowTotal > 0
-            ? '<strong>' + rowTotal.toFixed(2) + '</strong>'
-            : '<span style="color:#CBD5E1;">—</span>';
-        html += '<td style="' + cellStyle + 'background:#F0F9FF;">' + rowTotalDisp + '</td>';
         html += '</tr>';
     }
 
@@ -12142,7 +12137,6 @@ function renderRainfallReport() {
     monthTotals.forEach(function(t) {
         html += '<td style="' + totStyle + '">' + (t > 0 ? t.toFixed(2) : '<span style=\'color:#CBD5E1;\'>—</span>') + '</td>';
     });
-    html += '<td style="' + totStyle + 'background:#DBEAFE;">' + (grandTotal > 0 ? grandTotal.toFixed(2) : '—') + '</td>';
     html += '</tr>';
     html += '</tbody>';
 
