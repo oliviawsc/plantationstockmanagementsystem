@@ -7956,20 +7956,27 @@ const USERS_TABLE = 'opp_users';
 
 // All permission-controlled navigable sections (useradmin is super-admin-only and excluded)
 const ALL_SECTIONS = [
-    { id: 'dashboard',      label: '📊 Dashboard' },
-    { id: 'items',          label: '📦 Item File' },
-    { id: 'transactions',   label: '🔄 Record Stock' },
-    { id: 'summary',        label: '📑 Stock Transactions' },
-    { id: 'ledger',         label: '📒 Stock Summary' },
-    { id: 'locations',      label: '📍 Location Area' },
-    { id: 'manuring',       label: '🌱 Manuring Program' },
-    { id: 'roundprogress',  label: '📈 Fertilizer Issuance' },
-    { id: 'fieldmaint',     label: '🔧 Maintenance Program' },
-    { id: 'maintprogress',  label: '📊 Maintenance Progress' },
-    { id: 'chemusage',      label: '⚗️ Chemical Usage' },
-    { id: 'fertrecord',     label: '📋 Fertilizer Issuance Record' },
-    { id: 'chemrecord',     label: '⚗️ Chemical Issuance Record' },
-    { id: 'plantrecord',    label: '🌱 Field Planting Record' },
+    // Overview
+    { id: 'dashboard',       label: '📊 Dashboard',                  group: 'Overview' },
+    // Stock
+    { id: 'transactions',    label: '🔄 Record Stock',               group: 'Stock' },
+    { id: 'summary',         label: '📑 Stock Transactions',         group: 'Stock' },
+    { id: 'ledger',          label: '📒 Stock Summary',              group: 'Stock' },
+    { id: 'items',           label: '📦 Item File',                  group: 'Stock' },
+    { id: 'locations',       label: '📍 Location Area',              group: 'Stock' },
+    // Field Operations
+    { id: 'manuring',        label: '🌱 Manuring Program',           group: 'Field Operations' },
+    { id: 'roundprogress',   label: '📈 Fertilizer Issuance',        group: 'Field Operations' },
+    { id: 'fieldmaint',      label: '🔧 Maintenance Program',        group: 'Field Operations' },
+    { id: 'maintprogress',   label: '📊 Maintenance Progress',       group: 'Field Operations' },
+    { id: 'chemusage',       label: '⚗️ Chemical Usage',             group: 'Field Operations' },
+    { id: 'fertrecord',      label: '📋 Fertilizer Issuance Record', group: 'Field Operations' },
+    { id: 'chemrecord',      label: '⚗️ Chemical Issuance Record',   group: 'Field Operations' },
+    { id: 'plantrecord',     label: '🌱 Field Planting Record',      group: 'Field Operations' },
+    // Rainfall
+    { id: 'rainfall',        label: '🌧️ Rainfall Transactions',      group: 'Rainfall' },
+    { id: 'rainfallreport',  label: '📊 Rainfall Report',            group: 'Rainfall' },
+    { id: 'rainfallsummary', label: '📅 Monthly Rainfall Summary',   group: 'Rainfall' },
 ];
 
 // Super Admin — identified by email; password is managed in Supabase Auth.
@@ -9026,7 +9033,14 @@ function toggleEditPermissionsSection() {
 function renderPermissionCheckboxes() {
     const grid = document.getElementById('regPermissionsGrid');
     if (!grid) return;
-    grid.innerHTML = ALL_SECTIONS.map(s => `
+    let lastGroup = null;
+    grid.innerHTML = ALL_SECTIONS.map(s => {
+        let header = '';
+        if (s.group && s.group !== lastGroup) {
+            lastGroup = s.group;
+            header = `<div style="font-size:11px;font-weight:700;color:#15803d;text-transform:uppercase;letter-spacing:.06em;padding:10px 0 4px;border-bottom:1px solid #bbf7d0;margin-bottom:2px;">${s.group}</div>`;
+        }
+        return header + `
         <div class="flex items-center gap-3 py-1 border-b border-green-50 last:border-0">
             <span class="text-sm flex-1">${s.label}</span>
             <label class="flex items-center gap-1 text-xs cursor-pointer">
@@ -9038,7 +9052,8 @@ function renderPermissionCheckboxes() {
             <label class="flex items-center gap-1 text-xs cursor-pointer">
                 <input type="radio" class="reg-perm-radio accent-green-700" name="perm_reg_${s.id}" value="edit" /> Edit
             </label>
-        </div>`).join('');
+        </div>`;
+    }).join('');
 }
 
 function normalisePermissions(perms) {
@@ -9271,6 +9286,7 @@ async function openEditUserModal(id) {
             ${e}
         </label>`).join('');
 
+    let _permGroup = null;
     const permsRows = ALL_SECTIONS.map(s => {
         const stored = userPerms[s.id];
         const cur = stored !== undefined
@@ -9278,7 +9294,12 @@ async function openEditUserModal(id) {
             : (user.role === 'estate_user' && s.id in ESTATE_MOBILE_DEFAULTS
                 ? ESTATE_MOBILE_DEFAULTS[s.id]
                 : 'none');
-        return `
+        let header = '';
+        if (s.group && s.group !== _permGroup) {
+            _permGroup = s.group;
+            header = `<div style="font-size:11px;font-weight:700;color:#15803d;text-transform:uppercase;letter-spacing:.06em;padding:10px 0 4px;border-bottom:1px solid #bbf7d0;margin-bottom:2px;">${s.group}</div>`;
+        }
+        return header + `
         <div class="flex items-center gap-3 py-1 border-b border-green-50 last:border-0">
             <span class="text-sm flex-1">${s.label}</span>
             <label class="flex items-center gap-1 text-xs cursor-pointer">
