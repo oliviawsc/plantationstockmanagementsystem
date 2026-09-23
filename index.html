@@ -1181,14 +1181,14 @@
                     </div>
                     <div style="padding:6px;">
                         <button onclick="closeAvatarDropdown();showUserProfile()" style="width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:none;background:transparent;font-size:13px;font-weight:500;color:#374151;cursor:pointer;font-family:Inter,sans-serif;text-align:left;" onmouseover="this.style.background='#F3F4F6'" onmouseout="this.style.background='transparent'">
-                            <span>&#128100;</span> My Profile
+                            <span>&#128100;</span> <span data-i18n="avatar_my_profile">My Profile</span>
                         </button>
                         <button onclick="closeAvatarDropdown();showChangePassword()" style="width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:none;background:transparent;font-size:13px;font-weight:500;color:#374151;cursor:pointer;font-family:Inter,sans-serif;text-align:left;" onmouseover="this.style.background='#F3F4F6'" onmouseout="this.style.background='transparent'">
-                            <span>&#128274;</span> Change Password
+                            <span>&#128274;</span> <span data-i18n="avatar_change_pw">Change Password</span>
                         </button>
                         <div style="height:1px;background:#F1F5F9;margin:4px 0;"></div>
                         <button onclick="closeAvatarDropdown();logoutUser()" style="width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:none;background:transparent;font-size:13px;font-weight:500;color:#DC2626;cursor:pointer;font-family:Inter,sans-serif;text-align:left;" onmouseover="this.style.background='#FEF2F2'" onmouseout="this.style.background='transparent'">
-                            <span>&#128682;</span> Log Out
+                            <span>&#128682;</span> <span data-i18n="avatar_log_out">Log Out</span>
                         </button>
                     </div>
                 </div>
@@ -7366,6 +7366,9 @@ const I18N = {
         alert_delete_txn:         'Delete this transaction?',
         alert_select_estate:      'Please select an Estate before saving data.',
         alert_no_permission:      'You do not have permission to access this section.',
+        avatar_my_profile:        'My Profile',
+        avatar_change_pw:         'Change Password',
+        avatar_log_out:           'Log Out',
         /* Dashboard - Progress Trackers */
         dash_bal_fertilizer:         '🌿 Balance Fertilizer',
         dash_bal_fertilizer_sub:     'Current on-hand stock by item',
@@ -7763,6 +7766,9 @@ const I18N = {
         alert_delete_txn:         'Padam transaksi ini?',
         alert_select_estate:      'Sila pilih Estet sebelum menyimpan data.',
         alert_no_permission:      'Anda tidak mempunyai kebenaran untuk mengakses bahagian ini.',
+        avatar_my_profile:        'Profil Saya',
+        avatar_change_pw:         'Tukar Kata Laluan',
+        avatar_log_out:           'Log Keluar',
         /* Dashboard - Progress Trackers */
         dash_bal_fertilizer:         '🌿 Baki Baja',
         dash_bal_fertilizer_sub:     'Stok semasa mengikut item',
