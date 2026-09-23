@@ -1199,7 +1199,7 @@
         <div id="profileModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;align-items:center;justify-content:center;">
             <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:360px;margin:16px;box-shadow:0 16px 48px rgba(0,0,0,.18);font-family:Inter,sans-serif;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-                    <h3 style="font-size:16px;font-weight:700;color:#0F172A;margin:0;">&#128100; My Profile</h3>
+                    <h3 style="font-size:16px;font-weight:700;color:#0F172A;margin:0;">&#128100; <span data-i18n="avatar_my_profile">My Profile</span></h3>
                     <button onclick="document.getElementById('profileModal').style.display='none'" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94A3B8;">&#x2715;</button>
                 </div>
                 <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;">
@@ -1209,15 +1209,15 @@
                 </div>
                 <div style="background:#F8FAFC;border-radius:10px;padding:14px 16px;border:1px solid #E2E8F0;">
                     <div style="margin-bottom:10px;">
-                        <div style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#94A3B8;margin-bottom:3px;">User ID</div>
+                        <div style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#94A3B8;margin-bottom:3px;" data-i18n="profile_lbl_userid">User ID</div>
                         <div id="profileEmail" style="font-size:13.5px;font-weight:500;color:#0F172A;"></div>
                     </div>
                     <div>
-                        <div style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#94A3B8;margin-bottom:3px;">Role</div>
+                        <div style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#94A3B8;margin-bottom:3px;" data-i18n="profile_lbl_role">Role</div>
                         <div id="profileRoleDetail" style="font-size:13.5px;font-weight:500;color:#0F172A;text-transform:capitalize;"></div>
                     </div>
                 </div>
-                <button onclick="document.getElementById('profileModal').style.display='none'" style="width:100%;margin-top:16px;padding:9px;border-radius:8px;border:1px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;">Close</button>
+                <button onclick="document.getElementById('profileModal').style.display='none'" style="width:100%;margin-top:16px;padding:9px;border-radius:8px;border:1px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;" data-i18n="btn_close">Close</button>
             </div>
         </div>
 
@@ -1225,28 +1225,28 @@
         <div id="changePasswordModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;align-items:center;justify-content:center;">
             <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:360px;margin:16px;box-shadow:0 16px 48px rgba(0,0,0,.18);font-family:Inter,sans-serif;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-                    <h3 style="font-size:16px;font-weight:700;color:#0F172A;margin:0;">&#128274; Change Password</h3>
+                    <h3 style="font-size:16px;font-weight:700;color:#0F172A;margin:0;">&#128274; <span data-i18n="avatar_change_pw">Change Password</span></h3>
                     <button onclick="closeChangePasswordModal()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94A3B8;">&#x2715;</button>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:12px;">
                     <div>
-                        <label style="display:block;font-size:12.5px;font-weight:500;color:#374151;margin-bottom:4px;">Current Password</label>
-                        <input id="cpCurrentPw" type="password" placeholder="Enter current password" style="width:100%;padding:9px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2E7D32'" onblur="this.style.borderColor='#E2E8F0'" />
+                        <label style="display:block;font-size:12.5px;font-weight:500;color:#374151;margin-bottom:4px;" data-i18n="cp_lbl_current">Current Password</label>
+                        <input id="cpCurrentPw" type="password" data-i18n-placeholder="cp_ph_current" placeholder="Enter current password" style="width:100%;padding:9px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2E7D32'" onblur="this.style.borderColor='#E2E8F0'" />
                     </div>
                     <div>
-                        <label style="display:block;font-size:12.5px;font-weight:500;color:#374151;margin-bottom:4px;">New Password</label>
-                        <input id="cpNewPw" type="password" placeholder="Min 6 characters" style="width:100%;padding:9px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2E7D32'" onblur="this.style.borderColor='#E2E8F0'" />
+                        <label style="display:block;font-size:12.5px;font-weight:500;color:#374151;margin-bottom:4px;" data-i18n="cp_lbl_new">New Password</label>
+                        <input id="cpNewPw" type="password" data-i18n-placeholder="cp_ph_new" placeholder="Min 6 characters" style="width:100%;padding:9px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2E7D32'" onblur="this.style.borderColor='#E2E8F0'" />
                     </div>
                     <div>
-                        <label style="display:block;font-size:12.5px;font-weight:500;color:#374151;margin-bottom:4px;">Confirm New Password</label>
-                        <input id="cpConfirmPw" type="password" placeholder="Re-enter new password" style="width:100%;padding:9px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2E7D32'" onblur="this.style.borderColor='#E2E8F0'" />
+                        <label style="display:block;font-size:12.5px;font-weight:500;color:#374151;margin-bottom:4px;" data-i18n="cp_lbl_confirm">Confirm New Password</label>
+                        <input id="cpConfirmPw" type="password" data-i18n-placeholder="cp_ph_confirm" placeholder="Re-enter new password" style="width:100%;padding:9px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:13.5px;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2E7D32'" onblur="this.style.borderColor='#E2E8F0'" />
                     </div>
                     <p id="cpError"   style="display:none;font-size:12px;color:#DC2626;margin:0;"></p>
                     <p id="cpSuccess" style="display:none;font-size:12px;color:#16A34A;font-weight:600;margin:0;"></p>
                 </div>
                 <div style="display:flex;gap:8px;margin-top:18px;">
-                    <button onclick="closeChangePasswordModal()" style="flex:1;padding:9px;border-radius:8px;border:1px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;">Cancel</button>
-                    <button id="cpSaveBtn" onclick="submitChangePassword()" class="btn btn-primary" style="flex:1;justify-content:center;padding:9px;font-size:13px;">Save</button>
+                    <button onclick="closeChangePasswordModal()" style="flex:1;padding:9px;border-radius:8px;border:1px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;" data-i18n="btn_cancel">Cancel</button>
+                    <button id="cpSaveBtn" onclick="submitChangePassword()" class="btn btn-primary" style="flex:1;justify-content:center;padding:9px;font-size:13px;" data-i18n="btn_save">Save</button>
                 </div>
             </div>
         </div>
@@ -7452,6 +7452,16 @@ const I18N = {
         modal_edit_title:    '✏️ Edit Transaction',
         btn_save_changes:    'Save Changes',
         btn_cancel:          'Cancel',
+        btn_save:            'Save',
+        btn_close:           'Close',
+        profile_lbl_userid:  'User ID',
+        profile_lbl_role:    'Role',
+        cp_lbl_current:      'Current Password',
+        cp_lbl_new:          'New Password',
+        cp_lbl_confirm:      'Confirm New Password',
+        cp_ph_current:       'Enter current password',
+        cp_ph_new:           'Min 6 characters',
+        cp_ph_confirm:       'Re-enter new password',
         /* Dashboard Chart */
         dash_chart_title:    'Stock Level Chart',
         chart_legend_low:    '⚠️ Low Stock',
@@ -7854,6 +7864,16 @@ const I18N = {
         modal_edit_title:    '✏️ Edit Transaksi',
         btn_save_changes:    'Simpan Perubahan',
         btn_cancel:          'Batal',
+        btn_save:            'Simpan',
+        btn_close:           'Tutup',
+        profile_lbl_userid:  'ID Pengguna',
+        profile_lbl_role:    'Peranan',
+        cp_lbl_current:      'Kata Laluan Semasa',
+        cp_lbl_new:          'Kata Laluan Baru',
+        cp_lbl_confirm:      'Sahkan Kata Laluan Baru',
+        cp_ph_current:       'Masukkan kata laluan semasa',
+        cp_ph_new:           'Min 6 aksara',
+        cp_ph_confirm:       'Masukkan semula kata laluan baru',
         /* Dashboard Chart */
         dash_chart_title:    'Carta Tahap Stok',
         chart_legend_low:    '⚠️ Stok Rendah',
@@ -8047,6 +8067,12 @@ function setLang(lang) {
             // Use innerHTML so tags like <b> and <i> render correctly
             el.innerHTML = dict[key];
         }
+    });
+
+    // Translate placeholder attributes
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (dict[key] !== undefined) el.placeholder = dict[key];
     });
 
     // Update page title
