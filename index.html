@@ -11996,14 +11996,25 @@ function populateChemFilters() {
         btnLoad(saveBtn, 'Saving…');
 
         try {
-            // All users (including Super Admin) authenticate via Supabase Auth.
-            var verifyRes = await supabaseClient.auth.signInWithPassword({
-                email: session.email, password: cur
-            });
-            if (verifyRes.error) return showErr('Current password is incorrect.');
-
-            var updateRes = await supabaseClient.auth.updateUser({ password: nw });
-            if (updateRes.error) throw updateRes.error;
+            if (session.role === 'superadmin') {
+                // Super Admin uses Supabase Auth
+                var verifyRes = await supabaseClient.auth.signInWithPassword({
+                    email: session.email, password: cur
+                });
+                if (verifyRes.error) { btnDone(saveBtn); return showErr('Current password is incorrect.'); }
+                var updateRes = await supabaseClient.auth.updateUser({ password: nw });
+                if (updateRes.error) throw updateRes.error;
+            } else {
+                // Regular users: password stored as SHA-256 hash in opp_users
+                var curHash = await sha256Hex(cur);
+                var dbUser  = await fetchUserByEmail(session.email);
+                if (!dbUser || dbUser.passwordHash !== curHash) {
+                    btnDone(saveBtn);
+                    return showErr('Current password is incorrect.');
+                }
+                var newHash = await sha256Hex(nw);
+                await updateUserInSupabase({ ...dbUser, passwordHash: newHash });
+            }
 
             if(errEl) errEl.style.display='none';
             if(sucEl){ sucEl.textContent='Password changed successfully!'; sucEl.style.display='block'; }
