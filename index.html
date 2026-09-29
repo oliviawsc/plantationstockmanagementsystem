@@ -2287,34 +2287,73 @@
             </div>
         </section>
 
-        <!-- ============ MOBILE RAINFALL ADD (estate-mobile only) ============ -->
-        <section id="mobile_rainfall" class="page-section">
-            <div style="min-height:100vh;background:linear-gradient(160deg,#F0FDF4 0%,#E8F5E9 40%,#F8FAFC 100%);padding-bottom:60px;">
-
+        <!-- ============ MOBILE CATEGORY PAGE (Baja/Kimia/Anak Sawit) ============ -->
+        <section id="estate_category" class="page-section">
+            <div style="min-height:100vh;background:#F8FAFC;padding-bottom:80px;">
                 <!-- Header -->
-                <div style="padding:24px 20px 16px;">
-                    <h2 style="font-size:22px;font-weight:800;color:#0F172A;letter-spacing:-.3px;font-family:Inter,sans-serif;" data-i18n="rf_add_title">Add Rainfall Transaction</h2>
+                <div style="background:#fff;border-bottom:1px solid #E2E8F0;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;gap:8px;">
+                    <button onclick="navToSection('estate_hub')" style="padding:7px 14px;border-radius:9px;border:1.5px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;white-space:nowrap;">
+                        &#8592; Kembali
+                    </button>
+                    <h2 id="estateCatTitle" style="font-size:17px;font-weight:800;color:#0F172A;font-family:Inter,sans-serif;margin:0;flex:1;text-align:center;">Baja</h2>
+                    <button onclick="openMobileStockForm()" style="padding:7px 14px;border-radius:9px;border:none;background:linear-gradient(135deg,#16a34a,#166534);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;white-space:nowrap;box-shadow:0 2px 8px rgba(22,163,74,.3);">
+                        + Rekod Stok
+                    </button>
                 </div>
+                <!-- Tab bar -->
+                <div style="background:#fff;border-bottom:1.5px solid #E2E8F0;display:flex;">
+                    <button class="estate-cat-tab active" id="estateCatTabBaki" onclick="showEstateCategoryTab('baki')">Baki Stok</button>
+                    <button class="estate-cat-tab" id="estateCatTabTransaksi" onclick="showEstateCategoryTab('transaksi')">Transaksi</button>
+                    <button class="estate-cat-tab" id="estateCatTabRekod" onclick="showEstateCategoryTab('rekod')">Rekod</button>
+                </div>
+                <!-- Pane: Baki Stok -->
+                <div id="estateCatPaneBaki" style="padding:0 16px 20px;">
+                    <div id="estateBakiStokList" style="padding-top:4px;"></div>
+                    <p id="estateBakiFooter" style="font-size:11px;color:#94A3B8;text-align:right;padding:12px 0 0;margin:0;font-family:Inter,sans-serif;"></p>
+                </div>
+                <!-- Pane: Transaksi -->
+                <div id="estateCatPaneTransaksi" style="display:none;padding:16px;">
+                    <div id="estateTransaksiList" style="display:flex;flex-direction:column;gap:10px;"></div>
+                </div>
+                <!-- Pane: Rekod -->
+                <div id="estateCatPaneRekod" style="display:none;padding:16px;">
+                    <div id="estateRekodLinks" style="display:flex;flex-direction:column;gap:12px;"></div>
+                </div>
+            </div>
+        </section>
 
-                <!-- Form card -->
-                <div style="padding:0 16px;">
-                    <div style="background:#fff;border-radius:20px;box-shadow:0 4px 24px rgba(14,165,233,.1);padding:24px 20px;">
-
-                        <!-- Date -->
+        <!-- ============ MOBILE HUJAN PAGE (estate-mobile only) ============ -->
+        <section id="mobile_rainfall" class="page-section">
+            <div style="min-height:100vh;background:#F8FAFC;padding-bottom:80px;">
+                <!-- Header -->
+                <div style="background:#fff;border-bottom:1px solid #E2E8F0;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;gap:8px;">
+                    <button onclick="navToSection('estate_hub')" style="padding:7px 14px;border-radius:9px;border:1.5px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;white-space:nowrap;">
+                        &#8592; Kembali
+                    </button>
+                    <h2 style="font-size:17px;font-weight:800;color:#0F172A;font-family:Inter,sans-serif;margin:0;flex:1;text-align:center;">&#127783;&#65039; Hujan</h2>
+                    <button onclick="showMobileRainfallForm()" id="mobileRfAddBtn" style="padding:7px 14px;border-radius:9px;border:none;background:linear-gradient(135deg,#0369a1,#0c4a6e);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;white-space:nowrap;box-shadow:0 2px 8px rgba(3,105,161,.3);">
+                        + Rekod Hujan
+                    </button>
+                </div>
+                <!-- List panel -->
+                <div id="mobileRfListPanel" style="padding:16px;">
+                    <div id="mobileRfListBody" style="display:flex;flex-direction:column;gap:10px;"></div>
+                </div>
+                <!-- Form panel (hidden by default) -->
+                <div id="mobileRfFormPanel" style="display:none;padding:0 16px 20px;">
+                    <div style="background:#fff;border-radius:20px;box-shadow:0 4px 24px rgba(14,165,233,.1);padding:24px 20px;margin-top:16px;">
+                        <input type="hidden" id="mobileRfEditId" value="" />
+                        <h3 id="mobileRfFormTitle" style="font-size:16px;font-weight:700;color:#0F172A;margin:0 0 20px;font-family:Inter,sans-serif;">Tambah Rekod Hujan</h3>
                         <div style="margin-bottom:18px;">
                             <label style="display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:6px;" data-i18n="rf_lbl_date">Date</label>
                             <input type="date" id="mobileRfDate"
                                 style="width:100%;border:1.5px solid #A5D6A7;border-radius:10px;padding:10px 12px;font-size:15px;font-family:Inter,sans-serif;box-sizing:border-box;outline:none;" />
                         </div>
-
-                        <!-- Rainfall mm -->
                         <div style="margin-bottom:18px;">
                             <label style="display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:6px;" data-i18n="rf_lbl_mm">Rainfall (mm)</label>
-                            <input type="number" id="mobileRfMm" min="0" step="0.1" placeholder="e.g. 12.5"
+                            <input type="number" id="mobileRfMm" min="0" step="0.1" placeholder="cth. 12.5"
                                 style="width:100%;border:1.5px solid #A5D6A7;border-radius:10px;padding:10px 12px;font-size:15px;font-family:Inter,sans-serif;box-sizing:border-box;outline:none;" />
                         </div>
-
-                        <!-- Photo -->
                         <div style="margin-bottom:24px;">
                             <label style="display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:8px;" data-i18n="rf_lbl_photo">Photo (optional)</label>
                             <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
@@ -2337,12 +2376,14 @@
                                     style="max-width:100%;max-height:200px;border-radius:12px;border:2px solid #A5D6A7;object-fit:cover;" />
                             </div>
                         </div>
-
-                        <!-- Save button -->
-                        <button type="button" id="mobileRfSaveBtn" onclick="saveMobileRainfallTxn()"
-                            style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#16a34a,#166534);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;box-shadow:0 4px 14px rgba(22,163,74,.3);"
-                            data-i18n="rf_btn_save">Save Transaction</button>
-
+                        <div style="display:flex;gap:10px;">
+                            <button type="button" id="mobileRfSaveBtn" onclick="saveMobileRainfallTxn()"
+                                style="flex:1;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#16a34a,#166534);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;box-shadow:0 4px 14px rgba(22,163,74,.3);"
+                                data-i18n="rf_btn_save">Simpan</button>
+                            <button type="button" onclick="cancelMobileRainfallForm()"
+                                style="padding:14px 20px;border-radius:12px;border:1.5px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:14px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;"
+                                data-i18n="btn_cancel">Batal</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -8855,7 +8896,7 @@ function navToSection(sectionId) {
 
     // Permission guard: applies to every call path (sidebar, estate hub cards, direct calls).
     // estate_hub and mobile_viewrecord are always allowed — they're estate-mobile hub screens.
-    if (sectionId !== 'estate_hub' && sectionId !== 'mobile_viewrecord') {
+    if (sectionId !== 'estate_hub' && sectionId !== 'mobile_viewrecord' && sectionId !== 'estate_category') {
         const _gs = loadSession();
         if (_gs && _gs.role !== 'superadmin' && getSectionAccess(_gs, sectionId) === 'none') {
             return; // silently block — caller has no access to this section
@@ -8894,48 +8935,34 @@ function navToSection(sectionId) {
 
     // Section-specific init that navToSection must mirror from navigateToSection
     if (sectionId === 'mobile_rainfall') {
-        const el = document.getElementById('mobileRfDate');
-        if (el && !el.value) el.valueAsDate = new Date();
-        // The save button must always be enabled on this add form — force-enable
-        // it here after applyViewOnlyLock and refreshAll have both run, so any
-        // accidental lock from either path is overridden.
+        const listPanel = document.getElementById('mobileRfListPanel');
+        const formPanel = document.getElementById('mobileRfFormPanel');
+        const addBtn    = document.getElementById('mobileRfAddBtn');
+        if (listPanel) listPanel.style.display = '';
+        if (formPanel) formPanel.style.display = 'none';
+        if (addBtn)    addBtn.style.display    = '';
         const saveBtn = document.getElementById('mobileRfSaveBtn');
         if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('view-locked-field'); }
-        const rfDate = document.getElementById('mobileRfDate');
-        if (rfDate) { rfDate.disabled = false; rfDate.classList.remove('view-locked-field'); }
-        const rfMm = document.getElementById('mobileRfMm');
-        if (rfMm) { rfMm.disabled = false; rfMm.classList.remove('view-locked-field'); }
+        if (typeof renderMobileRainfallList === 'function') renderMobileRainfallList();
+    }
+    if (sectionId === 'estate_category') {
+        if (typeof showEstateCategoryTab === 'function') showEstateCategoryTab('baki');
     }
 }
 
 // ── Mobile bottom nav helpers ────────────────────────────────────────
-const MOBILE_RECORD_SECTIONS = ['fertrecord', 'chemrecord', 'plantrecord'];
+const MOBILE_RECORD_SECTIONS = ['fertrecord', 'chemrecord', 'plantrecord', 'estate_category', 'mobile_rainfall'];
 
 function mobileNavTo(dest) {
-    if (dest === 'home') {
-        navToSection('estate_hub');
-    } else if (dest === 'records') {
-        navToSection('mobile_viewrecord');
-    } else if (dest === 'summary') {
-        navToSection('summary');
-    } else if (dest === 'dashboard') {
-        navToSection('dashboard');
-    }
+    if (dest === 'home') navToSection('estate_hub');
 }
 
 function updateMobileBottomNav(sectionId) {
     if (!document.body.classList.contains('estate-mobile')) return;
-    const isRecord = MOBILE_RECORD_SECTIONS.includes(sectionId) || sectionId === 'mobile_viewrecord';
-    const map = {
-        mnavHome:      sectionId === 'estate_hub',
-        mnavRecords:   isRecord,
-        mnavSummary:   sectionId === 'summary',
-        mnavDashboard: sectionId === 'dashboard',
-    };
-    Object.entries(map).forEach(([id, active]) => {
-        const el = document.getElementById(id);
-        if (el) el.classList.toggle('active', active);
-    });
+    const homeEl = document.getElementById('mnavHome');
+    if (homeEl) homeEl.classList.toggle('active', sectionId === 'estate_hub');
+    const plusEl = document.getElementById('mnavPlus');
+    if (plusEl) plusEl.classList.remove('active');
 }
 
 // ── Apply nav & section visibility based on session ────────────────
@@ -9305,6 +9332,7 @@ const ESTATE_MOBILE_DEFAULTS = {
     rainfallreport:   'view',  // Rainfall Report tab
     rainfallsummary:  'view',  // Summary Monthly Rainfall tab
     mobile_rainfall:  'edit',  // Mobile-only rainfall add form (hub card)
+    estate_category:  'edit',  // Mobile category page (Baja/Kimia/Anak Sawit)
 };
 
 function getSectionAccess(session, sectionId) {
@@ -13078,21 +13106,13 @@ async function deleteSettingsBlock(id) {
 
 <!-- ── Mobile bottom nav bar (estate-mobile only) ── -->
 <nav id="mobileBottomNav">
-    <button class="mnav-item" id="mnavHome" onclick="mobileNavTo('home')">
-        <span class="mnav-icon">🔄</span>
-        <span class="mnav-label" data-i18n="mnav_home">Home</span>
+    <button class="mnav-item active" id="mnavHome" onclick="mobileNavTo('home')">
+        <span class="mnav-icon">&#127968;</span>
+        <span class="mnav-label">Laman Utama</span>
     </button>
-    <button class="mnav-item" id="mnavSummary" onclick="mobileNavTo('summary')">
-        <span class="mnav-icon">📑</span>
-        <span class="mnav-label" data-i18n="mnav_summary">Stock Transactions</span>
-    </button>
-    <button class="mnav-item" id="mnavRecords" onclick="mobileNavTo('records')">
-        <span class="mnav-icon">📋</span>
-        <span class="mnav-label" data-i18n="mnav_records">View Record</span>
-    </button>
-    <button class="mnav-item" id="mnavDashboard" onclick="mobileNavTo('dashboard')">
-        <span class="mnav-icon">📊</span>
-        <span class="mnav-label" data-i18n="mnav_dashboard">Dashboard</span>
+    <button class="mnav-item mnav-plus-btn" id="mnavPlus" onclick="openMobileStockForm()">
+        <span class="mnav-plus-circle">+</span>
+        <span class="mnav-label">Rekod Stok</span>
     </button>
 </nav>
 
