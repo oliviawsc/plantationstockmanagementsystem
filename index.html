@@ -12619,15 +12619,17 @@ function renderEstateTransaksi() {
         list.innerHTML = '<p style="text-align:center;color:#94A3B8;padding:32px 0;font-family:Inter,sans-serif;font-size:14px;">Tiada transaksi.</p>';
         return;
     }
-    var typeColors = { In:'#16a34a', Out:'#dc2626', Adj:'#d97706' };
-    var typeBg     = { In:'#DCFCE7', Out:'#FEE2E2', Adj:'#FEF3C7' };
+    var typeColors  = { In:'#16a34a', Out:'#dc2626', Adj:'#d97706' };
+    var typeBg      = { In:'#DCFCE7', Out:'#FEE2E2', Adj:'#FEF3C7' };
+    var typeLabels  = { In:'Masuk',   Out:'Keluar',  Adj:'Adj' };
     list.innerHTML = txns.map(function(t) {
-        var col = typeColors[t.type] || '#374151';
-        var bg  = typeBg[t.type]    || '#F1F5F9';
+        var col   = typeColors[t.type] || '#374151';
+        var bg    = typeBg[t.type]     || '#F1F5F9';
+        var label = typeLabels[t.type] || (t.type || '');
         return '<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1.5px solid #E2E8F0;">' +
             '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
                 '<div style="font-size:13px;font-weight:700;color:#0F172A;font-family:Inter,sans-serif;">' + (t.itemName || '') + '</div>' +
-                '<div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:' + bg + ';color:' + col + ';">' + (t.type || '') + '</div>' +
+                '<div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:' + bg + ';color:' + col + ';">' + label + '</div>' +
             '</div>' +
             '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
                 '<div style="font-size:12px;color:#64748B;font-family:Inter,sans-serif;">' + (t.date || '') + '</div>' +
