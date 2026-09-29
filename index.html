@@ -2331,26 +2331,19 @@
                         &#8592; Kembali
                     </button>
                     <h2 style="font-size:17px;font-weight:800;color:#0F172A;font-family:Inter,sans-serif;margin:0;flex:1;text-align:center;">&#127783;&#65039; Hujan</h2>
-                    <button onclick="showMobileRainfallForm()" id="mobileRfAddBtn" style="padding:7px 14px;border-radius:9px;border:none;background:linear-gradient(135deg,#0369a1,#0c4a6e);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;white-space:nowrap;box-shadow:0 2px 8px rgba(3,105,161,.3);">
-                        + Rekod Hujan
-                    </button>
+                    <div style="width:72px;"></div>
                 </div>
-                <!-- List panel -->
+                <!-- Tab bar -->
+                <div style="background:#fff;border-bottom:1.5px solid #E2E8F0;display:flex;">
+                    <button class="estate-cat-tab" id="mobileRfTabRekod" onclick="showMobileRainfallTab('rekod')">Rekod Hujan</button>
+                    <button class="estate-cat-tab active" id="mobileRfTabTransaksi" onclick="showMobileRainfallTab('transaksi')">Transaksi Hujan</button>
+                    <button class="estate-cat-tab" id="mobileRfTabBulanan" onclick="showMobileRainfallTab('bulanan')">Rekod Hujan Bulanan</button>
+                </div>
+                <!-- Pane: Transaksi Hujan (list, default) -->
                 <div id="mobileRfListPanel" style="padding:16px;">
                     <div id="mobileRfListBody" style="display:flex;flex-direction:column;gap:10px;"></div>
-                    <!-- Rekod Hujan Bulanan link -->
-                    <div style="margin-top:20px;">
-                        <button onclick="navToSection('rainfallreport')" style="display:flex;align-items:center;padding:18px 20px;background:#fff;border-radius:16px;border:1.5px solid #E0F2FE;cursor:pointer;gap:16px;width:100%;text-align:left;-webkit-tap-highlight-color:transparent;font-family:Inter,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.06);">
-                            <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#0369a1,#0c4a6e);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(3,105,161,.25);font-size:22px;">&#128200;</div>
-                            <div style="flex:1;">
-                                <div style="font-size:15px;font-weight:700;color:#0F172A;margin-bottom:3px;">Rekod Hujan Bulanan</div>
-                                <div style="font-size:11px;color:#0369a1;background:#E0F2FE;display:inline-block;padding:3px 10px;border-radius:99px;font-weight:600;">Lihat Laporan</div>
-                            </div>
-                            <span style="font-size:20px;color:#7DD3FC;">&#8250;</span>
-                        </button>
-                    </div>
                 </div>
-                <!-- Form panel (hidden by default) -->
+                <!-- Pane: Rekod Hujan (form, hidden by default) -->
                 <div id="mobileRfFormPanel" style="display:none;padding:0 16px 20px;">
                     <div style="background:#fff;border-radius:20px;box-shadow:0 4px 24px rgba(14,165,233,.1);padding:24px 20px;margin-top:16px;">
                         <input type="hidden" id="mobileRfEditId" value="" />
@@ -8948,15 +8941,9 @@ function navToSection(sectionId) {
 
     // Section-specific init that navToSection must mirror from navigateToSection
     if (sectionId === 'mobile_rainfall') {
-        const listPanel = document.getElementById('mobileRfListPanel');
-        const formPanel = document.getElementById('mobileRfFormPanel');
-        const addBtn    = document.getElementById('mobileRfAddBtn');
-        if (listPanel) listPanel.style.display = '';
-        if (formPanel) formPanel.style.display = 'none';
-        if (addBtn)    addBtn.style.display    = '';
+        if (typeof showMobileRainfallTab === 'function') showMobileRainfallTab('transaksi');
         const saveBtn = document.getElementById('mobileRfSaveBtn');
         if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('view-locked-field'); }
-        if (typeof renderMobileRainfallList === 'function') renderMobileRainfallList();
     }
     if (sectionId === 'estate_category') {
         if (typeof showEstateCategoryTab === 'function') showEstateCategoryTab('baki');
@@ -12733,6 +12720,25 @@ function renderMobileRainfallList() {
     }).join('');
 }
 
+function showMobileRainfallTab(tab) {
+    ['Rekod','Transaksi','Bulanan'].forEach(function(t) {
+        var btn = document.getElementById('mobileRfTab' + t);
+        if (btn) btn.classList.toggle('active', t.toLowerCase() === tab);
+    });
+    if (tab === 'bulanan') { navToSection('rainfallreport'); return; }
+    var listPanel = document.getElementById('mobileRfListPanel');
+    var formPanel = document.getElementById('mobileRfFormPanel');
+    if (listPanel) listPanel.style.display = tab === 'transaksi' ? '' : 'none';
+    if (formPanel) formPanel.style.display = tab === 'rekod'     ? '' : 'none';
+    if (tab === 'transaksi') renderMobileRainfallList();
+    if (tab === 'rekod' && !document.getElementById('mobileRfEditId').value) {
+        document.getElementById('mobileRfFormTitle').textContent = 'Tambah Rekod Hujan';
+        document.getElementById('mobileRfDate').valueAsDate = new Date();
+        document.getElementById('mobileRfMm').value = '';
+        clearMobileRainfallPhoto();
+    }
+}
+
 function showMobileRainfallForm(id) {
     document.getElementById('mobileRfEditId').value = id || '';
     var isEdit = Boolean(id);
@@ -12753,10 +12759,7 @@ function showMobileRainfallForm(id) {
             }
         }
     }
-    document.getElementById('mobileRfListPanel').style.display = 'none';
-    document.getElementById('mobileRfFormPanel').style.display = '';
-    var addBtn = document.getElementById('mobileRfAddBtn');
-    if (addBtn) addBtn.style.display = 'none';
+    showMobileRainfallTab('rekod');
     var saveBtn = document.getElementById('mobileRfSaveBtn');
     if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('view-locked-field'); }
 }
@@ -12765,13 +12768,10 @@ function editMobileRainfallRecord(id) { showMobileRainfallForm(id); }
 
 function cancelMobileRainfallForm() {
     document.getElementById('mobileRfEditId').value = '';
-    document.getElementById('mobileRfFormPanel').style.display = 'none';
-    document.getElementById('mobileRfListPanel').style.display = '';
-    var addBtn = document.getElementById('mobileRfAddBtn');
-    if (addBtn) addBtn.style.display = '';
-    document.getElementById('mobileRfDate').value = '';
-    document.getElementById('mobileRfMm').value   = '';
+    document.getElementById('mobileRfDate').value   = '';
+    document.getElementById('mobileRfMm').value     = '';
     clearMobileRainfallPhoto();
+    showMobileRainfallTab('transaksi');
 }
 
 function deleteMobileRainfallRecord(id) {
@@ -12794,6 +12794,7 @@ window.navToEstateCategory      = navToEstateCategory;
 window.showEstateCategoryTab    = showEstateCategoryTab;
 window.openMobileStockForm      = openMobileStockForm;
 window.renderMobileRainfallList = renderMobileRainfallList;
+window.showMobileRainfallTab    = showMobileRainfallTab;
 window.showMobileRainfallForm   = showMobileRainfallForm;
 window.editMobileRainfallRecord = editMobileRainfallRecord;
 window.cancelMobileRainfallForm = cancelMobileRainfallForm;
