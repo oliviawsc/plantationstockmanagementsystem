@@ -12676,9 +12676,15 @@ function renderEstateRekod() {
 }
 
 function openMobileStockForm(category) {
-    var cat = category || activeMobileCategory || null;
+    var cat = category || null;
     if (typeof resetTxnFormForNewEntry === 'function') resetTxnFormForNewEntry();
     var catSel = document.getElementById('txnCategory');
+    if (catSel) {
+        delete catSel.dataset.frozenCategory;
+        delete catSel.dataset.estateFreeze;
+        catSel.disabled = false;
+        catSel.value = '';
+    }
     if (catSel && cat) {
         catSel.value = cat;
         catSel.dataset.frozenCategory = cat;
@@ -12686,7 +12692,6 @@ function openMobileStockForm(category) {
         catSel.disabled = true;
     }
     navToSection('transactions');
-    if (catSel) catSel.disabled = true;
 }
 
 // ── Mobile Hujan list and form helpers ────────────────────────────────
