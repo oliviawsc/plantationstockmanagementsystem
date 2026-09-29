@@ -1531,7 +1531,7 @@
                             <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#2563eb,#1d4ed8);display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 14px rgba(37,99,235,.25);">
                                 <span style="font-size:28px;">&#9879;&#65039;</span>
                             </div>
-                            <div style="font-size:15px;font-weight:700;color:#0F172A;">Kimia</div>
+                            <div style="font-size:15px;font-weight:700;color:#0F172A;">Racun</div>
                         </button>
 
                         <!-- Anak Sawit -->
@@ -2296,9 +2296,7 @@
                         &#8592; Kembali
                     </button>
                     <h2 id="estateCatTitle" style="font-size:17px;font-weight:800;color:#0F172A;font-family:Inter,sans-serif;margin:0;flex:1;text-align:center;">Baja</h2>
-                    <button onclick="openMobileStockForm()" style="padding:7px 14px;border-radius:9px;border:none;background:linear-gradient(135deg,#16a34a,#166534);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;white-space:nowrap;box-shadow:0 2px 8px rgba(22,163,74,.3);">
-                        + Rekod Stok
-                    </button>
+                    <div style="width:72px;"></div>
                 </div>
                 <!-- Tab bar -->
                 <div style="background:#fff;border-bottom:1.5px solid #E2E8F0;display:flex;">
@@ -12541,7 +12539,7 @@ var activeMobileCategory = 'Fertilizer';
 
 function navToEstateCategory(category) {
     activeMobileCategory = category;
-    var titles = { 'Fertilizer': 'Baja', 'Chemical': 'Kimia', 'Oil Palm Seedling': 'Anak Sawit' };
+    var titles = { 'Fertilizer': 'Baja', 'Chemical': 'Racun', 'Oil Palm Seedling': 'Anak Sawit' };
     var titleEl = document.getElementById('estateCatTitle');
     if (titleEl) titleEl.textContent = titles[category] || category;
     navToSection('estate_category');
@@ -12638,7 +12636,7 @@ function renderEstateRekod() {
     if (!links) return;
     var cfg = {
         'Fertilizer':        { icon:'&#128203;', label:'Rekod Pengeluaran Baja',   section:'fertrecord',  bg:'linear-gradient(135deg,#16a34a,#166534)', shadow:'rgba(22,163,74,.25)'  },
-        'Chemical':          { icon:'&#9879;&#65039;', label:'Rekod Pengeluaran Kimia',  section:'chemrecord',  bg:'linear-gradient(135deg,#2563eb,#1d4ed8)', shadow:'rgba(37,99,235,.25)'  },
+        'Chemical':          { icon:'&#9879;&#65039;', label:'Rekod Pengeluaran Racun',  section:'chemrecord',  bg:'linear-gradient(135deg,#2563eb,#1d4ed8)', shadow:'rgba(37,99,235,.25)'  },
         'Oil Palm Seedling': { icon:'&#127807;', label:'Rekod Penanaman Lapangan', section:'plantrecord', bg:'linear-gradient(135deg,#d97706,#b45309)', shadow:'rgba(217,119,6,.25)'  },
     };
     var c = cfg[cat];
