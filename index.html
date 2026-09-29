@@ -12563,7 +12563,7 @@ function showEstateCategoryTab(tab) {
 
 function renderEstateBakiStok() {
     var cat = activeMobileCategory;
-    var catItems = (window.items || []).filter(function(i) { return i.category === cat; });
+    var catItems = (typeof items !== 'undefined' ? items : []).filter(function(i) { return i.category === cat; });
     var container = document.getElementById('estateBakiStokList');
     if (!container) return;
     var footer = document.getElementById('estateBakiFooter');
@@ -12574,7 +12574,7 @@ function renderEstateBakiStok() {
     }
     var asAt = new Date().toISOString().slice(0, 10);
     container.innerHTML = catItems.map(function(item) {
-        var bal = (window.transactions || [])
+        var bal = (typeof transactions !== 'undefined' ? transactions : [])
             .filter(function(t) { return String(t.itemId) === String(item.id) && t.date <= asAt; })
             .reduce(function(sum, t) {
                 if (t.type === 'In' || t.type === 'Adj') return sum + (parseFloat(t.qty) || 0);
@@ -12607,7 +12607,7 @@ function renderEstateTransaksi() {
     var cat  = activeMobileCategory;
     var list = document.getElementById('estateTransaksiList');
     if (!list) return;
-    var txns = (window.transactions || [])
+    var txns = (typeof transactions !== 'undefined' ? transactions : [])
         .filter(function(t) { return t.category === cat; })
         .sort(function(a, b) { return (b.date || '').localeCompare(a.date || '') || ((b.id || 0) - (a.id || 0)); });
     if (!txns.length) {
