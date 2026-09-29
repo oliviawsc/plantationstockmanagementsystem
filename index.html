@@ -1588,12 +1588,21 @@
                     </div>
                     <div>
                         <label class="block text-sm font-semibold mb-1" data-i18n="txn_lbl_type">Transaction Type</label>
-                        <select id="txnType" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
-                            <option value="" data-i18n="select_type">-- Select Type --</option>
-                            <option value="In" data-i18n="txn_type_in">In</option>
+                        <select id="txnType" class="hidden">
+                            <option value=""></option>
+                            <option value="In"  data-i18n="txn_type_in">In</option>
                             <option value="Out" data-i18n="txn_type_out">Out</option>
-                            <option value="Adj" data-i18n="txn_type_adj">Adj</option>
                         </select>
+                        <div style="display:flex;gap:10px;">
+                            <button type="button" id="txnTypeBtnIn" onclick="selectTxnType('In')"
+                                style="flex:1;padding:10px 8px;border-radius:9px;border:2px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;-webkit-tap-highlight-color:transparent;">
+                                <span style="font-size:16px;">📥</span><span data-i18n="txn_type_in">In</span>
+                            </button>
+                            <button type="button" id="txnTypeBtnOut" onclick="selectTxnType('Out')"
+                                style="flex:1;padding:10px 8px;border-radius:9px;border:2px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;-webkit-tap-highlight-color:transparent;">
+                                <span style="font-size:16px;">📤</span><span data-i18n="txn_type_out">Out</span>
+                            </button>
+                        </div>
                     </div>
                     <div id="txnQtyWrap">
                         <label class="block text-sm font-semibold mb-1" data-i18n="col_qty">
@@ -1674,22 +1683,25 @@
                             <span class="text-gray-400 font-normal text-xs ml-1" data-i18n="txn_picture_hint">(Optional — photo of delivery note, DO, or site)</span>
                         </label>
                         <div class="flex flex-wrap gap-3 items-start">
-                            <!-- Option 1: Upload from gallery / file system -->
-                            <label class="cursor-pointer">
-                                <div class="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white text-sm font-semibold px-4 py-2 rounded-lg select-none" data-i18n="btn_upload_photo">
-                                    🖼️ Upload Photo
+                            <!-- Camera icon button with dropdown -->
+                            <div style="position:relative;display:inline-block;">
+                                <button type="button" id="txnPhotoMenuBtn" onclick="toggleTxnPhotoMenu()"
+                                    style="display:flex;align-items:center;gap:8px;padding:9px 18px;border-radius:9px;border:1.5px solid #CBD5E1;background:#F8FAFC;color:#374151;font-size:14px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;">
+                                    📷 <span data-i18n="txn_lbl_picture">Supporting Picture</span>
+                                </button>
+                                <div id="txnPhotoMenu" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:50;background:#fff;border:1.5px solid #E2E8F0;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.12);min-width:200px;overflow:hidden;">
+                                    <label style="display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;border-bottom:1px solid #F1F5F9;">
+                                        <span style="font-size:16px;">🖼️</span>
+                                        <span style="font-size:13px;font-weight:600;color:#374151;" data-i18n="btn_upload_photo">Upload Photo</span>
+                                        <input type="file" id="txnPicture" accept="image/*" class="hidden" onchange="previewTxnPicture(this);closeTxnPhotoMenu()" />
+                                    </label>
+                                    <label style="display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;">
+                                        <span style="font-size:16px;">📸</span>
+                                        <span style="font-size:13px;font-weight:600;color:#374151;" data-i18n="btn_take_photo">Take Photo</span>
+                                        <input type="file" id="txnPictureCamera" accept="image/*" capture="environment" class="hidden" onchange="previewTxnPicture(this);closeTxnPhotoMenu()" />
+                                    </label>
                                 </div>
-                                <input type="file" id="txnPicture" accept="image/*"
-                                    class="hidden" onchange="previewTxnPicture(this)" />
-                            </label>
-                            <!-- Option 2: Take photo directly with camera -->
-                            <label class="cursor-pointer">
-                                <div class="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-4 py-2 rounded-lg select-none" data-i18n="btn_take_photo">
-                                    📷 Take Photo
-                                </div>
-                                <input type="file" id="txnPictureCamera" accept="image/*" capture="environment"
-                                    class="hidden" onchange="previewTxnPicture(this)" />
-                            </label>
+                            </div>
                             <!-- Preview -->
                             <div id="txnPicturePreviewWrap" class="hidden flex items-start gap-2">
                                 <img id="txnPicturePreview" src="" alt="Preview"
@@ -8292,6 +8304,40 @@ function resetTxnFormForNewEntry() {
     document.getElementById('txnDate').valueAsDate = new Date();
     document.getElementById('txnRowsBody').innerHTML = '';
     clearTxnPicture();
+    resetTxnTypeBtns();
+}
+
+function resetTxnTypeBtns() {
+    ['In','Out'].forEach(function(t) {
+        var btn = document.getElementById('txnTypeBtn' + t);
+        if (btn) { btn.style.borderColor='#E2E8F0'; btn.style.background='#F8FAFC'; btn.style.color='#374151'; }
+    });
+}
+
+function selectTxnType(type) {
+    var sel = document.getElementById('txnType');
+    if (!sel) return;
+    sel.value = type;
+    sel.dispatchEvent(new Event('change'));
+    var styles = { In: ['#16a34a','#DCFCE7','#166534'], Out: ['#dc2626','#FEE2E2','#991B1B'] };
+    ['In','Out'].forEach(function(t) {
+        var btn = document.getElementById('txnTypeBtn' + t);
+        if (!btn) return;
+        var s = t === type ? styles[t] : null;
+        btn.style.borderColor = s ? s[0] : '#E2E8F0';
+        btn.style.background  = s ? s[1] : '#F8FAFC';
+        btn.style.color       = s ? s[2] : '#374151';
+    });
+}
+
+function toggleTxnPhotoMenu() {
+    var menu = document.getElementById('txnPhotoMenu');
+    if (menu) menu.style.display = menu.style.display === 'none' ? '' : 'none';
+}
+
+function closeTxnPhotoMenu() {
+    var menu = document.getElementById('txnPhotoMenu');
+    if (menu) menu.style.display = 'none';
 }
 
 function navToEstateModule(category) {
@@ -12016,6 +12062,11 @@ function populateChemFilters() {
         var btn = document.getElementById('avatarBtn');
         if(dd && btn && !btn.contains(e.target) && !dd.contains(e.target)){
             dd.style.display='none';
+        }
+        var photoMenu = document.getElementById('txnPhotoMenu');
+        var photoBtn  = document.getElementById('txnPhotoMenuBtn');
+        if(photoMenu && photoBtn && !photoBtn.contains(e.target) && !photoMenu.contains(e.target)){
+            photoMenu.style.display='none';
         }
     });
     window.showUserProfile = function(){
