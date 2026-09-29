@@ -7165,6 +7165,8 @@ function saveEditTransaction() {
     const _dUpd = I18N[currentLang] || I18N['en'];
     alert(_dUpd.alert_txn_updated || 'Transaction updated successfully.');
     refreshAll();
+    var _catSec = document.getElementById('estate_category');
+    if (_catSec && _catSec.classList.contains('active')) renderEstateTransaksi();
     });
 }
 
@@ -12622,12 +12624,30 @@ function renderEstateTransaksi() {
                 '<div style="font-size:13px;font-weight:700;color:#0F172A;font-family:Inter,sans-serif;">' + (t.itemName || '') + '</div>' +
                 '<div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:' + bg + ';color:' + col + ';">' + (t.type || '') + '</div>' +
             '</div>' +
-            '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
                 '<div style="font-size:12px;color:#64748B;font-family:Inter,sans-serif;">' + (t.date || '') + '</div>' +
                 '<div style="font-size:13px;font-weight:600;color:#374151;font-family:Inter,sans-serif;">' + (t.qty || 0) + ' ' + (t.unit || '') + '</div>' +
             '</div>' +
+            '<div style="display:flex;gap:8px;border-top:1px solid #F1F5F9;padding-top:10px;">' +
+                '<button onclick="mobileEditEstateTransaksi(' + t.id + ')" style="flex:1;padding:7px 0;border-radius:8px;border:1.5px solid #3B82F6;background:#EFF6FF;color:#1D4ED8;font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;">✏️ Edit</button>' +
+                '<button onclick="mobileDeleteEstateTransaksi(' + t.id + ')" style="flex:1;padding:7px 0;border-radius:8px;border:1.5px solid #EF4444;background:#FEF2F2;color:#DC2626;font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;">🗑️ Padam</button>' +
+            '</div>' +
         '</div>';
     }).join('');
+}
+
+function mobileEditEstateTransaksi(id) {
+    openEditTxnModal(id);
+}
+
+function mobileDeleteEstateTransaksi(id) {
+    var txn = (typeof transactions !== 'undefined' ? transactions : []).find(function(t) { return String(t.id) === String(id); });
+    if (!txn) return;
+    if (!confirm('Padam transaksi ini?\n\nItem: ' + (txn.itemName || '') + '\nJenis: ' + (txn.type || '') + '  |  Qty: ' + parseFloat(txn.qty || 0).toFixed(2) + '  |  Tarikh: ' + (txn.date || '') + '\n\nTindakan ini tidak boleh dibatalkan.')) return;
+    transactions = transactions.filter(function(t) { return String(t.id) !== String(id); });
+    save(STORAGE_KEYS.transactions, transactions);
+    refreshAll();
+    renderEstateTransaksi();
 }
 
 function renderEstateRekod() {
