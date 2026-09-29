@@ -286,6 +286,8 @@
         body.estate-mobile [data-i18n="tab_rainfall_txns"]       { display: none !important; }
         body.estate-mobile [data-i18n="tab_rainfall_report"]     { display: none !important; }
         body.estate-mobile [data-i18n="tab_rainfall_summary"]    { display: none !important; }
+        body.estate-mobile #rainfallreport .htab-bar            { display: none !important; }
+        body.estate-mobile #rainfallsummary                     { display: none !important; }
 
         /* App title banner above the header */
         #estateAppBanner {
@@ -9341,7 +9343,7 @@ const ESTATE_MOBILE_DEFAULTS = {
     plantrecord:     'view',  // View Record tab
     rainfall:         'edit',  // Rainfall Transactions desktop section
     rainfallreport:   'view',  // Rainfall Report tab
-    rainfallsummary:  'view',  // Summary Monthly Rainfall tab
+    rainfallsummary:  'none',  // Hidden on mobile — not accessible from Hujan module
     mobile_rainfall:  'edit',  // Mobile-only rainfall add form (hub card)
     estate_category:  'edit',  // Mobile category page (Baja/Kimia/Anak Sawit)
 };
