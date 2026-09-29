@@ -2335,8 +2335,8 @@
                 </div>
                 <!-- Tab bar -->
                 <div style="background:#fff;border-bottom:1.5px solid #E2E8F0;display:flex;">
-                    <button class="estate-cat-tab" id="mobileRfTabRekod" onclick="showMobileRainfallTab('rekod')">Rekod Hujan</button>
-                    <button class="estate-cat-tab active" id="mobileRfTabTransaksi" onclick="showMobileRainfallTab('transaksi')">Transaksi Hujan</button>
+                    <button class="estate-cat-tab active" id="mobileRfTabRekod" onclick="showMobileRainfallTab('rekod')">Rekod Hujan</button>
+                    <button class="estate-cat-tab" id="mobileRfTabTransaksi" onclick="showMobileRainfallTab('transaksi')">Transaksi Hujan</button>
                     <button class="estate-cat-tab" id="mobileRfTabBulanan" onclick="showMobileRainfallTab('bulanan')">Rekod Hujan Bulanan</button>
                 </div>
                 <!-- Pane: Transaksi Hujan (list, default) -->
@@ -8941,7 +8941,7 @@ function navToSection(sectionId) {
 
     // Section-specific init that navToSection must mirror from navigateToSection
     if (sectionId === 'mobile_rainfall') {
-        if (typeof showMobileRainfallTab === 'function') showMobileRainfallTab('transaksi');
+        if (typeof showMobileRainfallTab === 'function') showMobileRainfallTab('rekod');
         const saveBtn = document.getElementById('mobileRfSaveBtn');
         if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('view-locked-field'); }
     }
