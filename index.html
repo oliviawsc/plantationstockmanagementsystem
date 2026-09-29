@@ -12156,11 +12156,33 @@ function saveRainfallTxn() {
     cancelAddRainfall();
 }
 
-function deleteRainfallTxn(id) {
-    if (!confirm('Delete this rainfall record?')) return;
+async function deleteRainfallTxn(id) {
+    const _d = I18N[currentLang] || I18N['en'];
+    if (!confirm(_d.alert_delete_txn || 'Delete this transaction?')) return;
+
+    // Remove from local array and update lastKnownIds so diff-based sync
+    // does not try to re-insert it via upsert
     rainfallTxns = rainfallTxns.filter(r => String(r.id) !== String(id));
-    save(STORAGE_KEYS.rainfallTxns, rainfallTxns);
+    lastKnownIds.opp_rainfall_txns = new Set(rainfallTxns.map(r => r.id));
+
+    // Persist to localStorage
+    const estateKey = STORAGE_KEYS.rainfallTxns + '::' + activeEstate;
+    localStorage.setItem(estateKey, JSON.stringify(rainfallTxns));
+
+    // Delete directly from Supabase by id — more reliable than diff-based sync
+    try {
+        const { error } = await supabaseClient
+            .from('opp_rainfall_txns').delete().eq('id', id);
+        if (error) {
+            console.error('[Supabase] delete rainfall txn', error);
+            showSyncError('Delete failed: ' + error.message);
+        }
+    } catch (err) {
+        console.error('[Supabase] delete rainfall txn', err);
+    }
+
     renderRainfallTxns();
+    renderRainfallChart();
 }
 
 function viewRainfallPicture(id) {
