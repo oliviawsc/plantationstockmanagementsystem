@@ -1690,7 +1690,22 @@
                             <div style="position:relative;display:inline-block;">
                                 <button type="button" id="txnPhotoMenuBtn" onclick="toggleTxnPhotoMenu()"
                                     style="display:flex;align-items:center;gap:8px;padding:9px 18px;border-radius:9px;border:1.5px solid #CBD5E1;background:#F8FAFC;color:#374151;font-size:14px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;">
-                                    📷 <span data-i18n="txn_lbl_picture">Supporting Picture</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 26" width="28" height="24" fill="currentColor">
+                                        <!-- camera body -->
+                                        <path d="M10 2L8 5H2C0.9 5 0 5.9 0 7v15c0 1.1.9 2 2 2h21c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-6L15 2H10z"/>
+                                        <!-- lens white ring -->
+                                        <circle cx="12.5" cy="14" r="6" fill="white"/>
+                                        <!-- lens dark fill -->
+                                        <circle cx="12.5" cy="14" r="4.2" fill="currentColor"/>
+                                        <!-- lens highlight -->
+                                        <circle cx="11" cy="12.5" r="1.2" fill="white"/>
+                                        <!-- plus badge circle -->
+                                        <circle cx="25" cy="6" r="5.5" fill="currentColor"/>
+                                        <circle cx="25" cy="6" r="5.5" fill="none" stroke="white" stroke-width="1"/>
+                                        <!-- plus sign -->
+                                        <path d="M25 3v6M22 6h6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                    <span data-i18n="txn_lbl_picture">Supporting Picture</span>
                                 </button>
                                 <div id="txnPhotoMenu" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:50;background:#fff;border:1.5px solid #E2E8F0;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.12);min-width:200px;overflow:hidden;">
                                     <label style="display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;border-bottom:1px solid #F1F5F9;">
