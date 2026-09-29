@@ -2336,6 +2336,17 @@
                 <!-- List panel -->
                 <div id="mobileRfListPanel" style="padding:16px;">
                     <div id="mobileRfListBody" style="display:flex;flex-direction:column;gap:10px;"></div>
+                    <!-- Rekod Hujan Bulanan link -->
+                    <div style="margin-top:20px;">
+                        <button onclick="navToSection('rainfallreport')" style="display:flex;align-items:center;padding:18px 20px;background:#fff;border-radius:16px;border:1.5px solid #E0F2FE;cursor:pointer;gap:16px;width:100%;text-align:left;-webkit-tap-highlight-color:transparent;font-family:Inter,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+                            <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#0369a1,#0c4a6e);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(3,105,161,.25);font-size:22px;">&#128200;</div>
+                            <div style="flex:1;">
+                                <div style="font-size:15px;font-weight:700;color:#0F172A;margin-bottom:3px;">Rekod Hujan Bulanan</div>
+                                <div style="font-size:11px;color:#0369a1;background:#E0F2FE;display:inline-block;padding:3px 10px;border-radius:99px;font-weight:600;">Lihat Laporan</div>
+                            </div>
+                            <span style="font-size:20px;color:#7DD3FC;">&#8250;</span>
+                        </button>
+                    </div>
                 </div>
                 <!-- Form panel (hidden by default) -->
                 <div id="mobileRfFormPanel" style="display:none;padding:0 16px 20px;">
@@ -8951,7 +8962,7 @@ function navToSection(sectionId) {
 }
 
 // ── Mobile bottom nav helpers ────────────────────────────────────────
-const MOBILE_RECORD_SECTIONS = ['fertrecord', 'chemrecord', 'plantrecord', 'estate_category', 'mobile_rainfall'];
+const MOBILE_RECORD_SECTIONS = ['fertrecord', 'chemrecord', 'plantrecord', 'estate_category', 'mobile_rainfall', 'rainfallreport'];
 
 function mobileNavTo(dest) {
     if (dest === 'home') navToSection('estate_hub');
