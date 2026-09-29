@@ -370,6 +370,26 @@
         .mnav-item:hover .mnav-icon { transform: translateY(-2px); }
         .mnav-item .mnav-label { font-size: 10px; font-weight: 600; letter-spacing: .01em; }
         .mnav-item.active .mnav-label { color: #166534; }
+        /* Mobile category page tabs */
+        .estate-cat-tab {
+            flex: 1; border: none; background: transparent;
+            border-bottom: 3px solid transparent;
+            padding: 12px 6px; font-size: 13px; font-weight: 600; color: #64748B;
+            cursor: pointer; font-family: Inter,sans-serif; text-align: center;
+            transition: all 0.15s; -webkit-tap-highlight-color: transparent;
+        }
+        .estate-cat-tab.active { color: #166534; border-bottom-color: #16a34a; }
+        /* Mobile nav plus button */
+        .mnav-plus-circle {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: linear-gradient(135deg,#16a34a,#166534);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; line-height: 1; color: #fff;
+            box-shadow: 0 4px 14px rgba(22,163,74,.4);
+            margin-bottom: 2px; transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .mnav-plus-btn:hover .mnav-plus-circle { box-shadow: 0 6px 20px rgba(22,163,74,.5); transform: scale(1.05); }
+        .mnav-plus-btn:active .mnav-plus-circle { transform: scale(0.94); }
 
         /* ── Field Operations tables: borders + center alignment ── */
         #roundProgressBody td, #roundProgressBlockBody td,
@@ -1495,43 +1515,39 @@
                 <!-- Module cards -->
                 <div style="padding:0 16px;display:flex;flex-direction:column;gap:14px;">
 
-                    <!-- 2×2 grid: Fertilizer, Chemical, Oil Palm Seedling, Rainfall -->
+                    <!-- 2×2 grid: Baja, Kimia, Anak Sawit, Hujan -->
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
 
-                        <!-- Fertilizer -->
-                        <button id="estateHubFertCard" class="estate-card" onclick="navToEstateModule('Fertilizer')">
-                            <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#16a34a,#166534);display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 14px rgba(22,163,74,.25);">
+                        <!-- Baja -->
+                        <button id="estateHubFertCard" class="estate-card" onclick="navToEstateCategory('Fertilizer')" style="padding:22px 12px;">
+                            <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#16a34a,#166534);display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 14px rgba(22,163,74,.25);">
                                 <span style="font-size:28px;">&#127807;</span>
                             </div>
-                            <div data-i18n="cat_fertilizer" style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:5px;">Fertilizer</div>
-                            <span data-i18n="hub_record_stock" style="font-size:11px;color:#16a34a;background:#DCFCE7;padding:3px 10px;border-radius:99px;font-weight:600;">Record Stock</span>
+                            <div style="font-size:15px;font-weight:700;color:#0F172A;">Baja</div>
                         </button>
 
-                        <!-- Chemical -->
-                        <button id="estateHubChemCard" class="estate-card" onclick="navToEstateModule('Chemical')">
-                            <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#2563eb,#1d4ed8);display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 14px rgba(37,99,235,.25);">
+                        <!-- Kimia -->
+                        <button id="estateHubChemCard" class="estate-card" onclick="navToEstateCategory('Chemical')" style="padding:22px 12px;">
+                            <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#2563eb,#1d4ed8);display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 14px rgba(37,99,235,.25);">
                                 <span style="font-size:28px;">&#9879;&#65039;</span>
                             </div>
-                            <div data-i18n="cat_chemical" style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:5px;">Chemical</div>
-                            <span data-i18n="hub_record_stock" style="font-size:11px;color:#2563eb;background:#DBEAFE;padding:3px 10px;border-radius:99px;font-weight:600;">Record Stock</span>
+                            <div style="font-size:15px;font-weight:700;color:#0F172A;">Kimia</div>
                         </button>
 
-                        <!-- Oil Palm Seedling -->
-                        <button id="estateHubOPSCard" class="estate-card" onclick="navToEstateModule('Oil Palm Seedling')">
-                            <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#d97706,#b45309);display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 14px rgba(217,119,6,.25);">
+                        <!-- Anak Sawit -->
+                        <button id="estateHubOPSCard" class="estate-card" onclick="navToEstateCategory('Oil Palm Seedling')" style="padding:22px 12px;">
+                            <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#d97706,#b45309);display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 14px rgba(217,119,6,.25);">
                                 <span style="font-size:28px;">&#127807;</span>
                             </div>
-                            <div style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:5px;text-align:center;line-height:1.25;"><span data-i18n="hub_ops_line1">Oil Palm</span><br><span data-i18n="hub_ops_line2">Seedling</span></div>
-                            <span data-i18n="hub_record_stock" style="font-size:11px;color:#b45309;background:#FEF3C7;padding:3px 10px;border-radius:99px;font-weight:600;">Record Stock</span>
+                            <div style="font-size:15px;font-weight:700;color:#0F172A;">Anak Sawit</div>
                         </button>
 
-                        <!-- Rainfall -->
-                        <button class="estate-card" onclick="navToSection('mobile_rainfall')">
-                            <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#0369a1,#0c4a6e);display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 14px rgba(3,105,161,.25);">
+                        <!-- Hujan -->
+                        <button class="estate-card" onclick="navToSection('mobile_rainfall')" style="padding:22px 12px;">
+                            <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#0369a1,#0c4a6e);display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 14px rgba(3,105,161,.25);">
                                 <span style="font-size:28px;">&#127783;&#65039;</span>
                             </div>
-                            <div data-i18n="home_card_rainfall" style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:5px;">Rainfall</div>
-                            <span data-i18n="hub_add_rainfall" style="font-size:11px;color:#0369a1;background:#E0F2FE;padding:3px 10px;border-radius:99px;font-weight:600;">Add Rainfall</span>
+                            <div style="font-size:15px;font-weight:700;color:#0F172A;">Hujan</div>
                         </button>
 
                     </div>
@@ -12221,7 +12237,7 @@ function renderRainfallTxns() {
         if (fromVal && r.date < fromVal) return false;
         if (toVal   && r.date > toVal)   return false;
         return true;
-    });
+    }).sort(function(a, b) { return (a.date || '').localeCompare(b.date || ''); });
     if (!filtered.length) {
         const d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
         const noData = (d && d.rf_no_data) || 'No rainfall records yet.';
@@ -12426,23 +12442,34 @@ function clearMobileRainfallPhoto() {
     document.getElementById('mobileRfCamera').value = '';
 }
 function _doSaveMobileRainfallTxn(picture) {
-    const date = document.getElementById('mobileRfDate').value;
-    const mm   = parseFloat(document.getElementById('mobileRfMm').value);
+    var date   = document.getElementById('mobileRfDate').value;
+    var mm     = parseFloat(document.getElementById('mobileRfMm').value);
+    var editId = document.getElementById('mobileRfEditId').value;
     if (!date) { alert('Please select a date.'); return; }
     if (isNaN(mm) || mm < 0) { alert('Please enter a valid rainfall amount.'); return; }
     if (!activeEstate) { alert('Please select an Estate first.'); return; }
 
-    const stored = localStorage.getItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate);
+    var stored = localStorage.getItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate);
     rainfallTxns = stored ? JSON.parse(stored) : [];
-    rainfallTxns.push({ id: Date.now(), date, mm, picture: picture || null, createdAt: new Date().toISOString().slice(0, 10) });
-    rainfallTxns.sort((a, b) => b.date.localeCompare(a.date));
+
+    if (editId) {
+        var idx = rainfallTxns.findIndex(function(r) { return String(r.id) === String(editId); });
+        if (idx >= 0) {
+            rainfallTxns[idx] = Object.assign({}, rainfallTxns[idx], {
+                date: date, mm: mm,
+                picture: (picture !== undefined) ? picture : rainfallTxns[idx].picture
+            });
+        }
+    } else {
+        rainfallTxns.push({ id: Date.now(), date: date, mm: mm, picture: picture || null, createdAt: new Date().toISOString().slice(0, 10) });
+    }
+    rainfallTxns.sort(function(a, b) { return b.date.localeCompare(a.date); });
 
     try {
         save(STORAGE_KEYS.rainfallTxns, rainfallTxns);
     } catch (quotaErr) {
         if (picture && (quotaErr.name === 'QuotaExceededError' || quotaErr.code === 22)) {
-            // Strip photos from all records and retry — storage is full
-            rainfallTxns = rainfallTxns.map(r => ({ ...r, picture: null }));
+            rainfallTxns = rainfallTxns.map(function(r) { return Object.assign({}, r, {picture: null}); });
             save(STORAGE_KEYS.rainfallTxns, rainfallTxns);
             alert('Storage full — rainfall saved without photo. Please clear old data to keep photos.');
         } else {
@@ -12450,12 +12477,13 @@ function _doSaveMobileRainfallTxn(picture) {
         }
     }
 
-    document.getElementById('mobileRfDate').value = '';
-    document.getElementById('mobileRfMm').value = '';
-    clearMobileRainfallPhoto();
-    const d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
+    var d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
     alert((d && d.rf_saved_ok) || 'Rainfall transaction saved!');
-    navToSection('estate_hub');
+    cancelMobileRainfallForm();
+    renderMobileRainfallList();
+    if (typeof renderRainfallReport  === 'function') renderRainfallReport();
+    if (typeof renderRainfallSummary === 'function') renderRainfallSummary();
+    if (typeof renderRainfallChart   === 'function') renderRainfallChart();
 }
 
 function saveMobileRainfallTxn() {
@@ -12480,6 +12508,230 @@ function saveMobileRainfallTxn() {
         alert('Error saving rainfall: ' + (err && err.message ? err.message : err));
     }
 }
+// ── Mobile category page ──────────────────────────────────────────────
+var activeMobileCategory = 'Fertilizer';
+
+function navToEstateCategory(category) {
+    activeMobileCategory = category;
+    var titles = { 'Fertilizer': 'Baja', 'Chemical': 'Kimia', 'Oil Palm Seedling': 'Anak Sawit' };
+    var titleEl = document.getElementById('estateCatTitle');
+    if (titleEl) titleEl.textContent = titles[category] || category;
+    navToSection('estate_category');
+}
+
+function showEstateCategoryTab(tab) {
+    ['baki','transaksi','rekod'].forEach(function(t) {
+        var panId = 'estateCatPane' + t.charAt(0).toUpperCase() + t.slice(1);
+        var btnId = 'estateCatTab'  + t.charAt(0).toUpperCase() + t.slice(1);
+        var pane = document.getElementById(panId);
+        var btn  = document.getElementById(btnId);
+        if (pane) pane.style.display = (t === tab) ? '' : 'none';
+        if (btn)  btn.classList.toggle('active', t === tab);
+    });
+    if (tab === 'baki')      renderEstateBakiStok();
+    if (tab === 'transaksi') renderEstateTransaksi();
+    if (tab === 'rekod')     renderEstateRekod();
+}
+
+function renderEstateBakiStok() {
+    var cat = activeMobileCategory;
+    var catItems = (window.items || []).filter(function(i) { return i.category === cat; });
+    var container = document.getElementById('estateBakiStokList');
+    if (!container) return;
+    var footer = document.getElementById('estateBakiFooter');
+    if (!catItems.length) {
+        container.innerHTML = '<p style="text-align:center;color:#94A3B8;padding:32px 0;font-family:Inter,sans-serif;font-size:14px;">Tiada item.</p>';
+        if (footer) footer.textContent = '';
+        return;
+    }
+    var asAt = new Date().toISOString().slice(0, 10);
+    container.innerHTML = catItems.map(function(item) {
+        var bal = (window.transactions || [])
+            .filter(function(t) { return String(t.itemId) === String(item.id) && t.date <= asAt; })
+            .reduce(function(sum, t) {
+                if (t.type === 'In' || t.type === 'Adj') return sum + (parseFloat(t.qty) || 0);
+                if (t.type === 'Out')                    return sum - (parseFloat(t.qty) || 0);
+                return sum;
+            }, 0);
+        var factor  = parseFloat(item.qtyPerUnit) || 0;
+        var pkgUnit = item.packageUnit || '';
+        var displayBal, displayUnit;
+        if (factor > 0 && pkgUnit) {
+            displayBal  = (bal / factor).toFixed(2);
+            displayUnit = pkgUnit;
+        } else {
+            displayBal  = bal % 1 === 0 ? bal.toFixed(0) : bal.toFixed(2);
+            displayUnit = item.baseUnit || item.unit || '';
+        }
+        return '<div style="display:flex;align-items:center;padding:14px 4px;border-bottom:1px solid #F1F5F9;">' +
+            '<div style="flex:1;font-size:14px;color:#0F172A;font-family:Inter,sans-serif;">' + item.name + '</div>' +
+            '<div style="font-size:15px;font-weight:700;color:#166534;font-family:Inter,sans-serif;">' + displayBal +
+            ' <span style="font-size:12px;font-weight:500;color:#64748B;">' + displayUnit + '</span></div>' +
+        '</div>';
+    }).join('');
+    if (footer) {
+        var d = new Date(asAt + 'T00:00:00');
+        footer.textContent = 'Baki stok setakat ' + d.toLocaleDateString('ms-MY', {day:'2-digit', month:'long', year:'numeric'});
+    }
+}
+
+function renderEstateTransaksi() {
+    var cat  = activeMobileCategory;
+    var list = document.getElementById('estateTransaksiList');
+    if (!list) return;
+    var txns = (window.transactions || [])
+        .filter(function(t) { return t.category === cat; })
+        .sort(function(a, b) { return (b.date || '').localeCompare(a.date || '') || ((b.id || 0) - (a.id || 0)); });
+    if (!txns.length) {
+        list.innerHTML = '<p style="text-align:center;color:#94A3B8;padding:32px 0;font-family:Inter,sans-serif;font-size:14px;">Tiada transaksi.</p>';
+        return;
+    }
+    var typeColors = { In:'#16a34a', Out:'#dc2626', Adj:'#d97706' };
+    var typeBg     = { In:'#DCFCE7', Out:'#FEE2E2', Adj:'#FEF3C7' };
+    list.innerHTML = txns.map(function(t) {
+        var col = typeColors[t.type] || '#374151';
+        var bg  = typeBg[t.type]    || '#F1F5F9';
+        return '<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1.5px solid #E2E8F0;">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
+                '<div style="font-size:13px;font-weight:700;color:#0F172A;font-family:Inter,sans-serif;">' + (t.itemName || '') + '</div>' +
+                '<div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:' + bg + ';color:' + col + ';">' + (t.type || '') + '</div>' +
+            '</div>' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+                '<div style="font-size:12px;color:#64748B;font-family:Inter,sans-serif;">' + (t.date || '') + '</div>' +
+                '<div style="font-size:13px;font-weight:600;color:#374151;font-family:Inter,sans-serif;">' + (t.qty || 0) + ' ' + (t.unit || '') + '</div>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+function renderEstateRekod() {
+    var cat   = activeMobileCategory;
+    var links = document.getElementById('estateRekodLinks');
+    if (!links) return;
+    var cfg = {
+        'Fertilizer':        { icon:'&#128203;', label:'Rekod Pengeluaran Baja',   section:'fertrecord',  bg:'linear-gradient(135deg,#16a34a,#166534)', shadow:'rgba(22,163,74,.25)'  },
+        'Chemical':          { icon:'&#9879;&#65039;', label:'Rekod Pengeluaran Kimia',  section:'chemrecord',  bg:'linear-gradient(135deg,#2563eb,#1d4ed8)', shadow:'rgba(37,99,235,.25)'  },
+        'Oil Palm Seedling': { icon:'&#127807;', label:'Rekod Penanaman Lapangan', section:'plantrecord', bg:'linear-gradient(135deg,#d97706,#b45309)', shadow:'rgba(217,119,6,.25)'  },
+    };
+    var c = cfg[cat];
+    if (!c) { links.innerHTML = ''; return; }
+    links.innerHTML = '<button onclick="navToSection(\'' + c.section + '\')" style="display:flex;align-items:center;padding:18px 20px;background:#fff;border-radius:16px;border:1.5px solid #E2E8F0;cursor:pointer;gap:16px;width:100%;text-align:left;-webkit-tap-highlight-color:transparent;font-family:Inter,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.06);">' +
+        '<div style="width:48px;height:48px;border-radius:12px;background:' + c.bg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px ' + c.shadow + ';font-size:22px;">' + c.icon + '</div>' +
+        '<div style="flex:1;font-size:15px;font-weight:700;color:#0F172A;">' + c.label + '</div>' +
+        '<span style="font-size:20px;color:#CBD5E1;">&#8250;</span>' +
+    '</button>';
+}
+
+function openMobileStockForm(category) {
+    var cat = category || activeMobileCategory || null;
+    if (typeof resetTxnFormForNewEntry === 'function') resetTxnFormForNewEntry();
+    var catSel = document.getElementById('txnCategory');
+    if (catSel && cat) {
+        catSel.value = cat;
+        catSel.dataset.frozenCategory = cat;
+        catSel.dataset.estateFreeze   = '1';
+        catSel.disabled = true;
+    }
+    navToSection('transactions');
+    if (catSel) catSel.disabled = true;
+}
+
+// ── Mobile Hujan list and form helpers ────────────────────────────────
+function renderMobileRainfallList() {
+    var list = document.getElementById('mobileRfListBody');
+    if (!list) return;
+    if (activeEstate) {
+        var stored = localStorage.getItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate);
+        rainfallTxns = stored ? JSON.parse(stored) : [];
+    }
+    var sorted = (rainfallTxns || []).slice().sort(function(a, b) {
+        return (a.date || '').localeCompare(b.date || '');
+    });
+    if (!sorted.length) {
+        list.innerHTML = '<p style="text-align:center;color:#94A3B8;padding:32px 0;font-family:Inter,sans-serif;font-size:14px;">Tiada rekod hujan.</p>';
+        return;
+    }
+    list.innerHTML = sorted.map(function(r) {
+        return '<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1.5px solid #E0F2FE;">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+                '<div>' +
+                    '<div style="font-size:13px;font-weight:600;color:#0C4A6E;font-family:Inter,sans-serif;">' + (r.date || '') + '</div>' +
+                    '<div style="font-size:20px;font-weight:800;color:#0369A1;font-family:Inter,sans-serif;">' + ((r.mm || 0).toFixed(1)) + ' mm</div>' +
+                '</div>' +
+                '<div style="display:flex;gap:8px;">' +
+                    '<button onclick="editMobileRainfallRecord(\'' + r.id + '\')" style="padding:7px 12px;border-radius:8px;border:none;background:#E0F2FE;color:#0369A1;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;">&#9998; Edit</button>' +
+                    '<button onclick="deleteMobileRainfallRecord(\'' + r.id + '\')" style="padding:7px 12px;border-radius:8px;border:none;background:#FEE2E2;color:#dc2626;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;">&#128465; Padam</button>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+function showMobileRainfallForm(id) {
+    document.getElementById('mobileRfEditId').value = id || '';
+    var isEdit = Boolean(id);
+    document.getElementById('mobileRfFormTitle').textContent = isEdit ? 'Edit Rekod Hujan' : 'Tambah Rekod Hujan';
+    clearMobileRainfallPhoto();
+    if (!isEdit) {
+        document.getElementById('mobileRfDate').valueAsDate = new Date();
+        document.getElementById('mobileRfMm').value = '';
+    } else {
+        var r = rainfallTxns.find(function(x) { return String(x.id) === String(id); });
+        if (r) {
+            document.getElementById('mobileRfDate').value = r.date;
+            document.getElementById('mobileRfMm').value   = r.mm;
+            if (r.picture) {
+                document.getElementById('mobileRfPreview').src = r.picture;
+                document.getElementById('mobileRfPreviewWrap').style.display = '';
+                document.getElementById('mobileRfClearBtn').style.display    = '';
+            }
+        }
+    }
+    document.getElementById('mobileRfListPanel').style.display = 'none';
+    document.getElementById('mobileRfFormPanel').style.display = '';
+    var addBtn = document.getElementById('mobileRfAddBtn');
+    if (addBtn) addBtn.style.display = 'none';
+    var saveBtn = document.getElementById('mobileRfSaveBtn');
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('view-locked-field'); }
+}
+
+function editMobileRainfallRecord(id) { showMobileRainfallForm(id); }
+
+function cancelMobileRainfallForm() {
+    document.getElementById('mobileRfEditId').value = '';
+    document.getElementById('mobileRfFormPanel').style.display = 'none';
+    document.getElementById('mobileRfListPanel').style.display = '';
+    var addBtn = document.getElementById('mobileRfAddBtn');
+    if (addBtn) addBtn.style.display = '';
+    document.getElementById('mobileRfDate').value = '';
+    document.getElementById('mobileRfMm').value   = '';
+    clearMobileRainfallPhoto();
+}
+
+function deleteMobileRainfallRecord(id) {
+    var _d = (window.I18N && (window.I18N[typeof currentLang !== 'undefined' ? currentLang : 'en'] || window.I18N['en'])) || {};
+    if (!confirm(_d.alert_delete_txn || 'Delete this transaction?')) return;
+    rainfallTxns = rainfallTxns.filter(function(r) { return String(r.id) !== String(id); });
+    lastKnownIds.opp_rainfall_txns = new Set(rainfallTxns.map(function(r) { return r.id; }));
+    var estateKey = STORAGE_KEYS.rainfallTxns + '::' + activeEstate;
+    localStorage.setItem(estateKey, JSON.stringify(rainfallTxns));
+    supabaseClient.from('opp_rainfall_txns').delete().eq('id', id)
+        .then(function(res) { if (res.error) console.error('[Supabase] delete rainfall txn', res.error); })
+        .catch(function(err) { console.error('[Supabase] delete rainfall txn', err); });
+    renderMobileRainfallList();
+    if (typeof renderRainfallReport  === 'function') renderRainfallReport();
+    if (typeof renderRainfallSummary === 'function') renderRainfallSummary();
+    if (typeof renderRainfallChart   === 'function') renderRainfallChart();
+}
+
+window.navToEstateCategory      = navToEstateCategory;
+window.showEstateCategoryTab    = showEstateCategoryTab;
+window.openMobileStockForm      = openMobileStockForm;
+window.renderMobileRainfallList = renderMobileRainfallList;
+window.showMobileRainfallForm   = showMobileRainfallForm;
+window.editMobileRainfallRecord = editMobileRainfallRecord;
+window.cancelMobileRainfallForm = cancelMobileRainfallForm;
+window.deleteMobileRainfallRecord = deleteMobileRainfallRecord;
 window.previewMobileRainfallPhoto = previewMobileRainfallPhoto;
 window.clearMobileRainfallPhoto   = clearMobileRainfallPhoto;
 window.saveMobileRainfallTxn      = saveMobileRainfallTxn;
