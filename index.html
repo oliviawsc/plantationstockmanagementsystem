@@ -12558,7 +12558,12 @@ function showEstateCategoryTab(tab) {
     });
     if (tab === 'baki')      renderEstateBakiStok();
     if (tab === 'transaksi') renderEstateTransaksi();
-    if (tab === 'rekod')     renderEstateRekod();
+    if (tab === 'rekod') {
+        var _rekodMap = { 'Fertilizer': 'fertrecord', 'Chemical': 'chemrecord', 'Oil Palm Seedling': 'plantrecord' };
+        var _dest = _rekodMap[activeMobileCategory];
+        if (_dest) { navToSection(_dest); return; }
+        renderEstateRekod();
+    }
 }
 
 function renderEstateBakiStok() {
