@@ -1589,6 +1589,7 @@
                         <select id="txnItem" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
                             <option value="" data-i18n="select_item">-- Select Item --</option>
                         </select>
+                        <div id="txnItemBalance" style="margin-top:6px;font-size:12px;color:#16a34a;font-weight:600;font-family:Inter,sans-serif;min-height:18px;"></div>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold mb-1" data-i18n="txn_lbl_type">Transaction Type</label>
@@ -1600,11 +1601,11 @@
                         <div style="display:flex;gap:10px;">
                             <button type="button" id="txnTypeBtnIn" onclick="selectTxnType('In')"
                                 style="flex:1;padding:10px 8px;border-radius:9px;border:2px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;-webkit-tap-highlight-color:transparent;">
-                                <span style="font-size:16px;">📥</span><span data-i18n="txn_type_in">In</span>
+                                <span style="font-size:16px;">📥</span><span>Masuk Stor</span>
                             </button>
                             <button type="button" id="txnTypeBtnOut" onclick="selectTxnType('Out')"
                                 style="flex:1;padding:10px 8px;border-radius:9px;border:2px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;-webkit-tap-highlight-color:transparent;">
-                                <span style="font-size:16px;">📤</span><span data-i18n="txn_type_out">Out</span>
+                                <span style="font-size:16px;">📤</span><span>Keluar Stor</span>
                             </button>
                         </div>
                     </div>
@@ -1635,27 +1636,24 @@
                             <option value="None/Storage" data-i18n="opt_none_storage">None/Storage</option>
                         </select>
                     </div>
-                    <!-- Multi-row Application Breakdown - shown ONLY for Out transactions -->
-                    <div id="txnMultiWrap" class="md:col-span-2 hidden bg-blue-50 border-2 border-dashed border-blue-400 p-4 rounded-lg">
-                        <div class="flex justify-between items-center mb-3">
-                            <label class="text-sm font-semibold" data-i18n="txn_breakdown_label">Application Breakdown (per Block) <span class="text-red-600">*</span></label>
-                            <button type="button" id="txnAddRowBtn" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded text-sm" data-i18n="btn_add_row">+ Add Row</button>
+                    <!-- Pengeluaran Mengikut Blok - shown ONLY for Keluar Stor -->
+                    <div id="txnMultiWrap" class="md:col-span-2 hidden">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-sm font-semibold text-gray-700">Pengeluaran Mengikut Blok</span>
+                            <span class="text-red-500 text-sm font-bold">*</span>
                         </div>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full text-sm">
-                                <thead class="bg-blue-100 text-blue-800">
-                                    <tr>
-                                        <th class="px-3 py-2 text-left" data-i18n="col_qty">Quantity</th>
-                                        <th class="px-3 py-2 text-left" data-i18n="txn_col_location_block">Location (Block)</th>
-                                        <th class="px-3 py-2 text-left" data-i18n="col_action">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="txnRowsBody"></tbody>
-                            </table>
+                        <div id="txnRowsBody" class="flex flex-col gap-3"></div>
+                        <!-- Running total -->
+                        <div id="txnRowsTotal" style="display:none;" class="mt-3 flex justify-between items-center bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+                            <span class="text-sm font-semibold text-green-800">Jumlah Keluar</span>
+                            <span id="txnRowsTotalVal" class="text-base font-bold text-green-900">—</span>
                         </div>
-                        <p class="text-xs text-blue-700 mt-2 italic" data-i18n="txn_breakdown_hint">
-                            📝 Add a row for each block where stock was applied. Each row creates a separate transaction record sharing the same Item, Date, Ref, and Round.
-                        </p>
+                        <!-- Add block button -->
+                        <button type="button" id="txnAddRowBtn"
+                            class="mt-3 w-full py-2.5 rounded-xl border-2 border-dashed border-green-400 text-green-700 font-semibold text-sm hover:bg-green-50 transition-colors"
+                            style="-webkit-tap-highlight-color:transparent;">
+                            + Tambah Blok
+                        </button>
                     </div>
 
                     <!-- Manuring round picker - shown ONLY when issuing Fertilizer Out -->
@@ -3259,11 +3257,11 @@
                 <div style="display:flex;gap:10px;">
                     <button type="button" id="editTxnTypeBtnIn" onclick="selectEditTxnType('In')"
                         style="flex:1;padding:10px 8px;border-radius:9px;border:2px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;-webkit-tap-highlight-color:transparent;">
-                        <span style="font-size:16px;">📥</span><span data-i18n="txn_type_in">Masuk</span>
+                        <span style="font-size:16px;">📥</span><span>Masuk Stor</span>
                     </button>
                     <button type="button" id="editTxnTypeBtnOut" onclick="selectEditTxnType('Out')"
                         style="flex:1;padding:10px 8px;border-radius:9px;border:2px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;-webkit-tap-highlight-color:transparent;">
-                        <span style="font-size:16px;">📤</span><span data-i18n="txn_type_out">Keluar</span>
+                        <span style="font-size:16px;">📤</span><span>Keluar Stor</span>
                     </button>
                 </div>
             </div>
@@ -4195,35 +4193,37 @@ function buildLocationOptionsHtml() {
 }
 
 function addTxnRow() {
-    const tbody    = document.getElementById('txnRowsBody');
-    const itemId   = document.getElementById('txnItem').value;
-    const item     = items.find(i => String(i.id) === String(itemId));
-    const baseUnit = item ? (item.baseUnit || item.unit || '—') : '—';
-    const pkgUnit  = item ? (item.packageUnit || '') : '';
-    // Use item's defaultQtyUnit setting; fall back to base
-    const defUnit   = (pkgUnit && item.defaultQtyUnit === 'package') ? 'package' : 'base';
+    const container = document.getElementById('txnRowsBody');
+    const itemId    = document.getElementById('txnItem').value;
+    const item      = items.find(i => String(i.id) === String(itemId));
+    const baseUnit  = item ? (item.baseUnit || item.unit || '—') : '—';
+    const pkgUnit   = item ? (item.packageUnit || '') : '';
+    const defUnit   = (pkgUnit && item && item.defaultQtyUnit === 'package') ? 'package' : 'base';
     const unitLabel = defUnit === 'package' ? pkgUnit : baseUnit;
 
-    const tr = document.createElement('tr');
-    const _dRow = I18N[currentLang] || I18N['en'];
-    tr.className = 'border-b border-blue-100';
-    tr.innerHTML = `
-        <td class="px-3 py-2">
-            <span class="em-row-label">${_dRow.col_qty}</span>
-            <div class="flex gap-1 items-center">
-                <input type="number" min="0" step="0.001" class="txn-row-qty w-24 border border-blue-300 rounded p-1"
-                    oninput="updateRowConversion(this)" />
-                <span class="txn-row-unit-label inline-block bg-blue-100 text-blue-800 font-semibold text-xs px-2 py-1 rounded border border-blue-300 whitespace-nowrap min-w-[40px] text-center">${unitLabel}</span>
-                <input type="hidden" class="txn-row-unit" value="${defUnit}" />
-            </div>
-            <p class="txn-row-conv text-xs text-green-700 mt-1 italic"></p>
-        </td>
-        <td class="px-3 py-2">
-            <span class="em-row-label">${_dRow.txn_col_location_block}</span>
-            <select class="txn-row-loc w-full border border-blue-300 rounded p-1 bg-white">${buildLocationOptionsHtml()}</select>
-        </td>
-        <td class="px-3 py-2"><button type="button" class="text-red-600 hover:underline text-sm" onclick="this.closest('tr').remove()">${_dRow.btn_remove}</button></td>`;
-    tbody.appendChild(tr);
+    const card = document.createElement('div');
+    card.className = 'txn-row-card';
+    card.style.cssText = 'background:#fff;border:1.5px solid #E2E8F0;border-radius:12px;padding:14px 16px;';
+    card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <span style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.05em;font-family:Inter,sans-serif;">Blok</span>
+            <button type="button" onclick="this.closest('.txn-row-card').remove();updateTxnRowTotal();"
+                style="font-size:12px;font-weight:700;color:#DC2626;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;padding:0;-webkit-tap-highlight-color:transparent;">✕ Buang</button>
+        </div>
+        <select class="txn-row-loc w-full border border-gray-300 rounded-lg p-2 bg-white text-sm" style="margin-bottom:12px;">${buildLocationOptionsHtml()}</select>
+        <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.05em;font-family:Inter,sans-serif;margin-bottom:8px;">Kuantiti</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+            <input type="number" min="0" step="0.001" placeholder="0"
+                class="txn-row-qty flex-1 border border-green-300 rounded-lg p-2 text-sm"
+                style="font-size:15px;font-weight:600;"
+                oninput="updateRowConversion(this);updateTxnRowTotal();" />
+            <span class="txn-row-unit-label"
+                style="background:#DCFCE7;color:#166534;font-size:13px;font-weight:700;padding:8px 12px;border-radius:8px;border:1px solid #86EFAC;white-space:nowrap;font-family:Inter,sans-serif;">${unitLabel}</span>
+            <input type="hidden" class="txn-row-unit" value="${defUnit}" />
+        </div>
+        <p class="txn-row-conv" style="font-size:11px;color:#16a34a;margin-top:6px;font-style:italic;min-height:16px;"></p>`;
+    container.appendChild(card);
+    updateTxnRowTotal();
 }
 document.getElementById('txnAddRowBtn').addEventListener('click', addTxnRow);
 
@@ -4256,7 +4256,7 @@ function saveTransaction() {
 
     /* ============ NEW: MULTI-ROW PATH FOR OUT TRANSACTIONS ============ */
     if (txnType === 'Out') {
-        const rows = Array.from(document.querySelectorAll('#txnRowsBody tr'));
+        const rows = Array.from(document.querySelectorAll('#txnRowsBody .txn-row-card'));
         if (rows.length === 0) {
             alert(_d.alert_add_row || 'Please add at least one Application Breakdown row.');
             return;
@@ -4294,7 +4294,7 @@ function saveTransaction() {
 
         // Persist one transaction per row
         const baseDate    = document.getElementById('txnDate').value;
-        const baseRemarks = document.getElementById('txnRemarks').value.trim();
+        const baseRemarks = (document.getElementById('txnRemarks') ? document.getElementById('txnRemarks').value.trim() : '');
         const baseId      = Date.now();
         const pictureData = getTxnPictureBase64();
         const currentUserName = (loadSession() && loadSession().name) || 'Unknown User';
@@ -4333,7 +4333,7 @@ function saveTransaction() {
         document.getElementById('txnQty').required = true;
         document.getElementById('txnLocation').required = true;
         clearTxnPicture();
-        alert(`${parsedRows.length} ${_d.alert_txn_saved_multi || 'transaction row(s) recorded successfully.'}`);
+        showTxnSuccessBanner(`✅ ${parsedRows.length} rekod berjaya disimpan.`);
         refreshAll();
         return;
     }
@@ -4372,7 +4372,7 @@ function saveTransaction() {
     document.getElementById('txnManuringWrap').classList.add('hidden');
     document.getElementById('txnMaintWrap').classList.add('hidden');
     clearTxnPicture();
-    alert(_d.alert_txn_saved || 'Transaction recorded successfully.');
+    showTxnSuccessBanner('✅ Rekod berjaya disimpan.');
     refreshAll();
 
     } finally {
@@ -6982,7 +6982,7 @@ function updateTxnQtyConversion() {
 
 /** Show live conversion hint inside the qty cell of a multi-row breakdown row */
 function updateRowConversion(qtyInput) {
-    const row    = qtyInput.closest('tr');
+    const row    = qtyInput.closest('.txn-row-card') || qtyInput.closest('tr');
     if (!row) return;
     const convEl = row.querySelector('.txn-row-conv');
     if (!convEl) return;
