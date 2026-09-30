@@ -12687,10 +12687,22 @@ function renderEstateTransaksi() {
     var typeColors  = { In:'#16a34a', Out:'#dc2626', Adj:'#d97706' };
     var typeBg      = { In:'#DCFCE7', Out:'#FEE2E2', Adj:'#FEF3C7' };
     var typeLabels  = { In:'Masuk',   Out:'Keluar',  Adj:'Adj' };
+    var _allItems   = (typeof items !== 'undefined' ? items : []);
     list.innerHTML = txns.map(function(t) {
         var col   = typeColors[t.type] || '#374151';
         var bg    = typeBg[t.type]     || '#F1F5F9';
         var label = typeLabels[t.type] || (t.type || '');
+        var _item     = _allItems.find(function(i) { return String(i.id) === String(t.itemId); });
+        var _pkgUnit  = _item && _item.packageUnit;
+        var _qtyPerPkg = _item && parseFloat(_item.qtyPerUnit);
+        var _dispQty, _dispUnit;
+        if (_pkgUnit && _qtyPerPkg > 0) {
+            _dispQty  = parseFloat((parseFloat(t.qty || 0) / _qtyPerPkg).toFixed(2));
+            _dispUnit = _pkgUnit;
+        } else {
+            _dispQty  = parseFloat(parseFloat(t.qty || 0).toFixed(2));
+            _dispUnit = t.unit || '';
+        }
         return '<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1.5px solid #E2E8F0;">' +
             '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
                 '<div style="font-size:13px;font-weight:700;color:#0F172A;font-family:Inter,sans-serif;">' + (t.itemName || '') + '</div>' +
@@ -12698,7 +12710,7 @@ function renderEstateTransaksi() {
             '</div>' +
             '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
                 '<div style="font-size:12px;color:#64748B;font-family:Inter,sans-serif;">' + (t.date || '') + '</div>' +
-                '<div style="font-size:13px;font-weight:600;color:#374151;font-family:Inter,sans-serif;">' + (t.qty || 0) + ' ' + (t.unit || '') + '</div>' +
+                '<div style="font-size:13px;font-weight:600;color:#374151;font-family:Inter,sans-serif;">' + _dispQty + ' ' + _dispUnit + '</div>' +
             '</div>' +
             '<div style="display:flex;gap:8px;border-top:1px solid #F1F5F9;padding-top:10px;">' +
                 '<button onclick="mobileEditEstateTransaksi(' + t.id + ')" style="flex:1;padding:7px 0;border-radius:8px;border:1.5px solid #3B82F6;background:#EFF6FF;color:#1D4ED8;font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;">✏️ Sunting</button>' +
