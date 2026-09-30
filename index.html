@@ -1685,47 +1685,30 @@
                             <span data-i18n="txn_lbl_picture">Supporting Picture</span>
                             <span class="text-gray-400 font-normal text-xs ml-1" data-i18n="txn_picture_hint">(Optional — photo of delivery note, DO, or site)</span>
                         </label>
-                        <div class="flex flex-wrap gap-3 items-start">
-                            <!-- Camera icon button with dropdown -->
-                            <div style="position:relative;display:inline-block;">
-                                <button type="button" id="txnPhotoMenuBtn" onclick="toggleTxnPhotoMenu()"
-                                    style="display:flex;align-items:center;gap:8px;padding:9px 18px;border-radius:9px;border:1.5px solid #CBD5E1;background:#F8FAFC;color:#374151;font-size:14px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 26" width="28" height="24" fill="currentColor">
-                                        <!-- camera body -->
-                                        <path d="M10 2L8 5H2C0.9 5 0 5.9 0 7v15c0 1.1.9 2 2 2h21c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-6L15 2H10z"/>
-                                        <!-- lens white ring -->
-                                        <circle cx="12.5" cy="14" r="6" fill="white"/>
-                                        <!-- lens dark fill -->
-                                        <circle cx="12.5" cy="14" r="4.2" fill="currentColor"/>
-                                        <!-- lens highlight -->
-                                        <circle cx="11" cy="12.5" r="1.2" fill="white"/>
-                                        <!-- plus badge circle -->
-                                        <circle cx="25" cy="6" r="5.5" fill="currentColor"/>
-                                        <circle cx="25" cy="6" r="5.5" fill="none" stroke="white" stroke-width="1"/>
-                                        <!-- plus sign -->
-                                        <path d="M25 3v6M22 6h6" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                                    </svg>
-                                    <span data-i18n="txn_lbl_picture">Supporting Picture</span>
-                                </button>
-                                <div id="txnPhotoMenu" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:50;background:#fff;border:1.5px solid #E2E8F0;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.12);min-width:200px;overflow:hidden;">
-                                    <label style="display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;border-bottom:1px solid #F1F5F9;">
-                                        <span style="font-size:16px;">🖼️</span>
-                                        <span style="font-size:13px;font-weight:600;color:#374151;" data-i18n="btn_upload_photo">Upload Photo</span>
-                                        <input type="file" id="txnPicture" accept="image/*" class="hidden" onchange="previewTxnPicture(this);closeTxnPhotoMenu()" />
-                                    </label>
-                                    <label style="display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;">
-                                        <span style="font-size:16px;">📸</span>
-                                        <span style="font-size:13px;font-weight:600;color:#374151;" data-i18n="btn_take_photo">Take Photo</span>
-                                        <input type="file" id="txnPictureCamera" accept="image/*" capture="environment" class="hidden" onchange="previewTxnPicture(this);closeTxnPhotoMenu()" />
-                                    </label>
-                                </div>
+                        <!-- Dashed card upload zone -->
+                        <div id="txnPhotoCard" style="width:100%;border:2.5px dashed #4ADE80;border-radius:16px;background:#FAFFF5;padding:28px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;box-sizing:border-box;">
+                            <!-- Camera SVG -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 40" width="52" height="40" fill="#9CA3AF">
+                                <path d="M17 3L14 8H5C3.3 8 2 9.3 2 11v24c0 1.7 1.3 3 3 3h38c1.7 0 3-1.3 3-3V11c0-1.7-1.3-3-3-3h-9L31 3H17z"/>
+                                <circle cx="24" cy="23" r="9" fill="#E5E7EB"/>
+                                <circle cx="24" cy="23" r="6.5" fill="#9CA3AF"/>
+                                <circle cx="21" cy="20" r="2" fill="#E5E7EB"/>
+                            </svg>
+                            <!-- Hidden file inputs -->
+                            <input type="file" id="txnPicture"       accept="image/*"                  class="hidden" onchange="previewTxnPicture(this)" />
+                            <input type="file" id="txnPictureCamera" accept="image/*" capture="environment" class="hidden" onchange="previewTxnPicture(this)" />
+                            <!-- Action links -->
+                            <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#6B7280;font-family:Inter,sans-serif;">
+                                <label for="txnPictureCamera" style="color:#16a34a;font-weight:700;cursor:pointer;" data-i18n="btn_take_photo">Ambil Foto</label>
+                                <span>·</span>
+                                <label for="txnPicture" style="color:#16a34a;font-weight:700;cursor:pointer;" data-i18n="btn_upload_photo">Unggah Foto</label>
                             </div>
-                            <!-- Preview -->
-                            <div id="txnPicturePreviewWrap" class="hidden flex items-start gap-2">
+                            <!-- Preview (hidden until photo chosen) -->
+                            <div id="txnPicturePreviewWrap" class="hidden" style="display:none;flex-direction:column;align-items:center;gap:8px;margin-top:4px;">
                                 <img id="txnPicturePreview" src="" alt="Preview"
-                                    class="w-24 h-24 object-cover rounded-lg border border-green-300 shadow" />
+                                    style="max-width:100%;max-height:180px;border-radius:12px;border:2px solid #86EFAC;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.1);" />
                                 <button type="button" onclick="clearTxnPicture()"
-                                    class="text-xs text-red-500 hover:underline mt-1" data-i18n="btn_remove">✖ Remove</button>
+                                    style="font-size:12px;color:#DC2626;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;font-weight:600;" data-i18n="btn_remove">✖ Buang Foto</button>
                             </div>
                         </div>
                         <p id="txnPictureFilename" class="text-xs text-green-700 mt-1 italic hidden"></p>
@@ -11778,7 +11761,8 @@ function previewTxnPicture(input) {
     const reader = new FileReader();
     reader.onload = (e) => {
         document.getElementById('txnPicturePreview').src = e.target.result;
-        document.getElementById('txnPicturePreviewWrap').classList.remove('hidden');
+        const _wrap = document.getElementById('txnPicturePreviewWrap');
+        if (_wrap) { _wrap.style.display = 'flex'; _wrap.classList.remove('hidden'); }
         const fn = document.getElementById('txnPictureFilename');
         if (fn) { fn.textContent = '✅ ' + file.name; fn.classList.remove('hidden'); }
     };
@@ -11802,7 +11786,7 @@ function clearTxnPicture() {
     if (input1)  input1.value  = '';
     if (input2)  input2.value  = '';
     if (preview) preview.src   = '';
-    if (wrap)    wrap.classList.add('hidden');
+    if (wrap)    { wrap.style.display = 'none'; wrap.classList.add('hidden'); }
     if (fn)      { fn.textContent = ''; fn.classList.add('hidden'); }
 }
 
