@@ -1685,6 +1685,7 @@
                             <option value=""></option>
                             <option value="In"  data-i18n="txn_type_in">In</option>
                             <option value="Out" data-i18n="txn_type_out">Out</option>
+                            <option value="Adj" data-i18n="txn_type_adj">Adj</option>
                         </select>
                         <div style="display:flex;gap:10px;">
                             <button type="button" id="txnTypeBtnIn" onclick="selectTxnType('In')"
@@ -1694,6 +1695,10 @@
                             <button type="button" id="txnTypeBtnOut" onclick="selectTxnType('Out')"
                                 style="flex:1;padding:10px 8px;border-radius:9px;border:2px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;-webkit-tap-highlight-color:transparent;">
                                 <span style="font-size:16px;">📤</span><span>Keluar Stor</span>
+                            </button>
+                            <button type="button" id="txnTypeBtnAdj" onclick="selectTxnType('Adj')"
+                                style="flex:1;padding:10px 8px;border-radius:9px;border:2px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;-webkit-tap-highlight-color:transparent;display:none;">
+                                <span style="font-size:16px;">⚖️</span><span data-i18n="txn_type_adj">Adjustment</span>
                             </button>
                         </div>
                     </div>
@@ -8443,7 +8448,7 @@ function stepTxnQty(delta) {
 }
 
 function resetTxnTypeBtns() {
-    ['In','Out'].forEach(function(t) {
+    ['In','Out','Adj'].forEach(function(t) {
         var btn = document.getElementById('txnTypeBtn' + t);
         if (btn) { btn.style.borderColor='#E2E8F0'; btn.style.background='#F8FAFC'; btn.style.color='#374151'; }
     });
@@ -8454,8 +8459,8 @@ function selectTxnType(type) {
     if (!sel) return;
     sel.value = type;
     sel.dispatchEvent(new Event('change'));
-    var styles = { In: ['#16a34a','#DCFCE7','#166534'], Out: ['#dc2626','#FEE2E2','#991B1B'] };
-    ['In','Out'].forEach(function(t) {
+    var styles = { In: ['#16a34a','#DCFCE7','#166534'], Out: ['#dc2626','#FEE2E2','#991B1B'], Adj: ['#7c3aed','#EDE9FE','#5b21b6'] };
+    ['In','Out','Adj'].forEach(function(t) {
         var btn = document.getElementById('txnTypeBtn' + t);
         if (!btn) return;
         var s = t === type ? styles[t] : null;
@@ -9297,6 +9302,11 @@ function updateMobileBottomNav(sectionId) {
 // ── Apply nav & section visibility based on session ────────────────
 function applyNavPermissions(session) {
     const isSuperAdmin = session.role === 'superadmin';
+    const isHQ         = session.role === 'hq_user';
+
+    // Show Adjustment transaction type only for superadmin and hq_user
+    const adjBtn = document.getElementById('txnTypeBtnAdj');
+    if (adjBtn) adjBtn.style.display = (isSuperAdmin || isHQ) ? 'flex' : 'none';
 
     // Show/hide admin-only nav items (setup pages now consolidated in Settings)
     document.getElementById('navUserAdmin').classList.toggle('hidden', !isSuperAdmin);
