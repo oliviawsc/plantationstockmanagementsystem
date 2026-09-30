@@ -411,6 +411,10 @@
         /* ── Hide print/export buttons on mobile record pages ───────── */
         body.estate-mobile .record-export-btns { display: none; }
 
+        /* ── Mobile date selects for txnDate (no Done/OK tap needed) ── */
+        body.estate-mobile #txnDate { display: none; }
+        body.estate-mobile #txnDateMobileSel { display: flex !important; }
+
         /* ── Mobile page header bar (estate-mobile only) ─────────── */
         .mobile-page-header { display: none; }
         body.estate-mobile .mobile-page-header {
@@ -1652,7 +1656,14 @@
                 <form id="txnForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold mb-1" data-i18n="col_date">Date</label>
+                        <!-- Desktop: native date input -->
                         <input id="txnDate" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="date" />
+                        <!-- Mobile: three selects that auto-confirm without a Done/OK tap -->
+                        <div id="txnDateMobileSel" style="display:none;gap:6px;">
+                            <select id="txnDateDay" onchange="syncTxnDateFromSelects()" class="flex-1 border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600" style="font-size:15px;min-width:0;"></select>
+                            <select id="txnDateMonth" onchange="syncTxnDateFromSelects()" class="flex-1 border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600" style="font-size:15px;min-width:0;"></select>
+                            <select id="txnDateYear" onchange="syncTxnDateFromSelects()" class="flex-1 border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600" style="font-size:15px;min-width:0;"></select>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold mb-1" data-i18n="col_category">Category</label>
@@ -4400,6 +4411,7 @@ function saveTransaction() {
         document.getElementById('txnForm').reset();
         refreezeTxnCategory();
         document.getElementById('txnDate').valueAsDate = new Date();
+        syncTxnDateSelects(document.getElementById('txnDate').value);
         document.getElementById('txnRowsBody').innerHTML = '';
         document.getElementById('txnManuringWrap').classList.add('hidden');
         document.getElementById('txnMaintWrap').classList.add('hidden');
@@ -4445,6 +4457,7 @@ function saveTransaction() {
     document.getElementById('txnForm').reset();
     refreezeTxnCategory();
     document.getElementById('txnDate').valueAsDate = new Date();
+    syncTxnDateSelects(document.getElementById('txnDate').value);
     document.getElementById('txnManuringWrap').classList.add('hidden');
     document.getElementById('txnMaintWrap').classList.add('hidden');
     clearTxnPicture();
@@ -8416,6 +8429,7 @@ function isEstateMobile(session) {
 function resetTxnFormForNewEntry() {
     document.getElementById('txnForm').reset();
     document.getElementById('txnDate').valueAsDate = new Date();
+    syncTxnDateSelects(document.getElementById('txnDate').value);
     var qtyInp = document.getElementById('txnQty');
     if (qtyInp) qtyInp.value = 1;
     document.getElementById('txnRowsBody').innerHTML = '';
@@ -8493,6 +8507,53 @@ function triggerPhotoOption(option) {
     var inp = document.getElementById(inputId);
     _photoMenuTarget = null;
     if (inp) inp.click();
+}
+
+/* ── Mobile date selects (Day/Month/Year) ──────────────────────── */
+(function initTxnDateSelectOptions() {
+    var dayEl = document.getElementById('txnDateDay');
+    var monEl = document.getElementById('txnDateMonth');
+    var yrEl  = document.getElementById('txnDateYear');
+    if (!dayEl) return;
+    for (var d = 1; d <= 31; d++) {
+        var o = document.createElement('option');
+        o.value = String(d).padStart(2, '0');
+        o.textContent = String(d).padStart(2, '0');
+        dayEl.appendChild(o);
+    }
+    var months = ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogos','Sep','Okt','Nov','Dis'];
+    months.forEach(function(name, i) {
+        var o = document.createElement('option');
+        o.value = String(i + 1).padStart(2, '0');
+        o.textContent = name;
+        monEl.appendChild(o);
+    });
+    var curYear = new Date().getFullYear();
+    for (var y = curYear - 3; y <= curYear + 1; y++) {
+        var o = document.createElement('option');
+        o.value = String(y);
+        o.textContent = String(y);
+        yrEl.appendChild(o);
+    }
+})();
+
+function syncTxnDateFromSelects() {
+    var d = document.getElementById('txnDateDay').value;
+    var m = document.getElementById('txnDateMonth').value;
+    var y = document.getElementById('txnDateYear').value;
+    if (d && m && y) document.getElementById('txnDate').value = y + '-' + m + '-' + d;
+}
+
+function syncTxnDateSelects(dateStr) {
+    var dayEl = document.getElementById('txnDateDay');
+    if (!dayEl) return;
+    var parts = dateStr ? dateStr.split('-') : [];
+    var y = parts[0] || String(new Date().getFullYear());
+    var m = parts[1] || String(new Date().getMonth() + 1).padStart(2, '0');
+    var d = parts[2] || String(new Date().getDate()).padStart(2, '0');
+    document.getElementById('txnDateYear').value  = y;
+    document.getElementById('txnDateMonth').value = m;
+    document.getElementById('txnDateDay').value   = d;
 }
 
 /* ── Item balance display ──────────────────────────────────────── */
@@ -9155,6 +9216,7 @@ function bootApp(session) {
         const greetNameEl = document.getElementById('estateHubGreetName');
         if (greetNameEl) greetNameEl.textContent = session.name || 'User';
         document.getElementById('txnDate').valueAsDate = new Date();
+        syncTxnDateSelects(document.getElementById('txnDate').value);
         applyEstateHubPermissions(session); // hide cards for inaccessible sections
         navToSection('estate_hub');
         refreshAll();                               // render localStorage data immediately
@@ -9193,6 +9255,7 @@ function bootApp(session) {
     }
 
     document.getElementById('txnDate').valueAsDate = new Date();
+    syncTxnDateSelects(document.getElementById('txnDate').value);
     refreshAll();
 
     // Pull fresh estate data from Supabase in the background
