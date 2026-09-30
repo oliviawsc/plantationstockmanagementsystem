@@ -569,6 +569,10 @@
         body.estate-mobile.txn-recording #txnMobileBack {
             display: flex;
         }
+        /* Hide back button for admin/HQ roles regardless of mode */
+        body.webapp-role #txnMobileBack {
+            display: none !important;
+        }
 
         /* ── Compact form on mobile ──────────────────────────────── */
         body.estate-mobile #txnForm.grid { gap: 12px; }
@@ -9303,6 +9307,9 @@ function updateMobileBottomNav(sectionId) {
 function applyNavPermissions(session) {
     const isSuperAdmin = session.role === 'superadmin';
     const isHQ         = session.role === 'hq_user';
+
+    // Mark body so CSS can hide mobile-only chrome for admin/HQ roles
+    document.body.classList.toggle('webapp-role', isSuperAdmin || isHQ);
 
     // Show Adjustment transaction type only for superadmin and hq_user
     const adjBtn = document.getElementById('txnTypeBtnAdj');
