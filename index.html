@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -410,6 +412,12 @@
 
         /* ── Hide print/export buttons on mobile record pages ───────── */
         body.estate-mobile .record-export-btns { display: none; }
+
+        /* ── Flatpickr calendar on mobile ────────────────────────────── */
+        body.estate-mobile .flatpickr-input { cursor: pointer; }
+        body.estate-mobile .flatpickr-calendar { font-family: Inter, sans-serif; font-size: 15px; }
+        body.estate-mobile .flatpickr-day.selected { background: #16a34a; border-color: #16a34a; }
+        body.estate-mobile .flatpickr-day.selected:hover { background: #15803d; border-color: #15803d; }
 
 
         /* ── Mobile page header bar (estate-mobile only) ─────────── */
@@ -9156,6 +9164,17 @@ function bootApp(session) {
         const greetNameEl = document.getElementById('estateHubGreetName');
         if (greetNameEl) greetNameEl.textContent = session.name || 'User';
         document.getElementById('txnDate').valueAsDate = new Date();
+        // Flatpickr on mobile: auto-closes on date tap, no OK/Done tick needed
+        if (typeof flatpickr !== 'undefined') {
+            flatpickr('#txnDate', {
+                disableMobile: true,
+                dateFormat: 'Y-m-d',
+                defaultDate: 'today',
+                onChange: function(selectedDates, dateStr) {
+                    document.getElementById('txnDate').value = dateStr;
+                }
+            });
+        }
         applyEstateHubPermissions(session); // hide cards for inaccessible sections
         navToSection('estate_hub');
         refreshAll();                               // render localStorage data immediately
