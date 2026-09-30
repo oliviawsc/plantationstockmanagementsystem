@@ -1811,7 +1811,7 @@
                     <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
                         <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="col_item_name">Item Name</p>
                         <div class="px-2.5 pb-1.5">
-                            <select id="filterItem" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                            <select id="filterItem" onchange="renderSummary()" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
                                 <option value="" data-i18n="opt_all">All</option>
                             </select>
                         </div>
@@ -1819,7 +1819,7 @@
                     <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
                         <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="txn_lbl_type">Type</p>
                         <div class="px-2.5 pb-1.5">
-                            <select id="filterType" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                            <select id="filterType" onchange="renderSummary()" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
                                 <option value="" data-i18n="opt_all">All</option>
                                 <option value="In" data-i18n="txn_type_in">In</option>
                                 <option value="Out" data-i18n="txn_type_out">Out</option>
@@ -1833,7 +1833,7 @@
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span id="filterFromDisplay" class="text-xs truncate">Select date</span>
                         </div>
-                        <input id="filterFrom" type="date" onchange="updateDateDisplay('filterFrom')"
+                        <input id="filterFrom" type="date" onchange="updateDateDisplay('filterFrom');renderSummary();"
                             style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
                     <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('filterTo')">
@@ -1842,13 +1842,11 @@
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span id="filterToDisplay" class="text-xs truncate">Select date</span>
                         </div>
-                        <input id="filterTo" type="date" onchange="updateDateDisplay('filterTo')"
+                        <input id="filterTo" type="date" onchange="updateDateDisplay('filterTo');renderSummary();"
                             style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
                 </div>
                 <div class="mt-4 flex gap-3">
-                    <button id="applyFilterBtn" class="bg-green-800 hover:bg-green-900 text-white px-5 py-2 rounded-lg font-semibold" data-i18n="btn_apply_filters">Apply Filters</button>
-                    <button id="clearFilterBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-lg font-semibold" data-i18n="btn_clear">Clear</button>
                     <button id="exportExcelBtn" class="ml-auto bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-2 rounded-lg font-semibold" data-i18n="btn_export">⬇️ Export to Excel</button>
                 </div>
             </div>
@@ -1903,7 +1901,7 @@
                     <div class="bg-gray-50 rounded-xl border border-gray-200" style="min-height:58px;">
                         <p class="text-xs font-bold text-green-900 px-2.5 pt-2 pb-0.5" data-i18n="col_item_name">Item Name</p>
                         <div class="px-2.5 pb-1.5">
-                            <select id="filterLedgerItem" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
+                            <select id="filterLedgerItem" onchange="renderLedger()" class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
                                 <option value="" data-i18n="opt_all">All</option>
                             </select>
                         </div>
@@ -1914,7 +1912,7 @@
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span id="ledgerFromDisplay" class="text-xs truncate">Select date</span>
                         </div>
-                        <input id="ledgerFrom" type="date" onchange="updateDateDisplay('ledgerFrom')"
+                        <input id="ledgerFrom" type="date" onchange="updateDateDisplay('ledgerFrom');renderLedger();"
                             style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
                     <div class="relative bg-gray-50 rounded-xl border border-gray-200 cursor-pointer" style="min-height:58px;" onclick="openDatePicker('ledgerTo')">
@@ -1923,13 +1921,11 @@
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span id="ledgerToDisplay" class="text-xs truncate">Select date</span>
                         </div>
-                        <input id="ledgerTo" type="date" onchange="updateDateDisplay('ledgerTo')"
+                        <input id="ledgerTo" type="date" onchange="updateDateDisplay('ledgerTo');renderLedger();"
                             style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;" />
                     </div>
                 </div>
                 <div class="mt-4 flex gap-3">
-                    <button id="applyLedgerFilterBtn" class="bg-green-800 hover:bg-green-900 text-white px-5 py-2 rounded-lg font-semibold" data-i18n="btn_apply_filters">Apply Filters</button>
-                    <button id="clearLedgerFilterBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-lg font-semibold" data-i18n="btn_clear">Clear</button>
                     <button id="exportLedgerBtn" class="ml-auto bg-yellow-600 hover:bg-yellow-700 text-white px-5 py-2 rounded-lg font-semibold" data-i18n="btn_export">⬇️ Export to Excel</button>
                 </div>
             </div>
@@ -5310,19 +5306,8 @@ function filterSummaryItemsByCategory() {
 
     // Restore selection if still valid (silently falls to '' if category changed or item removed)
     if (prevVal) filterSel.value = prevVal;
-}
-
-document.getElementById('applyFilterBtn').addEventListener('click', renderSummary);
-document.getElementById('clearFilterBtn').addEventListener('click', () => {
-    ['filterCategory', 'filterType', 'filterFrom', 'filterTo'].forEach(id => {
-        document.getElementById(id).value = '';
-    });
-    updateDateDisplay('filterFrom');
-    updateDateDisplay('filterTo');
-    // Reset item dropdown to show all items, then clear its value
-    filterSummaryItemsByCategory();
     renderSummary();
-});
+}
 
 // Export currently filtered rows to Excel via SheetJS
 document.getElementById('exportExcelBtn').addEventListener('click', () => {
@@ -5375,6 +5360,7 @@ function refreshLedgerItemDropdown(resetSelection) {
     if (!resetSelection && prevVal && filtered.some(i => i.name === prevVal)) {
         filterSel.value = prevVal;
     }
+    renderLedger();
 }
 
 
@@ -5608,16 +5594,6 @@ function renderLedger() {
     });
 }
 
-document.getElementById('applyLedgerFilterBtn').addEventListener('click', renderLedger);
-document.getElementById('clearLedgerFilterBtn').addEventListener('click', () => {
-    document.getElementById('filterLedgerCategory').value = '';
-    var lf = document.getElementById('ledgerFrom'); if (lf) lf.value = '';
-    var lt = document.getElementById('ledgerTo');   if (lt) lt.value = '';
-    updateDateDisplay('ledgerFrom');
-    updateDateDisplay('ledgerTo');
-    refreshLedgerItemDropdown(true);
-    renderLedger();
-});
 
 // Export the currently filtered ledger pivot to Excel via SheetJS, mirroring
 // the on-screen Item / Detail / Month layout.
