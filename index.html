@@ -4408,7 +4408,7 @@ function saveTransaction() {
         save(STORAGE_KEYS.transactions, transactions);
         document.getElementById('txnForm').reset();
         refreezeTxnCategory();
-        document.getElementById('txnDate').valueAsDate = new Date();
+        _setTxnDateToday();
         document.getElementById('txnRowsBody').innerHTML = '';
         document.getElementById('txnManuringWrap').classList.add('hidden');
         document.getElementById('txnMaintWrap').classList.add('hidden');
@@ -4453,7 +4453,7 @@ function saveTransaction() {
     save(STORAGE_KEYS.transactions, transactions);
     document.getElementById('txnForm').reset();
     refreezeTxnCategory();
-    document.getElementById('txnDate').valueAsDate = new Date();
+    _setTxnDateToday();
     document.getElementById('txnManuringWrap').classList.add('hidden');
     document.getElementById('txnMaintWrap').classList.add('hidden');
     clearTxnPicture();
@@ -8424,7 +8424,12 @@ function isEstateMobile(session) {
 // one, so switching hub cards always lands on a clean blank form.
 function resetTxnFormForNewEntry() {
     document.getElementById('txnForm').reset();
-    document.getElementById('txnDate').valueAsDate = new Date();
+    var today = new Date().toISOString().slice(0, 10);
+    if (_txnDateFlatpickr) {
+        _txnDateFlatpickr.setDate(today, true);
+    } else {
+        document.getElementById('txnDate').valueAsDate = new Date();
+    }
     var qtyInp = document.getElementById('txnQty');
     if (qtyInp) qtyInp.value = 1;
     document.getElementById('txnRowsBody').innerHTML = '';
@@ -9164,17 +9169,6 @@ function bootApp(session) {
         const greetNameEl = document.getElementById('estateHubGreetName');
         if (greetNameEl) greetNameEl.textContent = session.name || 'User';
         document.getElementById('txnDate').valueAsDate = new Date();
-        // Flatpickr on mobile: auto-closes on date tap, no OK/Done tick needed
-        if (typeof flatpickr !== 'undefined') {
-            flatpickr('#txnDate', {
-                disableMobile: true,
-                dateFormat: 'Y-m-d',
-                defaultDate: 'today',
-                onChange: function(selectedDates, dateStr) {
-                    document.getElementById('txnDate').value = dateStr;
-                }
-            });
-        }
         applyEstateHubPermissions(session); // hide cards for inaccessible sections
         navToSection('estate_hub');
         refreshAll();                               // render localStorage data immediately
@@ -13035,8 +13029,26 @@ function renderEstateRekod() {
     '</button>';
 }
 
+var _txnDateFlatpickr = null;
+function _setTxnDateToday() {
+    var today = new Date().toISOString().slice(0, 10);
+    if (_txnDateFlatpickr) { _txnDateFlatpickr.setDate(today, true); }
+    else { var el = document.getElementById('txnDate'); if (el) el.valueAsDate = new Date(); }
+}
+function _initTxnDateFlatpickr() {
+    if (_txnDateFlatpickr || typeof flatpickr === 'undefined') return;
+    try {
+        _txnDateFlatpickr = flatpickr(document.getElementById('txnDate'), {
+            disableMobile: true,
+            dateFormat: 'Y-m-d',
+            defaultDate: 'today'
+        });
+    } catch(e) { /* flatpickr unavailable — native picker used */ }
+}
+
 function openMobileStockForm(category) {
     var cat = category || null;
+    _initTxnDateFlatpickr();
     if (typeof resetTxnFormForNewEntry === 'function') resetTxnFormForNewEntry();
     var catSel = document.getElementById('txnCategory');
     if (catSel) {
