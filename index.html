@@ -4446,22 +4446,26 @@ function updateManuringVisibility() {
     const locWrap     = document.getElementById('txnLocationWrap');
     const qtyInput    = document.getElementById('txnQty');
     const locSelect   = document.getElementById('txnLocation');
+    const totalEl = document.getElementById('txnRowsTotal');
     if (txnType === 'Out') {
         multiWrap.classList.remove('hidden');
         qtyWrap.classList.add('hidden');
         locWrap.classList.add('hidden');
         qtyInput.required = false;
         locSelect.required = false;
+        if (totalEl) totalEl.style.display = 'flex';
         // seed first row if empty
         if (document.getElementById('txnRowsBody').children.length === 0) {
             addTxnRow();
         }
+        updateTxnRowTotal();
     } else {
         multiWrap.classList.add('hidden');
         qtyWrap.classList.remove('hidden');
         locWrap.classList.remove('hidden');
         qtyInput.required = true;
         locSelect.required = true;
+        if (totalEl) totalEl.style.display = 'none';
     }
 }
 document.getElementById('txnItem').addEventListener('change', updateManuringVisibility);
@@ -8474,7 +8478,7 @@ function updateTxnRowTotal() {
     var totalEl = document.getElementById('txnRowsTotal');
     var valEl   = document.getElementById('txnRowsTotalVal');
     if (!totalEl || !valEl) return;
-    if (cards.length === 0) { totalEl.style.display = 'none'; return; }
+    if (cards.length === 0) { valEl.textContent = '—'; return; }
     var itemId = document.getElementById('txnItem').value;
     var item   = (typeof items !== 'undefined' ? items : []).find(function(i) { return String(i.id) === String(itemId); });
     var baseTotal = cards.reduce(function(acc, card) {
