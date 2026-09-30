@@ -515,27 +515,42 @@
             border-radius: 14px;
         }
 
-        /* ── Fixed bottom bar — all phones (≤767 px) ────────────── */
-        @media (max-width: 767px) {
-            #txnBottomBar {
-                position: fixed;
-                bottom: 0; left: 0; right: 0;
-                background: #fff;
-                border-top: 2px solid #E2E8F0;
-                padding: 10px 16px;
-                padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
-                z-index: 200;
-                box-shadow: 0 -4px 16px rgba(0,0,0,.08);
-            }
-            #txnSaveBtn {
-                padding: 11px 22px !important;
-                font-size: 15px !important;
-                font-weight: 800 !important;
-                border-radius: 11px !important;
-            }
-            #txnForm {
-                padding-bottom: 80px !important;
-            }
+        /* ── Fixed bottom bar — only when transactions form is open ─ */
+        body.txn-recording #txnBottomBar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #fff;
+            border-top: 2px solid #E2E8F0;
+            padding: 10px 16px;
+            padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+            z-index: 200;
+            box-shadow: 0 -4px 16px rgba(0,0,0,.08);
+        }
+        body.txn-recording #txnSaveBtn {
+            padding: 11px 22px !important;
+            font-size: 15px !important;
+            font-weight: 800 !important;
+            border-radius: 11px !important;
+        }
+        body.txn-recording #txnForm {
+            padding-bottom: 80px !important;
+        }
+        /* Back arrow — mobile only, visible when on transactions form */
+        #txnMobileBack {
+            display: none;
+        }
+        body.estate-mobile.txn-recording #txnMobileBack {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 14px 4px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            color: #16a34a;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* ── Compact form on mobile ──────────────────────────────── */
@@ -547,6 +562,7 @@
         }
         body.estate-mobile #transactions h2,
         body.estate-mobile #transactions h3 { display: none; }
+        body.estate-mobile #transactions .htab-bar { display: none; }
 
         /* ── Compact photo card on mobile ────────────────────────── */
         body.estate-mobile #txnPhotoCard {
@@ -1610,6 +1626,10 @@
 
         <!-- ============ PAGE 3: STOCK TRANSACTION ============ -->
         <section id="transactions" class="page-section">
+            <button id="txnMobileBack" onclick="navToSection('estate_hub')" aria-label="Kembali">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                Kembali
+            </button>
             <div class="htab-bar">
                 <button class="htab-btn active" onclick="navigateToSection('transactions')" data-i18n="tab_record_stock">Record Stock</button>
                 <button class="htab-btn" onclick="navigateToSection('summary')" data-i18n="tab_stock_transactions">Stock Transactions</button>
@@ -9224,6 +9244,8 @@ function navToSection(sectionId) {
     // Clear the category freeze so it doesn't persist across sessions.
     if (sectionId === 'mobile_viewrecord') { updateMobileBottomNav(sectionId); return; }
     if (sectionId === 'estate_hub') {
+        document.body.classList.remove('txn-recording');
+        updateMobileBottomNav(sectionId);
         const catSel = document.getElementById('txnCategory');
         if (catSel) {
             delete catSel.dataset.estateFreeze;
@@ -9257,7 +9279,14 @@ function mobileNavTo(dest) {
 }
 
 function updateMobileBottomNav(sectionId) {
+    const isOnTxn = sectionId === 'transactions';
+    // Toggle txn-recording class so CSS scopes the fixed bottom bar correctly
+    document.body.classList.toggle('txn-recording', isOnTxn);
+
     if (!document.body.classList.contains('estate-mobile')) return;
+    const nav = document.getElementById('mobileBottomNav');
+    if (nav) nav.style.display = isOnTxn ? 'none' : 'flex';
+
     const homeEl = document.getElementById('mnavHome');
     if (homeEl) homeEl.classList.toggle('active', sectionId === 'estate_hub');
     const plusEl = document.getElementById('mnavPlus');
@@ -13287,6 +13316,7 @@ function navigateToSection(target) {
     const sec = document.getElementById(target);
     if (sec) sec.classList.add('active');
     sessionStorage.setItem('opp_active_section', target);
+    if (typeof updateMobileBottomNav === 'function') updateMobileBottomNav(target);
     refreshAll();
     if (target === 'maintprogress') renderMaintProgressDropdowns();
     if (target === 'chemusage') { renderCiTable(); renderChemByRound(); renderChemByBlock(); }
