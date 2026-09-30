@@ -1572,6 +1572,10 @@
                 <h3 class="text-xl font-bold mb-4" data-i18n="txn_form_title">Record Stock Movement</h3>
                 <form id="txnForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
+                        <label class="block text-sm font-semibold mb-1" data-i18n="col_date">Date</label>
+                        <input id="txnDate" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="date" />
+                    </div>
+                    <div>
                         <label class="block text-sm font-semibold mb-1" data-i18n="col_category">Category</label>
                         <select id="txnCategory" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600" onchange="filterTxnItemsByCategory()">
                             <option value="" data-i18n="select_category">-- Select Category --</option>
@@ -1624,10 +1628,6 @@
                             <input type="hidden" id="txnQtyUnit" value="base" />
                         </div>
                         <p id="txnQtyConversion" class="text-xs text-green-700 mt-1 italic hidden"></p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-1" data-i18n="col_date">Date</label>
-                        <input id="txnDate" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="date" />
                     </div>
                     <div id="txnLocationWrap">
                         <label class="block text-sm font-semibold mb-1" data-i18n="col_location">Location</label>
