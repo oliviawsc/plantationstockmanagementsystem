@@ -535,22 +535,12 @@
         body.txn-recording #txnForm {
             padding-bottom: 80px !important;
         }
-        /* Back arrow — mobile only, visible when on transactions form */
+        /* Back header bar — mobile only, visible when on transactions form */
         #txnMobileBack {
             display: none;
         }
         body.estate-mobile.txn-recording #txnMobileBack {
             display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 14px 4px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 700;
-            color: #16a34a;
-            -webkit-tap-highlight-color: transparent;
         }
 
         /* ── Compact form on mobile ──────────────────────────────── */
@@ -1626,10 +1616,13 @@
 
         <!-- ============ PAGE 3: STOCK TRANSACTION ============ -->
         <section id="transactions" class="page-section">
-            <button id="txnMobileBack" onclick="navToSection('estate_hub')" aria-label="Kembali">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-                Kembali
-            </button>
+            <div id="txnMobileBack" style="background:#fff;border-bottom:1px solid #E2E8F0;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;gap:8px;">
+                <button onclick="navToSection('estate_hub')" style="padding:7px 14px;border-radius:9px;border:1.5px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;white-space:nowrap;">
+                    &#8592; Kembali
+                </button>
+                <h2 style="font-size:17px;font-weight:800;color:#0F172A;font-family:Inter,sans-serif;margin:0;flex:1;text-align:center;">Rekod Stok</h2>
+                <div style="width:72px;"></div>
+            </div>
             <div class="htab-bar">
                 <button class="htab-btn active" onclick="navigateToSection('transactions')" data-i18n="tab_record_stock">Record Stock</button>
                 <button class="htab-btn" onclick="navigateToSection('summary')" data-i18n="tab_stock_transactions">Stock Transactions</button>
