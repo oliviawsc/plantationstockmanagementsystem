@@ -515,27 +515,27 @@
             border-radius: 14px;
         }
 
-        /* ── Fixed bottom bar on mobile ──────────────────────────── */
-        body.estate-mobile #txnBottomBar {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: #fff;
-            border-top: 2px solid #E2E8F0;
-            padding: 10px 16px;
-            padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
-            z-index: 200;
-            box-shadow: 0 -4px 16px rgba(0,0,0,.08);
-        }
-        body.estate-mobile #txnSaveBtn {
-            padding: 11px 22px;
-            font-size: 15px;
-            font-weight: 800;
-            border-radius: 11px;
-            letter-spacing: .01em;
-        }
-        /* push form content above the fixed bar */
-        body.estate-mobile #txnForm {
-            padding-bottom: 80px;
+        /* ── Fixed bottom bar — all phones (≤767 px) ────────────── */
+        @media (max-width: 767px) {
+            #txnBottomBar {
+                position: fixed;
+                bottom: 0; left: 0; right: 0;
+                background: #fff;
+                border-top: 2px solid #E2E8F0;
+                padding: 10px 16px;
+                padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+                z-index: 200;
+                box-shadow: 0 -4px 16px rgba(0,0,0,.08);
+            }
+            #txnSaveBtn {
+                padding: 11px 22px !important;
+                font-size: 15px !important;
+                font-weight: 800 !important;
+                border-radius: 11px !important;
+            }
+            #txnForm {
+                padding-bottom: 80px !important;
+            }
         }
 
         /* ── Compact form on mobile ──────────────────────────────── */
