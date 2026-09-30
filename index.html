@@ -507,9 +507,21 @@
         }
         body.estate-mobile #txnAddRowBtn {
             width: 100%;
-            padding: 11px;
+            padding: 13px;
             font-size: 15px;
-            border-radius: 10px;
+            font-weight: 700;
+        }
+        body.estate-mobile #txnSaveBtn {
+            width: 100%;
+            padding: 16px;
+            font-size: 17px;
+            font-weight: 800;
+            border-radius: 14px;
+            margin-top: 8px;
+            letter-spacing: .01em;
+        }
+        body.estate-mobile .txn-row-card {
+            border-radius: 14px;
         }
         body.estate-mobile #txnMultiWrap > div:first-child {
             flex-direction: column;
@@ -4358,7 +4370,7 @@ function saveTransaction() {
         inputQty: rawQty,
         inputUnit: enteredUnit,
         location: location,
-        remarks: document.getElementById('txnRemarks').value.trim(),
+        remarks: (document.getElementById('txnRemarks') ? document.getElementById('txnRemarks').value.trim() : ''),
         manuringRoundId: manuringRoundId,
         manuringRoundName: manuringRoundName,
         picture: pictureData,
@@ -4460,6 +4472,7 @@ function updateManuringVisibility() {
     }
 }
 document.getElementById('txnItem').addEventListener('change', updateManuringVisibility);
+document.getElementById('txnItem').addEventListener('change', updateTxnItemBalance);
 document.getElementById('txnType').addEventListener('change', updateManuringVisibility);
 
 /* -----------------------------------------------------------------
@@ -8432,6 +8445,76 @@ function triggerPhotoOption(option) {
     var inp = document.getElementById(inputId);
     _photoMenuTarget = null;
     if (inp) inp.click();
+}
+
+/* ── Item balance display ──────────────────────────────────────── */
+function updateTxnItemBalance() {
+    var itemId = document.getElementById('txnItem').value;
+    var balEl  = document.getElementById('txnItemBalance');
+    if (!balEl) return;
+    if (!itemId) { balEl.textContent = ''; return; }
+    var item = (typeof items !== 'undefined' ? items : []).find(function(i) { return String(i.id) === String(itemId); });
+    if (!item) { balEl.textContent = ''; return; }
+    var txns = (typeof transactions !== 'undefined' ? transactions : []);
+    var baseBalance = txns.filter(function(t) { return String(t.itemId) === String(itemId); })
+        .reduce(function(acc, t) {
+            var qty = parseFloat(t.qty) || 0;
+            return acc + (t.type === 'In' ? qty : -qty);
+        }, 0);
+    var pkgUnit    = item.packageUnit;
+    var qtyPerPkg  = parseFloat(item.qtyPerUnit) || 0;
+    var dispQty, dispUnit;
+    if (pkgUnit && qtyPerPkg > 0) {
+        dispQty  = parseFloat((baseBalance / qtyPerPkg).toFixed(2));
+        dispUnit = pkgUnit;
+    } else {
+        dispQty  = parseFloat(baseBalance.toFixed(2));
+        dispUnit = item.baseUnit || item.unit || '';
+    }
+    balEl.textContent = 'Baki tersedia: ' + dispQty + ' ' + dispUnit;
+    balEl.style.color = dispQty < 0 ? '#DC2626' : '#16a34a';
+}
+
+/* ── Block row total ────────────────────────────────────────────── */
+function updateTxnRowTotal() {
+    var cards   = Array.from(document.querySelectorAll('#txnRowsBody .txn-row-card'));
+    var totalEl = document.getElementById('txnRowsTotal');
+    var valEl   = document.getElementById('txnRowsTotalVal');
+    if (!totalEl || !valEl) return;
+    if (cards.length === 0) { totalEl.style.display = 'none'; return; }
+    var itemId = document.getElementById('txnItem').value;
+    var item   = (typeof items !== 'undefined' ? items : []).find(function(i) { return String(i.id) === String(itemId); });
+    var baseTotal = cards.reduce(function(acc, card) {
+        var rawQty  = parseFloat(card.querySelector('.txn-row-qty').value) || 0;
+        var unitEl  = card.querySelector('.txn-row-unit');
+        var unitVal = unitEl ? unitEl.value : 'base';
+        return acc + convertToBase(rawQty, unitVal, item);
+    }, 0);
+    var pkgUnit   = item && item.packageUnit;
+    var qtyPerPkg = item && parseFloat(item.qtyPerUnit);
+    var dispQty, dispUnit;
+    if (pkgUnit && qtyPerPkg > 0) {
+        dispQty  = parseFloat((baseTotal / qtyPerPkg).toFixed(2));
+        dispUnit = pkgUnit;
+    } else {
+        dispQty  = parseFloat(baseTotal.toFixed(2));
+        dispUnit = (item && (item.baseUnit || item.unit)) || '—';
+    }
+    valEl.textContent = dispQty + ' ' + dispUnit;
+    totalEl.style.display = 'flex';
+}
+
+/* ── Success banner ─────────────────────────────────────────────── */
+function showTxnSuccessBanner(msg) {
+    var existing = document.getElementById('txnSuccessBanner');
+    if (existing) existing.remove();
+    var banner = document.createElement('div');
+    banner.id = 'txnSuccessBanner';
+    banner.textContent = msg;
+    banner.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#16a34a;color:#fff;font-family:Inter,sans-serif;font-size:15px;font-weight:700;padding:14px 28px;border-radius:14px;box-shadow:0 4px 20px rgba(22,163,74,.35);z-index:9999;pointer-events:none;transition:opacity .4s;';
+    document.body.appendChild(banner);
+    setTimeout(function() { banner.style.opacity = '0'; }, 2200);
+    setTimeout(function() { if (banner.parentNode) banner.remove(); }, 2700);
 }
 
 function stepEditTxnQty(delta) {
