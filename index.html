@@ -408,6 +408,9 @@
             text-align: center !important;
         }
 
+        /* ── Hide print/export buttons on mobile record pages ───────── */
+        body.estate-mobile .record-export-btns { display: none; }
+
         /* ── Mobile page header bar (estate-mobile only) ─────────── */
         .mobile-page-header { display: none; }
         body.estate-mobile .mobile-page-header {
@@ -2499,7 +2502,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="flex flex-wrap gap-2 md:flex-shrink-0">
+                    <div class="flex flex-wrap gap-2 md:flex-shrink-0 record-export-btns">
                         <button type="button" onclick="printFertRecord()"
                             class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg font-semibold"
                             data-i18n="btn_print_pdf">&#128438; Print / PDF</button>
@@ -2547,7 +2550,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="flex flex-wrap gap-2 md:flex-shrink-0">
+                    <div class="flex flex-wrap gap-2 md:flex-shrink-0 record-export-btns">
                         <button type="button" onclick="printChemRecord()"
                             class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg font-semibold"
                             data-i18n="btn_print_pdf">&#128438; Print / PDF</button>
@@ -2595,7 +2598,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="flex flex-wrap gap-2 md:flex-shrink-0">
+                    <div class="flex flex-wrap gap-2 md:flex-shrink-0 record-export-btns">
                         <button onclick="printPlantRecord()"
                             class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-lg font-semibold" data-i18n="btn_print_pdf">&#128438; Print / PDF</button>
                         <button onclick="exportPlantRecord()"
