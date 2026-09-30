@@ -13053,8 +13053,15 @@ function _initTxnDateFlatpickr() {
         _txnDateFlatpickr = flatpickr(document.getElementById('txnDate'), {
             disableMobile: true,
             dateFormat: 'Y-m-d',
+            altInput: true,
+            altFormat: 'd/m/Y',
             defaultDate: 'today'
         });
+        // Style the visible altInput to match the form
+        var alt = document.querySelector('#txnDate + input.flatpickr-input');
+        if (alt) {
+            alt.style.cssText = 'width:100%;border:1.5px solid #86EFAC;border-radius:9px;padding:10px 12px;font-size:15px;font-family:Inter,sans-serif;color:#0F172A;background:#fff;outline:none;';
+        }
     } catch(e) { /* flatpickr unavailable — native picker used */ }
 }
 
