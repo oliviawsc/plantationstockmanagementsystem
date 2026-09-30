@@ -1686,25 +1686,19 @@
                             <span class="text-gray-400 font-normal text-xs ml-1" data-i18n="txn_picture_hint">(Optional — photo of delivery note, DO, or site)</span>
                         </label>
                         <!-- Dashed card upload zone -->
-                        <div id="txnPhotoCard" style="width:100%;border:2.5px dashed #4ADE80;border-radius:16px;background:#FAFFF5;padding:28px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;box-sizing:border-box;">
-                            <!-- Camera SVG -->
+                        <div id="txnPhotoCard" onclick="showPhotoSelectMenu('txn')" style="width:100%;border:2.5px dashed #4ADE80;border-radius:16px;background:#FAFFF5;padding:28px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;box-sizing:border-box;cursor:pointer;-webkit-tap-highlight-color:transparent;">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 40" width="52" height="40" fill="#9CA3AF">
                                 <path d="M17 3L14 8H5C3.3 8 2 9.3 2 11v24c0 1.7 1.3 3 3 3h38c1.7 0 3-1.3 3-3V11c0-1.7-1.3-3-3-3h-9L31 3H17z"/>
                                 <circle cx="24" cy="23" r="9" fill="#E5E7EB"/>
                                 <circle cx="24" cy="23" r="6.5" fill="#9CA3AF"/>
                                 <circle cx="21" cy="20" r="2" fill="#E5E7EB"/>
                             </svg>
-                            <!-- Hidden file inputs -->
-                            <input type="file" id="txnPicture"       accept="image/*"                  class="hidden" onchange="previewTxnPicture(this)" />
+                            <input type="file" id="txnPicture"       accept="image/*"                       class="hidden" onchange="previewTxnPicture(this)" />
                             <input type="file" id="txnPictureCamera" accept="image/*" capture="environment" class="hidden" onchange="previewTxnPicture(this)" />
-                            <!-- Action links -->
-                            <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#6B7280;font-family:Inter,sans-serif;">
-                                <label for="txnPictureCamera" style="color:#16a34a;font-weight:700;cursor:pointer;" data-i18n="btn_take_photo">Ambil Foto</label>
-                                <span>·</span>
-                                <label for="txnPicture" style="color:#16a34a;font-weight:700;cursor:pointer;" data-i18n="btn_upload_photo">Unggah Foto</label>
-                            </div>
+                            <input type="file" id="txnPictureFile"                                          class="hidden" onchange="previewTxnPicture(this)" />
+                            <div style="font-size:13px;color:#16a34a;font-weight:700;font-family:Inter,sans-serif;">Ketik untuk pilih gambar</div>
                             <!-- Preview (hidden until photo chosen) -->
-                            <div id="txnPicturePreviewWrap" class="hidden" style="display:none;flex-direction:column;align-items:center;gap:8px;margin-top:4px;">
+                            <div id="txnPicturePreviewWrap" class="hidden" style="display:none;flex-direction:column;align-items:center;gap:8px;margin-top:4px;" onclick="event.stopPropagation()">
                                 <img id="txnPicturePreview" src="" alt="Preview"
                                     style="max-width:100%;max-height:180px;border-radius:12px;border:2px solid #86EFAC;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.1);" />
                                 <button type="button" onclick="clearTxnPicture()"
@@ -3322,7 +3316,7 @@
                     <span data-i18n="txn_lbl_picture">Supporting Picture</span>
                     <span class="text-gray-400 font-normal text-xs ml-1">(Optional)</span>
                 </label>
-                <div id="editTxnPhotoCard" style="width:100%;border:2.5px dashed #4ADE80;border-radius:16px;background:#FAFFF5;padding:28px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;box-sizing:border-box;">
+                <div id="editTxnPhotoCard" onclick="showPhotoSelectMenu('editTxn')" style="width:100%;border:2.5px dashed #4ADE80;border-radius:16px;background:#FAFFF5;padding:28px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;box-sizing:border-box;cursor:pointer;-webkit-tap-highlight-color:transparent;">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 40" width="52" height="40" fill="#9CA3AF">
                         <path d="M17 3L14 8H5C3.3 8 2 9.3 2 11v24c0 1.7 1.3 3 3 3h38c1.7 0 3-1.3 3-3V11c0-1.7-1.3-3-3-3h-9L31 3H17z"/>
                         <circle cx="24" cy="23" r="9" fill="#E5E7EB"/>
@@ -3331,12 +3325,9 @@
                     </svg>
                     <input type="file" id="editTxnPicture"       accept="image/*"                       class="hidden" onchange="previewEditTxnPicture(this)" />
                     <input type="file" id="editTxnPictureCamera" accept="image/*" capture="environment" class="hidden" onchange="previewEditTxnPicture(this)" />
-                    <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#6B7280;font-family:Inter,sans-serif;">
-                        <label for="editTxnPictureCamera" style="color:#16a34a;font-weight:700;cursor:pointer;" data-i18n="btn_take_photo">Ambil Foto</label>
-                        <span>·</span>
-                        <label for="editTxnPicture" style="color:#16a34a;font-weight:700;cursor:pointer;" data-i18n="btn_upload_photo">Unggah Foto</label>
-                    </div>
-                    <div id="editTxnPicturePreviewWrap" style="display:none;flex-direction:column;align-items:center;gap:8px;margin-top:4px;">
+                    <input type="file" id="editTxnPictureFile"                                          class="hidden" onchange="previewEditTxnPicture(this)" />
+                    <div style="font-size:13px;color:#16a34a;font-weight:700;font-family:Inter,sans-serif;">Ketik untuk pilih gambar</div>
+                    <div id="editTxnPicturePreviewWrap" style="display:none;flex-direction:column;align-items:center;gap:8px;margin-top:4px;" onclick="event.stopPropagation()">
                         <img id="editTxnPicturePreview" src="" alt="Preview"
                             style="max-width:100%;max-height:180px;border-radius:12px;border:2px solid #86EFAC;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.1);" />
                         <button type="button" onclick="clearEditTxnPicture()"
@@ -3350,6 +3341,33 @@
                 <button type="button" onclick="closeEditTxnModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg font-semibold" data-i18n="btn_cancel">Cancel</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- =================================================================
+     PHOTO SOURCE PICKER (shared bottom-sheet)
+     ================================================================= -->
+<div id="photoSelectMenu" onclick="hidePhotoSelectMenu(event)"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:700;align-items:flex-end;justify-content:center;">
+    <div onclick="event.stopPropagation()"
+        style="background:#fff;width:100%;max-width:520px;border-radius:20px 20px 0 0;box-sizing:border-box;padding-bottom:max(8px,env(safe-area-inset-bottom,0px));overflow:hidden;">
+        <div style="text-align:center;color:#94A3B8;font-size:12px;font-family:Inter,sans-serif;padding:14px 16px 12px;border-bottom:1px solid #F1F5F9;">Pilih Sumber Gambar</div>
+        <button onclick="triggerPhotoOption('library')"
+            style="width:100%;padding:15px 20px;border:none;background:none;font-size:15px;font-weight:600;color:#0F172A;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;gap:14px;border-bottom:1px solid #F8FAFC;-webkit-tap-highlight-color:transparent;">
+            <span style="font-size:22px;">🖼️</span> Photo Library
+        </button>
+        <button onclick="triggerPhotoOption('camera')"
+            style="width:100%;padding:15px 20px;border:none;background:none;font-size:15px;font-weight:600;color:#0F172A;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;gap:14px;border-bottom:1px solid #F8FAFC;-webkit-tap-highlight-color:transparent;">
+            <span style="font-size:22px;">📷</span> Take Photo
+        </button>
+        <button onclick="triggerPhotoOption('file')"
+            style="width:100%;padding:15px 20px;border:none;background:none;font-size:15px;font-weight:600;color:#0F172A;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;gap:14px;border-bottom:1px solid #F1F5F9;-webkit-tap-highlight-color:transparent;">
+            <span style="font-size:22px;">📁</span> Choose File
+        </button>
+        <button onclick="document.getElementById('photoSelectMenu').style.display='none'"
+            style="width:100%;padding:15px 20px;border:none;background:none;font-size:15px;font-weight:700;color:#DC2626;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;">
+            Batal
+        </button>
     </div>
 </div>
 
@@ -7135,10 +7153,12 @@ function previewEditTxnPicture(input) {
 function clearEditTxnPicture() {
     const inp1 = document.getElementById('editTxnPicture');
     const inp2 = document.getElementById('editTxnPictureCamera');
+    const inp3 = document.getElementById('editTxnPictureFile');
     const prev = document.getElementById('editTxnPicturePreview');
     const wrap = document.getElementById('editTxnPicturePreviewWrap');
     if (inp1) inp1.value = '';
     if (inp2) inp2.value = '';
+    if (inp3) inp3.value = '';
     if (prev) prev.src  = '';
     if (wrap) wrap.style.display = 'none';
 }
@@ -8389,6 +8409,29 @@ function selectEditTxnType(type) {
         btn.style.background  = s ? s[1] : '#F8FAFC';
         btn.style.color       = s ? s[2] : '#374151';
     });
+}
+
+/* ── Photo source picker ───────────────────────────────────────── */
+var _photoMenuTarget = null;
+function showPhotoSelectMenu(target) {
+    _photoMenuTarget = target;
+    var menu = document.getElementById('photoSelectMenu');
+    if (menu) menu.style.display = 'flex';
+}
+function hidePhotoSelectMenu(e) {
+    if (e && e.target !== document.getElementById('photoSelectMenu')) return;
+    document.getElementById('photoSelectMenu').style.display = 'none';
+    _photoMenuTarget = null;
+}
+function triggerPhotoOption(option) {
+    document.getElementById('photoSelectMenu').style.display = 'none';
+    var prefix = _photoMenuTarget || 'txn';
+    var inputId = option === 'camera' ? (prefix + 'PictureCamera') :
+                  option === 'file'   ? (prefix + 'PictureFile')   :
+                                        (prefix + 'Picture');
+    var inp = document.getElementById(inputId);
+    _photoMenuTarget = null;
+    if (inp) inp.click();
 }
 
 function stepEditTxnQty(delta) {
@@ -11858,11 +11901,13 @@ function getTxnPictureBase64() {
 function clearTxnPicture() {
     const input1  = document.getElementById('txnPicture');
     const input2  = document.getElementById('txnPictureCamera');
+    const input3  = document.getElementById('txnPictureFile');
     const preview = document.getElementById('txnPicturePreview');
     const wrap    = document.getElementById('txnPicturePreviewWrap');
     const fn      = document.getElementById('txnPictureFilename');
     if (input1)  input1.value  = '';
     if (input2)  input2.value  = '';
+    if (input3)  input3.value  = '';
     if (preview) preview.src   = '';
     if (wrap)    { wrap.style.display = 'none'; wrap.classList.add('hidden'); }
     if (fn)      { fn.textContent = ''; fn.classList.add('hidden'); }
