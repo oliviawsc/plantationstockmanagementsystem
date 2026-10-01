@@ -1684,9 +1684,6 @@
                         <label class="block text-sm font-semibold mb-1" data-i18n="col_category">Category</label>
                         <select id="txnCategory" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600" onchange="filterTxnItemsByCategory()">
                             <option value="" data-i18n="select_category">-- Select Category --</option>
-                            <option value="Fertilizer" data-i18n="cat_fertilizer">Fertilizer</option>
-                            <option value="Chemical" data-i18n="cat_chemical">Chemical</option>
-                            <option value="Oil Palm Seedling" data-i18n="cat_seedling">Oil Palm Seedling</option>
                         </select>
                     </div>
                     <div>
@@ -1830,9 +1827,6 @@
                             <select id="filterCategory" onchange="filterSummaryItemsByCategory()"
                                 class="w-full text-xs text-green-800 bg-transparent border-0 focus:outline-none cursor-pointer">
                                 <option value="" data-i18n="opt_all">All</option>
-                                <option value="Fertilizer" data-i18n="cat_fertilizer">Fertilizer</option>
-                                <option value="Chemical" data-i18n="cat_chemical">Chemical</option>
-                                <option value="Oil Palm Seedling" data-i18n="cat_seedling">Oil Palm Seedling</option>
                             </select>
                         </div>
                     </div>
@@ -5003,7 +4997,35 @@ function renderRoundProgress() {
 /* -----------------------------------------------------------------
    DROPDOWN POPULATORS - run whenever master data changes
    ----------------------------------------------------------------- */
+function rebuildCategoryDropdowns() {
+    // Derive unique categories from items, preserving preferred order for the 3 known ones
+    const KNOWN_ORDER = ['Fertilizer', 'Chemical', 'Oil Palm Seedling'];
+    const all = [...new Set(items.map(i => i.category).filter(Boolean))];
+    const known   = KNOWN_ORDER.filter(c => all.includes(c));
+    const custom  = all.filter(c => !KNOWN_ORDER.includes(c)).sort((a, b) => a.localeCompare(b));
+    const ordered = [...known, ...custom];
+
+    const txnSel    = document.getElementById('txnCategory');
+    const filterSel = document.getElementById('filterCategory');
+    const d = I18N[currentLang] || I18N['en'];
+
+    if (txnSel) {
+        const prev = txnSel.value;
+        txnSel.innerHTML = `<option value="">${d.select_category || '-- Select Category --'}</option>` +
+            ordered.map(c => `<option value="${c}">${c}</option>`).join('');
+        if (prev && ordered.includes(prev)) txnSel.value = prev;
+    }
+    if (filterSel) {
+        const prev = filterSel.value;
+        filterSel.innerHTML = `<option value="">${d.opt_all || 'All'}</option>` +
+            ordered.map(c => `<option value="${c}">${c}</option>`).join('');
+        if (prev && ordered.includes(prev)) filterSel.value = prev;
+    }
+}
+
 function populateItemDropdowns() {
+    // Rebuild category dropdowns from current items list
+    rebuildCategoryDropdowns();
     // Transaction page: rebuild item list preserving current category selection
     filterTxnItemsByCategory();
 
