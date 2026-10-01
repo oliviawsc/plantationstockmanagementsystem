@@ -11029,8 +11029,23 @@ function renderFertRecord() {
             [...manuringRounds].sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' })).map(r =>
                 `<option value="${r.id}"${String(r.id) === String(cur) ? ' selected' : ''}>${r.name}</option>`
             ).join('');
-        // Auto-select first round if none selected
-        if (!roundSel.value && roundSel.options.length > 1) roundSel.value = roundSel.options[1].value;
+        // Auto-select the round with the most recent Out transaction; fall back to first
+        if (!roundSel.value && roundSel.options.length > 1) {
+            const latestByRound = {};
+            transactions.forEach(t => {
+                if (t.type === 'Out' && t.manuringRoundId && t.date) {
+                    const rid = String(t.manuringRoundId);
+                    if (!latestByRound[rid] || t.date > latestByRound[rid]) latestByRound[rid] = t.date;
+                }
+            });
+            let bestRound = '', bestDate = '';
+            Array.from(roundSel.options).forEach(opt => {
+                if (!opt.value) return;
+                const d = latestByRound[opt.value];
+                if (d && (!bestDate || d > bestDate)) { bestDate = d; bestRound = opt.value; }
+            });
+            roundSel.value = bestRound || roundSel.options[1].value;
+        }
     }
 
     const container = document.getElementById('fertRecordReport');
