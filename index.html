@@ -3026,12 +3026,8 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold mb-1">Category</label>
-                                <select id="itemCategory" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
-                                    <option value="">-- Select Category --</option>
-                                    <option value="Fertilizer">Fertilizer</option>
-                                    <option value="Chemical">Chemical</option>
-                                    <option value="Oil Palm Seedling">Oil Palm Seedling</option>
-                                </select>
+                                <input id="itemCategory" type="text" placeholder="e.g. Fertilizer, Chemical, Oil Palm Seedling" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                                <p class="text-xs text-gray-400 mt-1">Type any category name.</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold mb-1">Base Unit <span class="text-red-500">*</span></label>
@@ -4048,7 +4044,7 @@ function saveItem() {
     const defaultQtyUnit = (packageUnit && rawDefault === 'package') ? 'package' : 'base';
 
     if (!name)     { alert('Please enter an Item Name.'); return; }
-    if (!category) { alert('Please select a Category.'); return; }
+    if (!category) { alert('Please enter a Category.'); return; }
     if (!baseUnit) { alert('Please enter a Base Unit (e.g. kg, litre, pcs).'); return; }
 
     const itemSubmitBtn = document.getElementById('itemSubmitBtn');
