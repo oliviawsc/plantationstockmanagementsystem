@@ -5222,18 +5222,11 @@ function renderSummary() {
         const defUnit    = (item && pkgUnit && item.defaultQtyUnit === 'package') ? 'package' : 'base';
         const baseQty    = parseFloat(t.qty) || 0;
 
-        /**
-         * Format the display qty:
-         * - Primary: qty in defaultQtyUnit
-         * - Secondary (grey, smaller): qty in the other unit
-         */
         function formatQty(qty) {
-            if (!item || !pkgUnit || !factor) {
-                return `${qty} ${baseUnit}`;
+            if (defUnit === 'package' && pkgUnit && factor > 0) {
+                return `${(qty / factor).toFixed(2)} ${pkgUnit}`;
             }
-            // Always display in package unit only
-            const pkgQty = factor > 0 ? qty / factor : 0;
-            return `${pkgQty.toFixed(2)} ${pkgUnit}`;
+            return `${qty} ${baseUnit}`;
         }
 
         const qtyIn  = (t.type === 'In'  || t.type === 'Adj') ? formatQty(baseQty) : '';
@@ -5251,12 +5244,11 @@ function renderSummary() {
         if (badges.length > 0) roundHtml = badges.join('<br/>');
 
         const balance = calcBalanceUpTo(t.itemId, t);
-        // Format balance the same way
         const balanceDisplay = (() => {
-            if (!item || !pkgUnit || !factor) return `${parseFloat(balance).toFixed(2)} ${baseUnit}`;
-            // Always display in package unit only
-            const pkgBal = factor > 0 ? balance / factor : 0;
-            return `${pkgBal.toFixed(2)} ${pkgUnit}`;
+            if (defUnit === 'package' && pkgUnit && factor > 0) {
+                return `${(parseFloat(balance) / factor).toFixed(2)} ${pkgUnit}`;
+            }
+            return `${parseFloat(balance).toFixed(2)} ${baseUnit}`;
         })();
 
         const d = I18N[currentLang] || I18N['en'];
@@ -13011,15 +13003,17 @@ function renderEstateTransaksi() {
         var bg    = typeBg[t.type]     || '#F1F5F9';
         var label = typeLabels[t.type] || (t.type || '');
         var _item     = _allItems.find(function(i) { return String(i.id) === String(t.itemId); });
-        var _pkgUnit  = _item && _item.packageUnit;
+        var _baseUnit  = _item ? (_item.baseUnit || _item.unit || t.unit || '') : (t.unit || '');
+        var _pkgUnit   = _item && _item.packageUnit;
         var _qtyPerPkg = _item && parseFloat(_item.qtyPerUnit);
+        var _defUnit   = (_item && _pkgUnit && _item.defaultQtyUnit === 'package') ? 'package' : 'base';
         var _dispQty, _dispUnit;
-        if (_pkgUnit && _qtyPerPkg > 0) {
+        if (_defUnit === 'package' && _pkgUnit && _qtyPerPkg > 0) {
             _dispQty  = parseFloat((parseFloat(t.qty || 0) / _qtyPerPkg).toFixed(2));
             _dispUnit = _pkgUnit;
         } else {
             _dispQty  = parseFloat(parseFloat(t.qty || 0).toFixed(2));
-            _dispUnit = t.unit || '';
+            _dispUnit = _baseUnit;
         }
         return '<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1.5px solid #E2E8F0;">' +
             '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
