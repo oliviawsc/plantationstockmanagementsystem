@@ -12640,7 +12640,7 @@ function renderRainfallTxns() {
         if (fromVal && r.date < fromVal) return false;
         if (toVal   && r.date > toVal)   return false;
         return true;
-    }).sort(function(a, b) { return (a.date || '').localeCompare(b.date || ''); });
+    }).sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
     if (!filtered.length) {
         const d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
         const noData = (d && d.rf_no_data) || 'No rainfall records yet.';
