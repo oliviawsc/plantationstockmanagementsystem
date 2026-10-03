@@ -13113,12 +13113,8 @@ function openMobileStockForm(category) {
 function renderMobileRainfallList() {
     var list = document.getElementById('mobileRfListBody');
     if (!list) return;
-    if (activeEstate) {
-        var stored = localStorage.getItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate);
-        rainfallTxns = stored ? JSON.parse(stored) : [];
-    }
     var sorted = (rainfallTxns || []).slice().sort(function(a, b) {
-        return (a.date || '').localeCompare(b.date || '');
+        return (b.date || '').localeCompare(a.date || '');
     });
     if (!sorted.length) {
         list.innerHTML = '<p style="text-align:center;color:#94A3B8;padding:32px 0;font-family:Inter,sans-serif;font-size:14px;">Tiada rekod hujan.</p>';
@@ -13202,7 +13198,14 @@ function deleteMobileRainfallRecord(id) {
     var estateKey = STORAGE_KEYS.rainfallTxns + '::' + activeEstate;
     localStorage.setItem(estateKey, JSON.stringify(rainfallTxns));
     supabaseClient.from('opp_rainfall_txns').delete().eq('id', id)
-        .then(function(res) { if (res.error) console.error('[Supabase] delete rainfall txn', res.error); })
+        .then(function(res) {
+            if (res.error) console.error('[Supabase] delete rainfall txn', res.error);
+            // Re-apply deletion in case loadFromSupabase ran concurrently and restored the record
+            rainfallTxns = rainfallTxns.filter(function(r) { return String(r.id) !== String(id); });
+            lastKnownIds.opp_rainfall_txns = new Set(rainfallTxns.map(function(r) { return r.id; }));
+            localStorage.setItem(estateKey, JSON.stringify(rainfallTxns));
+            renderMobileRainfallList();
+        })
         .catch(function(err) { console.error('[Supabase] delete rainfall txn', err); });
     renderMobileRainfallList();
     if (typeof renderRainfallReport  === 'function') renderRainfallReport();
