@@ -12600,6 +12600,12 @@ async function deleteRainfallTxn(id) {
         console.error('[Supabase] delete rainfall txn', err);
     }
 
+    // Re-apply deletion: loadFromSupabase may have run concurrently and restored the record
+    rainfallTxns = rainfallTxns.filter(r => String(r.id) !== String(id));
+    lastKnownIds.opp_rainfall_txns = new Set(rainfallTxns.map(r => r.id));
+    const estateKey2 = STORAGE_KEYS.rainfallTxns + '::' + activeEstate;
+    localStorage.setItem(estateKey2, JSON.stringify(rainfallTxns));
+
     renderRainfallTxns();
     renderRainfallReport();
     renderRainfallSummary();
@@ -12628,11 +12634,6 @@ function clearRfFilter() {
 function renderRainfallTxns() {
     const tbody = document.getElementById('rfTableBody');
     if (!tbody) return;
-    // Reload from localStorage in case estate switched
-    if (activeEstate) {
-        const stored = localStorage.getItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate);
-        rainfallTxns = stored ? JSON.parse(stored) : [];
-    }
     // Apply date filter
     const fromVal = (document.getElementById('rfFilterFrom') || {}).value || '';
     const toVal   = (document.getElementById('rfFilterTo')   || {}).value || '';
