@@ -3803,13 +3803,19 @@ async function loadFromSupabase() {
             const localRf = JSON.parse(localStorage.getItem(keys0.rainfallTxns)) || [];
             const sbIds = new Set(sbRf.map(r => String(r.id)));
             const unsynced = localRf.filter(r => !sbIds.has(String(r.id)));
-            if (unsynced.length > 0) {
-                // Merge unsynced local records into Supabase dataset and push them up
-                rainfallTxns = [...sbRf, ...unsynced];
-                rainfallTxns.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+            let merged = unsynced.length > 0 ? [...sbRf, ...unsynced] : sbRf;
+            // Deduplicate by date: keep the record with the highest id per date
+            const byDate = {};
+            merged.forEach(r => {
+                const key = r.date || '';
+                if (!byDate[key] || r.id > byDate[key].id) byDate[key] = r;
+            });
+            const deduped = Object.values(byDate);
+            const hadDuplicates = deduped.length < merged.length;
+            rainfallTxns = deduped.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+            if (unsynced.length > 0 || hadDuplicates) {
+                // Push cleaned data back to Supabase (removes duplicates + adds unsynced)
                 syncToSupabase(STORAGE_KEYS.rainfallTxns, rainfallTxns);
-            } else {
-                rainfallTxns = sbRf;
             }
         }
 
@@ -12558,6 +12564,9 @@ function saveRainfallTxn() {
     if (!date) { alert('Please select a date.'); return; }
     if (isNaN(mm) || mm < 0) { alert('Please enter a valid rainfall amount (mm).'); return; }
     if (!activeEstate) { alert('Please select an Estate before saving data.'); return; }
+    // Prevent duplicate dates (ignore current record when editing)
+    const dupCheck = rainfallTxns.find(r => r.date === date && String(r.id) !== editId);
+    if (dupCheck) { alert('A rainfall record for ' + date.split('-').reverse().join('-') + ' already exists. Please edit the existing record instead.'); return; }
     const picture = getRainfallPictureBase64();
     if (editId) {
         // Update existing record
@@ -12853,12 +12862,13 @@ function _doSaveMobileRainfallTxn(picture) {
     if (!date) { alert('Please select a date.'); return; }
     if (isNaN(mm) || mm < 0) { alert('Please enter a valid rainfall amount.'); return; }
     if (!activeEstate) { alert('Please select an Estate first.'); return; }
-
-    var stored = localStorage.getItem(STORAGE_KEYS.rainfallTxns + '::' + activeEstate);
-    rainfallTxns = stored ? JSON.parse(stored) : [];
+    // Prevent duplicate dates (ignore current record when editing)
+    var dupCheck = rainfallTxns.find(function(r) { return r.date === date && String(r.id) !== String(editId); });
+    if (dupCheck) { alert('Rekod hujan untuk ' + date.split('-').reverse().join('-') + ' sudah wujud. Sila edit rekod yang sedia ada.'); return; }
 
     if (editId) {
         var idx = rainfallTxns.findIndex(function(r) { return String(r.id) === String(editId); });
+
         if (idx >= 0) {
             rainfallTxns[idx] = Object.assign({}, rainfallTxns[idx], {
                 date: date, mm: mm,
