@@ -12654,8 +12654,9 @@ function renderRainfallTxns() {
             ? '<img src="' + r.picture + '" onclick="viewRainfallPicture(\'' + r.id + '\')" title="Click to enlarge" ' +
               'style="width:56px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid #BFDBFE;display:block;margin:0 auto;" />'
             : '<span class="text-gray-300 text-xs">—</span>';
+        const dispDate = r.date ? r.date.split('-').reverse().join('-') : '';
         return '<tr class="hover:bg-blue-50">' +
-            '<td class="' + cellCls + '">' + r.date + '</td>' +
+            '<td class="' + cellCls + '">' + dispDate + '</td>' +
             '<td class="' + cellCls + ' font-semibold">' + r.mm.toFixed(1) + '</td>' +
             '<td class="' + cellCls + '">' + photoCell + '</td>' +
             '<td class="' + cellCls + '" style="white-space:nowrap;">' +
@@ -13124,7 +13125,7 @@ function renderMobileRainfallList() {
         return '<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1.5px solid #E0F2FE;">' +
             '<div style="display:flex;align-items:center;justify-content:space-between;">' +
                 '<div>' +
-                    '<div style="font-size:13px;font-weight:600;color:#0C4A6E;font-family:Inter,sans-serif;">' + (r.date || '') + '</div>' +
+                    '<div style="font-size:13px;font-weight:600;color:#0C4A6E;font-family:Inter,sans-serif;">' + (r.date ? r.date.split('-').reverse().join('-') : '') + '</div>' +
                     '<div style="font-size:20px;font-weight:800;color:#0369A1;font-family:Inter,sans-serif;">' + ((r.mm || 0).toFixed(1)) + ' mm</div>' +
                 '</div>' +
                 '<div style="display:flex;gap:8px;">' +
