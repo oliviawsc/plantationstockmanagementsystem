@@ -2447,24 +2447,22 @@
                         </div>
                         <div style="margin-bottom:24px;">
                             <label style="display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:8px;" data-i18n="rf_lbl_photo">Photo (optional)</label>
-                            <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
-                                <button type="button" onclick="document.getElementById('mobileRfFile').click()"
-                                    style="flex:1;min-width:120px;padding:10px;border-radius:10px;border:1.5px solid #CBD5E1;background:#F8FAFC;color:#374151;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">
-                                    &#128247; <span data-i18n="rf_btn_upload">Upload Photo</span>
-                                </button>
-                                <button type="button" onclick="document.getElementById('mobileRfCamera').click()"
-                                    style="flex:1;min-width:120px;padding:10px;border-radius:10px;border:1.5px solid #CBD5E1;background:#F8FAFC;color:#374151;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">
-                                    &#128249; <span data-i18n="rf_btn_camera">Take Photo</span>
-                                </button>
-                            </div>
-                            <button type="button" id="mobileRfClearBtn" onclick="clearMobileRainfallPhoto()" style="display:none;padding:8px 16px;border-radius:10px;border:1.5px solid #FCA5A5;background:#FEF2F2;color:#DC2626;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;margin-bottom:10px;">
-                                &#10005; <span data-i18n="rf_btn_clear_photo">Clear Photo</span>
-                            </button>
-                            <input type="file" id="mobileRfFile" accept="image/*" style="display:none;" onchange="previewMobileRainfallPhoto(this)" />
-                            <input type="file" id="mobileRfCamera" accept="image/*" capture="environment" style="display:none;" onchange="previewMobileRainfallPhoto(this)" />
-                            <div id="mobileRfPreviewWrap" style="display:none;">
-                                <img id="mobileRfPreview" src="" alt="Preview"
-                                    style="max-width:100%;max-height:200px;border-radius:12px;border:2px solid #A5D6A7;object-fit:cover;" />
+                            <div id="mobileRfPhotoCard" onclick="document.getElementById('mobileRfFile').click()" style="width:100%;border:2.5px dashed #4ADE80;border-radius:16px;background:#FAFFF5;padding:28px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;box-sizing:border-box;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 40" width="52" height="40" fill="#9CA3AF">
+                                    <path d="M17 3L14 8H5C3.3 8 2 9.3 2 11v24c0 1.7 1.3 3 3 3h38c1.7 0 3-1.3 3-3V11c0-1.7-1.3-3-3-3h-9L31 3H17z"/>
+                                    <circle cx="24" cy="23" r="9" fill="#E5E7EB"/>
+                                    <circle cx="24" cy="23" r="6.5" fill="#9CA3AF"/>
+                                    <circle cx="21" cy="20" r="2" fill="#E5E7EB"/>
+                                </svg>
+                                <input type="file" id="mobileRfFile" accept="image/*" style="display:none;" onchange="previewMobileRainfallPhoto(this)" />
+                                <input type="file" id="mobileRfCamera" accept="image/*" capture="environment" style="display:none;" onchange="previewMobileRainfallPhoto(this)" />
+                                <div style="font-size:13px;color:#16a34a;font-weight:700;font-family:Inter,sans-serif;">Ketik untuk pilih gambar</div>
+                                <div id="mobileRfPreviewWrap" style="display:none;flex-direction:column;align-items:center;gap:8px;margin-top:4px;" onclick="event.stopPropagation()">
+                                    <img id="mobileRfPreview" src="" alt="Preview"
+                                        style="max-width:100%;max-height:180px;border-radius:12px;border:2px solid #86EFAC;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.1);" />
+                                    <button type="button" id="mobileRfClearBtn" onclick="clearMobileRainfallPhoto()"
+                                        style="font-size:12px;color:#DC2626;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;font-weight:600;" data-i18n="btn_remove">✖ Buang Foto</button>
+                                </div>
                             </div>
                         </div>
                         <div style="display:flex;gap:10px;">
@@ -12842,7 +12840,7 @@ function previewMobileRainfallPhoto(input) {
     reader.onload = function(e) {
         _compressImageDataUrl(e.target.result, 800, 0.6, function(compressed) {
             document.getElementById('mobileRfPreview').src = compressed;
-            document.getElementById('mobileRfPreviewWrap').style.display = '';
+            document.getElementById('mobileRfPreviewWrap').style.display = 'flex';
             document.getElementById('mobileRfClearBtn').style.display = '';
         });
     };
@@ -13181,7 +13179,7 @@ function showMobileRainfallForm(id) {
             document.getElementById('mobileRfMm').value   = r.mm;
             if (r.picture) {
                 document.getElementById('mobileRfPreview').src = r.picture;
-                document.getElementById('mobileRfPreviewWrap').style.display = '';
+                document.getElementById('mobileRfPreviewWrap').style.display = 'flex';
                 document.getElementById('mobileRfClearBtn').style.display    = '';
             }
         }
