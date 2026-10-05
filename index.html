@@ -5343,15 +5343,23 @@ function deleteSummaryTransaction(id) {
     const txn = transactions.find(t => String(t.id) === String(id));
     if (!txn) return;
     if (!confirm(`Delete this transaction?\n\nItem: ${txn.itemName}\nType: ${txn.type}  |  Qty: ${parseFloat(txn.qty).toFixed(2)}  |  Date: ${txn.date}\n\nThis cannot be undone.`)) return;
-    // Step 1: remove locally before any async work so the diff-sync sees the deletion
+    // Step 1: remove from local memory.
+    // IMPORTANT: do NOT update lastKnownIds here — _executeSyncForEstate (called inside
+    // save → syncToSupabase) reads lastKnownIds asynchronously. If lastKnownIds is already
+    // updated to the post-deletion set, the diff sees previousIds === currentIds → removedIds = []
+    // → no Supabase DELETE. Leave lastKnownIds intact so the diff correctly produces removedIds = [id].
     transactions = transactions.filter(t => String(t.id) !== String(id));
-    lastKnownIds.opp_transactions = new Set(transactions.map(r => r.id));
     save(STORAGE_KEYS.transactions, transactions);
     refreshAll();
-    // Step 2: direct Supabase delete — bypasses the diff and fires regardless of race timing
+    // Step 2: direct Supabase delete as a safety net (covers any race where the diff-sync
+    // misses the deletion because loadFromSupabase reset lastKnownIds mid-flight)
     if (typeof supabaseClient !== 'undefined') {
         supabaseClient.from('opp_transactions').delete().eq('id', id)
-            .then(function() {
+            .then(function(result) {
+                if (result && result.error) {
+                    console.error('[Delete txn] Supabase error:', result.error);
+                    return;
+                }
                 // Step 3: re-apply deletion in case loadFromSupabase ran concurrently and restored the record
                 transactions = transactions.filter(t => String(t.id) !== String(id));
                 lastKnownIds.opp_transactions = new Set(transactions.map(r => r.id));
