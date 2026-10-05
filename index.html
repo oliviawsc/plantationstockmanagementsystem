@@ -14057,30 +14057,39 @@ function renderToolsRecord() {
     if (!container) return;
     var d = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {};
 
-    // Use window reference to guarantee cross-script access
-    var _txns  = (typeof transactions !== 'undefined' ? transactions : (window.transactions || []));
-    var _items = (typeof items        !== 'undefined' ? items        : (window.items        || []));
+    // Robust cross-script variable access with try-catch guard
+    var _txns = [], _items = [];
+    try { _txns = transactions; } catch(e) {}
+    if (!_txns || !_txns.length) _txns = window.transactions || [];
+    try { _items = items; } catch(e) {}
+    if (!_items || !_items.length) _items = window.items || [];
 
     // All tools transactions
     var toolsTxns = _txns.filter(function(t) { return t.category === 'Tools'; });
 
-    // Populate year dropdown
+    // Populate year dropdown — include "All Years" option
     var yearSel = document.getElementById('toolsRecordYear');
-    var currentYear = new Date().getFullYear();
+    var selectedYear = 'all';
     if (yearSel) {
-        var years = [...new Set(toolsTxns.map(function(t) { return t.date ? t.date.slice(0,4) : ''; }).filter(Boolean))].map(Number).sort(function(a,b){return b-a;});
-        if (!years.includes(currentYear)) years.unshift(currentYear);
-        var curYear = yearSel.value || String(currentYear);
-        yearSel.innerHTML = years.map(function(y) {
-            return '<option value="' + y + '"' + (String(y) === curYear ? ' selected' : '') + '>' + y + '</option>';
-        }).join('');
-        currentYear = parseInt(yearSel.value || currentYear, 10);
+        var years = [];
+        toolsTxns.forEach(function(t) {
+            var y = t.date ? t.date.slice(0,4) : '';
+            if (y && !years.includes(y)) years.push(y);
+        });
+        years.sort(function(a,b){return b.localeCompare(a);});
+        var curVal = yearSel.value || 'all';
+        yearSel.innerHTML =
+            '<option value="all"' + (curVal === 'all' ? ' selected' : '') + '>All Years</option>' +
+            years.map(function(y) {
+                return '<option value="' + y + '"' + (y === curVal ? ' selected' : '') + '>' + y + '</option>';
+            }).join('');
+        selectedYear = yearSel.value || 'all';
     }
 
-    // Filter to selected year, Out Store only (issuances)
-    var yearTxns = toolsTxns.filter(function(t) {
-        return t.date && t.date.slice(0,4) === String(currentYear);
-    });
+    // Filter by selected year (or show all)
+    var yearTxns = selectedYear === 'all'
+        ? toolsTxns
+        : toolsTxns.filter(function(t) { return t.date && t.date.slice(0,4) === selectedYear; });
 
     // All Tools category items (columns) — from items master list
     var toolItemNames = _items.filter(function(i) { return i.category === 'Tools'; }).map(function(i) { return i.name; });
@@ -14089,15 +14098,14 @@ function renderToolsRecord() {
         if (t.itemName && !toolItemNames.includes(t.itemName)) toolItemNames.push(t.itemName);
     });
 
-    // All unique workers (rows) — from transactions this year
-    var allWorkers = [...new Set(yearTxns.map(function(t) { return (t.remarks || '').trim(); }).filter(Boolean))].sort();
+    // All unique workers (rows) — use 'N/A' for transactions with no worker name
+    var allWorkers = [...new Set(yearTxns.map(function(t) { return (t.remarks || '').trim() || 'N/A'; }))].sort();
 
     // Pivot: { worker: { itemName: qty } }
     var pivot = {};
     allWorkers.forEach(function(w) { pivot[w] = {}; });
     yearTxns.forEach(function(t) {
-        var w = (t.remarks || '').trim();
-        if (!w) return;
+        var w = (t.remarks || '').trim() || 'N/A';
         var item = t.itemName || '';
         if (!item) return;
         if (!pivot[w]) pivot[w] = {};
@@ -14120,7 +14128,7 @@ function renderToolsRecord() {
 
     // Title row
     html += '<thead>';
-    html += '<tr><th colspan="' + totalCols + '" style="' + thTitle + '">REKOD PERALATAN ' + currentYear + '</th></tr>';
+    html += '<tr><th colspan="' + totalCols + '" style="' + thTitle + '">REKOD PERALATAN' + (selectedYear === 'all' ? '' : ' ' + selectedYear) + '</th></tr>';
 
     // Group header row
     html += '<tr>';
