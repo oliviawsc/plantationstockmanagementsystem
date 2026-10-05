@@ -1676,6 +1676,9 @@
             <div class="bg-white p-6 rounded-xl shadow">
                 <h3 class="text-xl font-bold mb-4" data-i18n="txn_form_title">Record Stock Movement</h3>
                 <form id="txnForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div id="txnCatFlowTitle" style="display:none;grid-column:1/-1;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:12px;padding:14px 16px;border-left:4px solid #16a34a;">
+                        <div id="txnCatFlowTitleText" style="font-size:16px;font-weight:800;color:#166534;font-family:Inter,sans-serif;"></div>
+                    </div>
                     <div>
                         <label class="block text-sm font-semibold mb-1" data-i18n="col_date">Date</label>
                         <input id="txnDate" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="date" />
@@ -8482,10 +8485,12 @@ function resetTxnFormForNewEntry() {
     document.getElementById('txnRowsBody').innerHTML = '';
     clearTxnPicture();
     resetTxnTypeBtns();
-    var catRow  = document.getElementById('txnCategoryRow');
-    var typeRow = document.getElementById('txnTypeRow');
-    if (catRow)  catRow.style.display  = '';
-    if (typeRow) typeRow.style.display = '';
+    var catRow    = document.getElementById('txnCategoryRow');
+    var typeRow   = document.getElementById('txnTypeRow');
+    var titleWrap = document.getElementById('txnCatFlowTitle');
+    if (catRow)    catRow.style.display    = '';
+    if (typeRow)   typeRow.style.display   = '';
+    if (titleWrap) titleWrap.style.display = 'none';
     var backEl = document.getElementById('txnMobileBack');
     if (backEl) { var h2 = backEl.querySelector('h2'); if (h2) h2.textContent = 'Rekod Stok'; }
 }
@@ -13007,16 +13012,22 @@ function openEstateCatWithType(type) {
     var catLabels = { 'Fertilizer': 'Baja', 'Chemical': 'Racun', 'Oil Palm Seedling': 'Anak Sawit' };
     var typeLabel = type === 'In' ? 'Masuk Stor' : 'Keluar Stor';
     var catLabel  = catLabels[activeMobileCategory] || activeMobileCategory;
-    openMobileStockForm(activeMobileCategory);
-    setTimeout(function() {
-        selectTxnType(type);
-        var backEl = document.getElementById('txnMobileBack');
-        if (backEl) { var h2 = backEl.querySelector('h2'); if (h2) h2.textContent = catLabel + ' ' + typeLabel; }
-        var catRow  = document.getElementById('txnCategoryRow');
-        var typeRow = document.getElementById('txnTypeRow');
-        if (catRow)  catRow.style.display  = 'none';
-        if (typeRow) typeRow.style.display = 'none';
-    }, 30);
+    var fullTitle = catLabel + ' ' + typeLabel;
+    openMobileStockForm(activeMobileCategory); // synchronous — refreshAll completes before returning
+    selectTxnType(type);
+    // Update sticky mobile header
+    var backEl = document.getElementById('txnMobileBack');
+    if (backEl) { var h2 = backEl.querySelector('h2'); if (h2) h2.textContent = fullTitle; }
+    // Show title banner above date field
+    var titleWrap = document.getElementById('txnCatFlowTitle');
+    var titleText = document.getElementById('txnCatFlowTitleText');
+    if (titleWrap) titleWrap.style.display = '';
+    if (titleText) titleText.textContent = fullTitle;
+    // Hide category and type rows
+    var catRow  = document.getElementById('txnCategoryRow');
+    var typeRow = document.getElementById('txnTypeRow');
+    if (catRow)  catRow.style.display  = 'none';
+    if (typeRow) typeRow.style.display = 'none';
 }
 
 function renderEstateBakiStok() {
