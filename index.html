@@ -9320,7 +9320,7 @@ function navToSection(sectionId) {
         if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('view-locked-field'); }
     }
     if (sectionId === 'estate_category') {
-        if (typeof showEstateCategoryTab === 'function') showEstateCategoryTab('baki');
+        if (typeof showEstateCatCardGrid === 'function') showEstateCatCardGrid();
     }
 }
 
@@ -13274,7 +13274,9 @@ function deleteMobileRainfallRecord(id) {
 }
 
 window.navToEstateCategory      = navToEstateCategory;
+window.showEstateCatCardGrid    = showEstateCatCardGrid;
 window.showEstateCategoryTab    = showEstateCategoryTab;
+window.openEstateCatWithType    = openEstateCatWithType;
 window.openMobileStockForm      = openMobileStockForm;
 window.renderMobileRainfallList = renderMobileRainfallList;
 window.showMobileRainfallTab    = showMobileRainfallTab;
