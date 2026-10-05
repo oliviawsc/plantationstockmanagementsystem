@@ -2977,36 +2977,14 @@
 
         <!-- ============ PAGE: TOOLS RECORD ============ -->
         <section id="toolsrecord" class="page-section">
-            <h2 class="text-3xl font-bold mb-2" data-i18n="page_toolsrecord">📋 Tools Record</h2>
+            <h2 class="text-3xl font-bold mb-2" data-i18n="page_toolsrecord">📋 Rekod Peralatan</h2>
             <p class="text-sm text-green-700 mb-6" data-i18n="page_toolsrecord_sub">View tools issuance records grouped by worker.</p>
             <div class="bg-white p-6 rounded-xl shadow">
-                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
-                    <h3 class="text-xl font-bold" data-i18n="toolsrecord_title">Issuance by Worker</h3>
-                    <div style="display:flex;gap:8px;align-items:center;">
-                        <select id="toolsRecordWorkerFilter" onchange="renderToolsRecord()" class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none">
-                            <option value="" data-i18n="opt_all_workers">All Workers</option>
-                        </select>
-                        <select id="toolsRecordItemFilter" onchange="renderToolsRecord()" class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none">
-                            <option value="" data-i18n="opt_all">All Items</option>
-                        </select>
-                    </div>
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+                    <label class="text-sm font-semibold text-gray-700">Year:</label>
+                    <select id="toolsRecordYear" onchange="renderToolsRecord()" class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none font-semibold"></select>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm" style="border-collapse:collapse;">
-                        <thead class="bg-green-50 text-green-900">
-                            <tr>
-                                <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_worker">Worker</th>
-                                <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_item_name">Item</th>
-                                <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_date">Date</th>
-                                <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_type">Type</th>
-                                <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_qty">Qty</th>
-                            </tr>
-                        </thead>
-                        <tbody id="toolsRecordTableBody">
-                            <tr><td colspan="5" class="text-center text-gray-400 py-8" data-i18n="tools_no_record">No tools records yet.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+                <div id="toolsRecordContainer" class="overflow-x-auto"></div>
             </div>
         </section>
 
@@ -8194,6 +8172,7 @@ const I18N = {
         col_worker:               'Worker',
         tools_lbl_items:          'Tools Type',
         tools_lbl_items_hint:     'Please tick the tools to be taken',
+        toolsrecord_col_worker:   'Nama Pengguna Pekerja',
     },
 
     ms: {
@@ -8631,6 +8610,7 @@ const I18N = {
         col_worker:               'Pekerja',
         tools_lbl_items:          'Jenis Peralatan',
         tools_lbl_items_hint:     'Sila tandakan peralatan yang ingin diambil',
+        toolsrecord_col_worker:   'Nama Pengguna Pekerja',
     }
 };
 
@@ -13858,16 +13838,15 @@ function selectToolsTxnType(type) {
 
 function rebuildToolsItemDropdown() {
     var toolItems = items.filter(function(i) { return i.category === 'Tools'; });
-    // Rebuild filter selects (not the checklist)
-    ['toolsFilterItem', 'toolsRecordItemFilter'].forEach(function(id) {
-        var sel = document.getElementById(id);
-        if (!sel) return;
-        var cur = sel.value;
-        sel.innerHTML = '<option value="">All Items</option>' + toolItems.map(function(i) {
+    // Rebuild filter select for transactions list
+    var filterSel = document.getElementById('toolsFilterItem');
+    if (filterSel) {
+        var cur = filterSel.value;
+        filterSel.innerHTML = '<option value="">All Items</option>' + toolItems.map(function(i) {
             return '<option value="' + i.name + '">' + i.name + '</option>';
         }).join('');
-        if (cur) sel.value = cur;
-    });
+        if (cur) filterSel.value = cur;
+    }
     // Rebuild checklist
     var checklist = document.getElementById('toolsItemChecklist');
     if (!checklist) return;
@@ -14061,59 +14040,108 @@ function deleteToolsTxn(id) {
 }
 
 function renderToolsRecord() {
-    var body = document.getElementById('toolsRecordTableBody');
-    if (!body) return;
+    var container = document.getElementById('toolsRecordContainer');
+    if (!container) return;
     var d = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {};
 
+    // All tools transactions
     var toolsTxns = transactions.filter(function(t) { return t.category === 'Tools'; });
 
-    // Rebuild worker filter
-    var workerSel = document.getElementById('toolsRecordWorkerFilter');
-    if (workerSel) {
-        var workers = [...new Set(toolsTxns.map(function(t) { return t.remarks || ''; }).filter(Boolean))].sort();
-        var curWorker = workerSel.value;
-        workerSel.innerHTML = '<option value="">' + (d.opt_all_workers || 'All Workers') + '</option>' +
-            workers.map(function(w) { return '<option value="' + w + '">' + w + '</option>'; }).join('');
-        if (curWorker) workerSel.value = curWorker;
+    // Populate year dropdown
+    var yearSel = document.getElementById('toolsRecordYear');
+    var currentYear = new Date().getFullYear();
+    if (yearSel) {
+        var years = [...new Set(toolsTxns.map(function(t) { return t.date ? t.date.slice(0,4) : ''; }).filter(Boolean))].map(Number).sort(function(a,b){return b-a;});
+        if (!years.includes(currentYear)) years.unshift(currentYear);
+        var curYear = yearSel.value || String(currentYear);
+        yearSel.innerHTML = years.map(function(y) {
+            return '<option value="' + y + '"' + (String(y) === curYear ? ' selected' : '') + '>' + y + '</option>';
+        }).join('');
+        currentYear = parseInt(yearSel.value || currentYear, 10);
     }
 
-    // Rebuild item filter
-    var itemSel = document.getElementById('toolsRecordItemFilter');
-    if (itemSel) {
-        var itemNames = [...new Set(toolsTxns.map(function(t) { return t.itemName || ''; }).filter(Boolean))].sort();
-        var curItem = itemSel.value;
-        itemSel.innerHTML = '<option value="">' + (d.opt_all || 'All Items') + '</option>' +
-            itemNames.map(function(n) { return '<option value="' + n + '">' + n + '</option>'; }).join('');
-        if (curItem) itemSel.value = curItem;
-    }
-
-    var workerFilter = (workerSel || {}).value || '';
-    var itemFilter   = (itemSel   || {}).value || '';
-
-    var filtered = toolsTxns.filter(function(t) {
-        if (workerFilter && (t.remarks || '') !== workerFilter) return false;
-        if (itemFilter   && (t.itemName || '') !== itemFilter)  return false;
-        return true;
+    // Filter to selected year, Out Store only (issuances)
+    var yearTxns = toolsTxns.filter(function(t) {
+        return t.date && t.date.slice(0,4) === String(currentYear);
     });
 
-    filtered.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
+    // All Tools category items (columns) — from items master list
+    var toolItemNames = items.filter(function(i) { return i.category === 'Tools'; }).map(function(i) { return i.name; });
+    // Also include any items seen in transactions but not in items master
+    yearTxns.forEach(function(t) {
+        if (t.itemName && !toolItemNames.includes(t.itemName)) toolItemNames.push(t.itemName);
+    });
 
-    if (!filtered.length) {
-        body.innerHTML = '<tr><td colspan="5" class="text-center text-gray-400 py-8">' + (d.tools_no_record || 'No tools records yet.') + '</td></tr>';
-        return;
+    // All unique workers (rows) — from transactions this year
+    var allWorkers = [...new Set(yearTxns.map(function(t) { return (t.remarks || '').trim(); }).filter(Boolean))].sort();
+
+    // Pivot: { worker: { itemName: qty } }
+    var pivot = {};
+    allWorkers.forEach(function(w) { pivot[w] = {}; });
+    yearTxns.forEach(function(t) {
+        var w = (t.remarks || '').trim();
+        if (!w) return;
+        var item = t.itemName || '';
+        if (!item) return;
+        if (!pivot[w]) pivot[w] = {};
+        pivot[w][item] = (pivot[w][item] || 0) + (t.qty || 1);
+    });
+
+    var totalCols = 2 + toolItemNames.length; // No. + Worker + items
+
+    // Styles
+    var borderStyle = 'border:1px solid #D1D5DB;';
+    var thTitle  = 'background:#fff;font-weight:800;font-size:14px;text-align:center;padding:10px 8px;' + borderStyle;
+    var thGroup  = 'background:#F5F0E8;color:#1F2937;font-weight:700;font-size:12px;text-align:center;padding:8px 6px;' + borderStyle;
+    var thItem   = 'background:#F5F0E8;color:#374151;font-weight:600;font-size:11px;text-align:center;padding:8px 6px;' + borderStyle + 'min-width:90px;max-width:120px;word-break:break-word;';
+    var thFixed  = 'background:#F9FAFB;color:#374151;font-weight:700;font-size:12px;text-align:left;padding:8px 10px;' + borderStyle + 'min-width:50px;';
+    var tdNum    = 'text-align:center;padding:8px 6px;color:#374151;font-size:13px;' + borderStyle;
+    var tdWorker = 'text-align:left;padding:8px 10px;color:#111827;font-size:13px;font-weight:500;' + borderStyle;
+    var tdCell   = 'text-align:center;padding:8px 6px;color:#374151;font-size:13px;' + borderStyle;
+
+    var html = '<table style="border-collapse:collapse;width:100%;font-family:Inter,sans-serif;">';
+
+    // Title row
+    html += '<thead>';
+    html += '<tr><th colspan="' + totalCols + '" style="' + thTitle + '">REKOD PERALATAN ' + currentYear + '</th></tr>';
+
+    // Group header row
+    html += '<tr>';
+    html += '<th rowspan="2" style="' + thFixed + 'text-align:center;">No.</th>';
+    html += '<th rowspan="2" style="' + thFixed + 'min-width:160px;">' + (d.toolsrecord_col_worker || 'Nama Pengguna Pekerja') + '</th>';
+    if (toolItemNames.length) {
+        html += '<th colspan="' + toolItemNames.length + '" style="' + thGroup + '">' + (d.tools_lbl_items || 'Jenis Peralatan') + '</th>';
     }
-    body.innerHTML = filtered.map(function(t) {
-        var typeBadge = t.type === 'In Store'
-            ? '<span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;">In Store</span>'
-            : '<span style="background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;">Out Store</span>';
-        return '<tr class="hover:bg-gray-50">' +
-            '<td class="px-3 py-2 border border-gray-100 font-medium">' + (t.remarks || '-') + '</td>' +
-            '<td class="px-3 py-2 border border-gray-100">' + (t.itemName || '') + '</td>' +
-            '<td class="px-3 py-2 border border-gray-100">' + (t.date || '') + '</td>' +
-            '<td class="px-3 py-2 border border-gray-100">' + typeBadge + '</td>' +
-            '<td class="px-3 py-2 border border-gray-100">' + (t.qty || '') + ' ' + (t.unit || '') + '</td>' +
-            '</tr>';
-    }).join('');
+    html += '</tr>';
+
+    // Item name header row
+    html += '<tr>';
+    toolItemNames.forEach(function(name) {
+        html += '<th style="' + thItem + '">' + name + '</th>';
+    });
+    html += '</tr>';
+    html += '</thead>';
+
+    // Body
+    html += '<tbody>';
+    if (!allWorkers.length) {
+        html += '<tr><td colspan="' + totalCols + '" style="text-align:center;padding:32px;color:#9CA3AF;font-size:13px;">' + (d.tools_no_record || 'No tools records yet.') + '</td></tr>';
+    } else {
+        allWorkers.forEach(function(worker, idx) {
+            var rowBg = idx % 2 === 0 ? '' : 'background:#F9FAFB;';
+            html += '<tr style="' + rowBg + '">';
+            html += '<td style="' + tdNum + '">' + (idx + 1) + '</td>';
+            html += '<td style="' + tdWorker + '">' + worker + '</td>';
+            toolItemNames.forEach(function(item) {
+                var qty = pivot[worker][item] || 0;
+                html += '<td style="' + tdCell + '">' + (qty > 0 ? qty : '') + '</td>';
+            });
+            html += '</tr>';
+        });
+    }
+    html += '</tbody></table>';
+
+    container.innerHTML = html;
 }
 
 window.renderToolsPage          = renderToolsPage;
