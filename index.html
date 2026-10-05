@@ -3861,9 +3861,13 @@ async function loadFromSupabase() {
                         });
                 }
             }
-            // Keep locally-added records not yet pushed to Supabase
+            // Keep locally-added records not yet pushed to Supabase.
+            // Exclude tombstoned ids so a deleted-but-not-yet-synced record is never
+            // treated as "unsynced local" and pushed back up to Supabase.
             const sbIds        = new Set(sbTxns.map(r => String(r.id)));
-            const localUnsynced = transactions.filter(r => !sbIds.has(String(r.id)));
+            const localUnsynced = transactions.filter(r =>
+                !sbIds.has(String(r.id)) && !tombstoneIds.has(String(r.id))
+            );
             transactions = [...filtered, ...localUnsynced];
             if (localUnsynced.length > 0) syncToSupabase(STORAGE_KEYS.transactions, transactions);
         }
@@ -5368,11 +5372,11 @@ function deleteSummaryTransaction(id) {
     if (!txn) return;
     if (!confirm(`Delete this transaction?\n\nItem: ${txn.itemName}\nType: ${txn.type}  |  Qty: ${parseFloat(txn.qty).toFixed(2)}  |  Date: ${txn.date}\n\nThis cannot be undone.`)) return;
 
-    const deletingEstate = activeEstate;
+    const deletingEstate = activeEstate || txn.estate;
     const tombstoneKey = `opp_deleted_txn_ids::${deletingEstate}`;
 
-    // Step 1: write tombstone to localStorage so the deletion survives page refresh.
-    // loadFromSupabase reads this tombstone and skips (+ re-deletes) any matching Supabase rows.
+    // Step 1: tombstone — persisted so the deletion survives page refresh even if
+    // the Supabase DELETE hasn't completed yet when the user refreshes.
     try {
         const tombstone = JSON.parse(localStorage.getItem(tombstoneKey)) || [];
         if (!tombstone.includes(String(id))) {
@@ -5381,33 +5385,35 @@ function deleteSummaryTransaction(id) {
         }
     } catch(e) {}
 
-    // Step 2: remove from local memory.
-    // IMPORTANT: do NOT update lastKnownIds here — _executeSyncForEstate (called inside
-    // save → syncToSupabase) reads lastKnownIds asynchronously. If lastKnownIds is already
-    // updated to the post-deletion set, the diff sees previousIds === currentIds → removedIds = []
-    // → no Supabase DELETE. Leave lastKnownIds intact so the diff correctly produces removedIds = [id].
+    // Step 2: update local state synchronously.
+    // Write to localStorage DIRECTLY (not via save() which has an activeEstate guard).
+    // Update lastKnownIds immediately so any future diff-sync won't try to re-delete.
     transactions = transactions.filter(t => String(t.id) !== String(id));
-    save(STORAGE_KEYS.transactions, transactions);
+    lastKnownIds.opp_transactions = new Set(transactions.map(r => r.id));
+    if (deletingEstate) {
+        try {
+            const estateKey = getEstateKeys(deletingEstate);
+            localStorage.setItem(estateKey.transactions, JSON.stringify(transactions));
+        } catch(e) {}
+    }
     refreshAll();
 
-    // Step 3: direct Supabase delete as primary path
+    // Step 3: direct Supabase DELETE (no diff-sync — straightforward delete by id).
     if (typeof supabaseClient !== 'undefined') {
         supabaseClient.from('opp_transactions').delete().eq('id', id)
             .then(function(result) {
                 if (result && result.error) {
                     console.error('[Delete txn] Supabase error:', result.error);
+                    // Keep tombstone so loadFromSupabase will retry on next page load
                     return;
                 }
-                // Confirmed deleted from Supabase — remove tombstone entry and re-apply locally
+                // Confirmed — clean tombstone entry
                 try {
                     const t2 = JSON.parse(localStorage.getItem(tombstoneKey)) || [];
-                    const cleaned = t2.filter(sid => String(sid) !== String(id));
-                    localStorage.setItem(tombstoneKey, JSON.stringify(cleaned));
+                    localStorage.setItem(tombstoneKey, JSON.stringify(
+                        t2.filter(sid => String(sid) !== String(id))
+                    ));
                 } catch(e) {}
-                transactions = transactions.filter(t => String(t.id) !== String(id));
-                lastKnownIds.opp_transactions = new Set(transactions.map(r => r.id));
-                const estateKey = getEstateKeys(deletingEstate);
-                localStorage.setItem(estateKey.transactions, JSON.stringify(transactions));
             });
     }
 }
