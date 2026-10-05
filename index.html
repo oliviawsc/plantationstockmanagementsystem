@@ -1212,6 +1212,9 @@
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;" data-i18n="sb_section_rainfall">Rainfall</p>
             <button data-target="rainfall" class="nav-item">              <span class="nav-icon">&#127783;&#65039;</span><span class="sb-label" data-i18n="sb_lbl_rainfall">Rainfall Transactions</span></button>
             <button data-target="rainfallreport" class="nav-item">        <span class="nav-icon">&#128200;</span><span class="sb-label" data-i18n="sb_lbl_rainfallreport">Monthly Rainfall Record</span></button>
+            <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;" data-i18n="sb_section_tools">Tools</p>
+            <button data-target="tools" class="nav-item">                  <span class="nav-icon">&#128295;</span><span class="sb-label" data-i18n="sb_lbl_tools">Tools / Peralatan</span></button>
+            <button data-target="toolsrecord" class="nav-item">            <span class="nav-icon">&#128203;</span><span class="sb-label" data-i18n="sb_lbl_toolsrecord">Tools Record</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;">Admin</p>
             <button data-target="settings" id="navSettings" class="nav-item hidden">
                 <span class="nav-icon">&#9881;&#65039;</span><span class="sb-label" data-i18n="sb_lbl_settings">Settings</span>
@@ -1453,6 +1456,15 @@
                             </svg>
                         </div>
                         <span class="home-card-title" data-i18n="home_card_rainfall">Rainfall</span>
+                    </button>
+                    <!-- Tools -->
+                    <button class="home-card" onclick="navigateToSection('tools')">
+                        <div class="home-card-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                            </svg>
+                        </div>
+                        <span class="home-card-title" data-i18n="home_card_tools">Tools</span>
                     </button>
                     <!-- Settings (superadmin only) -->
                     <button class="home-card hidden" id="homeCardSettings" onclick="navigateToSection('settings')">
@@ -1924,6 +1936,7 @@
                                 <option value="Fertilizer" data-i18n="cat_fertilizer">Fertilizer</option>
                                 <option value="Chemical" data-i18n="cat_chemical">Chemical</option>
                                 <option value="Oil Palm Seedling" data-i18n="cat_seedling">Oil Palm Seedling</option>
+                                <option value="Tools" data-i18n="cat_tools">Tools</option>
                             </select>
                         </div>
                     </div>
@@ -2851,6 +2864,139 @@
                 </div>
                 <div style="overflow:auto;max-height:65vh;border-radius:0 0 12px 12px;">
                     <table id="rfSummaryTable" class="text-sm border-collapse" style="width:100%;border:1px solid #CBD5E1;">
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ PAGE: TOOLS TRANSACTIONS ============ -->
+        <section id="tools" class="page-section">
+            <h2 class="text-3xl font-bold mb-2" data-i18n="page_tools">🔧 Tools Transactions</h2>
+            <p class="text-sm text-green-700 mb-6" data-i18n="page_tools_sub">Record tools issued and received at the store.</p>
+
+            <!-- Panel A: List -->
+            <div id="toolsTxnListPanel">
+                <div class="bg-white p-6 rounded-xl shadow mb-6">
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+                        <h3 class="text-xl font-bold" data-i18n="tools_txn_title">Tools Transactions</h3>
+                        <button onclick="showToolsTxnForm()" class="bg-green-700 hover:bg-green-800 text-white text-sm font-semibold px-4 py-2 rounded-lg" data-i18n="tools_btn_add">+ Add Transaction</button>
+                    </div>
+                    <!-- Filters -->
+                    <div class="flex flex-wrap gap-3 mb-4">
+                        <div>
+                            <p class="text-xs font-bold text-green-900 mb-1" data-i18n="filter_type">Type</p>
+                            <select id="toolsFilterType" onchange="renderToolsTxns()" class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none">
+                                <option value="" data-i18n="opt_all">All</option>
+                                <option value="In Store" data-i18n="tools_type_in">In Store</option>
+                                <option value="Out Store" data-i18n="tools_type_out">Out Store</option>
+                            </select>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-green-900 mb-1" data-i18n="col_item_name">Item Name</p>
+                            <select id="toolsFilterItem" onchange="renderToolsTxns()" class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none">
+                                <option value="" data-i18n="opt_all">All</option>
+                            </select>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-green-900 mb-1" data-i18n="col_worker">Worker</p>
+                            <select id="toolsFilterWorker" onchange="renderToolsTxns()" class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none">
+                                <option value="" data-i18n="opt_all">All</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm" style="border-collapse:collapse;">
+                            <thead class="bg-green-50 text-green-900">
+                                <tr>
+                                    <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_date">Date</th>
+                                    <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_type">Type</th>
+                                    <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_item_name">Item</th>
+                                    <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_qty">Qty</th>
+                                    <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_worker">Worker</th>
+                                    <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_action">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="toolsTxnTableBody">
+                                <tr><td colspan="6" class="text-center text-gray-400 py-8" data-i18n="tools_no_txn">No tools transactions yet.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel B: Add / Edit form -->
+            <div id="toolsTxnFormPanel" class="hidden">
+                <div class="bg-white p-6 rounded-xl shadow" style="max-width:600px;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                        <button onclick="cancelToolsTxnForm()" style="padding:6px 14px;border-radius:8px;border:1px solid #BBF7D0;background:#F0FDF4;color:#166534;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">&#8592; Back</button>
+                        <h3 class="text-xl font-bold" id="toolsTxnFormTitle" data-i18n="tools_form_add_title">Add Tools Transaction</h3>
+                        <input type="hidden" id="toolsTxnEditId" value="" />
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-1" data-i18n="col_date">Date</label>
+                            <input type="date" id="toolsTxnDate" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-1" data-i18n="col_type">Transaction Type</label>
+                            <select id="toolsTxnType" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                                <option value="Out Store" data-i18n="tools_type_out">Out Store</option>
+                                <option value="In Store" data-i18n="tools_type_in">In Store</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-1" data-i18n="col_item_name">Item (Tools category)</label>
+                            <select id="toolsTxnItem" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                                <option value="">-- Select Item --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-1" data-i18n="col_qty">Quantity</label>
+                            <input type="number" id="toolsTxnQty" min="1" value="1" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold mb-1" data-i18n="col_worker">Worker Name</label>
+                            <input type="text" id="toolsTxnWorker" placeholder="Enter worker name" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:10px;justify-content:flex-end;">
+                        <button onclick="cancelToolsTxnForm()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-5 py-2 rounded-lg text-sm" data-i18n="btn_cancel">Cancel</button>
+                        <button id="toolsTxnSaveBtn" onclick="saveToolsTransaction()" class="bg-green-700 hover:bg-green-800 text-white font-semibold px-5 py-2 rounded-lg text-sm" data-i18n="btn_save">Save</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ PAGE: TOOLS RECORD ============ -->
+        <section id="toolsrecord" class="page-section">
+            <h2 class="text-3xl font-bold mb-2" data-i18n="page_toolsrecord">📋 Tools Record</h2>
+            <p class="text-sm text-green-700 mb-6" data-i18n="page_toolsrecord_sub">View tools issuance records grouped by worker.</p>
+            <div class="bg-white p-6 rounded-xl shadow">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+                    <h3 class="text-xl font-bold" data-i18n="toolsrecord_title">Issuance by Worker</h3>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <select id="toolsRecordWorkerFilter" onchange="renderToolsRecord()" class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none">
+                            <option value="" data-i18n="opt_all_workers">All Workers</option>
+                        </select>
+                        <select id="toolsRecordItemFilter" onchange="renderToolsRecord()" class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none">
+                            <option value="" data-i18n="opt_all">All Items</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm" style="border-collapse:collapse;">
+                        <thead class="bg-green-50 text-green-900">
+                            <tr>
+                                <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_worker">Worker</th>
+                                <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_item_name">Item</th>
+                                <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_date">Date</th>
+                                <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_type">Type</th>
+                                <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_qty">Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody id="toolsRecordTableBody">
+                            <tr><td colspan="5" class="text-center text-gray-400 py-8" data-i18n="tools_no_record">No tools records yet.</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -5147,7 +5293,7 @@ function renderRoundProgress() {
    ----------------------------------------------------------------- */
 function rebuildCategoryDropdowns() {
     // Derive unique categories from items, preserving preferred order for the 3 known ones
-    const KNOWN_ORDER = ['Fertilizer', 'Chemical', 'Oil Palm Seedling'];
+    const KNOWN_ORDER = ['Fertilizer', 'Chemical', 'Oil Palm Seedling', 'Tools'];
     const all = [...new Set(items.map(i => i.category).filter(Boolean))];
     const known   = KNOWN_ORDER.filter(c => all.includes(c));
     const custom  = all.filter(c => !KNOWN_ORDER.includes(c)).sort((a, b) => a.localeCompare(b));
@@ -8015,6 +8161,29 @@ const I18N = {
         rf_col_action:            'Action',
         rf_no_data:               'No rainfall records yet.',
         rf_saved_ok:              'Rainfall transaction saved!',
+
+        /* Tools module */
+        sb_section_tools:         'Tools',
+        sb_lbl_tools:             'Tools / Peralatan',
+        sb_lbl_toolsrecord:       'Tools Record',
+        home_card_tools:          'Tools',
+        page_tools:               '🔧 Tools Transactions',
+        page_tools_sub:           'Record tools issued and received at the store.',
+        page_toolsrecord:         '📋 Tools Record',
+        page_toolsrecord_sub:     'View tools issuance records grouped by worker.',
+        tools_txn_title:          'Tools Transactions',
+        tools_btn_add:            '+ Add Transaction',
+        tools_type_in:            'In Store',
+        tools_type_out:           'Out Store',
+        tools_no_txn:             'No tools transactions yet.',
+        tools_form_add_title:     'Add Tools Transaction',
+        tools_form_edit_title:    'Edit Tools Transaction',
+        tools_saved_ok:           'Tools transaction saved!',
+        toolsrecord_title:        'Issuance by Worker',
+        tools_no_record:          'No tools records yet.',
+        opt_all_workers:          'All Workers',
+        cat_tools:                'Tools',
+        col_worker:               'Worker',
     },
 
     ms: {
@@ -8427,6 +8596,29 @@ const I18N = {
         rf_col_action:            'Tindakan',
         rf_no_data:               'Tiada rekod hujan lagi.',
         rf_saved_ok:              'Transaksi hujan berjaya disimpan!',
+
+        /* Tools module */
+        sb_section_tools:         'Peralatan',
+        sb_lbl_tools:             'Transaksi Peralatan',
+        sb_lbl_toolsrecord:       'Rekod Peralatan',
+        home_card_tools:          'Peralatan',
+        page_tools:               '🔧 Transaksi Peralatan',
+        page_tools_sub:           'Rekod peralatan yang dikeluarkan dan diterima di stor.',
+        page_toolsrecord:         '📋 Rekod Peralatan',
+        page_toolsrecord_sub:     'Lihat rekod pengeluaran peralatan mengikut nama pekerja.',
+        tools_txn_title:          'Transaksi Peralatan',
+        tools_btn_add:            '+ Tambah Transaksi',
+        tools_type_in:            'Masuk Stor',
+        tools_type_out:           'Keluar Stor',
+        tools_no_txn:             'Tiada transaksi peralatan lagi.',
+        tools_form_add_title:     'Tambah Transaksi Peralatan',
+        tools_form_edit_title:    'Edit Transaksi Peralatan',
+        tools_saved_ok:           'Transaksi peralatan berjaya disimpan!',
+        toolsrecord_title:        'Pengeluaran Mengikut Pekerja',
+        tools_no_record:          'Tiada rekod peralatan lagi.',
+        opt_all_workers:          'Semua Pekerja',
+        cat_tools:                'Peralatan',
+        col_worker:               'Pekerja',
     }
 };
 
@@ -13633,6 +13825,258 @@ window.cancelAddRainfall      = cancelAddRainfall;
 window.editRainfallTxn        = editRainfallTxn;
 
 // ══════════════════════════════════════════════════════════════════════
+// TOOLS / PERALATAN MODULE
+// ══════════════════════════════════════════════════════════════════════
+
+function renderToolsPage() {
+    rebuildToolsItemDropdown();
+    renderToolsTxns();
+}
+
+function rebuildToolsItemDropdown() {
+    var toolItems = items.filter(function(i) { return i.category === 'Tools'; });
+    ['toolsTxnItem', 'toolsFilterItem', 'toolsRecordItemFilter'].forEach(function(id) {
+        var sel = document.getElementById(id);
+        if (!sel) return;
+        var cur = sel.value;
+        var first = id === 'toolsTxnItem' ? '<option value="">-- Select Item --</option>' : '<option value="">All Items</option>';
+        sel.innerHTML = first + toolItems.map(function(i) {
+            return '<option value="' + i.name + '">' + i.name + '</option>';
+        }).join('');
+        if (cur) sel.value = cur;
+    });
+}
+
+function renderToolsTxns() {
+    rebuildToolsItemDropdown();
+    var body = document.getElementById('toolsTxnTableBody');
+    if (!body) return;
+    var d = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {};
+    var typeFilter   = (document.getElementById('toolsFilterType')   || {}).value || '';
+    var itemFilter   = (document.getElementById('toolsFilterItem')   || {}).value || '';
+    var workerFilter = (document.getElementById('toolsFilterWorker') || {}).value || '';
+
+    var toolsTxns = transactions.filter(function(t) {
+        return t.category === 'Tools';
+    });
+
+    // Rebuild worker filter
+    var workerSel = document.getElementById('toolsFilterWorker');
+    if (workerSel) {
+        var workers = [...new Set(toolsTxns.map(function(t) { return t.remarks || ''; }).filter(Boolean))].sort();
+        var curWorker = workerSel.value;
+        workerSel.innerHTML = '<option value="">' + (d.opt_all_workers || 'All Workers') + '</option>' +
+            workers.map(function(w) { return '<option value="' + w + '">' + w + '</option>'; }).join('');
+        if (curWorker) workerSel.value = curWorker;
+    }
+
+    var filtered = toolsTxns.filter(function(t) {
+        if (typeFilter   && t.type    !== typeFilter)   return false;
+        if (itemFilter   && t.itemName !== itemFilter)  return false;
+        if (workerFilter && (t.remarks || '') !== workerFilter) return false;
+        return true;
+    });
+
+    filtered.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
+
+    if (!filtered.length) {
+        body.innerHTML = '<tr><td colspan="6" class="text-center text-gray-400 py-8">' + (d.tools_no_txn || 'No tools transactions yet.') + '</td></tr>';
+        return;
+    }
+    body.innerHTML = filtered.map(function(t) {
+        var typeBadge = t.type === 'In Store'
+            ? '<span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;">In Store</span>'
+            : '<span style="background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;">Out Store</span>';
+        return '<tr class="hover:bg-gray-50">' +
+            '<td class="px-3 py-2 border border-gray-100">' + (t.date || '') + '</td>' +
+            '<td class="px-3 py-2 border border-gray-100">' + typeBadge + '</td>' +
+            '<td class="px-3 py-2 border border-gray-100">' + (t.itemName || '') + '</td>' +
+            '<td class="px-3 py-2 border border-gray-100">' + (t.qty || '') + ' ' + (t.unit || '') + '</td>' +
+            '<td class="px-3 py-2 border border-gray-100">' + (t.remarks || '-') + '</td>' +
+            '<td class="px-3 py-2 border border-gray-100" style="white-space:nowrap;">' +
+                '<button onclick="editToolsTxn(\'' + t.id + '\')" style="background:#EFF6FF;color:#1d4ed8;border:none;cursor:pointer;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;margin-right:4px;">Edit</button>' +
+                '<button onclick="deleteToolsTxn(\'' + t.id + '\')" style="background:#FEF2F2;color:#dc2626;border:none;cursor:pointer;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;">Delete</button>' +
+            '</td></tr>';
+    }).join('');
+}
+
+function showToolsTxnForm(editId) {
+    document.getElementById('toolsTxnListPanel').classList.add('hidden');
+    var panel = document.getElementById('toolsTxnFormPanel');
+    panel.classList.remove('hidden');
+    var d = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {};
+    if (editId) {
+        document.getElementById('toolsTxnFormTitle').textContent = d.tools_form_edit_title || 'Edit Tools Transaction';
+        document.getElementById('toolsTxnEditId').value = editId;
+        var txn = transactions.find(function(t) { return String(t.id) === String(editId); });
+        if (txn) {
+            document.getElementById('toolsTxnDate').value   = txn.date   || '';
+            document.getElementById('toolsTxnType').value   = txn.type   || 'Out Store';
+            document.getElementById('toolsTxnQty').value    = txn.qty    || 1;
+            document.getElementById('toolsTxnWorker').value = txn.remarks || '';
+            rebuildToolsItemDropdown();
+            document.getElementById('toolsTxnItem').value = txn.itemName || '';
+        }
+    } else {
+        document.getElementById('toolsTxnFormTitle').textContent = d.tools_form_add_title || 'Add Tools Transaction';
+        document.getElementById('toolsTxnEditId').value = '';
+        var dateEl = document.getElementById('toolsTxnDate');
+        if (!dateEl.value) dateEl.valueAsDate = new Date();
+        document.getElementById('toolsTxnType').value   = 'Out Store';
+        document.getElementById('toolsTxnQty').value    = 1;
+        document.getElementById('toolsTxnWorker').value = '';
+        rebuildToolsItemDropdown();
+        document.getElementById('toolsTxnItem').value = '';
+    }
+}
+
+function cancelToolsTxnForm() {
+    document.getElementById('toolsTxnFormPanel').classList.add('hidden');
+    document.getElementById('toolsTxnListPanel').classList.remove('hidden');
+}
+
+function saveToolsTransaction() {
+    var btn      = document.getElementById('toolsTxnSaveBtn');
+    var date     = (document.getElementById('toolsTxnDate')   || {}).value || '';
+    var type     = (document.getElementById('toolsTxnType')   || {}).value || 'Out Store';
+    var itemName = (document.getElementById('toolsTxnItem')   || {}).value || '';
+    var qty      = parseFloat((document.getElementById('toolsTxnQty') || {}).value) || 0;
+    var worker   = ((document.getElementById('toolsTxnWorker') || {}).value || '').trim();
+    var editId   = (document.getElementById('toolsTxnEditId') || {}).value || '';
+
+    if (!date)     { alert('Please select a date.');  return; }
+    if (!itemName) { alert('Please select an item.'); return; }
+    if (qty <= 0)  { alert('Quantity must be greater than 0.'); return; }
+
+    var item = items.find(function(i) { return i.name === itemName; });
+    var unit = item ? (item.unit || '') : '';
+
+    btnLoad(btn);
+    setTimeout(function() {
+        try {
+            if (editId) {
+                var idx = transactions.findIndex(function(t) { return String(t.id) === String(editId); });
+                if (idx !== -1) {
+                    transactions[idx] = Object.assign({}, transactions[idx], {
+                        date: date, type: type, itemName: itemName, qty: qty, unit: unit,
+                        category: 'Tools', remarks: worker
+                    });
+                }
+            } else {
+                var newTxn = {
+                    id:       Date.now(),
+                    date:     date,
+                    type:     type,
+                    itemId:   item ? item.id : '',
+                    itemName: itemName,
+                    category: 'Tools',
+                    qty:      qty,
+                    unit:     unit,
+                    location: activeEstate || '',
+                    remarks:  worker,
+                    user:     (typeof loadSession === 'function' && loadSession()) ? loadSession().username : ''
+                };
+                transactions.push(newTxn);
+            }
+            save(STORAGE_KEYS.transactions, transactions);
+            refreshAll();
+            btnSuccess(btn, function() { cancelToolsTxnForm(); });
+        } catch(e) {
+            btnDone(btn);
+            alert('Error saving transaction: ' + e.message);
+        }
+    }, 300);
+}
+
+function editToolsTxn(id) {
+    showToolsTxnForm(id);
+}
+
+function deleteToolsTxn(id) {
+    if (!confirm('Delete this tools transaction?')) return;
+    var tombKey = 'opp_deleted_txn_ids::' + (activeEstate || '');
+    try {
+        var tombSet = new Set(JSON.parse(localStorage.getItem(tombKey) || '[]'));
+        tombSet.add(String(id));
+        localStorage.setItem(tombKey, JSON.stringify([...tombSet]));
+    } catch(e) {}
+    transactions = transactions.filter(function(t) { return String(t.id) !== String(id); });
+    save(STORAGE_KEYS.transactions, transactions);
+    refreshAll();
+    if (typeof supabaseClient !== 'undefined') {
+        supabaseClient.from('opp_transactions').delete().eq('id', id).then(function(res) {
+            if (res.error) console.error('[Delete tools txn]', res.error);
+        });
+    }
+}
+
+function renderToolsRecord() {
+    var body = document.getElementById('toolsRecordTableBody');
+    if (!body) return;
+    var d = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {};
+
+    var toolsTxns = transactions.filter(function(t) { return t.category === 'Tools'; });
+
+    // Rebuild worker filter
+    var workerSel = document.getElementById('toolsRecordWorkerFilter');
+    if (workerSel) {
+        var workers = [...new Set(toolsTxns.map(function(t) { return t.remarks || ''; }).filter(Boolean))].sort();
+        var curWorker = workerSel.value;
+        workerSel.innerHTML = '<option value="">' + (d.opt_all_workers || 'All Workers') + '</option>' +
+            workers.map(function(w) { return '<option value="' + w + '">' + w + '</option>'; }).join('');
+        if (curWorker) workerSel.value = curWorker;
+    }
+
+    // Rebuild item filter
+    var itemSel = document.getElementById('toolsRecordItemFilter');
+    if (itemSel) {
+        var itemNames = [...new Set(toolsTxns.map(function(t) { return t.itemName || ''; }).filter(Boolean))].sort();
+        var curItem = itemSel.value;
+        itemSel.innerHTML = '<option value="">' + (d.opt_all || 'All Items') + '</option>' +
+            itemNames.map(function(n) { return '<option value="' + n + '">' + n + '</option>'; }).join('');
+        if (curItem) itemSel.value = curItem;
+    }
+
+    var workerFilter = (workerSel || {}).value || '';
+    var itemFilter   = (itemSel   || {}).value || '';
+
+    var filtered = toolsTxns.filter(function(t) {
+        if (workerFilter && (t.remarks || '') !== workerFilter) return false;
+        if (itemFilter   && (t.itemName || '') !== itemFilter)  return false;
+        return true;
+    });
+
+    filtered.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
+
+    if (!filtered.length) {
+        body.innerHTML = '<tr><td colspan="5" class="text-center text-gray-400 py-8">' + (d.tools_no_record || 'No tools records yet.') + '</td></tr>';
+        return;
+    }
+    body.innerHTML = filtered.map(function(t) {
+        var typeBadge = t.type === 'In Store'
+            ? '<span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;">In Store</span>'
+            : '<span style="background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;">Out Store</span>';
+        return '<tr class="hover:bg-gray-50">' +
+            '<td class="px-3 py-2 border border-gray-100 font-medium">' + (t.remarks || '-') + '</td>' +
+            '<td class="px-3 py-2 border border-gray-100">' + (t.itemName || '') + '</td>' +
+            '<td class="px-3 py-2 border border-gray-100">' + (t.date || '') + '</td>' +
+            '<td class="px-3 py-2 border border-gray-100">' + typeBadge + '</td>' +
+            '<td class="px-3 py-2 border border-gray-100">' + (t.qty || '') + ' ' + (t.unit || '') + '</td>' +
+            '</tr>';
+    }).join('');
+}
+
+window.renderToolsPage       = renderToolsPage;
+window.renderToolsTxns       = renderToolsTxns;
+window.renderToolsRecord     = renderToolsRecord;
+window.showToolsTxnForm      = showToolsTxnForm;
+window.cancelToolsTxnForm    = cancelToolsTxnForm;
+window.saveToolsTransaction  = saveToolsTransaction;
+window.editToolsTxn          = editToolsTxn;
+window.deleteToolsTxn        = deleteToolsTxn;
+window.rebuildToolsItemDropdown = rebuildToolsItemDropdown;
+
+// ══════════════════════════════════════════════════════════════════════
 // SETTINGS TAB SWITCHING
 // ══════════════════════════════════════════════════════════════════════
 
@@ -13670,6 +14114,8 @@ function navigateToSection(target) {
     }
     if (target === 'rainfallreport') renderRainfallReport();
     if (target === 'rainfallsummary') renderRainfallSummary();
+    if (target === 'tools') renderToolsPage();
+    if (target === 'toolsrecord') renderToolsRecord();
     if (target === 'mobile_rainfall') {
         const el = document.getElementById('mobileRfDate');
         if (el && !el.value) el.valueAsDate = new Date();
