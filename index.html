@@ -2875,8 +2875,8 @@
                 <button id="toolsTabTxnBtn" class="htab-btn active" onclick="switchToolsTab('txn')">📋 Transactions</button>
                 <button id="toolsTabRecBtn" class="htab-btn" onclick="switchToolsTab('rec')">📊 Rekod Peralatan</button>
             </div>
-            <h2 class="text-3xl font-bold mb-2" data-i18n="page_tools">🔧 Tools / Peralatan</h2>
-            <p class="text-sm text-green-700 mb-6" data-i18n="page_tools_sub">Record tools issued and received at the store.</p>
+            <h2 id="toolsSectionTitle" class="text-3xl font-bold mb-2" data-i18n="page_tools">🔧 Tools / Peralatan</h2>
+            <p id="toolsSectionSubtitle" class="text-sm text-green-700 mb-6" data-i18n="page_tools_sub">Record tools issued and received at the store.</p>
 
             <!-- Tab A: Transactions -->
             <div id="toolsTabTxnPanel">
@@ -14199,17 +14199,23 @@ function switchToolsTab(tab) {
     var recPanel = document.getElementById('toolsTabRecPanel');
     var txnBtn   = document.getElementById('toolsTabTxnBtn');
     var recBtn   = document.getElementById('toolsTabRecBtn');
+    var title    = document.getElementById('toolsSectionTitle');
+    var subtitle = document.getElementById('toolsSectionSubtitle');
     if (tab === 'rec') {
         if (txnPanel) txnPanel.style.display = 'none';
         if (recPanel) recPanel.style.display = '';
         if (txnBtn)   { txnBtn.classList.remove('active'); }
         if (recBtn)   { recBtn.classList.add('active'); }
+        if (title)    title.textContent    = '📋 Tools Record';
+        if (subtitle) subtitle.textContent = 'View tools issuance records grouped by worker.';
         renderToolsRecord();
     } else {
         if (txnPanel) txnPanel.style.display = '';
         if (recPanel) recPanel.style.display = 'none';
         if (txnBtn)   { txnBtn.classList.add('active'); }
         if (recBtn)   { recBtn.classList.remove('active'); }
+        if (title)    title.textContent    = '🔧 Tools / Peralatan';
+        if (subtitle) subtitle.textContent = 'Record tools issued and received at the store.';
     }
 }
 window.switchToolsTab = switchToolsTab;
