@@ -3862,13 +3862,26 @@ async function loadFromSupabase() {
                 }
             }
             // Keep locally-added records not yet pushed to Supabase.
-            // Exclude tombstoned ids so a deleted-but-not-yet-synced record is never
-            // treated as "unsynced local" and pushed back up to Supabase.
+            // Exclude tombstoned ids and records that were previously known in Supabase
+            // (prevKnown): if a record was once confirmed in Supabase but is now absent,
+            // it was deleted remotely (e.g. by superadmin) — never re-push it.
             const sbIds        = new Set(sbTxns.map(r => String(r.id)));
             const localUnsynced = transactions.filter(r =>
-                !sbIds.has(String(r.id)) && !tombstoneIds.has(String(r.id))
+                !sbIds.has(String(r.id)) &&
+                !tombstoneIds.has(String(r.id)) &&
+                !prevKnown.has(r.id)   // not previously confirmed in Supabase = truly new local
             );
             transactions = [...filtered, ...localUnsynced];
+            // Update lastKnownIds to reflect what is actually in Supabase now
+            lastKnownIds.opp_transactions = new Set(transactions.map(r => r.id));
+            // Persist updated transactions to localStorage so stale remote-deleted records
+            // don't survive the next page load on this device.
+            if (activeEstate) {
+                try {
+                    const _estKey = getEstateKeys(activeEstate);
+                    localStorage.setItem(_estKey.transactions, JSON.stringify(transactions));
+                } catch(e) {}
+            }
             if (localUnsynced.length > 0) syncToSupabase(STORAGE_KEYS.transactions, transactions);
         }
         if (!roundsRes.error && roundsRes.data !== null) manuringRounds   = roundsRes.data;
