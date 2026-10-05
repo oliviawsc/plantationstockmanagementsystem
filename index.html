@@ -2458,13 +2458,29 @@
             <div style="min-height:100vh;background:#F8FAFC;padding-bottom:80px;">
                 <!-- Header -->
                 <div style="background:#fff;border-bottom:1px solid #E2E8F0;padding:12px 20px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:10;">
+                    <button id="mobileRfBackBtn" onclick="showMobileRainfallCardGrid()" style="display:none;position:absolute;left:16px;background:none;border:none;cursor:pointer;font-size:24px;color:#374151;font-family:Inter,sans-serif;line-height:1;padding:0 8px;">&#8249;</button>
                     <h2 style="font-size:17px;font-weight:800;color:#0F172A;font-family:Inter,sans-serif;margin:0;text-align:center;">&#127783;&#65039; Hujan</h2>
                 </div>
-                <!-- Tab bar -->
-                <div style="background:#fff;border-bottom:1.5px solid #E2E8F0;display:flex;">
-                    <button class="estate-cat-tab active" id="mobileRfTabRekod" onclick="showMobileRainfallTab('rekod')">Rekod Hujan</button>
-                    <button class="estate-cat-tab" id="mobileRfTabTransaksi" onclick="showMobileRainfallTab('transaksi')">Transaksi Hujan</button>
-                    <button class="estate-cat-tab" id="mobileRfTabBulanan" onclick="showMobileRainfallTab('bulanan')">Rekod Hujan Bulanan</button>
+                <!-- Card Grid Menu -->
+                <div id="mobileRfCardGrid" style="padding:20px 16px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                    <button class="estate-card" onclick="showMobileRainfallTab('rekod')" style="padding:22px 12px;">
+                        <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#0ea5e9,#0284c7);display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 14px rgba(14,165,233,.25);">
+                            <span style="font-size:28px;">📝</span>
+                        </div>
+                        <div style="font-size:15px;font-weight:700;color:#0F172A;">Rekod Hujan</div>
+                    </button>
+                    <button class="estate-card" onclick="showMobileRainfallTab('transaksi')" style="padding:22px 12px;">
+                        <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#16a34a,#166534);display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 14px rgba(22,163,74,.25);">
+                            <span style="font-size:28px;">📋</span>
+                        </div>
+                        <div style="font-size:15px;font-weight:700;color:#0F172A;">Transaksi Hujan</div>
+                    </button>
+                    <button class="estate-card" onclick="showMobileRainfallTab('bulanan')" style="padding:22px 12px;grid-column:1/-1;">
+                        <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#7c3aed,#5b21b6);display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 14px rgba(124,58,237,.25);">
+                            <span style="font-size:28px;">📅</span>
+                        </div>
+                        <div style="font-size:15px;font-weight:700;color:#0F172A;">Rekod Hujan Bulanan</div>
+                    </button>
                 </div>
                 <!-- Pane: Transaksi Hujan (list, default) -->
                 <div id="mobileRfListPanel" style="padding:16px;">
@@ -9468,7 +9484,7 @@ function navToSection(sectionId) {
 
     // Section-specific init that navToSection must mirror from navigateToSection
     if (sectionId === 'mobile_rainfall') {
-        if (typeof showMobileRainfallTab === 'function') showMobileRainfallTab('rekod');
+        if (typeof showMobileRainfallCardGrid === 'function') showMobileRainfallCardGrid();
         const saveBtn = document.getElementById('mobileRfSaveBtn');
         if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('view-locked-field'); }
     }
@@ -13376,12 +13392,22 @@ function renderMobileRainfallList() {
     }).join('');
 }
 
+function showMobileRainfallCardGrid() {
+    var cardGrid = document.getElementById('mobileRfCardGrid');
+    var backBtn  = document.getElementById('mobileRfBackBtn');
+    var listPanel = document.getElementById('mobileRfListPanel');
+    var formPanel = document.getElementById('mobileRfFormPanel');
+    if (cardGrid)  cardGrid.style.display  = 'grid';
+    if (backBtn)   backBtn.style.display   = 'none';
+    if (listPanel) listPanel.style.display = 'none';
+    if (formPanel) formPanel.style.display = 'none';
+}
 function showMobileRainfallTab(tab) {
-    ['Rekod','Transaksi','Bulanan'].forEach(function(t) {
-        var btn = document.getElementById('mobileRfTab' + t);
-        if (btn) btn.classList.toggle('active', t.toLowerCase() === tab);
-    });
     if (tab === 'bulanan') { navToSection('rainfallreport'); return; }
+    var cardGrid = document.getElementById('mobileRfCardGrid');
+    var backBtn  = document.getElementById('mobileRfBackBtn');
+    if (cardGrid) cardGrid.style.display = 'none';
+    if (backBtn)  backBtn.style.display  = '';
     var listPanel = document.getElementById('mobileRfListPanel');
     var formPanel = document.getElementById('mobileRfFormPanel');
     if (listPanel) listPanel.style.display = tab === 'transaksi' ? '' : 'none';
@@ -13427,7 +13453,7 @@ function cancelMobileRainfallForm() {
     document.getElementById('mobileRfDate').value   = '';
     document.getElementById('mobileRfMm').value     = '';
     clearMobileRainfallPhoto();
-    showMobileRainfallTab('transaksi');
+    showMobileRainfallCardGrid();
 }
 
 function deleteMobileRainfallRecord(id) {
@@ -13459,7 +13485,8 @@ window.showEstateCategoryTab    = showEstateCategoryTab;
 window.openEstateCatWithType    = openEstateCatWithType;
 window.openMobileStockForm      = openMobileStockForm;
 window.renderMobileRainfallList = renderMobileRainfallList;
-window.showMobileRainfallTab    = showMobileRainfallTab;
+window.showMobileRainfallTab        = showMobileRainfallTab;
+window.showMobileRainfallCardGrid   = showMobileRainfallCardGrid;
 window.showMobileRainfallForm   = showMobileRainfallForm;
 window.editMobileRainfallRecord = editMobileRainfallRecord;
 window.cancelMobileRainfallForm = cancelMobileRainfallForm;
