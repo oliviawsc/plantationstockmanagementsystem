@@ -3604,6 +3604,30 @@ function btnDone(btn) {
         delete btn.dataset.origHtml;
     }
 }
+// Show a ✓ Saved! success state on the button for ~1.2s, then restore.
+// Optionally call onDone() after the animation (e.g. to close the form).
+// Safe to call even if btnLoad() was never called.
+function btnSuccess(btn, onDone) {
+    if (!btn) { if (onDone) onDone(); return; }
+    if (btn.dataset.origHtml === undefined) btn.dataset.origHtml = btn.innerHTML;
+    btn.disabled = true;
+    var _prevBg = btn.style.background, _prevColor = btn.style.color;
+    btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:5px;"><svg style="width:14px;height:14px;flex-shrink:0;" viewBox="0 0 20 20" fill="none"><path d="M4 10.5l5 4.5 7-8" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Saved!</span>';
+    btn.style.background = 'linear-gradient(135deg,#16a34a,#166534)';
+    btn.style.color      = '#fff';
+    btn.style.transform  = 'scale(1.06)';
+    btn.style.transition = 'transform 0.17s ease';
+    setTimeout(function() { if (btn) btn.style.transform = 'scale(1)'; }, 170);
+    setTimeout(function() {
+        if (!btn) return;
+        btn.style.background = _prevBg;
+        btn.style.color      = _prevColor;
+        btn.style.transform  = '';
+        btn.style.transition = '';
+        btnDone(btn);
+        if (onDone) onDone();
+    }, 1200);
+}
 // For save operations that complete synchronously (instant localStorage writes),
 // btnLoad()+btnDone() back-to-back never gets painted by the browser — JS blocks
 // the render until it yields. btnLoadThen() shows the spinner, yields so it
@@ -4410,6 +4434,7 @@ function saveTransaction() {
 
     const txnType  = document.getElementById('txnType').value;
     const txnSaveBtn = document.getElementById('txnSaveBtn');
+    let _txnSavedOk = false;
     btnLoad(txnSaveBtn);
     setTimeout(() => {
     try {
@@ -4507,6 +4532,7 @@ function saveTransaction() {
         document.getElementById('txnQty').required = true;
         document.getElementById('txnLocation').required = true;
         clearTxnPicture();
+        _txnSavedOk = true;
         showTxnSuccessBanner(`✅ ${parsedRows.length} rekod berjaya disimpan.`);
         refreshAll();
         return;
@@ -4546,11 +4572,12 @@ function saveTransaction() {
     document.getElementById('txnManuringWrap').classList.add('hidden');
     document.getElementById('txnMaintWrap').classList.add('hidden');
     clearTxnPicture();
+    _txnSavedOk = true;
     showTxnSuccessBanner('✅ Rekod berjaya disimpan.');
     refreshAll();
 
     } finally {
-        btnDone(txnSaveBtn);
+        _txnSavedOk ? btnSuccess(txnSaveBtn) : btnDone(txnSaveBtn);
     }
     }, 300);
 }
@@ -7454,13 +7481,14 @@ function saveEditTransaction() {
     };
 
     save(STORAGE_KEYS.transactions, transactions);
-    btnDone(editTxnSaveBtn);
-    closeEditTxnModal();
-    const _dUpd = I18N[currentLang] || I18N['en'];
-    alert(_dUpd.alert_txn_updated || 'Transaction updated successfully.');
     refreshAll();
     var _catSec = document.getElementById('estate_category');
     if (_catSec && _catSec.classList.contains('active')) renderEstateTransaksi();
+    btnSuccess(editTxnSaveBtn, function() {
+        closeEditTxnModal();
+        const _dUpd = I18N[currentLang] || I18N['en'];
+        alert(_dUpd.alert_txn_updated || 'Transaction updated successfully.');
+    });
     });
 }
 
@@ -10633,8 +10661,7 @@ function saveMaintClaim() {
             roundId: round.id, roundName: round.name,
             blockName, claimedArea, month
         };
-        btnDone(mpSaveBtn);
-        cancelEditMaintClaim();
+        btnSuccess(mpSaveBtn, cancelEditMaintClaim);
     } else {
         const existing = maintClaims.findIndex(c =>
             String(c.roundId) === String(roundId) &&
@@ -10646,7 +10673,7 @@ function saveMaintClaim() {
             maintClaims.push({ id: Date.now(), roundId: round.id, roundName: round.name,
                                blockName, claimedArea, month });
         }
-        btnDone(mpSaveBtn);
+        btnSuccess(mpSaveBtn);
         document.getElementById('mpClaimedArea').value = '';
         document.getElementById('mpRound').value       = '';
         document.getElementById('mpBlock').value       = '';
@@ -12725,8 +12752,10 @@ function saveRainfallTxn() {
         rainfallTxns.push({ id: Date.now(), date, mm, picture: picture || null, createdAt: new Date().toISOString().slice(0, 10) });
     }
     rainfallTxns.sort((a, b) => b.date.localeCompare(a.date));
+    const _rfSaveBtn = document.getElementById('rfSaveBtn');
+    btnLoad(_rfSaveBtn);
     save(STORAGE_KEYS.rainfallTxns, rainfallTxns);
-    cancelAddRainfall();
+    btnSuccess(_rfSaveBtn, cancelAddRainfall);
 }
 
 async function deleteRainfallTxn(id) {
@@ -13025,25 +13054,31 @@ function _doSaveMobileRainfallTxn(picture) {
     }
     rainfallTxns.sort(function(a, b) { return b.date.localeCompare(a.date); });
 
+    var _mRfBtn = document.getElementById('mobileRfSaveBtn');
+    btnLoad(_mRfBtn);
+    var _quotaMsg = null;
     try {
         save(STORAGE_KEYS.rainfallTxns, rainfallTxns);
     } catch (quotaErr) {
         if (picture && (quotaErr.name === 'QuotaExceededError' || quotaErr.code === 22)) {
             rainfallTxns = rainfallTxns.map(function(r) { return Object.assign({}, r, {picture: null}); });
             save(STORAGE_KEYS.rainfallTxns, rainfallTxns);
-            alert('Storage full — rainfall saved without photo. Please clear old data to keep photos.');
+            _quotaMsg = 'Storage full — rainfall saved without photo. Please clear old data to keep photos.';
         } else {
+            btnDone(_mRfBtn);
             throw quotaErr;
         }
     }
-
-    var d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
-    alert((d && d.rf_saved_ok) || 'Rainfall transaction saved!');
-    cancelMobileRainfallForm();
-    renderMobileRainfallList();
-    if (typeof renderRainfallReport  === 'function') renderRainfallReport();
-    if (typeof renderRainfallSummary === 'function') renderRainfallSummary();
-    if (typeof renderRainfallChart   === 'function') renderRainfallChart();
+    btnSuccess(_mRfBtn, function() {
+        if (_quotaMsg) alert(_quotaMsg);
+        var d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
+        alert((d && d.rf_saved_ok) || 'Rainfall transaction saved!');
+        cancelMobileRainfallForm();
+        renderMobileRainfallList();
+        if (typeof renderRainfallReport  === 'function') renderRainfallReport();
+        if (typeof renderRainfallSummary === 'function') renderRainfallSummary();
+        if (typeof renderRainfallChart   === 'function') renderRainfallChart();
+    });
 }
 
 function saveMobileRainfallTxn() {
