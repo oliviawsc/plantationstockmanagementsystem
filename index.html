@@ -1680,7 +1680,7 @@
                         <label class="block text-sm font-semibold mb-1" data-i18n="col_date">Date</label>
                         <input id="txnDate" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" type="date" />
                     </div>
-                    <div>
+                    <div id="txnCategoryRow">
                         <label class="block text-sm font-semibold mb-1" data-i18n="col_category">Category</label>
                         <select id="txnCategory" class="w-full border border-green-300 rounded p-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600" onchange="filterTxnItemsByCategory()">
                             <option value="" data-i18n="select_category">-- Select Category --</option>
@@ -1693,7 +1693,7 @@
                         </select>
                         <div id="txnItemBalance" style="margin-top:6px;font-size:12px;color:#16a34a;font-weight:600;font-family:Inter,sans-serif;min-height:18px;"></div>
                     </div>
-                    <div>
+                    <div id="txnTypeRow">
                         <label class="block text-sm font-semibold mb-1" data-i18n="txn_lbl_type">Transaction Type</label>
                         <select id="txnType" class="hidden">
                             <option value=""></option>
@@ -8482,6 +8482,12 @@ function resetTxnFormForNewEntry() {
     document.getElementById('txnRowsBody').innerHTML = '';
     clearTxnPicture();
     resetTxnTypeBtns();
+    var catRow  = document.getElementById('txnCategoryRow');
+    var typeRow = document.getElementById('txnTypeRow');
+    if (catRow)  catRow.style.display  = '';
+    if (typeRow) typeRow.style.display = '';
+    var backEl = document.getElementById('txnMobileBack');
+    if (backEl) { var h2 = backEl.querySelector('h2'); if (h2) h2.textContent = 'Rekod Stok'; }
 }
 
 function stepTxnQty(delta) {
@@ -12998,8 +13004,19 @@ function showEstateCategoryTab(tab) {
 }
 
 function openEstateCatWithType(type) {
+    var catLabels = { 'Fertilizer': 'Baja', 'Chemical': 'Racun', 'Oil Palm Seedling': 'Anak Sawit' };
+    var typeLabel = type === 'In' ? 'Masuk Stor' : 'Keluar Stor';
+    var catLabel  = catLabels[activeMobileCategory] || activeMobileCategory;
     openMobileStockForm(activeMobileCategory);
-    setTimeout(function() { selectTxnType(type); }, 30);
+    setTimeout(function() {
+        selectTxnType(type);
+        var backEl = document.getElementById('txnMobileBack');
+        if (backEl) { var h2 = backEl.querySelector('h2'); if (h2) h2.textContent = catLabel + ' ' + typeLabel; }
+        var catRow  = document.getElementById('txnCategoryRow');
+        var typeRow = document.getElementById('txnTypeRow');
+        if (catRow)  catRow.style.display  = 'none';
+        if (typeRow) typeRow.style.display = 'none';
+    }, 30);
 }
 
 function renderEstateBakiStok() {
