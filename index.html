@@ -1676,8 +1676,15 @@
             <div class="bg-white p-6 rounded-xl shadow">
                 <h3 class="text-xl font-bold mb-4" data-i18n="txn_form_title">Record Stock Movement</h3>
                 <form id="txnForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div id="txnCatFlowTitle" style="display:none;grid-column:1/-1;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:12px;padding:14px 16px;border-left:4px solid #16a34a;">
-                        <div id="txnCatFlowTitleText" style="font-size:16px;font-weight:800;color:#166534;font-family:Inter,sans-serif;"></div>
+                    <div id="txnCatFlowTitle" style="display:none;grid-column:1/-1;">
+                        <button type="button" onclick="navToEstateCategory(activeMobileCategory)"
+                            style="display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;padding:0 0 10px;font-family:Inter,sans-serif;font-size:14px;font-weight:600;color:#374151;-webkit-tap-highlight-color:transparent;">
+                            <span style="font-size:20px;line-height:1;">‹</span>
+                            <span>Kembali</span>
+                        </button>
+                        <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:12px;padding:14px 16px;border-left:4px solid #16a34a;">
+                            <div id="txnCatFlowTitleText" style="font-size:16px;font-weight:800;color:#166534;font-family:Inter,sans-serif;"></div>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold mb-1" data-i18n="col_date">Date</label>
