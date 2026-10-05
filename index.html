@@ -2932,29 +2932,37 @@
                         <h3 class="text-xl font-bold" id="toolsTxnFormTitle" data-i18n="tools_form_add_title">Add Tools Transaction</h3>
                         <input type="hidden" id="toolsTxnEditId" value="" />
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="grid grid-cols-1 gap-5 mb-4">
+                        <!-- Date -->
                         <div>
                             <label class="block text-sm font-semibold mb-1" data-i18n="col_date">Date</label>
                             <input type="date" id="toolsTxnDate" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                         </div>
+                        <!-- Transaction Type: button cards -->
                         <div>
-                            <label class="block text-sm font-semibold mb-1" data-i18n="col_type">Transaction Type</label>
-                            <select id="toolsTxnType" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600">
-                                <option value="Out Store" data-i18n="tools_type_out">Out Store</option>
-                                <option value="In Store" data-i18n="tools_type_in">In Store</option>
-                            </select>
+                            <label class="block text-sm font-semibold mb-2" data-i18n="col_type">Transaction Type</label>
+                            <input type="hidden" id="toolsTxnType" value="Out Store" />
+                            <div style="display:flex;gap:12px;">
+                                <button type="button" id="toolsTypeBtnIn" onclick="selectToolsTxnType('In Store')"
+                                    style="flex:1;padding:12px 8px;border-radius:10px;border:2px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;">
+                                    <span style="font-size:18px;">📥</span><span data-i18n="tools_type_in">Masuk Stor</span>
+                                </button>
+                                <button type="button" id="toolsTypeBtnOut" onclick="selectToolsTxnType('Out Store')"
+                                    style="flex:1;padding:12px 8px;border-radius:10px;border:2px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;">
+                                    <span style="font-size:18px;">📤</span><span data-i18n="tools_type_out">Keluar Stor</span>
+                                </button>
+                            </div>
                         </div>
+                        <!-- Items checklist -->
                         <div>
-                            <label class="block text-sm font-semibold mb-1" data-i18n="col_item_name">Item (Tools category)</label>
-                            <select id="toolsTxnItem" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600">
-                                <option value="">-- Select Item --</option>
-                            </select>
+                            <label class="block text-sm font-semibold mb-1"><span data-i18n="tools_lbl_items">Jenis Peralatan</span> <span style="color:#dc2626;">*</span></label>
+                            <p class="text-xs text-gray-500 mb-2" data-i18n="tools_lbl_items_hint">Sila tandakan peralatan yang ingin diambil</p>
+                            <div id="toolsItemChecklist" style="border:1px solid #BBF7D0;border-radius:8px;padding:8px 12px;max-height:220px;overflow-y:auto;background:#F9FAFB;">
+                                <p class="text-xs text-gray-400 py-2">No tools items found. Please add Tools category items in Item Files.</p>
+                            </div>
                         </div>
+                        <!-- Worker Name -->
                         <div>
-                            <label class="block text-sm font-semibold mb-1" data-i18n="col_qty">Quantity</label>
-                            <input type="number" id="toolsTxnQty" min="1" value="1" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
-                        </div>
-                        <div class="md:col-span-2">
                             <label class="block text-sm font-semibold mb-1" data-i18n="col_worker">Worker Name</label>
                             <input type="text" id="toolsTxnWorker" placeholder="Enter worker name" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                         </div>
@@ -8184,6 +8192,8 @@ const I18N = {
         opt_all_workers:          'All Workers',
         cat_tools:                'Tools',
         col_worker:               'Worker',
+        tools_lbl_items:          'Tools Type',
+        tools_lbl_items_hint:     'Please tick the tools to be taken',
     },
 
     ms: {
@@ -8619,6 +8629,8 @@ const I18N = {
         opt_all_workers:          'Semua Pekerja',
         cat_tools:                'Peralatan',
         col_worker:               'Pekerja',
+        tools_lbl_items:          'Jenis Peralatan',
+        tools_lbl_items_hint:     'Sila tandakan peralatan yang ingin diambil',
     }
 };
 
@@ -13833,18 +13845,44 @@ function renderToolsPage() {
     renderToolsTxns();
 }
 
+function selectToolsTxnType(type) {
+    var hidden = document.getElementById('toolsTxnType');
+    if (hidden) hidden.value = type;
+    var btnIn  = document.getElementById('toolsTypeBtnIn');
+    var btnOut = document.getElementById('toolsTypeBtnOut');
+    var activeStyle  = 'flex:1;padding:12px 8px;border-radius:10px;border:2px solid #16A34A;background:#F0FDF4;color:#166534;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;';
+    var inactiveStyle = 'flex:1;padding:12px 8px;border-radius:10px;border:2px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;';
+    if (btnIn)  btnIn.style.cssText  = type === 'In Store'  ? activeStyle : inactiveStyle;
+    if (btnOut) btnOut.style.cssText = type === 'Out Store' ? activeStyle : inactiveStyle;
+}
+
 function rebuildToolsItemDropdown() {
     var toolItems = items.filter(function(i) { return i.category === 'Tools'; });
-    ['toolsTxnItem', 'toolsFilterItem', 'toolsRecordItemFilter'].forEach(function(id) {
+    // Rebuild filter selects (not the checklist)
+    ['toolsFilterItem', 'toolsRecordItemFilter'].forEach(function(id) {
         var sel = document.getElementById(id);
         if (!sel) return;
         var cur = sel.value;
-        var first = id === 'toolsTxnItem' ? '<option value="">-- Select Item --</option>' : '<option value="">All Items</option>';
-        sel.innerHTML = first + toolItems.map(function(i) {
+        sel.innerHTML = '<option value="">All Items</option>' + toolItems.map(function(i) {
             return '<option value="' + i.name + '">' + i.name + '</option>';
         }).join('');
         if (cur) sel.value = cur;
     });
+    // Rebuild checklist
+    var checklist = document.getElementById('toolsItemChecklist');
+    if (!checklist) return;
+    if (!toolItems.length) {
+        checklist.innerHTML = '<p class="text-xs text-gray-400 py-2">No tools items found. Please add Tools category items in Item Files.</p>';
+        return;
+    }
+    checklist.innerHTML = toolItems.map(function(item) {
+        var safeId = 'toolsChk_' + item.name.replace(/[^a-zA-Z0-9]/g, '_');
+        return '<label style="display:flex;align-items:center;gap:10px;padding:8px 4px;cursor:pointer;border-bottom:1px solid #F1F5F9;font-size:14px;color:#1F2937;">' +
+            '<input type="checkbox" class="tools-item-chk" value="' + item.name + '" id="' + safeId + '" ' +
+            'style="width:17px;height:17px;accent-color:#16A34A;cursor:pointer;flex-shrink:0;" />' +
+            '<span>' + item.name + '</span>' +
+            '</label>';
+    }).join('');
 }
 
 function renderToolsTxns() {
@@ -13905,28 +13943,28 @@ function showToolsTxnForm(editId) {
     var panel = document.getElementById('toolsTxnFormPanel');
     panel.classList.remove('hidden');
     var d = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {};
+    rebuildToolsItemDropdown();
     if (editId) {
         document.getElementById('toolsTxnFormTitle').textContent = d.tools_form_edit_title || 'Edit Tools Transaction';
         document.getElementById('toolsTxnEditId').value = editId;
         var txn = transactions.find(function(t) { return String(t.id) === String(editId); });
         if (txn) {
             document.getElementById('toolsTxnDate').value   = txn.date   || '';
-            document.getElementById('toolsTxnType').value   = txn.type   || 'Out Store';
-            document.getElementById('toolsTxnQty').value    = txn.qty    || 1;
             document.getElementById('toolsTxnWorker').value = txn.remarks || '';
-            rebuildToolsItemDropdown();
-            document.getElementById('toolsTxnItem').value = txn.itemName || '';
+            selectToolsTxnType(txn.type || 'Out Store');
+            // Pre-check the item
+            document.querySelectorAll('.tools-item-chk').forEach(function(chk) {
+                chk.checked = chk.value === (txn.itemName || '');
+            });
         }
     } else {
         document.getElementById('toolsTxnFormTitle').textContent = d.tools_form_add_title || 'Add Tools Transaction';
         document.getElementById('toolsTxnEditId').value = '';
         var dateEl = document.getElementById('toolsTxnDate');
         if (!dateEl.value) dateEl.valueAsDate = new Date();
-        document.getElementById('toolsTxnType').value   = 'Out Store';
-        document.getElementById('toolsTxnQty').value    = 1;
         document.getElementById('toolsTxnWorker').value = '';
-        rebuildToolsItemDropdown();
-        document.getElementById('toolsTxnItem').value = '';
+        selectToolsTxnType('Out Store');
+        document.querySelectorAll('.tools-item-chk').forEach(function(chk) { chk.checked = false; });
     }
 }
 
@@ -13936,47 +13974,59 @@ function cancelToolsTxnForm() {
 }
 
 function saveToolsTransaction() {
-    var btn      = document.getElementById('toolsTxnSaveBtn');
-    var date     = (document.getElementById('toolsTxnDate')   || {}).value || '';
-    var type     = (document.getElementById('toolsTxnType')   || {}).value || 'Out Store';
-    var itemName = (document.getElementById('toolsTxnItem')   || {}).value || '';
-    var qty      = parseFloat((document.getElementById('toolsTxnQty') || {}).value) || 0;
-    var worker   = ((document.getElementById('toolsTxnWorker') || {}).value || '').trim();
-    var editId   = (document.getElementById('toolsTxnEditId') || {}).value || '';
+    var btn    = document.getElementById('toolsTxnSaveBtn');
+    var date   = (document.getElementById('toolsTxnDate')   || {}).value || '';
+    var type   = (document.getElementById('toolsTxnType')   || {}).value || 'Out Store';
+    var worker = ((document.getElementById('toolsTxnWorker') || {}).value || '').trim();
+    var editId = (document.getElementById('toolsTxnEditId') || {}).value || '';
 
-    if (!date)     { alert('Please select a date.');  return; }
-    if (!itemName) { alert('Please select an item.'); return; }
-    if (qty <= 0)  { alert('Quantity must be greater than 0.'); return; }
+    // Gather checked items
+    var checkedItems = [];
+    document.querySelectorAll('.tools-item-chk:checked').forEach(function(chk) {
+        checkedItems.push(chk.value);
+    });
 
-    var item = items.find(function(i) { return i.name === itemName; });
-    var unit = item ? (item.unit || '') : '';
+    if (!date)                { alert('Please select a date.');           return; }
+    if (!checkedItems.length) { alert('Please select at least one item.'); return; }
+
+    var session = (typeof loadSession === 'function') ? loadSession() : null;
+    var username = session ? (session.username || '') : '';
 
     btnLoad(btn);
     setTimeout(function() {
         try {
             if (editId) {
+                // Editing: update the single transaction (first checked item)
+                var itemName = checkedItems[0];
+                var item = items.find(function(i) { return i.name === itemName; });
+                var unit = item ? (item.unit || '') : '';
                 var idx = transactions.findIndex(function(t) { return String(t.id) === String(editId); });
                 if (idx !== -1) {
                     transactions[idx] = Object.assign({}, transactions[idx], {
-                        date: date, type: type, itemName: itemName, qty: qty, unit: unit,
+                        date: date, type: type, itemName: itemName, unit: unit,
+                        itemId: item ? item.id : transactions[idx].itemId,
                         category: 'Tools', remarks: worker
                     });
                 }
             } else {
-                var newTxn = {
-                    id:       Date.now(),
-                    date:     date,
-                    type:     type,
-                    itemId:   item ? item.id : '',
-                    itemName: itemName,
-                    category: 'Tools',
-                    qty:      qty,
-                    unit:     unit,
-                    location: activeEstate || '',
-                    remarks:  worker,
-                    user:     (typeof loadSession === 'function' && loadSession()) ? loadSession().username : ''
-                };
-                transactions.push(newTxn);
+                // New: one transaction per checked item
+                var baseId = Date.now();
+                checkedItems.forEach(function(itemName, idx) {
+                    var item = items.find(function(i) { return i.name === itemName; });
+                    transactions.push({
+                        id:       baseId + idx,
+                        date:     date,
+                        type:     type,
+                        itemId:   item ? item.id : '',
+                        itemName: itemName,
+                        category: 'Tools',
+                        qty:      1,
+                        unit:     item ? (item.unit || '') : '',
+                        location: activeEstate || '',
+                        remarks:  worker,
+                        user:     username
+                    });
+                });
             }
             save(STORAGE_KEYS.transactions, transactions);
             refreshAll();
@@ -14066,15 +14116,16 @@ function renderToolsRecord() {
     }).join('');
 }
 
-window.renderToolsPage       = renderToolsPage;
-window.renderToolsTxns       = renderToolsTxns;
-window.renderToolsRecord     = renderToolsRecord;
-window.showToolsTxnForm      = showToolsTxnForm;
-window.cancelToolsTxnForm    = cancelToolsTxnForm;
-window.saveToolsTransaction  = saveToolsTransaction;
-window.editToolsTxn          = editToolsTxn;
-window.deleteToolsTxn        = deleteToolsTxn;
+window.renderToolsPage          = renderToolsPage;
+window.renderToolsTxns          = renderToolsTxns;
+window.renderToolsRecord        = renderToolsRecord;
+window.showToolsTxnForm         = showToolsTxnForm;
+window.cancelToolsTxnForm       = cancelToolsTxnForm;
+window.saveToolsTransaction     = saveToolsTransaction;
+window.editToolsTxn             = editToolsTxn;
+window.deleteToolsTxn           = deleteToolsTxn;
 window.rebuildToolsItemDropdown = rebuildToolsItemDropdown;
+window.selectToolsTxnType       = selectToolsTxnType;
 
 // ══════════════════════════════════════════════════════════════════════
 // SETTINGS TAB SWITCHING
