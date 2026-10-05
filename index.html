@@ -5367,7 +5367,7 @@ function renderSummary() {
 }
 
 // Delete a single transaction from the Stock Summary
-function deleteSummaryTransaction(id) {
+async function deleteSummaryTransaction(id) {
     const txn = transactions.find(t => String(t.id) === String(id));
     if (!txn) return;
     if (!confirm(`Delete this transaction?\n\nItem: ${txn.itemName}\nType: ${txn.type}  |  Qty: ${parseFloat(txn.qty).toFixed(2)}  |  Date: ${txn.date}\n\nThis cannot be undone.`)) return;
@@ -5398,15 +5398,14 @@ function deleteSummaryTransaction(id) {
     }
     refreshAll();
 
-    // Step 3: direct Supabase DELETE (no diff-sync — straightforward delete by id).
+    // Step 3: await the Supabase DELETE — same pattern as all other deletes in this codebase.
     if (typeof supabaseClient !== 'undefined') {
-        supabaseClient.from('opp_transactions').delete().eq('id', id)
-            .then(function(result) {
-                if (result && result.error) {
-                    console.error('[Delete txn] Supabase error:', result.error);
-                    // Keep tombstone so loadFromSupabase will retry on next page load
-                    return;
-                }
+        try {
+            const { error } = await supabaseClient.from('opp_transactions').delete().eq('id', id);
+            if (error) {
+                console.error('[Delete txn] Supabase error:', error);
+                // Keep tombstone so loadFromSupabase will retry on next page load
+            } else {
                 // Confirmed — clean tombstone entry
                 try {
                     const t2 = JSON.parse(localStorage.getItem(tombstoneKey)) || [];
@@ -5414,7 +5413,10 @@ function deleteSummaryTransaction(id) {
                         t2.filter(sid => String(sid) !== String(id))
                     ));
                 } catch(e) {}
-            });
+            }
+        } catch(err) {
+            console.error('[Delete txn] Network error:', err);
+        }
     }
 }
 
