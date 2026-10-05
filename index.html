@@ -3828,7 +3828,21 @@ async function loadFromSupabase() {
 
         if (!itemsRes.error  && itemsRes.data  !== null) items            = itemsRes.data;
         if (!locsRes.error   && locsRes.data   !== null) locations        = locsRes.data;
-        if (!txnsRes.error   && txnsRes.data   !== null) transactions     = txnsRes.data;
+        if (!txnsRes.error   && txnsRes.data   !== null) {
+            const sbTxns    = txnsRes.data;
+            const prevKnown = lastKnownIds.opp_transactions; // ids known at last sync
+            const localIds  = new Set(transactions.map(r => String(r.id)));
+            // Filter out records that were locally deleted (were in prevKnown but removed locally)
+            const filtered  = sbTxns.filter(r => {
+                if (prevKnown.has(r.id) && !localIds.has(String(r.id))) return false; // locally deleted
+                return true;
+            });
+            // Keep locally-added records not yet pushed to Supabase
+            const sbIds        = new Set(sbTxns.map(r => String(r.id)));
+            const localUnsynced = transactions.filter(r => !sbIds.has(String(r.id)));
+            transactions = [...filtered, ...localUnsynced];
+            if (localUnsynced.length > 0) syncToSupabase(STORAGE_KEYS.transactions, transactions);
+        }
         if (!roundsRes.error && roundsRes.data !== null) manuringRounds   = roundsRes.data;
         if (!fmRoundsRes.error && fmRoundsRes.data !== null) fieldMaintRounds = fmRoundsRes.data;
         if (!claimsRes.error && claimsRes.data !== null) maintClaims      = claimsRes.data;
@@ -5329,9 +5343,22 @@ function deleteSummaryTransaction(id) {
     const txn = transactions.find(t => String(t.id) === String(id));
     if (!txn) return;
     if (!confirm(`Delete this transaction?\n\nItem: ${txn.itemName}\nType: ${txn.type}  |  Qty: ${parseFloat(txn.qty).toFixed(2)}  |  Date: ${txn.date}\n\nThis cannot be undone.`)) return;
+    // Step 1: remove locally before any async work so the diff-sync sees the deletion
     transactions = transactions.filter(t => String(t.id) !== String(id));
+    lastKnownIds.opp_transactions = new Set(transactions.map(r => r.id));
     save(STORAGE_KEYS.transactions, transactions);
     refreshAll();
+    // Step 2: direct Supabase delete — bypasses the diff and fires regardless of race timing
+    if (typeof supabaseClient !== 'undefined') {
+        supabaseClient.from('opp_transactions').delete().eq('id', id)
+            .then(function() {
+                // Step 3: re-apply deletion in case loadFromSupabase ran concurrently and restored the record
+                transactions = transactions.filter(t => String(t.id) !== String(id));
+                lastKnownIds.opp_transactions = new Set(transactions.map(r => r.id));
+                const estateKey = getEstateKeys(activeEstate);
+                localStorage.setItem(estateKey.transactions, JSON.stringify(transactions));
+            });
+    }
 }
 
 /**
