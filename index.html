@@ -2871,20 +2871,12 @@
 
         <!-- ============ PAGE: TOOLS TRANSACTIONS ============ -->
         <section id="tools" class="page-section">
+            <div class="htab-bar">
+                <button id="toolsTabTxnBtn" class="htab-btn active" onclick="switchToolsTab('txn')">📋 Transactions</button>
+                <button id="toolsTabRecBtn" class="htab-btn" onclick="switchToolsTab('rec')">📊 Rekod Peralatan</button>
+            </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_tools">🔧 Tools / Peralatan</h2>
             <p class="text-sm text-green-700 mb-6" data-i18n="page_tools_sub">Record tools issued and received at the store.</p>
-
-            <!-- Tab bar -->
-            <div style="display:flex;gap:0;border-bottom:2px solid #BBF7D0;margin-bottom:20px;">
-                <button id="toolsTabTxnBtn" onclick="switchToolsTab('txn')"
-                    style="padding:9px 22px;font-size:14px;font-weight:700;border:none;background:none;cursor:pointer;font-family:Inter,sans-serif;border-bottom:3px solid #16A34A;color:#15803D;margin-bottom:-2px;">
-                    📋 Transactions
-                </button>
-                <button id="toolsTabRecBtn" onclick="switchToolsTab('rec')"
-                    style="padding:9px 22px;font-size:14px;font-weight:700;border:none;background:none;cursor:pointer;font-family:Inter,sans-serif;border-bottom:3px solid transparent;color:#6B7280;margin-bottom:-2px;">
-                    📊 Rekod Peralatan
-                </button>
-            </div>
 
             <!-- Tab A: Transactions -->
             <div id="toolsTabTxnPanel">
@@ -14207,19 +14199,17 @@ function switchToolsTab(tab) {
     var recPanel = document.getElementById('toolsTabRecPanel');
     var txnBtn   = document.getElementById('toolsTabTxnBtn');
     var recBtn   = document.getElementById('toolsTabRecBtn');
-    var activeStyle   = 'padding:9px 22px;font-size:14px;font-weight:700;border:none;background:none;cursor:pointer;font-family:Inter,sans-serif;border-bottom:3px solid #16A34A;color:#15803D;margin-bottom:-2px;';
-    var inactiveStyle = 'padding:9px 22px;font-size:14px;font-weight:700;border:none;background:none;cursor:pointer;font-family:Inter,sans-serif;border-bottom:3px solid transparent;color:#6B7280;margin-bottom:-2px;';
     if (tab === 'rec') {
         if (txnPanel) txnPanel.style.display = 'none';
         if (recPanel) recPanel.style.display = '';
-        if (txnBtn)   txnBtn.style.cssText   = inactiveStyle;
-        if (recBtn)   recBtn.style.cssText   = activeStyle;
+        if (txnBtn)   { txnBtn.classList.remove('active'); }
+        if (recBtn)   { recBtn.classList.add('active'); }
         renderToolsRecord();
     } else {
         if (txnPanel) txnPanel.style.display = '';
         if (recPanel) recPanel.style.display = 'none';
-        if (txnBtn)   txnBtn.style.cssText   = activeStyle;
-        if (recBtn)   recBtn.style.cssText   = inactiveStyle;
+        if (txnBtn)   { txnBtn.classList.add('active'); }
+        if (recBtn)   { recBtn.classList.remove('active'); }
     }
 }
 window.switchToolsTab = switchToolsTab;
