@@ -7183,6 +7183,8 @@ function refreshAll() {
     if (typeof renderRainfallTxns === 'function') renderRainfallTxns();
     if (typeof renderRainfallReport === 'function') renderRainfallReport();
     if (typeof renderRainfallSummary === 'function') renderRainfallSummary();
+    if (typeof renderToolsTxns === 'function') renderToolsTxns();
+    if (typeof renderToolsRecord === 'function') renderToolsRecord();
 }
 
 /* -----------------------------------------------------------------
@@ -13846,7 +13848,8 @@ function selectToolsTxnType(type) {
 }
 
 function rebuildToolsItemDropdown() {
-    var toolItems = items.filter(function(i) { return i.category === 'Tools'; });
+    var _items = (typeof items !== 'undefined' ? items : (window.items || []));
+    var toolItems = _items.filter(function(i) { return i.category === 'Tools'; });
     // Rebuild filter select for transactions list
     var filterSel = document.getElementById('toolsFilterItem');
     if (filterSel) {
@@ -13882,7 +13885,8 @@ function renderToolsTxns() {
     var itemFilter   = (document.getElementById('toolsFilterItem')   || {}).value || '';
     var workerFilter = (document.getElementById('toolsFilterWorker') || {}).value || '';
 
-    var toolsTxns = transactions.filter(function(t) {
+    var _txns = (typeof transactions !== 'undefined' ? transactions : (window.transactions || []));
+    var toolsTxns = _txns.filter(function(t) {
         return t.category === 'Tools';
     });
 
@@ -14053,8 +14057,12 @@ function renderToolsRecord() {
     if (!container) return;
     var d = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {};
 
+    // Use window reference to guarantee cross-script access
+    var _txns  = (typeof transactions !== 'undefined' ? transactions : (window.transactions || []));
+    var _items = (typeof items        !== 'undefined' ? items        : (window.items        || []));
+
     // All tools transactions
-    var toolsTxns = transactions.filter(function(t) { return t.category === 'Tools'; });
+    var toolsTxns = _txns.filter(function(t) { return t.category === 'Tools'; });
 
     // Populate year dropdown
     var yearSel = document.getElementById('toolsRecordYear');
@@ -14075,7 +14083,7 @@ function renderToolsRecord() {
     });
 
     // All Tools category items (columns) — from items master list
-    var toolItemNames = items.filter(function(i) { return i.category === 'Tools'; }).map(function(i) { return i.name; });
+    var toolItemNames = _items.filter(function(i) { return i.category === 'Tools'; }).map(function(i) { return i.name; });
     // Also include any items seen in transactions but not in items master
     yearTxns.forEach(function(t) {
         if (t.itemName && !toolItemNames.includes(t.itemName)) toolItemNames.push(t.itemName);
