@@ -3832,11 +3832,35 @@ async function loadFromSupabase() {
             const sbTxns    = txnsRes.data;
             const prevKnown = lastKnownIds.opp_transactions; // ids known at last sync
             const localIds  = new Set(transactions.map(r => String(r.id)));
-            // Filter out records that were locally deleted (were in prevKnown but removed locally)
+            // Tombstone: ids deleted locally that may not yet be deleted in Supabase
+            let tombstoneIds = new Set();
+            try {
+                const tKey = `opp_deleted_txn_ids::${activeEstate}`;
+                tombstoneIds = new Set((JSON.parse(localStorage.getItem(tKey)) || []).map(String));
+            } catch(e) {}
+            // Filter out records that were locally deleted
             const filtered  = sbTxns.filter(r => {
+                if (tombstoneIds.has(String(r.id))) return false; // in tombstone — pending delete
                 if (prevKnown.has(r.id) && !localIds.has(String(r.id))) return false; // locally deleted
                 return true;
             });
+            // Re-issue Supabase deletes for any tombstoned ids still present in Supabase
+            if (tombstoneIds.size > 0) {
+                const stillInSb = sbTxns.filter(r => tombstoneIds.has(String(r.id))).map(r => r.id);
+                if (stillInSb.length > 0 && typeof supabaseClient !== 'undefined') {
+                    supabaseClient.from('opp_transactions').delete().in('id', stillInSb)
+                        .then(function(res) {
+                            if (res && !res.error) {
+                                try {
+                                    const tKey2 = `opp_deleted_txn_ids::${activeEstate}`;
+                                    const remaining = (JSON.parse(localStorage.getItem(tKey2)) || [])
+                                        .filter(sid => !stillInSb.map(String).includes(String(sid)));
+                                    localStorage.setItem(tKey2, JSON.stringify(remaining));
+                                } catch(e) {}
+                            }
+                        });
+                }
+            }
             // Keep locally-added records not yet pushed to Supabase
             const sbIds        = new Set(sbTxns.map(r => String(r.id)));
             const localUnsynced = transactions.filter(r => !sbIds.has(String(r.id)));
@@ -5343,7 +5367,21 @@ function deleteSummaryTransaction(id) {
     const txn = transactions.find(t => String(t.id) === String(id));
     if (!txn) return;
     if (!confirm(`Delete this transaction?\n\nItem: ${txn.itemName}\nType: ${txn.type}  |  Qty: ${parseFloat(txn.qty).toFixed(2)}  |  Date: ${txn.date}\n\nThis cannot be undone.`)) return;
-    // Step 1: remove from local memory.
+
+    const deletingEstate = activeEstate;
+    const tombstoneKey = `opp_deleted_txn_ids::${deletingEstate}`;
+
+    // Step 1: write tombstone to localStorage so the deletion survives page refresh.
+    // loadFromSupabase reads this tombstone and skips (+ re-deletes) any matching Supabase rows.
+    try {
+        const tombstone = JSON.parse(localStorage.getItem(tombstoneKey)) || [];
+        if (!tombstone.includes(String(id))) {
+            tombstone.push(String(id));
+            localStorage.setItem(tombstoneKey, JSON.stringify(tombstone));
+        }
+    } catch(e) {}
+
+    // Step 2: remove from local memory.
     // IMPORTANT: do NOT update lastKnownIds here — _executeSyncForEstate (called inside
     // save → syncToSupabase) reads lastKnownIds asynchronously. If lastKnownIds is already
     // updated to the post-deletion set, the diff sees previousIds === currentIds → removedIds = []
@@ -5351,8 +5389,8 @@ function deleteSummaryTransaction(id) {
     transactions = transactions.filter(t => String(t.id) !== String(id));
     save(STORAGE_KEYS.transactions, transactions);
     refreshAll();
-    // Step 2: direct Supabase delete as a safety net (covers any race where the diff-sync
-    // misses the deletion because loadFromSupabase reset lastKnownIds mid-flight)
+
+    // Step 3: direct Supabase delete as primary path
     if (typeof supabaseClient !== 'undefined') {
         supabaseClient.from('opp_transactions').delete().eq('id', id)
             .then(function(result) {
@@ -5360,10 +5398,15 @@ function deleteSummaryTransaction(id) {
                     console.error('[Delete txn] Supabase error:', result.error);
                     return;
                 }
-                // Step 3: re-apply deletion in case loadFromSupabase ran concurrently and restored the record
+                // Confirmed deleted from Supabase — remove tombstone entry and re-apply locally
+                try {
+                    const t2 = JSON.parse(localStorage.getItem(tombstoneKey)) || [];
+                    const cleaned = t2.filter(sid => String(sid) !== String(id));
+                    localStorage.setItem(tombstoneKey, JSON.stringify(cleaned));
+                } catch(e) {}
                 transactions = transactions.filter(t => String(t.id) !== String(id));
                 lastKnownIds.opp_transactions = new Set(transactions.map(r => r.id));
-                const estateKey = getEstateKeys(activeEstate);
+                const estateKey = getEstateKeys(deletingEstate);
                 localStorage.setItem(estateKey.transactions, JSON.stringify(transactions));
             });
     }
