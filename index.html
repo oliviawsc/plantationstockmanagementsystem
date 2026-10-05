@@ -4207,6 +4207,12 @@ navButtons.forEach(btn => {
         if (target === 'plantrecord') {
             renderPlantRecord();
         }
+        if (target === 'tools') {
+            if (typeof renderToolsPage === 'function') renderToolsPage();
+        }
+        if (target === 'toolsrecord') {
+            if (typeof renderToolsRecord === 'function') renderToolsRecord();
+        }
         if (target === 'settings') {
             renderEstatesList();
             renderItemsTable();
