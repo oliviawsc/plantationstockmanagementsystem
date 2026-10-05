@@ -4531,6 +4531,7 @@ function saveTransaction() {
         document.getElementById('txnLocationWrap').classList.remove('hidden');
         document.getElementById('txnQty').required = true;
         document.getElementById('txnLocation').required = true;
+        refreezeTxnType(); // restore Out/In type AFTER explicit show/hide resets
         clearTxnPicture();
         _txnSavedOk = true;
         showTxnSuccessBanner(`✅ ${parsedRows.length} rekod berjaya disimpan.`);
@@ -4571,6 +4572,7 @@ function saveTransaction() {
     _setTxnDateToday();
     document.getElementById('txnManuringWrap').classList.add('hidden');
     document.getElementById('txnMaintWrap').classList.add('hidden');
+    refreezeTxnType(); // restore type in case user came via openEstateCatWithType
     clearTxnPicture();
     _txnSavedOk = true;
     showTxnSuccessBanner('✅ Rekod berjaya disimpan.');
@@ -8832,6 +8834,12 @@ function refreezeTxnCategory() {
     if (!catSel || !catSel.dataset.frozenCategory) return;
     catSel.value    = catSel.dataset.frozenCategory;
     catSel.disabled = true;
+}
+function refreezeTxnType() {
+    if (!document.body.classList.contains('estate-mobile')) return;
+    const typeSel = document.getElementById('txnType');
+    if (!typeSel || !typeSel.dataset.frozenType) return;
+    selectTxnType(typeSel.dataset.frozenType);
 }
 
 function buildRoleOptions(selectedValue) {
@@ -13152,6 +13160,9 @@ function openEstateCatWithType(type) {
     var catLabel  = catLabels[activeMobileCategory] || activeMobileCategory;
     var fullTitle = catLabel + ' ' + typeLabel;
     openMobileStockForm(activeMobileCategory); // synchronous — refreshAll completes before returning
+    // Freeze the type so form.reset() in saveTransaction() can restore it (mirrors frozenCategory)
+    var txnTypeSel = document.getElementById('txnType');
+    if (txnTypeSel) txnTypeSel.dataset.frozenType = type;
     selectTxnType(type);
     // Update sticky mobile header
     var backEl = document.getElementById('txnMobileBack');
