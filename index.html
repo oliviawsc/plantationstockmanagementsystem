@@ -2919,11 +2919,12 @@
                                     <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_item_name">Item</th>
                                     <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_qty">Qty</th>
                                     <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_worker">Worker</th>
+                                    <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_photo">Photo</th>
                                     <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_action">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="toolsTxnTableBody">
-                                <tr><td colspan="6" class="text-center text-gray-400 py-8" data-i18n="tools_no_txn">No tools transactions yet.</td></tr>
+                                <tr><td colspan="7" class="text-center text-gray-400 py-8" data-i18n="tools_no_txn">No tools transactions yet.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -2971,6 +2972,30 @@
                         <div>
                             <label class="block text-sm font-semibold mb-1" data-i18n="col_worker">Worker Name</label>
                             <input type="text" id="toolsTxnWorker" placeholder="Enter worker name" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                        </div>
+                        <!-- Photo -->
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">
+                                <span data-i18n="txn_lbl_picture">Supporting Picture</span>
+                                <span class="text-gray-400 font-normal text-xs ml-1" data-i18n="txn_picture_hint">(Optional — photo of delivery note, DO, or site)</span>
+                            </label>
+                            <div onclick="showPhotoSelectMenu('toolsTxnPic')" style="width:100%;border:2.5px dashed #4ADE80;border-radius:16px;background:#FAFFF5;padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;box-sizing:border-box;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 40" width="48" height="36" fill="#9CA3AF">
+                                    <path d="M17 3L14 8H5C3.3 8 2 9.3 2 11v24c0 1.7 1.3 3 3 3h38c1.7 0 3-1.3 3-3V11c0-1.7-1.3-3-3-3h-9L31 3H17z"/>
+                                    <circle cx="24" cy="23" r="9" fill="#E5E7EB"/>
+                                    <circle cx="24" cy="23" r="6.5" fill="#9CA3AF"/>
+                                    <circle cx="21" cy="20" r="2" fill="#E5E7EB"/>
+                                </svg>
+                                <input type="file" id="toolsTxnPicPicture"       accept="image/*"                       class="hidden" onchange="previewToolsTxnPicture(this)" />
+                                <input type="file" id="toolsTxnPicPictureCamera" accept="image/*" capture="environment" class="hidden" onchange="previewToolsTxnPicture(this)" />
+                                <input type="file" id="toolsTxnPicPictureFile"                                          class="hidden" onchange="previewToolsTxnPicture(this)" />
+                                <div style="font-size:13px;color:#16a34a;font-weight:700;font-family:Inter,sans-serif;" data-i18n="photo_tap_hint">Ketik untuk pilih gambar</div>
+                                <div id="toolsTxnPicPreviewWrap" class="hidden" style="display:none;flex-direction:column;align-items:center;gap:8px;margin-top:4px;" onclick="event.stopPropagation()">
+                                    <img id="toolsTxnPicPreview" src="" alt="Preview" style="max-width:100%;max-height:180px;border-radius:12px;border:2px solid #86EFAC;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.1);" />
+                                    <button type="button" onclick="clearToolsTxnPicture()" style="font-size:12px;color:#DC2626;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;font-weight:600;" data-i18n="btn_remove">✖ Remove Photo</button>
+                                </div>
+                            </div>
+                            <p id="toolsTxnPicFilename" class="text-xs text-green-700 mt-1 italic hidden"></p>
                         </div>
                     </div>
                     <div style="display:flex;gap:10px;justify-content:flex-end;">
@@ -13928,19 +13953,23 @@ function renderToolsTxns() {
     filtered.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
 
     if (!filtered.length) {
-        body.innerHTML = '<tr><td colspan="6" class="text-center text-gray-400 py-8">' + (d.tools_no_txn || 'No tools transactions yet.') + '</td></tr>';
+        body.innerHTML = '<tr><td colspan="7" class="text-center text-gray-400 py-8">' + (d.tools_no_txn || 'No tools transactions yet.') + '</td></tr>';
         return;
     }
     body.innerHTML = filtered.map(function(t) {
         var typeBadge = t.type === 'In Store'
             ? '<span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;">In Store</span>'
             : '<span style="background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;">Out Store</span>';
+        var photoCell = t.picture
+            ? '<button onclick="viewToolsTxnPicture(\'' + t.id + '\')" style="background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;cursor:pointer;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:600;">📷 View</button>'
+            : '<span style="color:#9CA3AF;font-size:12px;">—</span>';
         return '<tr class="hover:bg-gray-50">' +
             '<td class="px-3 py-2 border border-gray-100">' + (t.date || '') + '</td>' +
             '<td class="px-3 py-2 border border-gray-100">' + typeBadge + '</td>' +
             '<td class="px-3 py-2 border border-gray-100">' + (t.itemName || '') + '</td>' +
             '<td class="px-3 py-2 border border-gray-100">' + (t.qty || '') + ' ' + (t.unit || '') + '</td>' +
             '<td class="px-3 py-2 border border-gray-100">' + (t.remarks || '-') + '</td>' +
+            '<td class="px-3 py-2 border border-gray-100 text-center">' + photoCell + '</td>' +
             '<td class="px-3 py-2 border border-gray-100" style="white-space:nowrap;">' +
                 '<button onclick="editToolsTxn(\'' + t.id + '\')" style="background:#EFF6FF;color:#1d4ed8;border:none;cursor:pointer;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;margin-right:4px;">Edit</button>' +
                 '<button onclick="deleteToolsTxn(\'' + t.id + '\')" style="background:#FEF2F2;color:#dc2626;border:none;cursor:pointer;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;">Delete</button>' +
@@ -13966,6 +13995,15 @@ function showToolsTxnForm(editId) {
             document.querySelectorAll('.tools-item-chk').forEach(function(chk) {
                 chk.checked = chk.value === (txn.itemName || '');
             });
+            // Pre-populate photo
+            if (txn.picture) {
+                var prev = document.getElementById('toolsTxnPicPreview');
+                var wrap = document.getElementById('toolsTxnPicPreviewWrap');
+                if (prev) prev.src = txn.picture;
+                if (wrap) { wrap.style.display = 'flex'; wrap.classList.remove('hidden'); }
+            } else {
+                clearToolsTxnPicture();
+            }
         }
     } else {
         document.getElementById('toolsTxnFormTitle').textContent = d.tools_form_add_title || 'Add Tools Transaction';
@@ -13975,12 +14013,14 @@ function showToolsTxnForm(editId) {
         document.getElementById('toolsTxnWorker').value = '';
         selectToolsTxnType('Out Store');
         document.querySelectorAll('.tools-item-chk').forEach(function(chk) { chk.checked = false; });
+        clearToolsTxnPicture();
     }
 }
 
 function cancelToolsTxnForm() {
     document.getElementById('toolsTxnFormPanel').classList.add('hidden');
     document.getElementById('toolsTxnListPanel').classList.remove('hidden');
+    clearToolsTxnPicture();
 }
 
 function saveToolsTransaction() {
@@ -14005,6 +14045,7 @@ function saveToolsTransaction() {
     btnLoad(btn);
     setTimeout(function() {
         try {
+            var pictureData = getToolsTxnPictureBase64();
             if (editId) {
                 // Editing: update the single transaction (first checked item)
                 var itemName = checkedItems[0];
@@ -14015,7 +14056,8 @@ function saveToolsTransaction() {
                     transactions[idx] = Object.assign({}, transactions[idx], {
                         date: date, type: type, itemName: itemName, unit: unit,
                         itemId: item ? item.id : transactions[idx].itemId,
-                        category: 'Tools', remarks: worker
+                        category: 'Tools', remarks: worker,
+                        picture: pictureData !== null ? pictureData : transactions[idx].picture
                     });
                 }
             } else {
@@ -14034,6 +14076,7 @@ function saveToolsTransaction() {
                         unit:     item ? (item.unit || '') : '',
                         location: activeEstate || '',
                         remarks:  worker,
+                        picture:  pictureData,
                         user:     username
                     });
                 });
@@ -14197,6 +14240,51 @@ window.editToolsTxn             = editToolsTxn;
 window.deleteToolsTxn           = deleteToolsTxn;
 window.rebuildToolsItemDropdown = rebuildToolsItemDropdown;
 window.selectToolsTxnType       = selectToolsTxnType;
+
+function previewToolsTxnPicture(input) {
+    if (!input.files || !input.files[0]) return;
+    var file = input.files[0];
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('toolsTxnPicPreview').src = e.target.result;
+        var wrap = document.getElementById('toolsTxnPicPreviewWrap');
+        if (wrap) { wrap.style.display = 'flex'; wrap.classList.remove('hidden'); }
+        var fn = document.getElementById('toolsTxnPicFilename');
+        if (fn) { fn.textContent = '✅ ' + file.name; fn.classList.remove('hidden'); }
+    };
+    reader.readAsDataURL(file);
+}
+function getToolsTxnPictureBase64() {
+    var preview = document.getElementById('toolsTxnPicPreview');
+    if (!preview || !preview.src || preview.src === window.location.href) return null;
+    return preview.src.startsWith('data:') ? preview.src : null;
+}
+function clearToolsTxnPicture() {
+    ['toolsTxnPicPicture','toolsTxnPicPictureCamera','toolsTxnPicPictureFile'].forEach(function(id) {
+        var el = document.getElementById(id); if (el) el.value = '';
+    });
+    var preview = document.getElementById('toolsTxnPicPreview');
+    var wrap    = document.getElementById('toolsTxnPicPreviewWrap');
+    var fn      = document.getElementById('toolsTxnPicFilename');
+    if (preview) preview.src = '';
+    if (wrap)    { wrap.style.display = 'none'; wrap.classList.add('hidden'); }
+    if (fn)      { fn.textContent = ''; fn.classList.add('hidden'); }
+}
+function viewToolsTxnPicture(id) {
+    var txn = (typeof transactions !== 'undefined' ? transactions : []).find(function(t) { return String(t.id) === String(id); });
+    if (!txn || !txn.picture) { alert('No picture available.'); return; }
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:16px;cursor:pointer;';
+    overlay.onclick = function() { overlay.remove(); };
+    var img = document.createElement('img');
+    img.src = txn.picture;
+    img.style.cssText = 'max-width:100%;max-height:90vh;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.6);';
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
+}
+window.previewToolsTxnPicture = previewToolsTxnPicture;
+window.clearToolsTxnPicture   = clearToolsTxnPicture;
+window.viewToolsTxnPicture    = viewToolsTxnPicture;
 
 function switchToolsTab(tab) {
     var txnPanel = document.getElementById('toolsTabTxnPanel');
