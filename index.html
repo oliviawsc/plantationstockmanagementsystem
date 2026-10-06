@@ -8787,9 +8787,17 @@ function setLang(lang) {
     if (typeof renderFertRecord === 'function') renderFertRecord();
     if (typeof renderChemRecord === 'function') renderChemRecord();
     if (typeof renderPlantRecord === 'function') renderPlantRecord();
-    if (typeof renderToolsRecord === 'function') renderToolsRecord();
-    if (typeof renderToolsTxns === 'function') renderToolsTxns();
-    if (typeof renderToolsStockSummary === 'function') renderToolsStockSummary();
+    // Re-render tools tables only when the tools section is currently active
+    var toolsEl = document.getElementById('tools');
+    if (toolsEl && toolsEl.style.display !== 'none') {
+        var recPanel = document.getElementById('toolsTabRecPanel');
+        if (recPanel && recPanel.style.display !== 'none') {
+            if (typeof renderToolsRecord === 'function') renderToolsRecord();
+        } else {
+            if (typeof renderToolsTxns === 'function') renderToolsTxns();
+            if (typeof renderToolsStockSummary === 'function') renderToolsStockSummary();
+        }
+    }
 }
 /* =================================================================
    AUTH SYSTEM
