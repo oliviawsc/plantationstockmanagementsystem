@@ -583,6 +583,30 @@
             font-weight: 800 !important;
             border-radius: 11px !important;
         }
+        /* ── Tools edit modal — float-up bottom sheet ─────────────────── */
+        body.tools-edit-modal #toolsTxnFormPanel:not(.hidden) {
+            position: fixed !important;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex !important;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 300;
+            padding: 0;
+        }
+        body.tools-edit-modal #toolsTxnFormPanel .bg-white {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 20px 20px 0 0 !important;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px 24px 80px !important;
+            animation: toolsEditSlideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        @keyframes toolsEditSlideUp {
+            from { transform: translateY(100%); }
+            to   { transform: translateY(0); }
+        }
         /* Back header bar — mobile only, visible when on transactions form */
         #txnMobileBack {
             display: none;
@@ -9863,6 +9887,12 @@ function navToSection(sectionId) {
         if (typeof showEstateCatCardGrid === 'function') showEstateCatCardGrid();
     }
     if (sectionId === 'tools_mobile_cat') {
+        document.body.classList.remove('tools-edit-modal');
+        document.body.classList.remove('tools-recording');
+        var _fp = document.getElementById('toolsTxnFormPanel');
+        var _lp = document.getElementById('toolsTxnListPanel');
+        if (_fp) _fp.classList.add('hidden');
+        if (_lp) _lp.classList.remove('hidden');
         if (typeof showToolsCatCardGrid === 'function') showToolsCatCardGrid();
     }
 }
@@ -14242,10 +14272,15 @@ function showToolsTxnForm(editId) {
 }
 
 function cancelToolsTxnForm() {
+    var fromEditModal = document.body.classList.contains('tools-edit-modal');
     document.getElementById('toolsTxnFormPanel').classList.add('hidden');
     document.getElementById('toolsTxnListPanel').classList.remove('hidden');
     clearToolsTxnPicture();
     document.body.classList.remove('tools-recording');
+    document.body.classList.remove('tools-edit-modal');
+    if (fromEditModal) {
+        navToSection('tools_mobile_cat');
+    }
 }
 
 function saveToolsTransaction() {
@@ -14807,6 +14842,7 @@ function mobileEditToolsTxn(id) {
     if (totalWrap)   totalWrap.style.display   = 'none';
     if (saveBtn)     saveBtn.textContent       = isBM ? 'Simpan Perubahan' : 'Save Changes';
     document.body.classList.add('tools-recording');
+    document.body.classList.add('tools-edit-modal');
 }
 
 function mobileDeleteToolsTxnMobile(id) {
