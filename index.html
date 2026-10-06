@@ -9813,7 +9813,7 @@ function bootApp(session) {
                 const firstAccessible = ALL_SECTIONS.find(
                     s => getSectionAccess(session, s.id) !== 'none'
                 );
-                const landId = firstAccessible ? firstAccessible.id : null;
+                const landId = firstAccessible ? firstAccessible.id : 'home';
                 document.querySelectorAll('.page-section').forEach(sec => {
                     sec.classList.toggle('active', sec.id === landId);
                 });
@@ -10318,6 +10318,7 @@ function normalisePermissions(perms) {
     }
     const result = Object.assign({}, perms);
     delete result.__role;
+    delete result.__configured;
     return result;
 }
 
@@ -10372,6 +10373,15 @@ function getSectionAccess(session, sectionId) {
                 ? perms[sectionId]
                 : ESTATE_MOBILE_DEFAULTS[sectionId];
         }
+    }
+    // hq_user: if permissions have never been configured by an admin
+    // (__configured flag absent), default every section to 'view' so the
+    // user can at least see data after being assigned an estate.
+    // Once an admin saves the user's permissions (even as all-none),
+    // __configured is set and the explicit values take over.
+    if (session.role === 'hq_user') {
+        const rawPerms = session.permissions || {};
+        if (!rawPerms.__configured) return 'view';
     }
     const perms = normalisePermissions(session.permissions);
     return perms[sectionId] || 'none';
@@ -10664,6 +10674,9 @@ async function saveEditUser() {
                 perms[s.id] = val;
             }
         });
+        // Mark as explicitly configured so getSectionAccess uses these values
+        // instead of the 'view' fallback for hq_user with empty perms.
+        if (role === 'hq_user') perms.__configured = true;
     }
 
     if (!name)                          { alert('Name is required.'); return; }
