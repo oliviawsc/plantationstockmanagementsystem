@@ -5519,10 +5519,11 @@ function filterTxnItemsByCategory() {
     const txnSel      = document.getElementById('txnItem');
     const prevVal     = txnSel.value; // preserve current selection
 
-    // Filter items — show all if no category chosen
+    // Filter items — show all if no category chosen; always exclude Tools
+    const nonTools = items.filter(i => i.category !== 'Tools');
     const filtered = selectedCat
-        ? items.filter(i => i.category === selectedCat)
-        : items;
+        ? nonTools.filter(i => i.category === selectedCat)
+        : nonTools;
 
     const d = I18N[currentLang] || I18N['en'];
     txnSel.innerHTML = `<option value="">${d.select_item}</option>` +
@@ -5809,9 +5810,10 @@ function filterSummaryItemsByCategory() {
     const filterSel   = document.getElementById('filterItem');
     const prevVal     = filterSel.value;
 
+    const nonTools = items.filter(i => i.category !== 'Tools');
     const filtered = selectedCat
-        ? items.filter(i => i.category === selectedCat)
-        : items;
+        ? nonTools.filter(i => i.category === selectedCat)
+        : nonTools;
 
     filterSel.innerHTML = '<option value="">All</option>' +
         filtered.map(i => `<option value="${i.name}">${i.name}</option>`).join('');
@@ -5862,9 +5864,10 @@ function refreshLedgerItemDropdown(resetSelection) {
     const filterSel    = document.getElementById('filterLedgerItem');
     const prevVal       = filterSel.value;
 
+    const nonTools = items.filter(i => i.category !== 'Tools');
     const filtered = selectedCat
-        ? items.filter(i => i.category === selectedCat)
-        : items;
+        ? nonTools.filter(i => i.category === selectedCat)
+        : nonTools;
 
     filterSel.innerHTML = '<option value="">All</option>' +
         filtered.map(i => `<option value="${i.name}">${i.name}</option>`).join('');
