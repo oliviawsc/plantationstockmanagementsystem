@@ -2869,6 +2869,8 @@
             <div id="toolsTabTxnPanel">
             <!-- Panel A: List -->
             <div id="toolsTxnListPanel">
+                <!-- Stock balance summary -->
+                <div id="toolsStockSummary" class="bg-white p-4 rounded-xl shadow mb-4"></div>
                 <div class="bg-white p-6 rounded-xl shadow mb-6">
                     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
                         <h3 class="text-xl font-bold" data-i18n="tools_txn_title">Tools Transactions</h3>
@@ -8207,6 +8209,7 @@ const I18N = {
         page_toolsrecord_sub:     'View tools issuance records grouped by worker.',
         tab_tools_txn:            '📋 Transactions',
         tab_tools_rec:            '📊 Tools Record',
+        tools_stock_balance:      'Current Stock Balance',
         tools_txn_title:          'Tools Transactions',
         tools_btn_add:            '+ Add Transaction',
         tools_type_in:            'In Store',
@@ -8647,6 +8650,7 @@ const I18N = {
         page_toolsrecord_sub:     'Lihat rekod pengeluaran peralatan mengikut nama pekerja.',
         tab_tools_txn:            '📋 Transaksi',
         tab_tools_rec:            '📊 Rekod Peralatan',
+        tools_stock_balance:      'Baki Stok Semasa',
         tools_txn_title:          'Transaksi Peralatan',
         tools_btn_add:            '+ Tambah Transaksi',
         tools_type_in:            'Masuk Stor',
@@ -13878,6 +13882,31 @@ window.editRainfallTxn        = editRainfallTxn;
 function renderToolsPage() {
     rebuildToolsItemDropdown();
     renderToolsTxns();
+    renderToolsStockSummary();
+}
+
+function renderToolsStockSummary() {
+    var el = document.getElementById('toolsStockSummary');
+    if (!el) return;
+    var _items = (typeof items !== 'undefined' ? items : (window.items || []));
+    var toolItems = _items.filter(function(i) { return i.category === 'Tools'; });
+    if (!toolItems.length) { el.innerHTML = ''; return; }
+    var d = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {};
+    var cards = toolItems.map(function(item) {
+        var bal = calcToolsBalance(item.name);
+        var isLow = bal <= 0;
+        var cardBg    = isLow ? '#FEF2F2' : '#F0FDF4';
+        var borderCol = isLow ? '#FCA5A5' : '#86EFAC';
+        var numCol    = isLow ? '#DC2626'  : '#15803D';
+        return '<div style="background:' + cardBg + ';border:1px solid ' + borderCol + ';border-radius:10px;padding:10px 14px;min-width:110px;text-align:center;">' +
+            '<div style="font-size:11px;color:#6B7280;font-weight:600;margin-bottom:4px;">' + item.name + '</div>' +
+            '<div style="font-size:20px;font-weight:800;color:' + numCol + ';">' + bal + '</div>' +
+            '<div style="font-size:11px;color:#9CA3AF;">' + (item.unit || '') + '</div>' +
+            '</div>';
+    }).join('');
+    el.innerHTML =
+        '<p style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;">' + (d.tools_stock_balance || 'Current Stock Balance') + '</p>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:8px;">' + cards + '</div>';
 }
 
 function selectToolsTxnType(type) {
@@ -14288,6 +14317,7 @@ function renderToolsRecord() {
     container.innerHTML = html;
 }
 
+window.renderToolsStockSummary  = renderToolsStockSummary;
 window.renderToolsPage          = renderToolsPage;
 window.renderToolsTxns          = renderToolsTxns;
 window.renderToolsRecord        = renderToolsRecord;
