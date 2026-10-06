@@ -13999,7 +13999,11 @@ function renderToolsTxns() {
         return true;
     });
 
-    filtered.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
+    filtered.sort(function(a, b) {
+        var d = (b.date || '').localeCompare(a.date || '');
+        if (d !== 0) return d;
+        return Number(b.id) - Number(a.id); // same date → newer transaction first
+    });
 
     if (!filtered.length) {
         body.innerHTML = '<tr><td colspan="8" class="text-center text-gray-400 py-8">' + (d.tools_no_txn || 'No tools transactions yet.') + '</td></tr>';
