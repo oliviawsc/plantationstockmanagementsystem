@@ -14780,6 +14780,8 @@ function renderToolsCatTransaksi() {
 }
 
 function mobileEditToolsTxn(id) {
+    navigateToSection('tools');
+    if (typeof switchToolsTab === 'function') switchToolsTab('txn');
     editToolsTxn(id);
 }
 
