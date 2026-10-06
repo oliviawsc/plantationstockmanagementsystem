@@ -8977,11 +8977,20 @@ const ALL_SECTIONS = [
     { id: 'plantrecord',     label: '🌱 Field Planting Record',      group: 'Reports' },
     // Rainfall
     { id: 'rainfall',        label: '🌧️ Rainfall Transactions',      group: 'Rainfall' },
-    { id: 'rainfallreport',  label: '📊 Rainfall Report',            group: 'Rainfall' },
-    { id: 'rainfallsummary', label: '📅 Monthly Rainfall Summary',   group: 'Rainfall' },
+    { id: 'rainfallreport',  label: '📊 Monthly Rainfall Record',    group: 'Rainfall' },
+    { id: 'rainfallsummary', label: '📅 Yearly Rainfall Record',     group: 'Rainfall' },
     // Tools
     { id: 'tools',           label: '🔧 Tools Transactions',         group: 'Tools' },
     { id: 'toolsrecord',     label: '📋 Tools Record',               group: 'Tools' },
+];
+
+// Sections shown in user management for Estate Users (mobile interface)
+const ESTATE_SECTIONS = [
+    { id: 'estate_baja',      label: '🌿 Baja (Fertilizer)',              group: 'Mobile Modules' },
+    { id: 'estate_racun',     label: '⚗️ Racun (Chemical)',               group: 'Mobile Modules' },
+    { id: 'estate_anak',      label: '🌱 Anak Sawit (Oil Palm Seedling)', group: 'Mobile Modules' },
+    { id: 'mobile_rainfall',  label: '🌧️ Hujan (Rainfall)',              group: 'Mobile Modules' },
+    { id: 'tools_mobile_cat', label: '🔧 Peralatan (Tools)',              group: 'Mobile Modules' },
 ];
 
 // Super Admin — identified by email; password is managed in Supabase Auth.
@@ -9962,9 +9971,11 @@ function applyNavPermissions(session) {
 // Hide hub cards for sections the current user cannot access.
 // Called once during bootApp for estate-mobile users.
 function applyEstateHubPermissions(session) {
-    const txnOk  = getSectionAccess(session, 'transactions') !== 'none';
-    const sumOk  = getSectionAccess(session, 'summary')      !== 'none';
-    const dashOk = getSectionAccess(session, 'dashboard')    !== 'none';
+    const dashOk = getSectionAccess(session, 'dashboard')      !== 'none';
+    const fertOk = getSectionAccess(session, 'estate_baja')    !== 'none';
+    const chemOk = getSectionAccess(session, 'estate_racun')   !== 'none';
+    const opsOk  = getSectionAccess(session, 'estate_anak')    !== 'none';
+    const sumOk  = getSectionAccess(session, 'summary')        !== 'none';
 
     const hide = (id, show) => {
         const el = document.getElementById(id);
@@ -9972,9 +9983,9 @@ function applyEstateHubPermissions(session) {
     };
 
     hide('estateHubDashCard', dashOk);
-    hide('estateHubFertCard', txnOk);
-    hide('estateHubChemCard', txnOk);
-    hide('estateHubOPSCard',  txnOk);
+    hide('estateHubFertCard', fertOk);
+    hide('estateHubChemCard', chemOk);
+    hide('estateHubOPSCard',  opsOk);
     hide('estateHubSumCard',  sumOk);
 }
 
@@ -10242,6 +10253,27 @@ function toggleEditPermissionsSection() {
     if (permsSection) permsSection.classList.toggle('hidden', isAdmin);
     if (estSection)   estSection.classList.toggle('hidden', isAdmin);
     if (adminNotice)  adminNotice.classList.toggle('hidden', !isAdmin);
+    if (!isAdmin) {
+        const sections = role === 'estate_user' ? ESTATE_SECTIONS : ALL_SECTIONS;
+        const grid = document.getElementById('editPermissionsGrid');
+        if (grid) {
+            let _pg = null;
+            grid.innerHTML = sections.map(function(s) {
+                var header = '';
+                if (s.group && s.group !== _pg) {
+                    _pg = s.group;
+                    header = '<div style="font-size:11px;font-weight:700;color:#15803d;text-transform:uppercase;letter-spacing:.06em;padding:10px 0 4px;border-bottom:1px solid #bbf7d0;margin-bottom:2px;">' + s.group + '</div>';
+                }
+                return header +
+                    '<div class="flex items-center gap-3 py-1 border-b border-green-50 last:border-0">' +
+                        '<span class="text-sm flex-1">' + s.label + '</span>' +
+                        '<label class="flex items-center gap-1 text-xs cursor-pointer"><input type="radio" name="perm_edit_' + s.id + '" value="none" checked /> None</label>' +
+                        '<label class="flex items-center gap-1 text-xs cursor-pointer"><input type="radio" name="perm_edit_' + s.id + '" value="view" /> View</label>' +
+                        '<label class="flex items-center gap-1 text-xs cursor-pointer"><input type="radio" name="perm_edit_' + s.id + '" value="edit" /> Edit</label>' +
+                    '</div>';
+            }).join('');
+        }
+    }
 }
 
 // Render permission checkboxes in the registration form
@@ -10298,8 +10330,11 @@ const ESTATE_MOBILE_DEFAULTS = {
     rainfallreport:   'view',  // Rainfall Report tab
     rainfallsummary:  'none',  // Hidden on mobile — not accessible from Hujan module
     mobile_rainfall:  'edit',  // Mobile-only rainfall add form (hub card)
-    estate_category:  'edit',  // Mobile category page (Baja/Kimia/Anak Sawit)
+    estate_category:  'edit',  // Mobile category page (internal nav target)
     tools_mobile_cat: 'edit',  // Mobile Tools category page (navigation hub only)
+    estate_baja:      'edit',  // Baja (Fertilizer) mobile module
+    estate_racun:     'edit',  // Racun (Chemical) mobile module
+    estate_anak:      'edit',  // Anak Sawit (Oil Palm Seedling) mobile module
 };
 
 function getSectionAccess(session, sectionId) {
@@ -10411,8 +10446,9 @@ function buildUserRow(u) {
     } else {
         const perms  = normalisePermissions(u.permissions);
         const hasAny = Object.keys(perms).length > 0;
+        const _rowSections = u.role === 'estate_user' ? ESTATE_SECTIONS : ALL_SECTIONS;
         permsHtml = hasAny
-            ? ALL_SECTIONS.map(s => {
+            ? _rowSections.map(s => {
                 const level = perms[s.id];
                 if (!level || level === 'none') return '';
                 const colour = level === 'edit' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-700';
@@ -10504,7 +10540,8 @@ async function openEditUserModal(id) {
         </label>`).join('');
 
     let _permGroup = null;
-    const permsRows = ALL_SECTIONS.map(s => {
+    const _editSections = (userRole === 'estate_user') ? ESTATE_SECTIONS : ALL_SECTIONS;
+    const permsRows = _editSections.map(s => {
         const stored = userPerms[s.id];
         const cur = stored !== undefined
             ? stored
@@ -10567,7 +10604,7 @@ async function openEditUserModal(id) {
                 </div>
                 <div id="editPermissionsSection" ${hidePermEdit ? 'class="hidden"' : ''}>
                     <label class="block text-sm font-semibold mb-2">Sections Allowed</label>
-                    <div class="border border-green-200 rounded-lg p-3 bg-green-50">${permsRows}</div>
+                    <div id="editPermissionsGrid" class="border border-green-200 rounded-lg p-3 bg-green-50">${permsRows}</div>
                     <p class="text-xs text-gray-400 mt-1"><b>View</b> = read-only. <b>Edit</b> = full access.</p>
                 </div>
                 <div id="editAdminNotice" ${!isAdminEdit ? 'class="hidden"' : ''}>
@@ -10595,7 +10632,8 @@ async function saveEditUser() {
 
     const perms = {};
     if (!isAdmin) {
-        ALL_SECTIONS.forEach(s => {
+        const _saveSections = role === 'estate_user' ? ESTATE_SECTIONS : ALL_SECTIONS;
+        _saveSections.forEach(s => {
             const checked = document.querySelector(`input[name="perm_edit_${s.id}"]:checked`);
             const val = checked ? checked.value : 'none';
             if (val !== 'none' || (role === 'estate_user' && s.id in ESTATE_MOBILE_DEFAULTS)) {
@@ -13543,6 +13581,12 @@ function saveMobileRainfallTxn() {
 var activeMobileCategory = 'Fertilizer';
 
 function navToEstateCategory(category) {
+    var sectionMap = { 'Fertilizer': 'estate_baja', 'Chemical': 'estate_racun', 'Oil Palm Seedling': 'estate_anak' };
+    var sectionId = sectionMap[category];
+    if (sectionId && typeof getSectionAccess === 'function') {
+        var _sess = typeof loadSession === 'function' ? loadSession() : null;
+        if (_sess && getSectionAccess(_sess, sectionId) === 'none') return;
+    }
     activeMobileCategory = category;
     var titles = { 'Fertilizer': 'Baja', 'Chemical': 'Racun', 'Oil Palm Seedling': 'Anak Sawit' };
     var titleEl = document.getElementById('estateCatTitle');
