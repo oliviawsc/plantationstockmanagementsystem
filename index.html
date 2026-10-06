@@ -2959,9 +2959,10 @@
                         <div id="toolsInStorePanel" style="display:none;">
                             <div class="mb-3">
                                 <label class="block text-sm font-semibold mb-1"><span data-i18n="col_item_name">Item</span> <span style="color:#dc2626;">*</span></label>
-                                <select id="toolsInStoreItem" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                                <select id="toolsInStoreItem" onchange="updateToolsInStoreBalance()" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                                     <option value="">-- Select Item --</option>
                                 </select>
+                                <div id="toolsInStoreBalance" style="margin-top:6px;font-size:12px;font-weight:600;font-family:Inter,sans-serif;min-height:18px;color:#16a34a;"></div>
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold mb-1"><span data-i18n="col_qty">Quantity</span> <span style="color:#dc2626;">*</span></label>
@@ -13926,10 +13927,13 @@ function rebuildToolsItemDropdown() {
     }
     checklist.innerHTML = toolItems.map(function(item) {
         var safeId = 'toolsChk_' + item.name.replace(/[^a-zA-Z0-9]/g, '_');
+        var bal = calcToolsBalance(item.name);
+        var balColor = bal < 0 ? '#DC2626' : '#16a34a';
         return '<label style="display:flex;align-items:center;gap:10px;padding:8px 4px;cursor:pointer;border-bottom:1px solid #F1F5F9;font-size:14px;color:#1F2937;">' +
             '<input type="checkbox" class="tools-item-chk" value="' + item.name + '" id="' + safeId + '" ' +
             'style="width:17px;height:17px;accent-color:#16A34A;cursor:pointer;flex-shrink:0;" />' +
-            '<span>' + item.name + '</span>' +
+            '<span style="flex:1;">' + item.name + '</span>' +
+            '<span style="font-size:11px;font-weight:600;color:' + balColor + ';">Baki: ' + bal + ' ' + (item.unit || '') + '</span>' +
             '</label>';
     }).join('');
 }
@@ -14294,6 +14298,29 @@ window.editToolsTxn             = editToolsTxn;
 window.deleteToolsTxn           = deleteToolsTxn;
 window.rebuildToolsItemDropdown = rebuildToolsItemDropdown;
 window.selectToolsTxnType       = selectToolsTxnType;
+
+function calcToolsBalance(itemName) {
+    var txns = (typeof transactions !== 'undefined' ? transactions : (window.transactions || []));
+    return txns.filter(function(t) { return t.category === 'Tools' && t.itemName === itemName; })
+        .reduce(function(acc, t) {
+            var qty = parseFloat(t.qty) || 0;
+            return acc + (t.type === 'In Store' ? qty : -qty);
+        }, 0);
+}
+function updateToolsInStoreBalance() {
+    var sel   = document.getElementById('toolsInStoreItem');
+    var balEl = document.getElementById('toolsInStoreBalance');
+    if (!balEl) return;
+    var itemName = sel ? sel.value : '';
+    if (!itemName) { balEl.textContent = ''; return; }
+    var _items = (typeof items !== 'undefined' ? items : (window.items || []));
+    var item = _items.find(function(i) { return i.name === itemName; });
+    var bal = calcToolsBalance(itemName);
+    balEl.textContent = 'Baki: ' + bal + ' ' + (item ? (item.unit || '') : '');
+    balEl.style.color = bal < 0 ? '#DC2626' : '#16a34a';
+}
+window.calcToolsBalance          = calcToolsBalance;
+window.updateToolsInStoreBalance = updateToolsInStoreBalance;
 
 function previewToolsTxnPicture(input) {
     if (!input.files || !input.files[0]) return;
