@@ -14783,10 +14783,9 @@ function mobileEditToolsTxn(id) {
     navigateToSection('tools');
     if (typeof switchToolsTab === 'function') switchToolsTab('txn');
     editToolsTxn(id); // calls showToolsTxnForm(id) which resets mobile state first
-    // Apply same mobile flow styling as openToolsCatWithType
-    var txn = (typeof transactions !== 'undefined' ? transactions : []).find(function(t) { return String(t.id) === String(id); });
-    var typeLabel = txn && txn.type === 'In Store' ? 'Masuk Stor' : 'Keluar Stor';
-    var fullTitle = 'Sunting — Peralatan ' + typeLabel;
+    // Apply Baja-style edit modal look
+    var lang = localStorage.getItem('opp_lang') || 'en';
+    var isBM = lang === 'ms';
     var titleWrap   = document.getElementById('toolsCatFlowTitle');
     var titleText   = document.getElementById('toolsCatFlowTitleText');
     var formHeader  = document.getElementById('toolsFormHeader');
@@ -14797,16 +14796,16 @@ function mobileEditToolsTxn(id) {
     var cancelBtn   = document.getElementById('toolsTxnCancelBtn');
     var totalWrap   = document.getElementById('toolsTxnTotal');
     var saveBtn     = document.getElementById('toolsTxnSaveBtn');
-    if (titleWrap)   { titleWrap.style.display  = ''; }
-    if (titleText)   titleText.textContent       = fullTitle;
-    if (formHeader)  formHeader.style.display    = 'none';
-    if (typeSection) typeSection.style.display   = 'none';
-    if (tabBar)      tabBar.style.display        = 'none';
-    if (secTitle)    secTitle.style.display      = 'none';
-    if (secSub)      secSub.style.display        = 'none';
-    if (cancelBtn)   cancelBtn.style.display     = 'none';
-    if (totalWrap)   totalWrap.style.display     = 'none';
-    if (saveBtn)     saveBtn.textContent         = 'Simpan Transaksi';
+    if (titleWrap)   titleWrap.style.display   = '';
+    if (titleText)   titleText.textContent     = isBM ? '✏️ Edit Transaksi' : '✏️ Edit Transaction';
+    if (formHeader)  formHeader.style.display  = 'none';
+    if (typeSection) typeSection.style.display = 'none';
+    if (tabBar)      tabBar.style.display      = 'none';
+    if (secTitle)    secTitle.style.display    = 'none';
+    if (secSub)      secSub.style.display      = 'none';
+    if (cancelBtn)   { cancelBtn.style.display = ''; cancelBtn.textContent = isBM ? 'Batal' : 'Cancel'; }
+    if (totalWrap)   totalWrap.style.display   = 'none';
+    if (saveBtn)     saveBtn.textContent       = isBM ? 'Simpan Perubahan' : 'Save Changes';
     document.body.classList.add('tools-recording');
 }
 
