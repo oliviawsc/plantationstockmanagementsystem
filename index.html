@@ -8789,7 +8789,7 @@ function setLang(lang) {
     if (typeof renderPlantRecord === 'function') renderPlantRecord();
     // Re-render tools tables only when the tools section is currently active
     var toolsEl = document.getElementById('tools');
-    if (toolsEl && toolsEl.style.display !== 'none') {
+    if (toolsEl && toolsEl.classList.contains('active')) {
         var recPanel = document.getElementById('toolsTabRecPanel');
         if (recPanel && recPanel.style.display !== 'none') {
             if (typeof renderToolsRecord === 'function') renderToolsRecord();
