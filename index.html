@@ -14628,12 +14628,17 @@ function showToolsCatCardGrid() {
 }
 
 function showToolsCatTab(tab) {
+    if (tab === 'rekod') {
+        navigateToSection('tools');
+        if (typeof switchToolsTab === 'function') switchToolsTab('rec');
+        return;
+    }
     var cardGrid = document.getElementById('toolsCatCardGrid');
     var backBtn  = document.getElementById('toolsCatBackBtn');
     var title    = document.getElementById('toolsCatTitle');
     if (cardGrid) cardGrid.style.display = 'none';
     if (backBtn)  backBtn.style.display  = '';
-    var titles = { baki: 'Baki Stok', transaksi: 'Transaksi', rekod: 'Rekod Peralatan' };
+    var titles = { baki: 'Baki Stok', transaksi: 'Transaksi' };
     if (title)    title.textContent = titles[tab] || 'Peralatan';
     ['baki','transaksi','rekod'].forEach(function(t) {
         var pane = document.getElementById('toolsCatPane' + t.charAt(0).toUpperCase() + t.slice(1));
@@ -14641,7 +14646,6 @@ function showToolsCatTab(tab) {
     });
     if (tab === 'baki')      renderToolsCatBakiStok();
     if (tab === 'transaksi') renderToolsCatTransaksi();
-    if (tab === 'rekod')     renderToolsCatRekod();
 }
 
 function openToolsCatWithType(type) {
