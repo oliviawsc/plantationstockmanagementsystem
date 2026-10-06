@@ -14228,6 +14228,13 @@ function renderToolsRecord() {
     var container = document.getElementById('toolsRecordContainer');
     if (!container) return;
     var d = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {};
+    var lang = localStorage.getItem('opp_lang') || 'en';
+    var isBM = lang === 'ms';
+    // Language-aware labels (fallback when window.I18N is not accessible from this scope)
+    if (!d.toolsrecord_table_title) d.toolsrecord_table_title = isBM ? 'REKOD PERALATAN' : 'TOOLS RECORD';
+    if (!d.toolsrecord_col_worker)  d.toolsrecord_col_worker  = isBM ? 'Nama Pengguna Pekerja' : 'Worker Name';
+    if (!d.tools_lbl_items)         d.tools_lbl_items         = isBM ? 'Jenis Peralatan' : 'Tools Type';
+    if (!d.tools_no_record)         d.tools_no_record         = isBM ? 'Tiada rekod peralatan lagi.' : 'No tools records yet.';
 
     // Robust cross-script variable access with try-catch guard
     var _txns = [], _items = [];
