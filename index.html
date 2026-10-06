@@ -14782,7 +14782,32 @@ function renderToolsCatTransaksi() {
 function mobileEditToolsTxn(id) {
     navigateToSection('tools');
     if (typeof switchToolsTab === 'function') switchToolsTab('txn');
-    editToolsTxn(id);
+    editToolsTxn(id); // calls showToolsTxnForm(id) which resets mobile state first
+    // Apply same mobile flow styling as openToolsCatWithType
+    var txn = (typeof transactions !== 'undefined' ? transactions : []).find(function(t) { return String(t.id) === String(id); });
+    var typeLabel = txn && txn.type === 'In Store' ? 'Masuk Stor' : 'Keluar Stor';
+    var fullTitle = 'Sunting — Peralatan ' + typeLabel;
+    var titleWrap   = document.getElementById('toolsCatFlowTitle');
+    var titleText   = document.getElementById('toolsCatFlowTitleText');
+    var formHeader  = document.getElementById('toolsFormHeader');
+    var typeSection = document.getElementById('toolsTxnTypeSection');
+    var tabBar      = document.getElementById('toolsTabBar');
+    var secTitle    = document.getElementById('toolsSectionTitle');
+    var secSub      = document.getElementById('toolsSectionSubtitle');
+    var cancelBtn   = document.getElementById('toolsTxnCancelBtn');
+    var totalWrap   = document.getElementById('toolsTxnTotal');
+    var saveBtn     = document.getElementById('toolsTxnSaveBtn');
+    if (titleWrap)   { titleWrap.style.display  = ''; }
+    if (titleText)   titleText.textContent       = fullTitle;
+    if (formHeader)  formHeader.style.display    = 'none';
+    if (typeSection) typeSection.style.display   = 'none';
+    if (tabBar)      tabBar.style.display        = 'none';
+    if (secTitle)    secTitle.style.display      = 'none';
+    if (secSub)      secSub.style.display        = 'none';
+    if (cancelBtn)   cancelBtn.style.display     = 'none';
+    if (totalWrap)   totalWrap.style.display     = 'none';
+    if (saveBtn)     saveBtn.textContent         = 'Simpan Transaksi';
+    document.body.classList.add('tools-recording');
 }
 
 function mobileDeleteToolsTxnMobile(id) {
