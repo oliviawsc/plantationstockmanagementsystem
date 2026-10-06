@@ -5466,7 +5466,7 @@ function rebuildCategoryDropdowns() {
     const KNOWN_ORDER = ['Fertilizer', 'Chemical', 'Oil Palm Seedling'];
     const all = [...new Set(items.map(i => i.category).filter(Boolean))];
     const known   = KNOWN_ORDER.filter(c => all.includes(c));
-    const custom  = all.filter(c => !KNOWN_ORDER.includes(c)).sort((a, b) => a.localeCompare(b));
+    const custom  = all.filter(c => !KNOWN_ORDER.includes(c) && c !== 'Tools').sort((a, b) => a.localeCompare(b));
     const ordered = [...known, ...custom];
 
     const txnSel    = document.getElementById('txnCategory');
