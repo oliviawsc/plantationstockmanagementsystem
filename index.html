@@ -2968,8 +2968,8 @@
                                 <input type="number" id="toolsInStoreQty" min="1" value="1" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                             </div>
                         </div>
-                        <!-- Worker Name -->
-                        <div>
+                        <!-- Worker Name (Out Store only) -->
+                        <div id="toolsWorkerField">
                             <label class="block text-sm font-semibold mb-1" data-i18n="col_worker">Worker Name</label>
                             <input type="text" id="toolsTxnWorker" placeholder="Enter worker name" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                         </div>
@@ -13888,10 +13888,12 @@ function selectToolsTxnType(type) {
     var inactiveStyle = 'flex:1;padding:12px 8px;border-radius:10px;border:2px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;';
     if (btnIn)  btnIn.style.cssText  = type === 'In Store'  ? activeStyle : inactiveStyle;
     if (btnOut) btnOut.style.cssText = type === 'Out Store' ? activeStyle : inactiveStyle;
-    var outPanel = document.getElementById('toolsOutStorePanel');
-    var inPanel  = document.getElementById('toolsInStorePanel');
-    if (outPanel) outPanel.style.display = type === 'Out Store' ? '' : 'none';
-    if (inPanel)  inPanel.style.display  = type === 'In Store'  ? '' : 'none';
+    var outPanel    = document.getElementById('toolsOutStorePanel');
+    var inPanel     = document.getElementById('toolsInStorePanel');
+    var workerField = document.getElementById('toolsWorkerField');
+    if (outPanel)    outPanel.style.display    = type === 'Out Store' ? '' : 'none';
+    if (inPanel)     inPanel.style.display     = type === 'In Store'  ? '' : 'none';
+    if (workerField) workerField.style.display = type === 'Out Store' ? '' : 'none';
 }
 
 function rebuildToolsItemDropdown() {
