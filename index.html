@@ -2908,6 +2908,7 @@
                                     <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_item_name">Item</th>
                                     <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_qty">Qty</th>
                                     <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_worker">Worker</th>
+                                    <th class="px-3 py-2 text-right border border-green-200" data-i18n="col_balance">Balance</th>
                                     <th class="px-3 py-2 text-center border border-green-200" data-i18n="col_photo">Photo</th>
                                     <th class="px-3 py-2 text-left border border-green-200" data-i18n="col_action">Action</th>
                                 </tr>
@@ -14001,7 +14002,7 @@ function renderToolsTxns() {
     filtered.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
 
     if (!filtered.length) {
-        body.innerHTML = '<tr><td colspan="7" class="text-center text-gray-400 py-8">' + (d.tools_no_txn || 'No tools transactions yet.') + '</td></tr>';
+        body.innerHTML = '<tr><td colspan="8" class="text-center text-gray-400 py-8">' + (d.tools_no_txn || 'No tools transactions yet.') + '</td></tr>';
         return;
     }
     body.innerHTML = filtered.map(function(t) {
@@ -14011,12 +14012,16 @@ function renderToolsTxns() {
         var photoCell = t.picture
             ? '<button onclick="viewToolsTxnPicture(\'' + t.id + '\')" style="background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;cursor:pointer;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:600;">📷 View</button>'
             : '<span style="color:#9CA3AF;font-size:12px;">—</span>';
+        var bal = calcToolsBalanceUpTo(t.itemName, t);
+        var balColor = bal < 0 ? '#DC2626' : '#166534';
+        var balCell = '<span style="font-weight:600;color:' + balColor + ';">' + bal + ' ' + (t.unit || '') + '</span>';
         return '<tr class="hover:bg-gray-50">' +
             '<td class="px-3 py-2 border border-gray-100">' + (t.date || '') + '</td>' +
             '<td class="px-3 py-2 border border-gray-100">' + typeBadge + '</td>' +
             '<td class="px-3 py-2 border border-gray-100">' + (t.itemName || '') + '</td>' +
             '<td class="px-3 py-2 border border-gray-100">' + (t.qty || '') + ' ' + (t.unit || '') + '</td>' +
             '<td class="px-3 py-2 border border-gray-100">' + (t.remarks || '-') + '</td>' +
+            '<td class="px-3 py-2 border border-gray-100 text-right">' + balCell + '</td>' +
             '<td class="px-3 py-2 border border-gray-100 text-center">' + photoCell + '</td>' +
             '<td class="px-3 py-2 border border-gray-100" style="white-space:nowrap;">' +
                 '<button onclick="editToolsTxn(\'' + t.id + '\')" style="background:#EFF6FF;color:#1d4ed8;border:none;cursor:pointer;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;margin-right:4px;">Edit</button>' +
@@ -14337,6 +14342,22 @@ function calcToolsBalance(itemName) {
             return acc + (t.type === 'In Store' ? qty : -qty);
         }, 0);
 }
+function calcToolsBalanceUpTo(itemName, refTxn) {
+    var txns = (typeof transactions !== 'undefined' ? transactions : (window.transactions || []));
+    var itemTxns = txns.filter(function(t) { return t.category === 'Tools' && t.itemName === itemName; });
+    itemTxns.sort(function(a, b) {
+        var d = (a.date || '').localeCompare(b.date || '');
+        if (d !== 0) return d;
+        return String(a.id).localeCompare(String(b.id));
+    });
+    var bal = 0;
+    for (var i = 0; i < itemTxns.length; i++) {
+        var qty = parseFloat(itemTxns[i].qty) || 0;
+        bal += itemTxns[i].type === 'In Store' ? qty : -qty;
+        if (String(itemTxns[i].id) === String(refTxn.id)) break;
+    }
+    return bal;
+}
 function updateToolsInStoreBalance() {
     var sel   = document.getElementById('toolsInStoreItem');
     var balEl = document.getElementById('toolsInStoreBalance');
@@ -14350,6 +14371,7 @@ function updateToolsInStoreBalance() {
     balEl.style.color = bal < 0 ? '#DC2626' : '#16a34a';
 }
 window.calcToolsBalance          = calcToolsBalance;
+window.calcToolsBalanceUpTo      = calcToolsBalanceUpTo;
 window.updateToolsInStoreBalance = updateToolsInStoreBalance;
 
 function previewToolsTxnPicture(input) {
