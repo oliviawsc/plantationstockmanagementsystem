@@ -563,6 +563,26 @@
         body.txn-recording #txnForm {
             padding-bottom: 80px !important;
         }
+        /* ── Tools form sticky bottom bar — mobile Peralatan flow ── */
+        body.tools-recording #toolsTxnBottomBar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #fff;
+            border-top: 2px solid #E2E8F0;
+            padding: 10px 16px;
+            padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+            z-index: 200;
+            box-shadow: 0 -4px 16px rgba(0,0,0,.08);
+        }
+        body.tools-recording #toolsTxnFormPanel .bg-white {
+            padding-bottom: 80px !important;
+        }
+        body.tools-recording #toolsTxnSaveBtn {
+            padding: 11px 22px !important;
+            font-size: 15px !important;
+            font-weight: 800 !important;
+            border-radius: 11px !important;
+        }
         /* Back header bar — mobile only, visible when on transactions form */
         #txnMobileBack {
             display: none;
@@ -3047,7 +3067,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold mb-1"><span data-i18n="col_qty">Quantity</span> <span style="color:#dc2626;">*</span></label>
-                                <input type="number" id="toolsInStoreQty" min="1" value="1" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
+                                <input type="number" id="toolsInStoreQty" min="1" value="1" oninput="_updateToolsTxnTotal()" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                             </div>
                         </div>
                         <!-- Worker Name (Out Store only) -->
@@ -3080,8 +3100,12 @@
                             <p id="toolsTxnPicFilename" class="text-xs text-green-700 mt-1 italic hidden"></p>
                         </div>
                     </div>
-                    <div style="display:flex;gap:10px;justify-content:flex-end;">
-                        <button onclick="cancelToolsTxnForm()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-5 py-2 rounded-lg text-sm" data-i18n="btn_cancel">Cancel</button>
+                    <div id="toolsTxnBottomBar" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px;">
+                        <div id="toolsTxnTotal" style="display:none;flex:1;flex-direction:column;">
+                            <span id="toolsTxnTotalLabel" style="font-size:12px;font-weight:600;color:#6B7280;margin-bottom:2px;font-family:Inter,sans-serif;">Jumlah Keluar</span>
+                            <span id="toolsTxnTotalVal" style="font-size:18px;font-weight:700;color:#166534;font-family:Inter,sans-serif;">—</span>
+                        </div>
+                        <button id="toolsTxnCancelBtn" onclick="cancelToolsTxnForm()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-5 py-2 rounded-lg text-sm" data-i18n="btn_cancel">Cancel</button>
                         <button id="toolsTxnSaveBtn" onclick="saveToolsTransaction()" class="bg-green-700 hover:bg-green-800 text-white font-semibold px-5 py-2 rounded-lg text-sm" data-i18n="btn_save">Save</button>
                     </div>
                 </div>
@@ -14052,6 +14076,7 @@ function rebuildToolsItemDropdown() {
         checklist.innerHTML = '<p class="text-xs text-gray-400 py-2">No tools items found. Please add Tools category items in Item Files.</p>';
         return;
     }
+    checklist.onchange = function() { if (typeof _updateToolsTxnTotal === 'function') _updateToolsTxnTotal(); };
     checklist.innerHTML = toolItems.map(function(item) {
         var safeId = 'toolsChk_' + item.name.replace(/[^a-zA-Z0-9]/g, '_');
         var bal = calcToolsBalance(item.name);
@@ -14148,6 +14173,11 @@ function showToolsTxnForm(editId) {
     if (tabBar)      tabBar.style.display      = '';
     if (secTitle)    secTitle.style.display    = '';
     if (secSub)      secSub.style.display      = '';
+    var cancelBtn = document.getElementById('toolsTxnCancelBtn');
+    var totalWrap = document.getElementById('toolsTxnTotal');
+    if (cancelBtn) cancelBtn.style.display = '';
+    if (totalWrap) totalWrap.style.display = 'none';
+    document.body.classList.remove('tools-recording');
     var d = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {};
     rebuildToolsItemDropdown();
     if (editId) {
@@ -14199,6 +14229,7 @@ function cancelToolsTxnForm() {
     document.getElementById('toolsTxnFormPanel').classList.add('hidden');
     document.getElementById('toolsTxnListPanel').classList.remove('hidden');
     clearToolsTxnPicture();
+    document.body.classList.remove('tools-recording');
 }
 
 function saveToolsTransaction() {
@@ -14567,6 +14598,20 @@ function switchToolsTab(tab) {
 }
 window.switchToolsTab = switchToolsTab;
 
+function _updateToolsTxnTotal() {
+    var type    = (document.getElementById('toolsTxnType') || {}).value || 'Out Store';
+    var totalEl = document.getElementById('toolsTxnTotalVal');
+    if (!totalEl) return;
+    var count;
+    if (type === 'In Store') {
+        count = parseFloat((document.getElementById('toolsInStoreQty') || {}).value || 0) || 0;
+    } else {
+        count = document.querySelectorAll('.tools-item-chk:checked').length;
+    }
+    totalEl.textContent = count + ' —';
+}
+window._updateToolsTxnTotal = _updateToolsTxnTotal;
+
 function showToolsCatCardGrid() {
     var cardGrid = document.getElementById('toolsCatCardGrid');
     var backBtn  = document.getElementById('toolsCatBackBtn');
@@ -14619,6 +14664,17 @@ function openToolsCatWithType(type) {
     if (tabBar)      tabBar.style.display      = 'none';
     if (secTitle)    secTitle.style.display    = 'none';
     if (secSub)      secSub.style.display      = 'none';
+    // Sticky bottom bar: hide Cancel, show total display, activate CSS
+    var cancelBtn  = document.getElementById('toolsTxnCancelBtn');
+    var totalWrap  = document.getElementById('toolsTxnTotal');
+    var totalLabel = document.getElementById('toolsTxnTotalLabel');
+    var totalVal   = document.getElementById('toolsTxnTotalVal');
+    if (cancelBtn)  cancelBtn.style.display  = 'none';
+    if (totalWrap)  { totalWrap.style.display = 'flex'; }
+    if (totalLabel) totalLabel.textContent = type === 'In' ? 'Jumlah Masuk' : 'Jumlah Keluar';
+    if (totalVal)   totalVal.textContent   = '0 —';
+    document.body.classList.add('tools-recording');
+    _updateToolsTxnTotal();
 }
 
 function renderToolsCatBakiStok() {
