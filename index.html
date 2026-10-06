@@ -14439,13 +14439,13 @@ function renderToolsRecord() {
     var borderStyle = 'border:1px solid #D1D5DB;';
     var thTitle  = 'background:#fff;font-weight:800;font-size:14px;text-align:center;padding:10px 8px;' + borderStyle;
     var thGroup  = 'background:#F5F0E8;color:#1F2937;font-weight:700;font-size:12px;text-align:center;padding:8px 6px;' + borderStyle;
-    var thItem   = 'background:#F5F0E8;color:#374151;font-weight:600;font-size:11px;text-align:center;padding:8px 6px;' + borderStyle + 'min-width:90px;max-width:120px;word-break:break-word;';
-    var thFixed  = 'background:#F9FAFB;color:#374151;font-weight:700;font-size:12px;text-align:left;padding:8px 10px;' + borderStyle + 'min-width:50px;';
-    var tdNum    = 'text-align:center;padding:8px 6px;color:#374151;font-size:13px;' + borderStyle;
-    var tdWorker = 'text-align:left;padding:8px 10px;color:#111827;font-size:13px;font-weight:500;' + borderStyle;
-    var tdCell   = 'text-align:center;padding:8px 6px;color:#374151;font-size:13px;' + borderStyle;
+    var thItem   = 'background:#F5F0E8;color:#374151;font-weight:600;font-size:11px;text-align:center;padding:8px 6px;' + borderStyle + 'min-width:70px;white-space:normal;word-break:break-word;overflow-wrap:anywhere;vertical-align:top;';
+    var thFixed  = 'background:#F9FAFB;color:#374151;font-weight:700;font-size:12px;text-align:left;padding:8px 10px;' + borderStyle + 'min-width:50px;white-space:normal;word-break:break-word;';
+    var tdNum    = 'text-align:center;padding:8px 6px;color:#374151;font-size:13px;' + borderStyle + 'white-space:normal;';
+    var tdWorker = 'text-align:left;padding:8px 10px;color:#111827;font-size:13px;font-weight:500;' + borderStyle + 'white-space:normal;word-break:break-word;min-width:100px;';
+    var tdCell   = 'text-align:center;padding:8px 6px;color:#374151;font-size:13px;' + borderStyle + 'white-space:normal;';
 
-    var html = '<table style="border-collapse:collapse;width:100%;font-family:Inter,sans-serif;">';
+    var html = '<table style="border-collapse:collapse;width:auto;min-width:100%;font-family:Inter,sans-serif;">';
 
     // Title row
     html += '<thead>';
