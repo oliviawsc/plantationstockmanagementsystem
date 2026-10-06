@@ -9759,7 +9759,7 @@ function navToSection(sectionId) {
 
     // Permission guard: applies to every call path (sidebar, estate hub cards, direct calls).
     // estate_hub and mobile_viewrecord are always allowed — they're estate-mobile hub screens.
-    if (sectionId !== 'estate_hub' && sectionId !== 'mobile_viewrecord' && sectionId !== 'estate_category') {
+    if (sectionId !== 'estate_hub' && sectionId !== 'mobile_viewrecord' && sectionId !== 'estate_category' && sectionId !== 'tools_mobile_cat') {
         const _gs = loadSession();
         if (_gs && _gs.role !== 'superadmin' && getSectionAccess(_gs, sectionId) === 'none') {
             return; // silently block — caller has no access to this section
@@ -9810,7 +9810,7 @@ function navToSection(sectionId) {
 }
 
 // ── Mobile bottom nav helpers ────────────────────────────────────────
-const MOBILE_RECORD_SECTIONS = ['fertrecord', 'chemrecord', 'plantrecord', 'estate_category', 'mobile_rainfall', 'rainfallreport'];
+const MOBILE_RECORD_SECTIONS = ['fertrecord', 'chemrecord', 'plantrecord', 'estate_category', 'tools_mobile_cat', 'mobile_rainfall', 'rainfallreport'];
 
 function mobileNavTo(dest) {
     if (dest === 'home') navToSection('estate_hub');
