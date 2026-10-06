@@ -9851,7 +9851,7 @@ function navToSection(sectionId) {
 
     // Permission guard: applies to every call path (sidebar, estate hub cards, direct calls).
     // estate_hub and mobile_viewrecord are always allowed — they're estate-mobile hub screens.
-    if (sectionId !== 'estate_hub' && sectionId !== 'mobile_viewrecord' && sectionId !== 'estate_category' && sectionId !== 'tools_mobile_cat') {
+    if (sectionId !== 'estate_hub' && sectionId !== 'mobile_viewrecord' && sectionId !== 'estate_category') {
         const _gs = loadSession();
         if (_gs && _gs.role !== 'superadmin' && getSectionAccess(_gs, sectionId) === 'none') {
             return; // silently block — caller has no access to this section
@@ -9893,8 +9893,10 @@ function navToSection(sectionId) {
     // Section-specific init that navToSection must mirror from navigateToSection
     if (sectionId === 'mobile_rainfall') {
         if (typeof showMobileRainfallCardGrid === 'function') showMobileRainfallCardGrid();
+        const _rfSession = loadSession();
+        const _rfAccess  = _rfSession ? getSectionAccess(_rfSession, 'mobile_rainfall') : 'edit';
         const saveBtn = document.getElementById('mobileRfSaveBtn');
-        if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.remove('view-locked-field'); }
+        if (saveBtn && _rfAccess === 'edit') { saveBtn.disabled = false; saveBtn.classList.remove('view-locked-field'); }
     }
     if (sectionId === 'estate_category') {
         if (typeof showEstateCatCardGrid === 'function') showEstateCatCardGrid();
@@ -14944,6 +14946,11 @@ window.renderToolsCatRekod        = renderToolsCatRekod;
 // ── Home page navigation helper ──────────────────────────────────────
 function navigateToSection(target) {
     if (target === 'toolsrecord') {
+        const _trSession = loadSession();
+        if (_trSession && _trSession.role !== 'superadmin') {
+            const _trAccess = typeof getSectionAccess === 'function' ? getSectionAccess(_trSession, 'toolsrecord') : 'none';
+            if (_trAccess === 'none') { alert('You do not have permission to access this section.'); return; }
+        }
         navigateToSection('tools');
         if (typeof switchToolsTab === 'function') switchToolsTab('rec');
         return;
