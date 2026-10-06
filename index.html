@@ -10539,13 +10539,16 @@ async function openEditUserModal(id) {
             ${e}
         </label>`).join('');
 
+    const userRole    = user.role || 'estate_user';
+    const isAdminEdit = userRole === 'superadmin';
+
     let _permGroup = null;
     const _editSections = (userRole === 'estate_user') ? ESTATE_SECTIONS : ALL_SECTIONS;
     const permsRows = _editSections.map(s => {
         const stored = userPerms[s.id];
         const cur = stored !== undefined
             ? stored
-            : (user.role === 'estate_user' && s.id in ESTATE_MOBILE_DEFAULTS
+            : (userRole === 'estate_user' && s.id in ESTATE_MOBILE_DEFAULTS
                 ? ESTATE_MOBILE_DEFAULTS[s.id]
                 : 'none');
         let header = '';
@@ -10567,9 +10570,6 @@ async function openEditUserModal(id) {
             </label>
         </div>`;
     }).join('');
-
-    const userRole    = user.role || 'estate_user';
-    const isAdminEdit = userRole === 'superadmin';
     const hideEstEdit  = isAdminEdit;
     const hidePermEdit = isAdminEdit;
 
