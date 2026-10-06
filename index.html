@@ -1975,7 +1975,6 @@
                                 <option value="Fertilizer" data-i18n="cat_fertilizer">Fertilizer</option>
                                 <option value="Chemical" data-i18n="cat_chemical">Chemical</option>
                                 <option value="Oil Palm Seedling" data-i18n="cat_seedling">Oil Palm Seedling</option>
-                                <option value="Tools" data-i18n="cat_tools">Tools</option>
                             </select>
                         </div>
                     </div>
@@ -5464,7 +5463,7 @@ function renderRoundProgress() {
    ----------------------------------------------------------------- */
 function rebuildCategoryDropdowns() {
     // Derive unique categories from items, preserving preferred order for the 3 known ones
-    const KNOWN_ORDER = ['Fertilizer', 'Chemical', 'Oil Palm Seedling', 'Tools'];
+    const KNOWN_ORDER = ['Fertilizer', 'Chemical', 'Oil Palm Seedling'];
     const all = [...new Set(items.map(i => i.category).filter(Boolean))];
     const known   = KNOWN_ORDER.filter(c => all.includes(c));
     const custom  = all.filter(c => !KNOWN_ORDER.includes(c)).sort((a, b) => a.localeCompare(b));
@@ -5645,6 +5644,7 @@ function getFilteredTransactions() {
     const to    = document.getElementById('filterTo').value;
 
     return transactions.filter(t => {
+        if (t.category === 'Tools')    return false;
         if (cat && t.category !== cat) return false;
         if (itm && t.itemName !== itm) return false;
         if (typ && t.type !== typ)     return false;
@@ -5901,6 +5901,7 @@ function getLedgerRows(applyFilters) {
 
     const groups = {}; // key: "itemId|YYYY-MM"
     transactions.forEach(t => {
+        if (t.category === 'Tools') return;
         const month = (t.date || '').slice(0, 7);
         if (!month) return;
         const key = `${t.itemId}|${month}`;
