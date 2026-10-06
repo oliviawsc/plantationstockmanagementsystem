@@ -14175,8 +14175,10 @@ function showToolsTxnForm(editId) {
     if (secSub)      secSub.style.display      = '';
     var cancelBtn = document.getElementById('toolsTxnCancelBtn');
     var totalWrap = document.getElementById('toolsTxnTotal');
+    var saveBtn   = document.getElementById('toolsTxnSaveBtn');
     if (cancelBtn) cancelBtn.style.display = '';
     if (totalWrap) totalWrap.style.display = 'none';
+    if (saveBtn)   { var _d2 = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {}; saveBtn.textContent = _d2.btn_save || 'Save'; }
     document.body.classList.remove('tools-recording');
     var d = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {};
     rebuildToolsItemDropdown();
@@ -14669,10 +14671,12 @@ function openToolsCatWithType(type) {
     var totalWrap  = document.getElementById('toolsTxnTotal');
     var totalLabel = document.getElementById('toolsTxnTotalLabel');
     var totalVal   = document.getElementById('toolsTxnTotalVal');
+    var saveBtn    = document.getElementById('toolsTxnSaveBtn');
     if (cancelBtn)  cancelBtn.style.display  = 'none';
     if (totalWrap)  { totalWrap.style.display = 'flex'; }
     if (totalLabel) totalLabel.textContent = type === 'In' ? 'Jumlah Masuk' : 'Jumlah Keluar';
     if (totalVal)   totalVal.textContent   = '0 —';
+    if (saveBtn)    saveBtn.textContent    = 'Simpan Transaksi';
     document.body.classList.add('tools-recording');
     _updateToolsTxnTotal();
 }
