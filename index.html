@@ -14222,8 +14222,8 @@ function renderToolsRecord() {
     try { _items = items; } catch(e) {}
     if (!_items || !_items.length) _items = window.items || [];
 
-    // All tools transactions
-    var toolsTxns = _txns.filter(function(t) { return t.category === 'Tools'; });
+    // Out Store tools transactions only (issuance records)
+    var toolsTxns = _txns.filter(function(t) { return t.category === 'Tools' && t.type === 'Out Store'; });
 
     // Populate year dropdown — include "All Years" option
     var yearSel = document.getElementById('toolsRecordYear');
