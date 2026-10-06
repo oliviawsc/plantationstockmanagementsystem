@@ -10343,9 +10343,27 @@ const ESTATE_MOBILE_DEFAULTS = {
     estate_anak:      'edit',  // Anak Sawit (Oil Palm Seedling) mobile module
 };
 
+// Maps desktop / sub sections to the estate-mobile section that controls them.
+// Keeps permission logic in one place instead of spreading special-cases everywhere.
+const ESTATE_SECTION_PARENT = {
+    tools:             'tools_mobile_cat', // desktop Tools section → Peralatan mobile
+    fertrecord:        'estate_baja',      // Fertilizer Application Record → Baja module
+    chemrecord:        'estate_racun',     // Chemical Application Record  → Racun module
+    plantrecord:       'estate_anak',      // Field Planting Record        → Anak Sawit module
+    rainfallreport:    'mobile_rainfall',  // Monthly Rainfall Record      → Hujan module
+    rainfallsummary:   'mobile_rainfall',  // Yearly Rainfall Summary      → Hujan module
+    mobile_viewrecord: null,               // View Record hub — always allow
+};
+
 function getSectionAccess(session, sectionId) {
     if (!session || session.role === 'superadmin') return 'edit';
     if (session.role === 'estate_user') {
+        // Resolve sub-sections to their controlling parent module permission.
+        if (Object.prototype.hasOwnProperty.call(ESTATE_SECTION_PARENT, sectionId)) {
+            const parent = ESTATE_SECTION_PARENT[sectionId];
+            if (parent === null) return 'edit'; // hub page — always allow
+            sectionId = parent;                 // fall through using parent ID
+        }
         const perms = normalisePermissions(session.permissions);
         if (sectionId in ESTATE_MOBILE_DEFAULTS) {
             // If admin explicitly saved a value (including 'none'), honour it.
