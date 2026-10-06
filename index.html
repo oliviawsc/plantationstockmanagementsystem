@@ -1690,7 +1690,7 @@
                         </button>
 
                         <!-- Hujan -->
-                        <button class="estate-card" onclick="navToSection('mobile_rainfall')" style="padding:22px 12px;">
+                        <button id="estateHubRainfallCard" class="estate-card" onclick="navToSection('mobile_rainfall')" style="padding:22px 12px;">
                             <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#0369a1,#0c4a6e);display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 14px rgba(3,105,161,.25);">
                                 <span style="font-size:28px;">&#127783;&#65039;</span>
                             </div>
@@ -1698,7 +1698,7 @@
                         </button>
 
                         <!-- Peralatan / Tools -->
-                        <button class="estate-card" onclick="navToSection('tools_mobile_cat')" style="padding:22px 12px;">
+                        <button id="estateHubToolsCard" class="estate-card" onclick="navToSection('tools_mobile_cat')" style="padding:22px 12px;">
                             <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#7c3aed,#5b21b6);display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 14px rgba(124,58,237,.25);">
                                 <span style="font-size:28px;">&#128295;</span>
                             </div>
@@ -9971,22 +9971,26 @@ function applyNavPermissions(session) {
 // Hide hub cards for sections the current user cannot access.
 // Called once during bootApp for estate-mobile users.
 function applyEstateHubPermissions(session) {
-    const dashOk = getSectionAccess(session, 'dashboard')      !== 'none';
-    const fertOk = getSectionAccess(session, 'estate_baja')    !== 'none';
-    const chemOk = getSectionAccess(session, 'estate_racun')   !== 'none';
-    const opsOk  = getSectionAccess(session, 'estate_anak')    !== 'none';
-    const sumOk  = getSectionAccess(session, 'summary')        !== 'none';
+    const dashOk  = getSectionAccess(session, 'dashboard')      !== 'none';
+    const fertOk  = getSectionAccess(session, 'estate_baja')    !== 'none';
+    const chemOk  = getSectionAccess(session, 'estate_racun')   !== 'none';
+    const opsOk   = getSectionAccess(session, 'estate_anak')    !== 'none';
+    const sumOk   = getSectionAccess(session, 'summary')        !== 'none';
+    const rainOk  = getSectionAccess(session, 'mobile_rainfall')  !== 'none';
+    const toolsOk = getSectionAccess(session, 'tools_mobile_cat') !== 'none';
 
     const hide = (id, show) => {
         const el = document.getElementById(id);
         if (el) el.style.display = show ? '' : 'none';
     };
 
-    hide('estateHubDashCard', dashOk);
-    hide('estateHubFertCard', fertOk);
-    hide('estateHubChemCard', chemOk);
-    hide('estateHubOPSCard',  opsOk);
-    hide('estateHubSumCard',  sumOk);
+    hide('estateHubDashCard',     dashOk);
+    hide('estateHubFertCard',     fertOk);
+    hide('estateHubChemCard',     chemOk);
+    hide('estateHubOPSCard',      opsOk);
+    hide('estateHubSumCard',      sumOk);
+    hide('estateHubRainfallCard', rainOk);
+    hide('estateHubToolsCard',    toolsOk);
 }
 
 // ── View-only enforcement ────────────────────────────────────────
