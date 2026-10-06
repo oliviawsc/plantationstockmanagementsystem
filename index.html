@@ -14631,6 +14631,13 @@ function showToolsCatTab(tab) {
     if (tab === 'rekod') {
         navigateToSection('tools');
         if (typeof switchToolsTab === 'function') switchToolsTab('rec');
+        // Hide tab bar and page heading/subtitle (same as Keluar/Masuk Stor flow)
+        var tabBar   = document.getElementById('toolsTabBar');
+        var secTitle = document.getElementById('toolsSectionTitle');
+        var secSub   = document.getElementById('toolsSectionSubtitle');
+        if (tabBar)   tabBar.style.display   = 'none';
+        if (secTitle) secTitle.style.display = 'none';
+        if (secSub)   secSub.style.display   = 'none';
         return;
     }
     var cardGrid = document.getElementById('toolsCatCardGrid');
@@ -14828,6 +14835,15 @@ function navigateToSection(target) {
     if (sec) sec.classList.add('active');
     sessionStorage.setItem('opp_active_section', target);
     if (typeof updateMobileBottomNav === 'function') updateMobileBottomNav(target);
+    // Restore tools section chrome that mobile Peralatan flow may have hidden
+    if (target === 'tools') {
+        var _tb = document.getElementById('toolsTabBar');
+        var _st = document.getElementById('toolsSectionTitle');
+        var _ss = document.getElementById('toolsSectionSubtitle');
+        if (_tb) _tb.style.display = '';
+        if (_st) _st.style.display = '';
+        if (_ss) _ss.style.display = '';
+    }
     refreshAll();
     if (target === 'maintprogress') renderMaintProgressDropdowns();
     if (target === 'chemusage') { renderCiTable(); renderChemByRound(); renderChemByBlock(); }
