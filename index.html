@@ -2928,7 +2928,7 @@
 
         <!-- ============ PAGE: TOOLS TRANSACTIONS ============ -->
         <section id="tools" class="page-section">
-            <div class="htab-bar">
+            <div id="toolsTabBar" class="htab-bar">
                 <button id="toolsTabTxnBtn" class="htab-btn active" onclick="switchToolsTab('txn')" data-i18n="tab_tools_txn">📋 Transactions</button>
                 <button id="toolsTabRecBtn" class="htab-btn" onclick="switchToolsTab('rec')" data-i18n="tab_tools_rec">📊 Rekod Peralatan</button>
             </div>
@@ -14139,9 +14139,15 @@ function showToolsTxnForm(editId) {
     var titleWrap   = document.getElementById('toolsCatFlowTitle');
     var formHeader  = document.getElementById('toolsFormHeader');
     var typeSection = document.getElementById('toolsTxnTypeSection');
+    var tabBar      = document.getElementById('toolsTabBar');
+    var secTitle    = document.getElementById('toolsSectionTitle');
+    var secSub      = document.getElementById('toolsSectionSubtitle');
     if (titleWrap)   titleWrap.style.display   = 'none';
     if (formHeader)  formHeader.style.display  = '';
     if (typeSection) typeSection.style.display = '';
+    if (tabBar)      tabBar.style.display      = '';
+    if (secTitle)    secTitle.style.display    = '';
+    if (secSub)      secSub.style.display      = '';
     var d = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {};
     rebuildToolsItemDropdown();
     if (editId) {
@@ -14598,15 +14604,21 @@ function openToolsCatWithType(type) {
     if (typeof switchToolsTab === 'function') switchToolsTab('txn');
     if (typeof showToolsTxnForm === 'function') showToolsTxnForm();
     if (typeof selectToolsTxnType === 'function') selectToolsTxnType(type === 'In' ? 'In Store' : 'Out Store');
-    // Show title banner above date, hide form header and type section
-    var titleWrap = document.getElementById('toolsCatFlowTitle');
-    var titleText = document.getElementById('toolsCatFlowTitleText');
-    var formHeader = document.getElementById('toolsFormHeader');
+    // Show title banner above date; hide form header, type section, page title/subtitle/tab bar
+    var titleWrap   = document.getElementById('toolsCatFlowTitle');
+    var titleText   = document.getElementById('toolsCatFlowTitleText');
+    var formHeader  = document.getElementById('toolsFormHeader');
     var typeSection = document.getElementById('toolsTxnTypeSection');
-    if (titleWrap) titleWrap.style.display = '';
-    if (titleText) titleText.textContent = fullTitle;
-    if (formHeader) formHeader.style.display = 'none';
+    var tabBar      = document.getElementById('toolsTabBar');
+    var secTitle    = document.getElementById('toolsSectionTitle');
+    var secSub      = document.getElementById('toolsSectionSubtitle');
+    if (titleWrap)  titleWrap.style.display  = '';
+    if (titleText)  titleText.textContent    = fullTitle;
+    if (formHeader)  formHeader.style.display  = 'none';
     if (typeSection) typeSection.style.display = 'none';
+    if (tabBar)      tabBar.style.display      = 'none';
+    if (secTitle)    secTitle.style.display    = 'none';
+    if (secSub)      secSub.style.display      = 'none';
 }
 
 function renderToolsCatBakiStok() {
