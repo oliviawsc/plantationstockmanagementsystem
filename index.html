@@ -8227,7 +8227,8 @@ const I18N = {
         col_worker:               'Worker',
         tools_lbl_items:          'Tools Type',
         tools_lbl_items_hint:     'Please tick the tools to be taken',
-        toolsrecord_col_worker:   'Nama Pengguna Pekerja',
+        toolsrecord_col_worker:   'Worker Name',
+        toolsrecord_table_title:  'TOOLS RECORD',
     },
 
     ms: {
@@ -8669,6 +8670,7 @@ const I18N = {
         tools_lbl_items:          'Jenis Peralatan',
         tools_lbl_items_hint:     'Sila tandakan peralatan yang ingin diambil',
         toolsrecord_col_worker:   'Nama Pengguna Pekerja',
+        toolsrecord_table_title:  'REKOD PERALATAN',
     }
 };
 
@@ -14287,7 +14289,7 @@ function renderToolsRecord() {
 
     // Title row
     html += '<thead>';
-    html += '<tr><th colspan="' + totalCols + '" style="' + thTitle + '">REKOD PERALATAN' + (selectedYear === 'all' ? '' : ' ' + selectedYear) + '</th></tr>';
+    html += '<tr><th colspan="' + totalCols + '" style="' + thTitle + '">' + (d.toolsrecord_table_title || 'TOOLS RECORD') + (selectedYear === 'all' ? '' : ' ' + selectedYear) + '</th></tr>';
 
     // Group header row
     html += '<tr>';
