@@ -2947,12 +2947,25 @@
                                 </button>
                             </div>
                         </div>
-                        <!-- Items checklist -->
-                        <div>
+                        <!-- Out Store: Items checklist (multiple) -->
+                        <div id="toolsOutStorePanel">
                             <label class="block text-sm font-semibold mb-1"><span data-i18n="tools_lbl_items">Jenis Peralatan</span> <span style="color:#dc2626;">*</span></label>
                             <p class="text-xs text-gray-500 mb-2" data-i18n="tools_lbl_items_hint">Sila tandakan peralatan yang ingin diambil</p>
                             <div id="toolsItemChecklist" style="border:1px solid #BBF7D0;border-radius:8px;padding:8px 12px;max-height:220px;overflow-y:auto;background:#F9FAFB;">
                                 <p class="text-xs text-gray-400 py-2">No tools items found. Please add Tools category items in Item Files.</p>
+                            </div>
+                        </div>
+                        <!-- In Store: single item + quantity -->
+                        <div id="toolsInStorePanel" style="display:none;">
+                            <div class="mb-3">
+                                <label class="block text-sm font-semibold mb-1"><span data-i18n="col_item_name">Item</span> <span style="color:#dc2626;">*</span></label>
+                                <select id="toolsInStoreItem" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                                    <option value="">-- Select Item --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-1"><span data-i18n="col_qty">Quantity</span> <span style="color:#dc2626;">*</span></label>
+                                <input type="number" id="toolsInStoreQty" min="1" value="1" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                             </div>
                         </div>
                         <!-- Worker Name -->
@@ -13875,6 +13888,10 @@ function selectToolsTxnType(type) {
     var inactiveStyle = 'flex:1;padding:12px 8px;border-radius:10px;border:2px solid #E2E8F0;background:#F8FAFC;color:#374151;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;';
     if (btnIn)  btnIn.style.cssText  = type === 'In Store'  ? activeStyle : inactiveStyle;
     if (btnOut) btnOut.style.cssText = type === 'Out Store' ? activeStyle : inactiveStyle;
+    var outPanel = document.getElementById('toolsOutStorePanel');
+    var inPanel  = document.getElementById('toolsInStorePanel');
+    if (outPanel) outPanel.style.display = type === 'Out Store' ? '' : 'none';
+    if (inPanel)  inPanel.style.display  = type === 'In Store'  ? '' : 'none';
 }
 
 function rebuildToolsItemDropdown() {
@@ -13888,6 +13905,15 @@ function rebuildToolsItemDropdown() {
             return '<option value="' + i.name + '">' + i.name + '</option>';
         }).join('');
         if (cur) filterSel.value = cur;
+    }
+    // Rebuild In Store item select
+    var inStoreSel = document.getElementById('toolsInStoreItem');
+    if (inStoreSel) {
+        var curIn = inStoreSel.value;
+        inStoreSel.innerHTML = '<option value="">-- Select Item --</option>' + toolItems.map(function(i) {
+            return '<option value="' + i.name + '">' + i.name + '</option>';
+        }).join('');
+        if (curIn) inStoreSel.value = curIn;
     }
     // Rebuild checklist
     var checklist = document.getElementById('toolsItemChecklist');
@@ -13978,10 +14004,17 @@ function showToolsTxnForm(editId) {
             document.getElementById('toolsTxnDate').value   = txn.date   || '';
             document.getElementById('toolsTxnWorker').value = txn.remarks || '';
             selectToolsTxnType(txn.type || 'Out Store');
-            // Pre-check the item
-            document.querySelectorAll('.tools-item-chk').forEach(function(chk) {
-                chk.checked = chk.value === (txn.itemName || '');
-            });
+            if (txn.type === 'In Store') {
+                var inSel = document.getElementById('toolsInStoreItem');
+                if (inSel) inSel.value = txn.itemName || '';
+                var inQtyEl = document.getElementById('toolsInStoreQty');
+                if (inQtyEl) inQtyEl.value = txn.qty || 1;
+            } else {
+                // Pre-check the item
+                document.querySelectorAll('.tools-item-chk').forEach(function(chk) {
+                    chk.checked = chk.value === (txn.itemName || '');
+                });
+            }
             // Pre-populate photo
             if (txn.picture) {
                 var prev = document.getElementById('toolsTxnPicPreview');
@@ -14000,6 +14033,10 @@ function showToolsTxnForm(editId) {
         document.getElementById('toolsTxnWorker').value = '';
         selectToolsTxnType('Out Store');
         document.querySelectorAll('.tools-item-chk').forEach(function(chk) { chk.checked = false; });
+        var inSelNew = document.getElementById('toolsInStoreItem');
+        if (inSelNew) inSelNew.value = '';
+        var inQtyNew = document.getElementById('toolsInStoreQty');
+        if (inQtyNew) inQtyNew.value = 1;
         clearToolsTxnPicture();
     }
 }
@@ -14023,8 +14060,8 @@ function saveToolsTransaction() {
         checkedItems.push(chk.value);
     });
 
-    if (!date)                { alert('Please select a date.');           return; }
-    if (!checkedItems.length) { alert('Please select at least one item.'); return; }
+    if (!date) { alert('Please select a date.'); return; }
+    if (type !== 'In Store' && !checkedItems.length) { alert('Please select at least one item.'); return; }
 
     var session = (typeof loadSession === 'function') ? loadSession() : null;
     var username = session ? (session.username || '') : '';
@@ -14033,40 +14070,68 @@ function saveToolsTransaction() {
     setTimeout(function() {
         try {
             var pictureData = getToolsTxnPictureBase64();
-            if (editId) {
-                // Editing: update the single transaction (first checked item)
-                var itemName = checkedItems[0];
-                var item = items.find(function(i) { return i.name === itemName; });
-                var unit = item ? (item.unit || '') : '';
-                var idx = transactions.findIndex(function(t) { return String(t.id) === String(editId); });
-                if (idx !== -1) {
-                    transactions[idx] = Object.assign({}, transactions[idx], {
-                        date: date, type: type, itemName: itemName, unit: unit,
-                        itemId: item ? item.id : transactions[idx].itemId,
-                        category: 'Tools', remarks: worker,
-                        picture: pictureData !== null ? pictureData : transactions[idx].picture
+            if (type === 'In Store') {
+                // In Store: single item + quantity
+                var inItemName = ((document.getElementById('toolsInStoreItem') || {}).value || '').trim();
+                var inQty = parseFloat((document.getElementById('toolsInStoreQty') || {}).value) || 1;
+                if (!inItemName) { btnDone(btn); alert('Please select an item.'); return; }
+                var inItem = items.find(function(i) { return i.name === inItemName; });
+                if (editId) {
+                    var idx = transactions.findIndex(function(t) { return String(t.id) === String(editId); });
+                    if (idx !== -1) {
+                        transactions[idx] = Object.assign({}, transactions[idx], {
+                            date: date, type: type, itemName: inItemName,
+                            itemId: inItem ? inItem.id : transactions[idx].itemId,
+                            qty: inQty, unit: inItem ? (inItem.unit || '') : '',
+                            category: 'Tools', remarks: worker,
+                            picture: pictureData !== null ? pictureData : transactions[idx].picture
+                        });
+                    }
+                } else {
+                    transactions.push({
+                        id: Date.now(), date: date, type: type,
+                        itemId: inItem ? inItem.id : '', itemName: inItemName,
+                        category: 'Tools', qty: inQty,
+                        unit: inItem ? (inItem.unit || '') : '',
+                        location: activeEstate || '', remarks: worker,
+                        picture: pictureData, user: username
                     });
                 }
             } else {
-                // New: one transaction per checked item
-                var baseId = Date.now();
-                checkedItems.forEach(function(itemName, idx) {
+                // Out Store: one transaction per checked item (qty = 1 each)
+                if (editId) {
+                    var itemName = checkedItems[0];
                     var item = items.find(function(i) { return i.name === itemName; });
-                    transactions.push({
-                        id:       baseId + idx,
-                        date:     date,
-                        type:     type,
-                        itemId:   item ? item.id : '',
-                        itemName: itemName,
-                        category: 'Tools',
-                        qty:      1,
-                        unit:     item ? (item.unit || '') : '',
-                        location: activeEstate || '',
-                        remarks:  worker,
-                        picture:  pictureData,
-                        user:     username
+                    var unit = item ? (item.unit || '') : '';
+                    var idx = transactions.findIndex(function(t) { return String(t.id) === String(editId); });
+                    if (idx !== -1) {
+                        transactions[idx] = Object.assign({}, transactions[idx], {
+                            date: date, type: type, itemName: itemName, unit: unit,
+                            itemId: item ? item.id : transactions[idx].itemId,
+                            category: 'Tools', remarks: worker,
+                            picture: pictureData !== null ? pictureData : transactions[idx].picture
+                        });
+                    }
+                } else {
+                    var baseId = Date.now();
+                    checkedItems.forEach(function(itemName, idx) {
+                        var item = items.find(function(i) { return i.name === itemName; });
+                        transactions.push({
+                            id:       baseId + idx,
+                            date:     date,
+                            type:     type,
+                            itemId:   item ? item.id : '',
+                            itemName: itemName,
+                            category: 'Tools',
+                            qty:      1,
+                            unit:     item ? (item.unit || '') : '',
+                            location: activeEstate || '',
+                            remarks:  worker,
+                            picture:  pictureData,
+                            user:     username
+                        });
                     });
-                });
+                }
             }
             save(STORAGE_KEYS.transactions, transactions);
             refreshAll();
