@@ -2948,6 +2948,11 @@
 
         <!-- ============ PAGE: TOOLS TRANSACTIONS ============ -->
         <section id="tools" class="page-section">
+            <!-- Mobile sticky header — shown only when accessed from Peralatan mobile card -->
+            <div id="toolsMobilePageHeader" style="display:none;align-items:center;justify-content:center;background:#fff;border-bottom:1px solid #E2E8F0;padding:16px 20px;position:sticky;top:0;z-index:10;">
+                <button onclick="navToSection('tools_mobile_cat')" style="position:absolute;left:16px;background:none;border:none;cursor:pointer;font-size:24px;color:#374151;font-family:Inter,sans-serif;line-height:1;padding:0 8px;">&#8249;</button>
+                <h2 style="font-size:17px;font-weight:800;color:#0F172A;font-family:Inter,sans-serif;margin:0;text-align:center;">Peralatan</h2>
+            </div>
             <div id="toolsTabBar" class="htab-bar">
                 <button id="toolsTabTxnBtn" class="htab-btn active" onclick="switchToolsTab('txn')" data-i18n="tab_tools_txn">📋 Transactions</button>
                 <button id="toolsTabRecBtn" class="htab-btn" onclick="switchToolsTab('rec')" data-i18n="tab_tools_rec">📊 Rekod Peralatan</button>
@@ -3114,6 +3119,11 @@
 
             <!-- Tab B: Rekod Peralatan -->
             <div id="toolsTabRecPanel" style="display:none;">
+                <!-- Mobile content heading — shown only when accessed from Peralatan mobile card -->
+                <div id="toolsRecMobileHeading" style="display:none;padding:16px 0 4px;">
+                    <h2 style="font-size:22px;font-weight:800;color:#0F172A;font-family:Inter,sans-serif;margin:0;">&#128203; Rekod Peralatan</h2>
+                    <p style="font-size:13px;color:#16a34a;font-weight:500;margin:4px 0 0;font-family:Inter,sans-serif;" data-i18n="page_tools_rec_sub">Lihat rekod pengeluaran peralatan mengikut nama pekerja.</p>
+                </div>
                 <div class="bg-white p-6 rounded-xl shadow">
                     <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
                         <label class="text-sm font-semibold text-gray-700">Year:</label>
@@ -14176,9 +14186,13 @@ function showToolsTxnForm(editId) {
     var cancelBtn = document.getElementById('toolsTxnCancelBtn');
     var totalWrap = document.getElementById('toolsTxnTotal');
     var saveBtn   = document.getElementById('toolsTxnSaveBtn');
+    var mobileHdr = document.getElementById('toolsMobilePageHeader');
+    var recHead   = document.getElementById('toolsRecMobileHeading');
     if (cancelBtn) cancelBtn.style.display = '';
     if (totalWrap) totalWrap.style.display = 'none';
     if (saveBtn)   { var _d2 = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {}; saveBtn.textContent = _d2.btn_save || 'Save'; }
+    if (mobileHdr) mobileHdr.style.display = 'none';
+    if (recHead)   recHead.style.display   = 'none';
     document.body.classList.remove('tools-recording');
     var d = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {};
     rebuildToolsItemDropdown();
@@ -14631,13 +14645,17 @@ function showToolsCatTab(tab) {
     if (tab === 'rekod') {
         navigateToSection('tools');
         if (typeof switchToolsTab === 'function') switchToolsTab('rec');
-        // Hide tab bar and page heading/subtitle (same as Keluar/Masuk Stor flow)
-        var tabBar   = document.getElementById('toolsTabBar');
-        var secTitle = document.getElementById('toolsSectionTitle');
-        var secSub   = document.getElementById('toolsSectionSubtitle');
-        if (tabBar)   tabBar.style.display   = 'none';
-        if (secTitle) secTitle.style.display = 'none';
-        if (secSub)   secSub.style.display   = 'none';
+        // Hide tab bar and page heading/subtitle; show mobile sticky header + content heading
+        var tabBar      = document.getElementById('toolsTabBar');
+        var secTitle    = document.getElementById('toolsSectionTitle');
+        var secSub      = document.getElementById('toolsSectionSubtitle');
+        var mobileHdr   = document.getElementById('toolsMobilePageHeader');
+        var recHeading  = document.getElementById('toolsRecMobileHeading');
+        if (tabBar)     tabBar.style.display     = 'none';
+        if (secTitle)   secTitle.style.display   = 'none';
+        if (secSub)     secSub.style.display     = 'none';
+        if (mobileHdr)  mobileHdr.style.display  = 'flex';
+        if (recHeading) recHeading.style.display = '';
         return;
     }
     var cardGrid = document.getElementById('toolsCatCardGrid');
@@ -14837,12 +14855,16 @@ function navigateToSection(target) {
     if (typeof updateMobileBottomNav === 'function') updateMobileBottomNav(target);
     // Restore tools section chrome that mobile Peralatan flow may have hidden
     if (target === 'tools') {
-        var _tb = document.getElementById('toolsTabBar');
-        var _st = document.getElementById('toolsSectionTitle');
-        var _ss = document.getElementById('toolsSectionSubtitle');
-        if (_tb) _tb.style.display = '';
-        if (_st) _st.style.display = '';
-        if (_ss) _ss.style.display = '';
+        var _tb  = document.getElementById('toolsTabBar');
+        var _st  = document.getElementById('toolsSectionTitle');
+        var _ss  = document.getElementById('toolsSectionSubtitle');
+        var _mh  = document.getElementById('toolsMobilePageHeader');
+        var _rmh = document.getElementById('toolsRecMobileHeading');
+        if (_tb)  _tb.style.display  = '';
+        if (_st)  _st.style.display  = '';
+        if (_ss)  _ss.style.display  = '';
+        if (_mh)  _mh.style.display  = 'none';
+        if (_rmh) _rmh.style.display = 'none';
     }
     refreshAll();
     if (target === 'maintprogress') renderMaintProgressDropdowns();
