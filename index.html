@@ -2466,46 +2466,59 @@
             <div style="min-height:100vh;background:#F8FAFC;padding-bottom:80px;">
                 <!-- Header -->
                 <div style="background:#fff;border-bottom:1px solid #E2E8F0;padding:12px 20px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:10;">
-                    <button onclick="navToSection('estate_hub')" style="position:absolute;left:16px;background:none;border:none;cursor:pointer;font-size:24px;color:#374151;font-family:Inter,sans-serif;line-height:1;padding:0 8px;">&#8249;</button>
-                    <h2 style="font-size:17px;font-weight:800;color:#0F172A;font-family:Inter,sans-serif;margin:0;text-align:center;">Peralatan</h2>
+                    <button id="toolsCatBackBtn" onclick="showToolsCatCardGrid()" style="display:none;position:absolute;left:16px;background:none;border:none;cursor:pointer;font-size:24px;color:#374151;font-family:Inter,sans-serif;line-height:1;padding:0 8px;">&#8249;</button>
+                    <h2 id="toolsCatTitle" style="font-size:17px;font-weight:800;color:#0F172A;font-family:Inter,sans-serif;margin:0;text-align:center;">Peralatan</h2>
                 </div>
-                <!-- 5 Sub-cards (2-column grid) -->
-                <div style="padding:20px 16px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <!-- Card Grid Menu -->
+                <div id="toolsCatCardGrid" style="padding:20px 16px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
                     <!-- Keluar Stor -->
-                    <button class="estate-card" onclick="toolsMobileCatAction('out')" style="padding:22px 12px;">
+                    <button class="estate-card" onclick="openToolsCatWithType('Out')" style="padding:22px 12px;">
                         <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#dc2626,#991b1b);display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 14px rgba(220,38,38,.25);">
-                            <span style="font-size:28px;">&#128100;&#8203;&#128228;</span>
+                            <span style="font-size:28px;">📤</span>
                         </div>
                         <div style="font-size:15px;font-weight:700;color:#0F172A;">Keluar Stor</div>
                     </button>
                     <!-- Masuk Stor -->
-                    <button class="estate-card" onclick="toolsMobileCatAction('in')" style="padding:22px 12px;">
+                    <button class="estate-card" onclick="openToolsCatWithType('In')" style="padding:22px 12px;">
                         <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#16a34a,#166534);display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 14px rgba(22,163,74,.25);">
-                            <span style="font-size:28px;">&#128229;</span>
+                            <span style="font-size:28px;">📥</span>
                         </div>
                         <div style="font-size:15px;font-weight:700;color:#0F172A;">Masuk Stor</div>
                     </button>
                     <!-- Baki Stok -->
-                    <button class="estate-card" onclick="toolsMobileCatAction('baki')" style="padding:22px 12px;">
+                    <button class="estate-card" onclick="showToolsCatTab('baki')" style="padding:22px 12px;">
                         <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#0ea5e9,#0284c7);display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 14px rgba(14,165,233,.25);">
-                            <span style="font-size:28px;">&#128230;</span>
+                            <span style="font-size:28px;">📦</span>
                         </div>
                         <div style="font-size:15px;font-weight:700;color:#0F172A;">Baki Stok</div>
                     </button>
                     <!-- Transaksi -->
-                    <button class="estate-card" onclick="toolsMobileCatAction('txn')" style="padding:22px 12px;">
+                    <button class="estate-card" onclick="showToolsCatTab('transaksi')" style="padding:22px 12px;">
                         <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#7c3aed,#5b21b6);display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 14px rgba(124,58,237,.25);">
-                            <span style="font-size:28px;">&#128203;</span>
+                            <span style="font-size:28px;">📋</span>
                         </div>
                         <div style="font-size:15px;font-weight:700;color:#0F172A;">Transaksi</div>
                     </button>
                     <!-- Rekod -->
-                    <button class="estate-card" onclick="toolsMobileCatAction('rekod')" style="padding:22px 12px;">
+                    <button class="estate-card" onclick="showToolsCatTab('rekod')" style="padding:22px 12px;">
                         <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#d97706,#b45309);display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 14px rgba(217,119,6,.25);">
-                            <span style="font-size:28px;">&#128221;</span>
+                            <span style="font-size:28px;">📝</span>
                         </div>
                         <div style="font-size:15px;font-weight:700;color:#0F172A;">Rekod</div>
                     </button>
+                </div>
+                <!-- Pane: Baki Stok -->
+                <div id="toolsCatPaneBaki" style="display:none;padding:0 16px 20px;">
+                    <div id="toolsBakiStokList" style="padding-top:4px;"></div>
+                    <p id="toolsBakiFooter" style="font-size:11px;color:#94A3B8;text-align:right;padding:12px 0 0;margin:0;font-family:Inter,sans-serif;"></p>
+                </div>
+                <!-- Pane: Transaksi -->
+                <div id="toolsCatPaneTransaksi" style="display:none;padding:16px;">
+                    <div id="toolsTransaksiList" style="display:flex;flex-direction:column;gap:10px;"></div>
+                </div>
+                <!-- Pane: Rekod -->
+                <div id="toolsCatPaneRekod" style="display:none;padding:16px;">
+                    <div id="toolsRekodLinks" style="display:flex;flex-direction:column;gap:12px;"></div>
                 </div>
             </div>
         </section>
@@ -9807,6 +9820,9 @@ function navToSection(sectionId) {
     if (sectionId === 'estate_category') {
         if (typeof showEstateCatCardGrid === 'function') showEstateCatCardGrid();
     }
+    if (sectionId === 'tools_mobile_cat') {
+        if (typeof showToolsCatCardGrid === 'function') showToolsCatCardGrid();
+    }
 }
 
 // ── Mobile bottom nav helpers ────────────────────────────────────────
@@ -14530,22 +14546,155 @@ function switchToolsTab(tab) {
 }
 window.switchToolsTab = switchToolsTab;
 
-function toolsMobileCatAction(action) {
-    if (action === 'rekod') {
-        navigateToSection('tools');
-        if (typeof switchToolsTab === 'function') switchToolsTab('rec');
-    } else if (action === 'out' || action === 'in') {
-        navigateToSection('tools');
-        if (typeof switchToolsTab === 'function') switchToolsTab('txn');
-        if (typeof showToolsTxnForm === 'function') showToolsTxnForm();
-        if (typeof selectToolsTxnType === 'function') selectToolsTxnType(action === 'in' ? 'In Store' : 'Out Store');
-    } else {
-        // baki or txn — navigate to tools transactions list (balance cards shown at top)
-        navigateToSection('tools');
-        if (typeof switchToolsTab === 'function') switchToolsTab('txn');
+function showToolsCatCardGrid() {
+    var cardGrid = document.getElementById('toolsCatCardGrid');
+    var backBtn  = document.getElementById('toolsCatBackBtn');
+    var title    = document.getElementById('toolsCatTitle');
+    if (cardGrid) cardGrid.style.display = 'grid';
+    if (backBtn)  backBtn.style.display  = 'none';
+    if (title)    title.textContent      = 'Peralatan';
+    ['baki','transaksi','rekod'].forEach(function(t) {
+        var pane = document.getElementById('toolsCatPane' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (pane) pane.style.display = 'none';
+    });
+}
+
+function showToolsCatTab(tab) {
+    var cardGrid = document.getElementById('toolsCatCardGrid');
+    var backBtn  = document.getElementById('toolsCatBackBtn');
+    var title    = document.getElementById('toolsCatTitle');
+    if (cardGrid) cardGrid.style.display = 'none';
+    if (backBtn)  backBtn.style.display  = '';
+    var titles = { baki: 'Baki Stok', transaksi: 'Transaksi', rekod: 'Rekod Peralatan' };
+    if (title)    title.textContent = titles[tab] || 'Peralatan';
+    ['baki','transaksi','rekod'].forEach(function(t) {
+        var pane = document.getElementById('toolsCatPane' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (pane) pane.style.display = (t === tab) ? '' : 'none';
+    });
+    if (tab === 'baki')      renderToolsCatBakiStok();
+    if (tab === 'transaksi') renderToolsCatTransaksi();
+    if (tab === 'rekod')     renderToolsCatRekod();
+}
+
+function openToolsCatWithType(type) {
+    navigateToSection('tools');
+    if (typeof switchToolsTab === 'function') switchToolsTab('txn');
+    if (typeof showToolsTxnForm === 'function') showToolsTxnForm();
+    if (typeof selectToolsTxnType === 'function') selectToolsTxnType(type === 'In' ? 'In Store' : 'Out Store');
+}
+
+function renderToolsCatBakiStok() {
+    var toolsItems = (typeof items !== 'undefined' ? items : []).filter(function(i) { return i.category === 'Tools'; });
+    var container  = document.getElementById('toolsBakiStokList');
+    var footer     = document.getElementById('toolsBakiFooter');
+    if (!container) return;
+    if (!toolsItems.length) {
+        container.innerHTML = '<p style="text-align:center;color:#94A3B8;padding:32px 0;font-family:Inter,sans-serif;font-size:14px;">Tiada item.</p>';
+        if (footer) footer.textContent = '';
+        return;
+    }
+    var asAt  = new Date().toISOString().slice(0, 10);
+    var _txns = (typeof transactions !== 'undefined' ? transactions : []);
+    container.innerHTML = toolsItems.map(function(item) {
+        var bal = _txns
+            .filter(function(t) { return t.category === 'Tools' && t.itemName === item.name && (t.date || '') <= asAt; })
+            .reduce(function(sum, t) {
+                var qty = parseFloat(t.qty) || 0;
+                return t.type === 'In Store' ? sum + qty : sum - qty;
+            }, 0);
+        var unit       = item.unit || '';
+        var displayBal = bal % 1 === 0 ? String(bal) : bal.toFixed(2);
+        return '<div style="display:flex;align-items:center;padding:14px 4px;border-bottom:1px solid #F1F5F9;">' +
+            '<div style="flex:1;font-size:14px;color:#0F172A;font-family:Inter,sans-serif;">' + item.name + '</div>' +
+            '<div style="font-size:15px;font-weight:700;color:#166534;font-family:Inter,sans-serif;">' + displayBal +
+            ' <span style="font-size:12px;font-weight:500;color:#64748B;">' + unit + '</span></div>' +
+        '</div>';
+    }).join('');
+    if (footer) {
+        var d = new Date(asAt + 'T00:00:00');
+        footer.textContent = 'Baki stok setakat ' + d.toLocaleDateString('ms-MY', {day:'2-digit', month:'long', year:'numeric'});
     }
 }
-window.toolsMobileCatAction = toolsMobileCatAction;
+
+function renderToolsCatTransaksi() {
+    var list = document.getElementById('toolsTransaksiList');
+    if (!list) return;
+    var txns = (typeof transactions !== 'undefined' ? transactions : [])
+        .filter(function(t) { return t.category === 'Tools'; })
+        .sort(function(a, b) { return (b.date || '').localeCompare(a.date || '') || (Number(b.id) - Number(a.id)); });
+    if (!txns.length) {
+        list.innerHTML = '<p style="text-align:center;color:#94A3B8;padding:32px 0;font-family:Inter,sans-serif;font-size:14px;">Tiada transaksi.</p>';
+        return;
+    }
+    var typeColors = { 'In Store': '#16a34a', 'Out Store': '#dc2626' };
+    var typeBg     = { 'In Store': '#DCFCE7', 'Out Store': '#FEE2E2' };
+    var typeLabels = { 'In Store': 'Masuk',   'Out Store': 'Keluar'  };
+    list.innerHTML = txns.map(function(t) {
+        var col   = typeColors[t.type] || '#374151';
+        var bg    = typeBg[t.type]     || '#F1F5F9';
+        var label = typeLabels[t.type] || (t.type || '');
+        var qty   = parseFloat(parseFloat(t.qty || 0).toFixed(2));
+        var unit  = t.unit || '';
+        return '<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1.5px solid #E2E8F0;">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
+                '<div style="font-size:13px;font-weight:700;color:#0F172A;font-family:Inter,sans-serif;">' + (t.itemName || '') + '</div>' +
+                '<div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:' + bg + ';color:' + col + ';">' + label + '</div>' +
+            '</div>' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+                '<div style="font-size:12px;color:#64748B;font-family:Inter,sans-serif;">' + (t.date || '') + '</div>' +
+                '<div style="font-size:13px;font-weight:600;color:#374151;font-family:Inter,sans-serif;">' + qty + ' ' + unit + '</div>' +
+            '</div>' +
+            '<div style="display:flex;gap:8px;border-top:1px solid #F1F5F9;padding-top:10px;">' +
+                '<button onclick="mobileEditToolsTxn(' + t.id + ')" style="flex:1;padding:7px 0;border-radius:8px;border:1.5px solid #3B82F6;background:#EFF6FF;color:#1D4ED8;font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;">&#9999;&#65039; Sunting</button>' +
+                '<button onclick="mobileDeleteToolsTxnMobile(' + t.id + ')" style="flex:1;padding:7px 0;border-radius:8px;border:1.5px solid #EF4444;background:#FEF2F2;color:#DC2626;font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;">&#128465;&#65039; Padam</button>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+function mobileEditToolsTxn(id) {
+    editToolsTxn(id);
+}
+
+function mobileDeleteToolsTxnMobile(id) {
+    var txn = (typeof transactions !== 'undefined' ? transactions : []).find(function(t) { return String(t.id) === String(id); });
+    if (!txn) return;
+    if (!confirm('Padam transaksi ini?\n\nItem: ' + (txn.itemName || '') + '\nJenis: ' + (txn.type || '') + '  |  Qty: ' + parseFloat(txn.qty || 0).toFixed(2) + '  |  Tarikh: ' + (txn.date || '') + '\n\nTindakan ini tidak boleh dibatalkan.')) return;
+    var tombKey = 'opp_deleted_txn_ids::' + (typeof activeEstate !== 'undefined' ? activeEstate : '');
+    try {
+        var tombSet = new Set(JSON.parse(localStorage.getItem(tombKey) || '[]'));
+        tombSet.add(String(id));
+        localStorage.setItem(tombKey, JSON.stringify([...tombSet]));
+    } catch(e) {}
+    transactions = transactions.filter(function(t) { return String(t.id) !== String(id); });
+    save(STORAGE_KEYS.transactions, transactions);
+    refreshAll();
+    renderToolsCatTransaksi();
+    if (typeof supabaseClient !== 'undefined') {
+        supabaseClient.from('opp_transactions').delete().eq('id', id).then(function(res) {
+            if (res.error) console.error('[Delete tools txn mobile]', res.error);
+        });
+    }
+}
+
+function renderToolsCatRekod() {
+    var links = document.getElementById('toolsRekodLinks');
+    if (!links) return;
+    links.innerHTML = '<button onclick="navigateToSection(\'tools\');if(typeof switchToolsTab===\'function\')switchToolsTab(\'rec\');" style="display:flex;align-items:center;padding:18px 20px;background:#fff;border-radius:16px;border:1.5px solid #E2E8F0;cursor:pointer;gap:16px;width:100%;text-align:left;-webkit-tap-highlight-color:transparent;font-family:Inter,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.06);">' +
+        '<div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#5b21b6);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,.25);font-size:22px;">&#128295;</div>' +
+        '<div style="flex:1;font-size:15px;font-weight:700;color:#0F172A;">Rekod Peralatan</div>' +
+        '<span style="font-size:20px;color:#CBD5E1;">&#8250;</span>' +
+    '</button>';
+}
+
+window.showToolsCatCardGrid       = showToolsCatCardGrid;
+window.showToolsCatTab            = showToolsCatTab;
+window.openToolsCatWithType       = openToolsCatWithType;
+window.renderToolsCatBakiStok     = renderToolsCatBakiStok;
+window.renderToolsCatTransaksi    = renderToolsCatTransaksi;
+window.mobileEditToolsTxn         = mobileEditToolsTxn;
+window.mobileDeleteToolsTxnMobile = mobileDeleteToolsTxnMobile;
+window.renderToolsCatRekod        = renderToolsCatRekod;
 
 // ══════════════════════════════════════════════════════════════════════
 // SETTINGS TAB SWITCHING
