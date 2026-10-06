@@ -339,26 +339,13 @@
         body.estate-mobile #appLayout { display: block; }
         body.estate-mobile #mainWrapper {
             padding-top: 94px;
-            padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+            padding-bottom: env(safe-area-inset-bottom, 0px);
             overflow-y: visible !important; /* override @media overflow-y:auto */
             height: auto !important;        /* override flex-set height */
         }
 
-        /* ── Mobile bottom nav bar ── */
-        #mobileBottomNav { display: none; }
-        body.estate-mobile #mobileBottomNav {
-            display: flex;
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: #fff;
-            border-top: 1.5px solid #E2E8F0;
-            z-index: 200;
-            box-shadow: 0 -2px 16px rgba(0,0,0,.10);
-            padding-bottom: env(safe-area-inset-bottom, 0px);
-            /* Force GPU compositing layer — prevents iOS fixed-position jitter */
-            -webkit-transform: translate3d(0,0,0);
-            transform: translate3d(0,0,0);
-        }
+        /* ── Mobile bottom nav bar — hidden ── */
+        #mobileBottomNav { display: none !important; }
         .mnav-item {
             flex: 1; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
