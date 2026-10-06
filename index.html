@@ -13899,15 +13899,15 @@ function renderToolsStockSummary() {
         var cardBg    = isLow ? '#FEF2F2' : '#F0FDF4';
         var borderCol = isLow ? '#FCA5A5' : '#86EFAC';
         var numCol    = isLow ? '#DC2626'  : '#15803D';
-        return '<div style="background:' + cardBg + ';border:1px solid ' + borderCol + ';border-radius:10px;padding:10px 14px;min-width:110px;text-align:center;">' +
-            '<div style="font-size:11px;color:#6B7280;font-weight:600;margin-bottom:4px;">' + item.name + '</div>' +
+        return '<div style="background:' + cardBg + ';border:1px solid ' + borderCol + ';border-radius:10px;padding:10px 14px;text-align:center;">' +
+            '<div style="font-size:11px;color:#6B7280;font-weight:600;margin-bottom:4px;word-break:break-word;">' + item.name + '</div>' +
             '<div style="font-size:20px;font-weight:800;color:' + numCol + ';">' + bal + '</div>' +
             '<div style="font-size:11px;color:#9CA3AF;">' + (item.unit || '') + '</div>' +
             '</div>';
     }).join('');
     el.innerHTML =
         '<p style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;">' + (d.tools_stock_balance || 'Current Stock Balance') + '</p>' +
-        '<div style="display:flex;flex-wrap:wrap;gap:8px;">' + cards + '</div>';
+        '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;">' + cards + '</div>';
 }
 
 function selectToolsTxnType(type) {
