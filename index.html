@@ -2994,19 +2994,27 @@
             <!-- Panel B: Add / Edit form -->
             <div id="toolsTxnFormPanel" class="hidden">
                 <div class="bg-white p-6 rounded-xl shadow" style="max-width:600px;">
-                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                    <div id="toolsFormHeader" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
                         <button onclick="cancelToolsTxnForm()" style="padding:6px 14px;border-radius:8px;border:1px solid #BBF7D0;background:#F0FDF4;color:#166534;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">&#8592; Back</button>
                         <h3 class="text-xl font-bold" id="toolsTxnFormTitle" data-i18n="tools_form_add_title">Add Tools Transaction</h3>
                         <input type="hidden" id="toolsTxnEditId" value="" />
                     </div>
                     <div class="grid grid-cols-1 gap-5 mb-4">
+                        <!-- Mobile category flow title (shown when opened from Peralatan card) -->
+                        <div id="toolsCatFlowTitle" style="display:none;">
+                            <button type="button" onclick="navToSection('tools_mobile_cat')"
+                                style="background:none;border:none;cursor:pointer;padding:0 0 10px;font-size:22px;color:#374151;line-height:1;-webkit-tap-highlight-color:transparent;">&#8249;</button>
+                            <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:12px;padding:14px 16px;border-left:4px solid #16a34a;">
+                                <div id="toolsCatFlowTitleText" style="font-size:16px;font-weight:800;color:#166534;font-family:Inter,sans-serif;"></div>
+                            </div>
+                        </div>
                         <!-- Date -->
                         <div>
                             <label class="block text-sm font-semibold mb-1" data-i18n="col_date">Date</label>
                             <input type="date" id="toolsTxnDate" class="w-full border border-green-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600" />
                         </div>
                         <!-- Transaction Type: button cards -->
-                        <div>
+                        <div id="toolsTxnTypeSection">
                             <label class="block text-sm font-semibold mb-2" data-i18n="col_type">Transaction Type</label>
                             <input type="hidden" id="toolsTxnType" value="Out Store" />
                             <div style="display:flex;gap:12px;">
@@ -14127,6 +14135,13 @@ function showToolsTxnForm(editId) {
     document.getElementById('toolsTxnListPanel').classList.add('hidden');
     var panel = document.getElementById('toolsTxnFormPanel');
     panel.classList.remove('hidden');
+    // Reset mobile-category flow state (openToolsCatWithType may override after this call)
+    var titleWrap   = document.getElementById('toolsCatFlowTitle');
+    var formHeader  = document.getElementById('toolsFormHeader');
+    var typeSection = document.getElementById('toolsTxnTypeSection');
+    if (titleWrap)   titleWrap.style.display   = 'none';
+    if (formHeader)  formHeader.style.display  = '';
+    if (typeSection) typeSection.style.display = '';
     var d = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {};
     rebuildToolsItemDropdown();
     if (editId) {
@@ -14577,10 +14592,21 @@ function showToolsCatTab(tab) {
 }
 
 function openToolsCatWithType(type) {
+    var typeLabel = type === 'In' ? 'Masuk Stor' : 'Keluar Stor';
+    var fullTitle = 'Peralatan ' + typeLabel;
     navigateToSection('tools');
     if (typeof switchToolsTab === 'function') switchToolsTab('txn');
     if (typeof showToolsTxnForm === 'function') showToolsTxnForm();
     if (typeof selectToolsTxnType === 'function') selectToolsTxnType(type === 'In' ? 'In Store' : 'Out Store');
+    // Show title banner above date, hide form header and type section
+    var titleWrap = document.getElementById('toolsCatFlowTitle');
+    var titleText = document.getElementById('toolsCatFlowTitleText');
+    var formHeader = document.getElementById('toolsFormHeader');
+    var typeSection = document.getElementById('toolsTxnTypeSection');
+    if (titleWrap) titleWrap.style.display = '';
+    if (titleText) titleText.textContent = fullTitle;
+    if (formHeader) formHeader.style.display = 'none';
+    if (typeSection) typeSection.style.display = 'none';
 }
 
 function renderToolsCatBakiStok() {
