@@ -4156,8 +4156,38 @@ function _showToast(msg, bg, autoDismissMs) {
 // Pull the full dataset down from Supabase on boot, replacing in-memory
 // arrays and refreshing the UI.  localStorage cache is left in place so
 // the app shows something instantly while this runs.
+function _showDashLoadingSpinner() {
+    ['chartFertilizerEmpty','chartChemicalEmpty','chartSeedlingEmpty'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.dataset.origText = el.dataset.origText || el.innerHTML;
+        el.innerHTML = '<span style="display:inline-flex;align-items:center;gap:8px;">' +
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="animation:saveBtnSpin .9s linear infinite;flex-shrink:0;">' +
+            '<path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>' +
+            '<span data-i18n="loading_data">Loading data…</span></span>';
+        el.classList.remove('hidden');
+    });
+    ['chartFertilizerWrap','chartChemicalWrap','chartSeedlingWrap'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+}
+
+function _hideDashLoadingSpinner() {
+    ['chartFertilizerEmpty','chartChemicalEmpty','chartSeedlingEmpty'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        if (el.dataset.origText !== undefined) {
+            el.innerHTML = el.dataset.origText;
+            delete el.dataset.origText;
+        }
+        el.classList.add('hidden');
+    });
+}
+
 async function loadFromSupabase() {
     if (!activeEstate) return;
+    _showDashLoadingSpinner();
     try {
         const [itemsRes, locsRes, txnsRes, roundsRes,
                fmRoundsRes, claimsRes, chemRes, rainfallRes] = await Promise.all([
@@ -4326,6 +4356,8 @@ async function loadFromSupabase() {
         }
     } catch (err) {
         console.error('[Supabase] loadFromSupabase failed', err);
+    } finally {
+        _hideDashLoadingSpinner();
     }
 }
 
@@ -8186,6 +8218,7 @@ const I18N = {
         dash_chart_title:    'Stock Level Chart',
         chart_legend_low:    '⚠️ Low Stock',
         chart_empty:         'No stock data to display yet.',
+        loading_data:        'Loading data…',
         chart_ok:            'OK',
         chart_sub_fertilizer:'On Hand quantity for all fertilizer items',
         chart_sub_chemical:  'On Hand quantity for all chemical items — red bars indicate low stock',
@@ -8628,6 +8661,7 @@ const I18N = {
         dash_chart_title:    'Carta Tahap Stok',
         chart_legend_low:    '⚠️ Stok Rendah',
         chart_empty:         'Tiada data stok untuk dipaparkan.',
+        loading_data:        'Memuatkan data…',
         chart_ok:            'OK',
         chart_sub_fertilizer:'Kuantiti stok semasa untuk semua item baja',
         chart_sub_chemical:  'Kuantiti stok semasa untuk semua item bahan kimia — bar merah menunjukkan stok rendah',
