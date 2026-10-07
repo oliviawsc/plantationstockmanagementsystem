@@ -4186,6 +4186,19 @@ function _hideDashLoadingSpinner() {
 }
 
 async function loadFromSupabase() {
+    // DEBUG: confirm function reached and what activeEstate is
+    (function() {
+        var t = document.createElement('div');
+        t.id = '_sbStartToast';
+        t.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);' +
+            'background:#7c3aed;color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;' +
+            'font-weight:600;z-index:99999;box-shadow:0 2px 8px rgba(0,0,0,.25);';
+        t.textContent = 'loadFromSupabase called | activeEstate=' + (activeEstate || '(empty)');
+        var old = document.getElementById('_sbStartToast');
+        if (old) old.remove();
+        document.body.appendChild(t);
+        setTimeout(function() { if (t.parentNode) t.remove(); }, 12000);
+    })();
     if (!activeEstate) return;
     _showDashLoadingSpinner();
     try {
@@ -9793,6 +9806,23 @@ function bootApp(session) {
     }
 
     activeEstate = defaultEstate;
+
+    // DEBUG: show what estate was resolved
+    (function() {
+        var t = document.createElement('div');
+        t.id = '_bootDebugToast';
+        t.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);' +
+            'background:#1e40af;color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;' +
+            'font-weight:600;z-index:99999;box-shadow:0 2px 8px rgba(0,0,0,.25);max-width:90vw;word-break:break-all;';
+        t.textContent = 'BOOT: role=' + session.role +
+            ' | estates=' + JSON.stringify(session.estates) +
+            ' | estate=' + (session.estate || '(empty)') +
+            ' | defaultEstate=' + (defaultEstate || '(empty)');
+        var old = document.getElementById('_bootDebugToast');
+        if (old) old.remove();
+        document.body.appendChild(t);
+        setTimeout(function() { if (t.parentNode) t.remove(); }, 12000);
+    })();
 
     if (defaultEstate) {
         // Hide the blank state and load this estate's data right away
