@@ -10358,6 +10358,8 @@ const ESTATE_SECTION_PARENT = {
 
 function getSectionAccess(session, sectionId) {
     if (!session || session.role === 'superadmin') return 'edit';
+    // 'home' is the landing/navigation page — never lock it for any role.
+    if (sectionId === 'home') return 'edit';
     if (session.role === 'estate_user') {
         // Resolve sub-sections to their controlling parent module permission.
         if (Object.prototype.hasOwnProperty.call(ESTATE_SECTION_PARENT, sectionId)) {
