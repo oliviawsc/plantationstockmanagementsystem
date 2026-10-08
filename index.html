@@ -1457,7 +1457,7 @@
                         <span class="home-card-title" data-i18n="home_card_stock_records">Stock Records</span>
                     </button>
                     <!-- Field Operations -->
-                    <button class="home-card" onclick="navigateToSection('roundprogress')">
+                    <button class="home-card" id="homeCardFieldOps" onclick="navigateToFirstFieldOpsSection()">
                         <div class="home-card-icon">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 22V12"/><path d="M12 12C12 7 7 3 2 3c0 5 4 9 10 9z"/>
@@ -1467,7 +1467,7 @@
                         <span class="home-card-title" data-i18n="home_card_field_ops">Field Operations</span>
                     </button>
                     <!-- Reports -->
-                    <button class="home-card" onclick="navigateToSection('fertrecord')">
+                    <button class="home-card" id="homeCardReports" onclick="navigateToFirstReportsSection()">
                         <div class="home-card-icon">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
@@ -1477,7 +1477,7 @@
                         <span class="home-card-title" data-i18n="home_card_reports">Reports</span>
                     </button>
                     <!-- Rainfall -->
-                    <button class="home-card" onclick="navigateToSection('rainfall')">
+                    <button class="home-card" id="homeCardRainfall" onclick="navigateToFirstRainfallSection()">
                         <div class="home-card-icon">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="8" y1="19" x2="8" y2="21"/><line x1="8" y1="13" x2="8" y2="15"/>
@@ -1489,7 +1489,7 @@
                         <span class="home-card-title" data-i18n="home_card_rainfall">Rainfall</span>
                     </button>
                     <!-- Tools -->
-                    <button class="home-card" onclick="navigateToSection('tools')">
+                    <button class="home-card" id="homeCardTools" onclick="navigateToFirstToolsSection()">
                         <div class="home-card-icon">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
@@ -2051,9 +2051,9 @@
         <!-- ============ PAGE 8: MANURING PROGRESS SUMMARY ============ -->
         <section id="roundprogress" class="page-section">
             <div class="htab-bar">
-                <button class="htab-btn active" onclick="navigateToSection('roundprogress')" data-i18n="tab_fertilizer_issuance">Fertilizer Issuance</button>
-                <button class="htab-btn" onclick="navigateToSection('maintprogress')" data-i18n="tab_maintenance_progress">Maintenance Progress</button>
-                <button class="htab-btn" onclick="navigateToSection('chemusage')" data-i18n="tab_chemical_usage">Chemical Usage</button>
+                <button class="htab-btn active" data-target="roundprogress" onclick="navigateToSection('roundprogress')" data-i18n="tab_fertilizer_issuance">Fertilizer Issuance</button>
+                <button class="htab-btn" data-target="maintprogress" onclick="navigateToSection('maintprogress')" data-i18n="tab_maintenance_progress">Maintenance Progress</button>
+                <button class="htab-btn" data-target="chemusage" onclick="navigateToSection('chemusage')" data-i18n="tab_chemical_usage">Chemical Usage</button>
             </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="nav_roundprogress">Fertilizer Issuance</h2>
             <p class="text-sm text-green-700 mb-6" data-i18n="progress_subtitle">Track fertilizer application progress across fertilizer issuance rounds and blocks. Compare actual quantities applied against the budgeted fertilizer requirement.</p>
@@ -2155,9 +2155,9 @@
         <!-- ============ PAGE 10: MAINTENANCE PROGRESS & CHEMICAL USAGE ============ -->
         <section id="maintprogress" class="page-section">
             <div class="htab-bar">
-                <button class="htab-btn" onclick="navigateToSection('roundprogress')" data-i18n="tab_fertilizer_issuance">Fertilizer Issuance</button>
-                <button class="htab-btn active" onclick="navigateToSection('maintprogress')" data-i18n="tab_maintenance_progress">Maintenance Progress</button>
-                <button class="htab-btn" onclick="navigateToSection('chemusage')" data-i18n="tab_chemical_usage">Chemical Usage</button>
+                <button class="htab-btn" data-target="roundprogress" onclick="navigateToSection('roundprogress')" data-i18n="tab_fertilizer_issuance">Fertilizer Issuance</button>
+                <button class="htab-btn active" data-target="maintprogress" onclick="navigateToSection('maintprogress')" data-i18n="tab_maintenance_progress">Maintenance Progress</button>
+                <button class="htab-btn" data-target="chemusage" onclick="navigateToSection('chemusage')" data-i18n="tab_chemical_usage">Chemical Usage</button>
             </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_maintprogress">📊 Maintenance Progress</h2>
             <p class="text-sm text-green-700 mb-6" data-i18n="page_maintprogress_sub">Track field maintenance progress by round and block. Record claimed maintenance area and monitor completion against planned block coverage.</p>
@@ -2278,9 +2278,9 @@
         <!-- ============ PAGE: CHEMICAL USAGE ============ -->
         <section id="chemusage" class="page-section">
             <div class="htab-bar">
-                <button class="htab-btn" onclick="navigateToSection('roundprogress')" data-i18n="tab_fertilizer_issuance">Fertilizer Issuance</button>
-                <button class="htab-btn" onclick="navigateToSection('maintprogress')" data-i18n="tab_maintenance_progress">Maintenance Progress</button>
-                <button class="htab-btn active" onclick="navigateToSection('chemusage')" data-i18n="tab_chemical_usage">Chemical Usage</button>
+                <button class="htab-btn" data-target="roundprogress" onclick="navigateToSection('roundprogress')" data-i18n="tab_fertilizer_issuance">Fertilizer Issuance</button>
+                <button class="htab-btn" data-target="maintprogress" onclick="navigateToSection('maintprogress')" data-i18n="tab_maintenance_progress">Maintenance Progress</button>
+                <button class="htab-btn active" data-target="chemusage" onclick="navigateToSection('chemusage')" data-i18n="tab_chemical_usage">Chemical Usage</button>
             </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_chemusage">&#x2697;&#xFE0F; Chemical Usage</h2>
             <p class="text-sm text-green-700 mb-6" data-i18n="page_chemusage_sub">View chemical usage per hectare by round and block. Manage active ingredient definitions and maximum dosage rates.</p>
@@ -2661,9 +2661,9 @@
                 <button class="mrec-tab" onclick="navToSection('plantrecord')" data-i18n="mrec_tab_plant">🌱 Planting</button>
             </div>
             <div class="htab-bar">
-                <button class="htab-btn active" onclick="navigateToSection('fertrecord')" data-i18n="tab_fert_issuance_rec">Fertilizer Issuance Record</button>
-                <button class="htab-btn" onclick="navigateToSection('chemrecord')" data-i18n="tab_chem_issuance_rec">Chemical Issuance Record</button>
-                <button class="htab-btn" onclick="navigateToSection('plantrecord')" data-i18n="tab_planting_rec">Field Planting Record</button>
+                <button class="htab-btn active" data-target="fertrecord" onclick="navigateToSection('fertrecord')" data-i18n="tab_fert_issuance_rec">Fertilizer Issuance Record</button>
+                <button class="htab-btn" data-target="chemrecord" onclick="navigateToSection('chemrecord')" data-i18n="tab_chem_issuance_rec">Chemical Issuance Record</button>
+                <button class="htab-btn" data-target="plantrecord" onclick="navigateToSection('plantrecord')" data-i18n="tab_planting_rec">Field Planting Record</button>
             </div>
             <h2 class="text-3xl font-bold mb-6" data-i18n="page_fertrecord">&#128203; Fertilizer Application Record</h2>
 
@@ -2708,9 +2708,9 @@
                 <button class="mrec-tab" onclick="navToSection('plantrecord')" data-i18n="mrec_tab_plant">🌱 Planting</button>
             </div>
             <div class="htab-bar">
-                <button class="htab-btn" onclick="navigateToSection('fertrecord')" data-i18n="tab_fert_issuance_rec">Fertilizer Issuance Record</button>
-                <button class="htab-btn active" onclick="navigateToSection('chemrecord')" data-i18n="tab_chem_issuance_rec">Chemical Issuance Record</button>
-                <button class="htab-btn" onclick="navigateToSection('plantrecord')" data-i18n="tab_planting_rec">Field Planting Record</button>
+                <button class="htab-btn" data-target="fertrecord" onclick="navigateToSection('fertrecord')" data-i18n="tab_fert_issuance_rec">Fertilizer Issuance Record</button>
+                <button class="htab-btn active" data-target="chemrecord" onclick="navigateToSection('chemrecord')" data-i18n="tab_chem_issuance_rec">Chemical Issuance Record</button>
+                <button class="htab-btn" data-target="plantrecord" onclick="navigateToSection('plantrecord')" data-i18n="tab_planting_rec">Field Planting Record</button>
             </div>
             <h2 class="text-3xl font-bold mb-6" data-i18n="page_chemrecord">&#9879;&#65039; Chemical Application Record</h2>
 
@@ -2755,9 +2755,9 @@
                 <button class="mrec-tab active" onclick="navToSection('plantrecord')" data-i18n="mrec_tab_plant">🌱 Planting</button>
             </div>
             <div class="htab-bar">
-                <button class="htab-btn" onclick="navigateToSection('fertrecord')" data-i18n="tab_fert_issuance_rec">Fertilizer Issuance Record</button>
-                <button class="htab-btn" onclick="navigateToSection('chemrecord')" data-i18n="tab_chem_issuance_rec">Chemical Issuance Record</button>
-                <button class="htab-btn active" onclick="navigateToSection('plantrecord')" data-i18n="tab_planting_rec">Field Planting Record</button>
+                <button class="htab-btn" data-target="fertrecord" onclick="navigateToSection('fertrecord')" data-i18n="tab_fert_issuance_rec">Fertilizer Issuance Record</button>
+                <button class="htab-btn" data-target="chemrecord" onclick="navigateToSection('chemrecord')" data-i18n="tab_chem_issuance_rec">Chemical Issuance Record</button>
+                <button class="htab-btn active" data-target="plantrecord" onclick="navigateToSection('plantrecord')" data-i18n="tab_planting_rec">Field Planting Record</button>
             </div>
             <h2 class="text-3xl font-bold mb-6" data-i18n="page_plantrecord">🌱 Field Planting Record</h2>
 
@@ -2789,9 +2789,9 @@
         <!-- ============ PAGE 13: RAINFALL TRANSACTIONS ============ -->
         <section id="rainfall" class="page-section">
             <div class="htab-bar">
-                <button class="htab-btn active" onclick="navigateToSection('rainfall')" data-i18n="tab_rainfall_txns">Rainfall Transactions</button>
-                <button class="htab-btn" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Monthly Rainfall Record</button>
-                <button class="htab-btn" onclick="navigateToSection('rainfallsummary')" data-i18n="tab_rainfall_summary">Yearly Rainfall Record</button>
+                <button class="htab-btn active" data-target="rainfall" onclick="navigateToSection('rainfall')" data-i18n="tab_rainfall_txns">Rainfall Transactions</button>
+                <button class="htab-btn" data-target="rainfallreport" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Monthly Rainfall Record</button>
+                <button class="htab-btn" data-target="rainfallsummary" onclick="navigateToSection('rainfallsummary')" data-i18n="tab_rainfall_summary">Yearly Rainfall Record</button>
             </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_rainfall">&#127783;&#65039; Rainfall Transactions</h2>
             <p class="text-sm text-blue-700 mb-6" data-i18n="page_rainfall_sub">Record daily rainfall readings with date, amount (mm), and an optional photo.</p>
@@ -2919,9 +2919,9 @@
                 <h2 style="font-size:17px;font-weight:800;color:#0F172A;font-family:Inter,sans-serif;margin:0;text-align:center;" data-i18n="tab_rainfall_report">Rekod Hujan Bulanan</h2>
             </div>
             <div class="htab-bar">
-                <button class="htab-btn" onclick="navigateToSection('rainfall')" data-i18n="tab_rainfall_txns">Rainfall Transactions</button>
-                <button class="htab-btn active" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Monthly Rainfall Record</button>
-                <button class="htab-btn" onclick="navigateToSection('rainfallsummary')" data-i18n="tab_rainfall_summary">Yearly Rainfall Record</button>
+                <button class="htab-btn" data-target="rainfall" onclick="navigateToSection('rainfall')" data-i18n="tab_rainfall_txns">Rainfall Transactions</button>
+                <button class="htab-btn active" data-target="rainfallreport" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Monthly Rainfall Record</button>
+                <button class="htab-btn" data-target="rainfallsummary" onclick="navigateToSection('rainfallsummary')" data-i18n="tab_rainfall_summary">Yearly Rainfall Record</button>
             </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_rainfallreport">&#128200; Monthly Rainfall Record</h2>
             <p class="text-sm text-blue-700 mb-4" data-i18n="page_rainfallreport_sub">Monthly rainfall summary by day for the selected year.</p>
@@ -2951,9 +2951,9 @@
         <!-- ============ PAGE: SUMMARY MONTHLY RAINFALL RECORD ============ -->
         <section id="rainfallsummary" class="page-section">
             <div class="htab-bar">
-                <button class="htab-btn" onclick="navigateToSection('rainfall')" data-i18n="tab_rainfall_txns">Rainfall Transactions</button>
-                <button class="htab-btn" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Monthly Rainfall Record</button>
-                <button class="htab-btn active" onclick="navigateToSection('rainfallsummary')" data-i18n="tab_rainfall_summary">Yearly Rainfall Record</button>
+                <button class="htab-btn" data-target="rainfall" onclick="navigateToSection('rainfall')" data-i18n="tab_rainfall_txns">Rainfall Transactions</button>
+                <button class="htab-btn" data-target="rainfallreport" onclick="navigateToSection('rainfallreport')" data-i18n="tab_rainfall_report">Monthly Rainfall Record</button>
+                <button class="htab-btn active" data-target="rainfallsummary" onclick="navigateToSection('rainfallsummary')" data-i18n="tab_rainfall_summary">Yearly Rainfall Record</button>
             </div>
             <h2 class="text-3xl font-bold mb-2" data-i18n="page_rainfallsummary">&#128200; Yearly Rainfall Record</h2>
             <p class="text-sm text-blue-700 mb-4" data-i18n="page_rainfallsummary_sub">Annual monthly totals with year-on-year variance.</p>
@@ -2977,8 +2977,8 @@
                 <h2 style="font-size:17px;font-weight:800;color:#0F172A;font-family:Inter,sans-serif;margin:0;text-align:center;">Peralatan</h2>
             </div>
             <div id="toolsTabBar" class="htab-bar">
-                <button id="toolsTabTxnBtn" class="htab-btn active" onclick="switchToolsTab('txn')" data-i18n="tab_tools_txn">📋 Tools Transactions</button>
-                <button id="toolsTabRecBtn" class="htab-btn" onclick="switchToolsTab('rec')" data-i18n="tab_tools_rec">📊 Rekod Peralatan</button>
+                <button id="toolsTabTxnBtn" class="htab-btn active" data-target="tools" onclick="switchToolsTab('txn')" data-i18n="tab_tools_txn">📋 Tools Transactions</button>
+                <button id="toolsTabRecBtn" class="htab-btn" data-target="toolsrecord" onclick="switchToolsTab('rec')" data-i18n="tab_tools_rec">📊 Rekod Peralatan</button>
             </div>
             <h2 id="toolsSectionTitle" class="text-3xl font-bold mb-2" data-i18n="page_tools">🔧 Tools Transactions</h2>
             <p id="toolsSectionSubtitle" class="text-sm text-green-700 mb-6" data-i18n="page_tools_sub">Record tools issued and received at the store.</p>
@@ -10000,6 +10000,34 @@ function applyNavPermissions(session) {
         homeCardStockRecords.classList.toggle('hidden', !anyStock);
     }
 
+    // Field Operations home card: visible if ANY field ops sub-section is accessible
+    const homeCardFieldOps = document.getElementById('homeCardFieldOps');
+    if (homeCardFieldOps && !isSuperAdmin) {
+        const anyFieldOps = ['roundprogress', 'maintprogress', 'chemusage'].some(s => getSectionAccess(session, s) !== 'none');
+        homeCardFieldOps.classList.toggle('hidden', !anyFieldOps);
+    }
+
+    // Reports home card: visible if ANY reports sub-section is accessible
+    const homeCardReports = document.getElementById('homeCardReports');
+    if (homeCardReports && !isSuperAdmin) {
+        const anyReports = ['fertrecord', 'chemrecord', 'plantrecord'].some(s => getSectionAccess(session, s) !== 'none');
+        homeCardReports.classList.toggle('hidden', !anyReports);
+    }
+
+    // Rainfall home card: visible if ANY rainfall sub-section is accessible
+    const homeCardRainfall = document.getElementById('homeCardRainfall');
+    if (homeCardRainfall && !isSuperAdmin) {
+        const anyRainfall = ['rainfall', 'rainfallreport', 'rainfallsummary'].some(s => getSectionAccess(session, s) !== 'none');
+        homeCardRainfall.classList.toggle('hidden', !anyRainfall);
+    }
+
+    // Tools home card: visible if ANY tools sub-section is accessible
+    const homeCardTools = document.getElementById('homeCardTools');
+    if (homeCardTools && !isSuperAdmin) {
+        const anyTools = ['tools', 'toolsrecord'].some(s => getSectionAccess(session, s) !== 'none');
+        homeCardTools.classList.toggle('hidden', !anyTools);
+    }
+
     // Show/hide each nav button based on permissions
     document.querySelectorAll('[data-target]').forEach(btn => {
         const target = btn.getAttribute('data-target');
@@ -14755,6 +14783,13 @@ window.clearToolsTxnPicture   = clearToolsTxnPicture;
 window.viewToolsTxnPicture    = viewToolsTxnPicture;
 
 function switchToolsTab(tab) {
+    if (tab === 'rec') {
+        var _sess = loadSession();
+        if (_sess && _sess.role !== 'superadmin') {
+            var _access = typeof getSectionAccess === 'function' ? getSectionAccess(_sess, 'toolsrecord') : 'none';
+            if (_access === 'none') { alert('You do not have permission to access this section.'); return; }
+        }
+    }
     var txnPanel = document.getElementById('toolsTabTxnPanel');
     var recPanel = document.getElementById('toolsTabRecPanel');
     var txnBtn   = document.getElementById('toolsTabTxnBtn');
@@ -15035,6 +15070,57 @@ function navigateToFirstStockSection() {
     }
 }
 
+function navigateToFirstFieldOpsSection() {
+    const session = loadSession();
+    const order = ['roundprogress', 'maintprogress', 'chemusage'];
+    if (session && session.role !== 'superadmin') {
+        const first = order.find(s => getSectionAccess(session, s) !== 'none');
+        if (!first) { alert('You do not have permission to access this section.'); return; }
+        navigateToSection(first);
+    } else {
+        navigateToSection('roundprogress');
+    }
+}
+
+function navigateToFirstReportsSection() {
+    const session = loadSession();
+    const order = ['fertrecord', 'chemrecord', 'plantrecord'];
+    if (session && session.role !== 'superadmin') {
+        const first = order.find(s => getSectionAccess(session, s) !== 'none');
+        if (!first) { alert('You do not have permission to access this section.'); return; }
+        navigateToSection(first);
+    } else {
+        navigateToSection('fertrecord');
+    }
+}
+
+function navigateToFirstRainfallSection() {
+    const session = loadSession();
+    const order = ['rainfall', 'rainfallreport', 'rainfallsummary'];
+    if (session && session.role !== 'superadmin') {
+        const first = order.find(s => getSectionAccess(session, s) !== 'none');
+        if (!first) { alert('You do not have permission to access this section.'); return; }
+        navigateToSection(first);
+    } else {
+        navigateToSection('rainfall');
+    }
+}
+
+function navigateToFirstToolsSection() {
+    const session = loadSession();
+    if (session && session.role !== 'superadmin') {
+        if (getSectionAccess(session, 'tools') !== 'none') {
+            navigateToSection('tools');
+        } else if (getSectionAccess(session, 'toolsrecord') !== 'none') {
+            navigateToSection('toolsrecord');
+        } else {
+            alert('You do not have permission to access this section.');
+        }
+    } else {
+        navigateToSection('tools');
+    }
+}
+
 function navigateToSection(target) {
     if (target === 'toolsrecord') {
         const _trSession = loadSession();
@@ -15042,8 +15128,21 @@ function navigateToSection(target) {
             const _trAccess = typeof getSectionAccess === 'function' ? getSectionAccess(_trSession, 'toolsrecord') : 'none';
             if (_trAccess === 'none') { alert('You do not have permission to access this section.'); return; }
         }
-        navigateToSection('tools');
+        // Navigate directly to the tools section DOM (bypassing its own permission check),
+        // since toolsrecord is a tab panel inside the tools page, not a separate page-section.
+        const _tl = document.getElementById('appLayout');
+        if (_tl) _tl.classList.remove('home-mode');
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        const _tnb = document.querySelector('.nav-item[data-target="toolsrecord"]');
+        if (_tnb) _tnb.classList.add('active');
+        document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+        const _tSec = document.getElementById('tools');
+        if (_tSec) _tSec.classList.add('active');
+        sessionStorage.setItem('opp_active_section', 'tools');
+        if (typeof updateMobileBottomNav === 'function') updateMobileBottomNav('tools');
+        if (typeof renderToolsPage === 'function') renderToolsPage();
         if (typeof switchToolsTab === 'function') switchToolsTab('rec');
+        if (typeof applyViewOnlyLock === 'function') applyViewOnlyLock('toolsrecord');
         return;
     }
     const session = loadSession();
