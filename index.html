@@ -3899,14 +3899,15 @@ const lastKnownIds = {
  */
 function loadEstateData(estate) {
     const keys = getEstateKeys(estate);
-    items            = JSON.parse(localStorage.getItem(keys.items))            || [];
-    locations        = JSON.parse(localStorage.getItem(keys.locations))        || [];
-    transactions     = JSON.parse(localStorage.getItem(keys.transactions))     || [];
-    manuringRounds   = JSON.parse(localStorage.getItem(keys.manuringRounds))   || [];
-    fieldMaintRounds = JSON.parse(localStorage.getItem(keys.fieldMaintRounds)) || [];
-    maintClaims      = JSON.parse(localStorage.getItem(keys.maintClaims))      || [];
-    chemIngredients  = JSON.parse(localStorage.getItem(keys.chemIngredients))  || [];
-    rainfallTxns     = JSON.parse(localStorage.getItem(keys.rainfallTxns))     || [];
+    const _parseArr = (k) => { try { const v = JSON.parse(localStorage.getItem(k)); return Array.isArray(v) ? v : []; } catch(e) { return []; } };
+    items            = _parseArr(keys.items);
+    locations        = _parseArr(keys.locations);
+    transactions     = _parseArr(keys.transactions);
+    manuringRounds   = _parseArr(keys.manuringRounds);
+    fieldMaintRounds = _parseArr(keys.fieldMaintRounds);
+    maintClaims      = _parseArr(keys.maintClaims);
+    chemIngredients  = _parseArr(keys.chemIngredients);
+    rainfallTxns     = _parseArr(keys.rainfallTxns);
     // Refresh id snapshots
     lastKnownIds.opp_items              = new Set(items.map(r => r.id));
     lastKnownIds.opp_locations          = new Set(locations.map(r => r.id));
@@ -4186,19 +4187,6 @@ function _hideDashLoadingSpinner() {
 }
 
 async function loadFromSupabase() {
-    // DEBUG: confirm function reached and what activeEstate is
-    (function() {
-        var t = document.createElement('div');
-        t.id = '_sbStartToast';
-        t.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);' +
-            'background:#7c3aed;color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;' +
-            'font-weight:600;z-index:99999;box-shadow:0 2px 8px rgba(0,0,0,.25);';
-        t.textContent = 'loadFromSupabase called | activeEstate=' + (activeEstate || '(empty)');
-        var old = document.getElementById('_sbStartToast');
-        if (old) old.remove();
-        document.body.appendChild(t);
-        setTimeout(function() { if (t.parentNode) t.remove(); }, 12000);
-    })();
     if (!activeEstate) return;
     _showDashLoadingSpinner();
     try {
@@ -4342,20 +4330,6 @@ async function loadFromSupabase() {
         renderMaintPctTracker();
         renderChemUsageTracker();
         renderRainfallChart();
-
-        // Debug toast: show how many records loaded (temporary diagnostic)
-        (function() {
-            var t = document.createElement('div');
-            t.id = '_sbDebugToast';
-            t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);' +
-                'background:#15803d;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;' +
-                'font-weight:600;z-index:99999;box-shadow:0 2px 8px rgba(0,0,0,.25);';
-            t.textContent = '✓ Loaded: ' + items.length + ' items, ' + transactions.length + ' txns for [' + activeEstate + ']';
-            var old = document.getElementById('_sbDebugToast');
-            if (old) old.remove();
-            document.body.appendChild(t);
-            setTimeout(function() { if (t.parentNode) t.remove(); }, 8000);
-        })();
 
         // Silently refresh the current user's own permissions from Supabase.
         // This ensures that if an admin changes this user's access while they
@@ -9807,23 +9781,6 @@ function bootApp(session) {
 
     activeEstate = defaultEstate;
 
-    // DEBUG: show what estate was resolved
-    (function() {
-        var t = document.createElement('div');
-        t.id = '_bootDebugToast';
-        t.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);' +
-            'background:#1e40af;color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;' +
-            'font-weight:600;z-index:99999;box-shadow:0 2px 8px rgba(0,0,0,.25);max-width:90vw;word-break:break-all;';
-        t.textContent = 'BOOT: role=' + session.role +
-            ' | estates=' + JSON.stringify(session.estates) +
-            ' | estate=' + (session.estate || '(empty)') +
-            ' | defaultEstate=' + (defaultEstate || '(empty)');
-        var old = document.getElementById('_bootDebugToast');
-        if (old) old.remove();
-        document.body.appendChild(t);
-        setTimeout(function() { if (t.parentNode) t.remove(); }, 12000);
-    })();
-
     if (defaultEstate) {
         // Hide the blank state and load this estate's data right away
         hideEstateBlankState();
@@ -9909,18 +9866,7 @@ function bootApp(session) {
     }
 
     document.getElementById('txnDate').valueAsDate = new Date();
-    try {
-        refreshAll();
-    } catch (_rErr) {
-        (function() {
-            var t = document.createElement('div');
-            t.style.cssText = 'position:fixed;top:120px;left:50%;transform:translateX(-50%);' +
-                'background:#dc2626;color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;' +
-                'font-weight:600;z-index:99999;box-shadow:0 2px 8px rgba(0,0,0,.25);max-width:90vw;word-break:break-all;';
-            t.textContent = 'refreshAll ERROR: ' + (_rErr && (_rErr.message || String(_rErr)));
-            document.body.appendChild(t);
-        })();
-    }
+    try { refreshAll(); } catch (_rErr) { console.error('[refreshAll]', _rErr); }
 
     // Pull fresh estate data from Supabase in the background
     if (activeEstate) loadFromSupabase();
@@ -14316,6 +14262,7 @@ function renderToolsTxns() {
     var workerFilter = (document.getElementById('toolsFilterWorker') || {}).value || '';
 
     var _txns = (typeof transactions !== 'undefined' ? transactions : (window.transactions || []));
+    if (!Array.isArray(_txns)) _txns = [];
     var toolsTxns = _txns.filter(function(t) {
         return t.category === 'Tools';
     });
@@ -14592,7 +14539,7 @@ function renderToolsRecord() {
     // Robust cross-script variable access with try-catch guard
     var _txns = [], _items = [];
     try { _txns = transactions; } catch(e) {}
-    if (!_txns || !_txns.length) _txns = window.transactions || [];
+    if (!Array.isArray(_txns)) _txns = [];
     try { _items = items; } catch(e) {}
     if (!_items || !_items.length) _items = window.items || [];
 
@@ -14714,7 +14661,8 @@ window.rebuildToolsItemDropdown = rebuildToolsItemDropdown;
 window.selectToolsTxnType       = selectToolsTxnType;
 
 function calcToolsBalance(itemName) {
-    var txns = (typeof transactions !== 'undefined' ? transactions : (window.transactions || []));
+    var txns = (typeof transactions !== 'undefined' ? transactions : []);
+    if (!Array.isArray(txns)) txns = [];
     return txns.filter(function(t) { return t.category === 'Tools' && t.itemName === itemName; })
         .reduce(function(acc, t) {
             var qty = parseFloat(t.qty) || 0;
@@ -14722,7 +14670,8 @@ function calcToolsBalance(itemName) {
         }, 0);
 }
 function calcToolsBalanceUpTo(itemName, refTxn) {
-    var txns = (typeof transactions !== 'undefined' ? transactions : (window.transactions || []));
+    var txns = (typeof transactions !== 'undefined' ? transactions : []);
+    if (!Array.isArray(txns)) txns = [];
     var itemTxns = txns.filter(function(t) { return t.category === 'Tools' && t.itemName === itemName; });
     itemTxns.sort(function(a, b) {
         var d = (a.date || '').localeCompare(b.date || '');
@@ -14933,6 +14882,7 @@ function renderToolsCatBakiStok() {
     }
     var asAt  = new Date().toISOString().slice(0, 10);
     var _txns = (typeof transactions !== 'undefined' ? transactions : []);
+    if (!Array.isArray(_txns)) _txns = [];
     container.innerHTML = toolsItems.map(function(item) {
         var bal = _txns
             .filter(function(t) { return t.category === 'Tools' && t.itemName === item.name && (t.date || '') <= asAt; })
