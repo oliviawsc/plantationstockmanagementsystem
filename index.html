@@ -1437,7 +1437,7 @@
                 </div>
                 <div class="home-card-grid">
                     <!-- Dashboard -->
-                    <button class="home-card" onclick="navigateToSection('dashboard')">
+                    <button class="home-card" id="homeCardDashboard" onclick="navigateToSection('dashboard')">
                         <div class="home-card-icon">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
@@ -9992,6 +9992,12 @@ function applyNavPermissions(session) {
     const homeCardUserAdmin = document.getElementById('homeCardUserAdmin');
     if (homeCardSettings)  homeCardSettings.classList.toggle('hidden', !isSuperAdmin);
     if (homeCardUserAdmin) homeCardUserAdmin.classList.toggle('hidden', !isSuperAdmin);
+
+    // Dashboard home card: visible only if dashboard is accessible
+    const homeCardDashboard = document.getElementById('homeCardDashboard');
+    if (homeCardDashboard && !isSuperAdmin) {
+        homeCardDashboard.classList.toggle('hidden', getSectionAccess(session, 'dashboard') === 'none');
+    }
 
     // Stock Records home card: visible if ANY stock sub-section is accessible
     const homeCardStockRecords = document.getElementById('homeCardStockRecords');
