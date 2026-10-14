@@ -10085,6 +10085,8 @@ const VIEW_LOCK_SAFE_ACTIONS = [
     'filter', 'Filter', 'logout', 'Logout', 'showUserProfile',
     'showChangePassword', 'submitChangePassword', 'closeChangePasswordModal',
     'attemptLogin', 'onSidebarEstateChange', 'setLang',
+    // Tab / section navigation — these never mutate data, they only switch views
+    'navigateToSection', 'navigateToFirst', 'switchToolsTab',
 ];
 
 // Filter / search input fields that must stay usable even in view-only
