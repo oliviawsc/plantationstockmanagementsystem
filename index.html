@@ -13609,8 +13609,8 @@ function renderRainfallReport() {
     if (!yearEl) return;
     yearEl.textContent = rfReportYear;
 
-    const d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
-    const titlePfx = (d && d.rf_rpt_title) || 'MONTHLY RAINFALL (MM) FOR';
+    const d = I18N[currentLang] || I18N['en'];
+    const titlePfx = d.rf_rpt_title || 'MONTHLY RAINFALL (MM) FOR';
     document.getElementById('rfReportTitle').textContent = titlePfx + ' ' + rfReportYear;
 
     // Always reload from localStorage — fall back to session.estate if activeEstate is somehow unset
@@ -13628,7 +13628,7 @@ function renderRainfallReport() {
         }
     });
 
-    const months   = (d && d.months_short) || ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const months   = d.months_short || ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const hdrStyle = 'background:#1e3a5f;color:#fff;font-weight:700;padding:6px 8px;text-align:center;border:1px solid #334155;white-space:nowrap;position:sticky;top:0;z-index:2;';
     const subStyle = 'background:#1e3a5f;color:#90CAF9;font-weight:400;font-size:11px;padding:3px 8px;text-align:center;border:1px solid #334155;position:sticky;top:33px;z-index:2;';
     const cellStyle= 'padding:4px 8px;text-align:center;border:1px solid #E2E8F0;';
@@ -14205,8 +14205,8 @@ function renderRainfallSummary() {
         rainfallTxns = stored ? JSON.parse(stored) : [];
     }
 
-    const d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
-    const months = (d && d.months_short) || ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const d = I18N[currentLang] || I18N['en'];
+    const months = d.months_short || ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
     // Aggregate: { year: { 1..12: total_mm } }
     const byYear = {};
