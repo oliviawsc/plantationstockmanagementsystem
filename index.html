@@ -9028,7 +9028,9 @@ function setLang(lang) {
     if (typeof renderManuringPctChart === 'function') renderManuringPctChart();
     if (typeof renderMaintPctTracker === 'function') renderMaintPctTracker();
     if (typeof renderChemUsageTracker === 'function') renderChemUsageTracker();
-    if (typeof renderRainfallChart === 'function') renderRainfallChart();
+    if (typeof renderRainfallChart  === 'function') renderRainfallChart();
+    if (typeof renderRainfallReport  === 'function') renderRainfallReport();
+    if (typeof renderRainfallSummary === 'function') renderRainfallSummary();
     if (typeof renderFertRecord === 'function') renderFertRecord();
     if (typeof renderChemRecord === 'function') renderChemRecord();
     if (typeof renderPlantRecord === 'function') renderPlantRecord();
@@ -13626,7 +13628,7 @@ function renderRainfallReport() {
         }
     });
 
-    const months   = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const months   = (d && d.months_short) || ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const hdrStyle = 'background:#1e3a5f;color:#fff;font-weight:700;padding:6px 8px;text-align:center;border:1px solid #334155;white-space:nowrap;position:sticky;top:0;z-index:2;';
     const subStyle = 'background:#1e3a5f;color:#90CAF9;font-weight:400;font-size:11px;padding:3px 8px;text-align:center;border:1px solid #334155;position:sticky;top:33px;z-index:2;';
     const cellStyle= 'padding:4px 8px;text-align:center;border:1px solid #E2E8F0;';
@@ -14204,7 +14206,7 @@ function renderRainfallSummary() {
     }
 
     const d = window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en'];
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const months = (d && d.months_short) || ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
     // Aggregate: { year: { 1..12: total_mm } }
     const byYear = {};
