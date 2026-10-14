@@ -10763,22 +10763,37 @@ function buildExpandedUserRow(u) {
                d.toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit', hour12: true });
     })() : '—';
     var mods = u.role === 'estate_user' ? ESTATE_MODULES : USER_MODULES;
+    var SECTION_NAMES = {
+        dashboard: 'Dashboard', transactions: 'Transactions', summary: 'Stock Summary',
+        ledger: 'Ledger', roundprogress: 'Rounding Progress', maintprogress: 'Maintenance Progress',
+        chemusage: 'Chemical Usage', fertrecord: 'Fertilizer Record', chemrecord: 'Chemical Record',
+        plantrecord: 'Plant Record', rainfall: 'Rainfall Entry', rainfallreport: 'Rainfall Report',
+        rainfallsummary: 'Rainfall Summary', tools: 'Tools', toolsrecord: 'Tools Record',
+        estate_baja: 'Fertilizer', estate_racun: 'Chemical', estate_anak: 'Oil Palm Seedling',
+        mobile_rainfall: 'Rainfall', tools_mobile_cat: 'Tools'
+    };
     var moduleCards = mods.map(function(mod) {
-        var perms = normalisePermissions(u.permissions);
-        var accCount = isSuperAdmin ? mod.sections.length : mod.sections.filter(function(s) { return (perms[s] || 'none') !== 'none'; }).length;
-        var tags = getModulePermTags(u, mod);
-        var permCount = isSuperAdmin ? (tags.length * mod.sections.length) : (tags.length * Math.max(accCount, 1));
-        var tagsHtml = tags.map(function(t) {
-            var tc = { View: { bg: '#f0fdf4', fg: '#166534' }, Create: { bg: '#f0fdf4', fg: '#166534' }, Edit: { bg: '#eff6ff', fg: '#1d4ed8' }, Delete: { bg: '#fef2f2', fg: '#dc2626' }, Export: { bg: '#f3e8ff', fg: '#7e22ce' } };
-            var c = tc[t] || { bg: '#f1f5f9', fg: '#475569' };
-            return '<span style="background:' + c.bg + ';color:' + c.fg + ';font-size:11px;font-weight:600;padding:3px 8px;border-radius:5px;">' + t + '</span>';
+        var accCount = mod.sections.filter(function(s) { return getSectionAccess(u, s) !== 'none'; }).length;
+        var sectionRows = mod.sections.map(function(s, idx) {
+            var level = getSectionAccess(u, s);
+            var badge;
+            if (level === 'edit') {
+                badge = '<span style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;">Edit</span>';
+            } else if (level === 'view') {
+                badge = '<span style="background:#dcfce7;color:#166534;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;">View</span>';
+            } else {
+                badge = '<span style="background:#f1f5f9;color:#94a3b8;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;">No Access</span>';
+            }
+            var border = idx < mod.sections.length - 1 ? 'border-bottom:1px solid #f8fafc;' : '';
+            return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;' + border + '">' +
+                '<span style="font-size:12px;color:#475569;">' + (SECTION_NAMES[s] || s) + '</span>' + badge + '</div>';
         }).join('');
-        return '<div style="' + (!tags.length ? 'opacity:.45;' : '') + 'border:1px solid #e2e8f0;border-radius:10px;padding:14px;background:#fff;">' +
-            '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
+        return '<div style="' + (!accCount ? 'opacity:.45;' : '') + 'border:1px solid #e2e8f0;border-radius:10px;padding:14px;background:#fff;">' +
+            '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">' +
             '<div style="width:36px;height:36px;border-radius:10px;background:' + mod.iconBg + ';display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">' + mod.icon + '</div>' +
             '<div><div style="font-weight:700;font-size:13px;color:#0f172a;">' + mod.name + '</div>' +
-            '<div style="font-size:11px;color:#94a3b8;">' + accCount + ' section' + (accCount !== 1 ? 's' : '') + ' • ' + permCount + ' permission' + (permCount !== 1 ? 's' : '') + '</div></div></div>' +
-            '<div style="display:flex;flex-wrap:wrap;gap:4px;">' + (tagsHtml || '<span style="font-size:11px;color:#94a3b8;">No access</span>') + '</div>' +
+            '<div style="font-size:11px;color:#94a3b8;">' + accCount + ' of ' + mod.sections.length + ' section' + (mod.sections.length !== 1 ? 's' : '') + ' accessible</div></div></div>' +
+            '<div>' + sectionRows + '</div>' +
             '</div>';
     }).join('');
     return '<div style="padding:20px;display:grid;grid-template-columns:220px 1fr;gap:20px;font-family:Inter,sans-serif;align-items:start;">' +
