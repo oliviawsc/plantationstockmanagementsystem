@@ -4331,6 +4331,16 @@ async function loadFromSupabase() {
         renderChemUsageTracker();
         renderRainfallChart();
 
+        // Re-render mobile estate panes that are open but not covered by refreshAll().
+        // Critical for a fresh-browser login where localStorage was empty on boot:
+        // the user may have already tapped into Baki/Transaksi before Supabase data arrived.
+        if (typeof activeMobileCategory !== 'undefined' && activeMobileCategory) {
+            if (typeof renderEstateBakiStok  === 'function') renderEstateBakiStok();
+            if (typeof renderEstateTransaksi === 'function') renderEstateTransaksi();
+        }
+        // Re-render the mobile rainfall list in case the Hujan pane is open.
+        if (typeof renderMobileRainfallList === 'function') renderMobileRainfallList();
+
         // Silently refresh the current user's own permissions from Supabase.
         // This ensures that if an admin changes this user's access while they
         // are logged in, the nav updates without requiring a re-login.
