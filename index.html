@@ -2975,7 +2975,7 @@
             <!-- Mobile sticky header — shown only when accessed from Peralatan mobile card -->
             <div id="toolsMobilePageHeader" style="display:none;align-items:center;justify-content:center;background:#fff;border-bottom:1px solid #E2E8F0;padding:16px 20px;position:sticky;top:0;z-index:10;">
                 <button onclick="navToSection('tools_mobile_cat')" style="position:absolute;left:16px;background:none;border:none;cursor:pointer;font-size:24px;color:#374151;font-family:Inter,sans-serif;line-height:1;padding:0 8px;">&#8249;</button>
-                <h2 style="font-size:17px;font-weight:800;color:#0F172A;font-family:Inter,sans-serif;margin:0;text-align:center;">Peralatan</h2>
+                <h2 style="font-size:17px;font-weight:800;color:#0F172A;font-family:Inter,sans-serif;margin:0;text-align:center;" data-i18n="hub_peralatan">Peralatan</h2>
             </div>
             <div id="toolsTabBar" class="htab-bar">
                 <button id="toolsTabTxnBtn" class="htab-btn active" data-target="tools" onclick="switchToolsTab('txn')" data-i18n="tab_tools_txn">📋 Tools Transactions</button>
@@ -3145,7 +3145,7 @@
             <div id="toolsTabRecPanel" style="display:none;">
                 <!-- Mobile content heading — shown only when accessed from Peralatan mobile card -->
                 <div id="toolsRecMobileHeading" style="display:none;padding:16px 0 4px;">
-                    <h2 style="font-size:22px;font-weight:800;color:#0F172A;font-family:Inter,sans-serif;margin:0;">&#128203; Rekod Peralatan</h2>
+                    <h2 style="font-size:22px;font-weight:800;color:#0F172A;font-family:Inter,sans-serif;margin:0;" data-i18n="page_tools_rec_heading">&#128203; Rekod Peralatan</h2>
                     <p style="font-size:13px;color:#16a34a;font-weight:500;margin:4px 0 0;font-family:Inter,sans-serif;" data-i18n="page_tools_rec_sub">Lihat rekod pengeluaran peralatan mengikut nama pekerja.</p>
                 </div>
                 <div class="bg-white p-6 rounded-xl shadow">
@@ -8426,6 +8426,8 @@ const I18N = {
         page_tools_sub:           'Record tools issued and received at the store.',
         page_toolsrecord:         '📋 Tools Record',
         page_toolsrecord_sub:     'View tools issuance records grouped by worker.',
+        page_tools_rec_heading:   '📋 Tools Record',
+        page_tools_rec_sub:       'View tools issuance records grouped by worker.',
         tab_tools_txn:            '📋 Tools Transactions',
         tab_tools_rec:            '📊 Tools Record',
         tools_stock_balance:      'Current Stock Balance',
@@ -8898,6 +8900,8 @@ const I18N = {
         page_tools_sub:           'Rekod peralatan yang dikeluarkan dan diterima di stor.',
         page_toolsrecord:         '📋 Rekod Peralatan',
         page_toolsrecord_sub:     'Lihat rekod pengeluaran peralatan mengikut nama pekerja.',
+        page_tools_rec_heading:   '📋 Rekod Peralatan',
+        page_tools_rec_sub:       'Lihat rekod pengeluaran peralatan mengikut nama pekerja.',
         tab_tools_txn:            '📋 Transaksi Peralatan',
         tab_tools_rec:            '📊 Rekod Peralatan',
         tools_stock_balance:      'Baki Stok Semasa',
