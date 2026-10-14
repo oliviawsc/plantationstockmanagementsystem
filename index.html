@@ -10177,6 +10177,14 @@ function _applyViewOnlyLockNow(sectionId) {
             if (el.disabled) el.disabled = false;
             if (el.classList.contains('view-locked-field')) el.classList.remove('view-locked-field');
         });
+        // Restore clickable non-button elements (e.g. photo upload card divs)
+        section.querySelectorAll('div[onclick], span[onclick]').forEach(el => {
+            if (el.dataset.estateFreeze) return;
+            el.style.pointerEvents = '';
+            el.style.opacity = '';
+            el.style.cursor = '';
+            el.classList.remove('view-locked-field');
+        });
         const existingBanner = section.querySelector('.view-only-banner');
         if (existingBanner) existingBanner.remove();
         return;
@@ -10203,6 +10211,23 @@ function _applyViewOnlyLockNow(sectionId) {
         }
         if (!btn.disabled) btn.disabled = true;
         if (!btn.classList.contains('view-locked-field')) btn.classList.add('view-locked-field');
+    });
+
+    // Lock non-button clickable elements (e.g. photo upload card divs) that
+    // perform a mutating action. These can't use the `disabled` attribute so
+    // pointer-events:none is used instead.
+    section.querySelectorAll('div[onclick], span[onclick]').forEach(el => {
+        const handler = el.getAttribute('onclick') || '';
+        if (isSafeAction(handler)) {
+            el.style.pointerEvents = '';
+            el.style.opacity = '';
+            el.style.cursor = '';
+            return;
+        }
+        el.style.pointerEvents = 'none';
+        el.style.opacity = '0.5';
+        el.style.cursor = 'default';
+        if (!el.classList.contains('view-locked-field')) el.classList.add('view-locked-field');
     });
 
     // Export buttons use addEventListener (no onclick attribute) so they pass
