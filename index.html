@@ -1799,13 +1799,14 @@
                     <!-- Pengeluaran Mengikut Blok - shown ONLY for Keluar Stor -->
                     <div id="txnMultiWrap" class="md:col-span-2 hidden">
                         <div class="flex items-center gap-2 mb-3">
-                            <span class="text-sm font-semibold text-gray-700">Pengeluaran Mengikut Blok</span>
+                            <span class="text-sm font-semibold text-gray-700" data-i18n="txn_lbl_issuance_by_block">Pengeluaran Mengikut Blok</span>
                         </div>
                         <div id="txnRowsBody" class="flex flex-col gap-3"></div>
                         <!-- Add block button -->
                         <button type="button" id="txnAddRowBtn"
                             class="mt-3 w-full py-2.5 rounded-xl border-2 border-dashed border-green-400 text-green-700 font-semibold text-sm hover:bg-green-50 transition-colors"
-                            style="-webkit-tap-highlight-color:transparent;">
+                            style="-webkit-tap-highlight-color:transparent;"
+                            data-i18n="txn_btn_add_block">
                             + Tambah Blok
                         </button>
                     </div>
@@ -4780,17 +4781,18 @@ function addTxnRow() {
     const defUnit   = (pkgUnit && item && item.defaultQtyUnit === 'package') ? 'package' : 'base';
     const unitLabel = defUnit === 'package' ? pkgUnit : baseUnit;
 
+    var _dRow = I18N[currentLang] || I18N['en'];
     const card = document.createElement('div');
     card.className = 'txn-row-card';
     card.style.cssText = 'background:#fff;border:1.5px solid #E2E8F0;border-radius:12px;padding:14px 16px;';
     card.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-            <span style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.05em;font-family:Inter,sans-serif;">Blok</span>
+            <span style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.05em;font-family:Inter,sans-serif;">${_dRow.mp_lbl_block || 'Block'}</span>
             <button type="button" onclick="this.closest('.txn-row-card').remove();updateTxnRowTotal();"
-                style="font-size:12px;font-weight:700;color:#DC2626;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;padding:0;-webkit-tap-highlight-color:transparent;">✕ Buang</button>
+                style="font-size:12px;font-weight:700;color:#DC2626;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;padding:0;-webkit-tap-highlight-color:transparent;">${_dRow.btn_remove_row || '✕ Remove'}</button>
         </div>
         <select class="txn-row-loc w-full border border-gray-300 rounded-lg p-2 bg-white text-sm" style="margin-bottom:12px;">${buildLocationOptionsHtml()}</select>
-        <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.05em;font-family:Inter,sans-serif;margin-bottom:8px;">Kuantiti</div>
+        <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.05em;font-family:Inter,sans-serif;margin-bottom:8px;">${_dRow.lbl_quantity || 'Quantity'}</div>
         <div style="display:flex;gap:8px;align-items:center;">
             <input type="number" min="0" step="0.001" placeholder="0"
                 class="txn-row-qty flex-1 border border-green-300 rounded-lg p-2 text-sm"
@@ -8136,6 +8138,10 @@ const I18N = {
         mobile_edit_txn_title:   '✏️ Edit Transaction',
         mobile_cannot_undo:      'This action cannot be undone.',
         mobile_rf_duplicate:     'A rainfall record for {date} already exists. Please edit the existing record.',
+        txn_lbl_issuance_by_block: 'Issuance by Block',
+        txn_btn_add_block:   '+ Add Block',
+        lbl_quantity:        'Quantity',
+        btn_remove_row:      '✕ Remove',
         btn_upload_photo:    '🖼️ Upload Photo',
         btn_take_photo:      '📷 Take Photo',
         btn_remove:          '✖ Remove',
@@ -8601,6 +8607,10 @@ const I18N = {
         mobile_edit_txn_title:   '✏️ Edit Transaksi',
         mobile_cannot_undo:      'Tindakan ini tidak boleh dibatalkan.',
         mobile_rf_duplicate:     'Rekod hujan untuk {date} sudah wujud. Sila edit rekod yang sedia ada.',
+        txn_lbl_issuance_by_block: 'Pengeluaran Mengikut Blok',
+        txn_btn_add_block:   '+ Tambah Blok',
+        lbl_quantity:        'Kuantiti',
+        btn_remove_row:      '✕ Buang',
         btn_upload_photo:    '🖼️ Muat Naik Gambar',
         btn_take_photo:      '📷 Ambil Gambar',
         btn_remove:          '✖ Buang',
