@@ -3150,7 +3150,7 @@
                 </div>
                 <div class="bg-white p-6 rounded-xl shadow">
                     <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
-                        <label class="text-sm font-semibold text-gray-700">Year:</label>
+                        <label class="text-sm font-semibold text-gray-700" data-i18n="dash_lbl_year">Year:</label>
                         <select id="toolsRecordYear" onchange="renderToolsRecord()" class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none font-semibold"></select>
                     </div>
                     <div id="toolsRecordContainer" class="overflow-x-auto"></div>
@@ -8142,6 +8142,7 @@ const I18N = {
         txn_btn_add_block:   '+ Add Block',
         lbl_quantity:        'Quantity',
         btn_remove_row:      '✕ Remove',
+        opt_all_years:       'All Years',
         btn_upload_photo:    '🖼️ Upload Photo',
         btn_take_photo:      '📷 Take Photo',
         btn_remove:          '✖ Remove',
@@ -8611,6 +8612,7 @@ const I18N = {
         txn_btn_add_block:   '+ Tambah Blok',
         lbl_quantity:        'Kuantiti',
         btn_remove_row:      '✕ Buang',
+        opt_all_years:       'Semua Tahun',
         btn_upload_photo:    '🖼️ Muat Naik Gambar',
         btn_take_photo:      '📷 Ambil Gambar',
         btn_remove:          '✖ Buang',
@@ -9034,9 +9036,12 @@ function setLang(lang) {
     if (typeof renderFertRecord === 'function') renderFertRecord();
     if (typeof renderChemRecord === 'function') renderChemRecord();
     if (typeof renderPlantRecord === 'function') renderPlantRecord();
-    // Re-render tools tables only when the tools section is currently active
+    // Re-render tools tables only when the tools/toolsrecord section is currently active
     var toolsEl = document.getElementById('tools');
-    if (toolsEl && toolsEl.classList.contains('active')) {
+    var toolsRecEl = document.getElementById('toolsrecord');
+    if (toolsRecEl && toolsRecEl.classList.contains('active')) {
+        if (typeof renderToolsRecord === 'function') renderToolsRecord();
+    } else if (toolsEl && toolsEl.classList.contains('active')) {
         var recPanel = document.getElementById('toolsTabRecPanel');
         if (recPanel && recPanel.style.display !== 'none') {
             if (typeof renderToolsRecord === 'function') renderToolsRecord();
@@ -14699,9 +14704,8 @@ function deleteToolsTxn(id) {
 function renderToolsRecord() {
     var container = document.getElementById('toolsRecordContainer');
     if (!container) return;
-    var d = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {};
-    var lang = localStorage.getItem('opp_lang') || 'en';
-    var isBM = lang === 'ms';
+    var d = I18N[currentLang] || I18N['en'];
+    var isBM = currentLang === 'ms';
     // Language-aware labels (fallback when window.I18N is not accessible from this scope)
     if (!d.toolsrecord_table_title) d.toolsrecord_table_title = isBM ? 'REKOD PERALATAN' : 'TOOLS RECORD';
     if (!d.toolsrecord_col_worker)  d.toolsrecord_col_worker  = isBM ? 'Nama Pengguna Pekerja' : 'Worker Name';
@@ -14730,7 +14734,7 @@ function renderToolsRecord() {
         years.sort(function(a,b){return b.localeCompare(a);});
         var curVal = yearSel.value || 'all';
         yearSel.innerHTML =
-            '<option value="all"' + (curVal === 'all' ? ' selected' : '') + '>All Years</option>' +
+            '<option value="all"' + (curVal === 'all' ? ' selected' : '') + '>' + (d.opt_all_years || 'All Years') + '</option>' +
             years.map(function(y) {
                 return '<option value="' + y + '"' + (y === curVal ? ' selected' : '') + '>' + y + '</option>';
             }).join('');
