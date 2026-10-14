@@ -4318,7 +4318,7 @@ async function loadFromSupabase() {
         lastKnownIds.opp_chem_ingredients   = new Set(chemIngredients.map(r => r.id));
         lastKnownIds.opp_rainfall_txns      = new Set(rainfallTxns.map(r => r.id));
 
-        refreshAll();
+        try { refreshAll(); } catch (_e) { console.error('[refreshAll in loadFromSupabase]', _e); }
         renderManuringRounds();
         renderManuringHistory();
         renderRoundProgress();
@@ -4331,15 +4331,17 @@ async function loadFromSupabase() {
         renderChemUsageTracker();
         renderRainfallChart();
 
-        // Re-render mobile estate panes that are open but not covered by refreshAll().
-        // Critical for a fresh-browser login where localStorage was empty on boot:
-        // the user may have already tapped into Baki/Transaksi before Supabase data arrived.
+        // Re-render mobile panes that are open but not covered by refreshAll().
+        // Critical on a fresh-browser login: localStorage was empty at boot, so
+        // the user may have navigated into a pane and seen "Tiada item." before
+        // Supabase data arrived. These calls update those panes in-place.
         if (typeof activeMobileCategory !== 'undefined' && activeMobileCategory) {
             if (typeof renderEstateBakiStok  === 'function') renderEstateBakiStok();
             if (typeof renderEstateTransaksi === 'function') renderEstateTransaksi();
         }
-        // Re-render the mobile rainfall list in case the Hujan pane is open.
-        if (typeof renderMobileRainfallList === 'function') renderMobileRainfallList();
+        if (typeof renderMobileRainfallList    === 'function') renderMobileRainfallList();
+        if (typeof renderToolsCatBakiStok      === 'function') renderToolsCatBakiStok();
+        if (typeof renderToolsCatTransaksi     === 'function') renderToolsCatTransaksi();
 
         // Silently refresh the current user's own permissions from Supabase.
         // This ensures that if an admin changes this user's access while they
@@ -9832,17 +9834,31 @@ function bootApp(session) {
 
     // Estate mobile users (estate_user) get the dedicated mobile hub
     if (isEstateMobile(session)) {
+        // On a fresh-browser login the pre-mobile-hide style was never injected
+        // (it only runs at page-load time when there is a cached session). Without
+        // it, adding the estate-mobile class immediately triggers the CSS rule
+        // "body.estate-mobile #appLayout { display:block }" which has higher
+        // specificity than Tailwind's .hidden, revealing the desktop layout before
+        // the mobile hub is ready. Inject it here if missing so #appLayout stays
+        // hidden with !important until we finish setting up the mobile hub.
+        if (!document.getElementById('pre-mobile-hide')) {
+            const _pmSt = document.createElement('style');
+            _pmSt.id = 'pre-mobile-hide';
+            _pmSt.textContent = '#appLayout{display:none!important}';
+            document.head.appendChild(_pmSt);
+        }
         document.body.classList.add('estate-mobile');
-        const _preMobileHide = document.getElementById('pre-mobile-hide');
-        if (_preMobileHide) _preMobileHide.remove();
-        document.getElementById('appLayout').classList.remove('hidden');
         // Populate greeting
         const greetNameEl = document.getElementById('estateHubGreetName');
         if (greetNameEl) greetNameEl.textContent = session.name || 'User';
         document.getElementById('txnDate').valueAsDate = new Date();
         applyEstateHubPermissions(session); // hide cards for inaccessible sections
         navToSection('estate_hub');
-        refreshAll();                               // render localStorage data immediately
+        // Mobile hub is now fully set up — reveal #appLayout
+        const _preMobileHide = document.getElementById('pre-mobile-hide');
+        if (_preMobileHide) _preMobileHide.remove();
+        document.getElementById('appLayout').classList.remove('hidden');
+        try { refreshAll(); } catch (_rErr) { console.error('[refreshAll mobile]', _rErr); }
         if (activeEstate) loadFromSupabase();       // then fetch fresh data from Supabase
         setLang(localStorage.getItem('opp_lang') || 'en');
         return;
