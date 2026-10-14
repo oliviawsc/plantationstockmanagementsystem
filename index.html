@@ -1842,7 +1842,7 @@
                             <input type="file" id="txnPicture"       accept="image/*"                       class="hidden" onchange="previewTxnPicture(this)" />
                             <input type="file" id="txnPictureCamera" accept="image/*" capture="environment" class="hidden" onchange="previewTxnPicture(this)" />
                             <input type="file" id="txnPictureFile"                                          class="hidden" onchange="previewTxnPicture(this)" />
-                            <div style="font-size:13px;color:#16a34a;font-weight:700;font-family:Inter,sans-serif;">Ketik untuk pilih gambar</div>
+                            <div style="font-size:13px;color:#16a34a;font-weight:700;font-family:Inter,sans-serif;" data-i18n="photo_tap_hint">Ketik untuk pilih gambar</div>
                             <!-- Preview (hidden until photo chosen) -->
                             <div id="txnPicturePreviewWrap" class="hidden" style="display:none;flex-direction:column;align-items:center;gap:8px;margin-top:4px;" onclick="event.stopPropagation()">
                                 <img id="txnPicturePreview" src="" alt="Preview"
@@ -3767,7 +3767,7 @@
                     <input type="file" id="editTxnPicture"       accept="image/*"                       class="hidden" onchange="previewEditTxnPicture(this)" />
                     <input type="file" id="editTxnPictureCamera" accept="image/*" capture="environment" class="hidden" onchange="previewEditTxnPicture(this)" />
                     <input type="file" id="editTxnPictureFile"                                          class="hidden" onchange="previewEditTxnPicture(this)" />
-                    <div style="font-size:13px;color:#16a34a;font-weight:700;font-family:Inter,sans-serif;">Ketik untuk pilih gambar</div>
+                    <div style="font-size:13px;color:#16a34a;font-weight:700;font-family:Inter,sans-serif;" data-i18n="photo_tap_hint">Ketik untuk pilih gambar</div>
                     <div id="editTxnPicturePreviewWrap" style="display:none;flex-direction:column;align-items:center;gap:8px;margin-top:4px;" onclick="event.stopPropagation()">
                         <img id="editTxnPicturePreview" src="" alt="Preview"
                             style="max-width:100%;max-height:180px;border-radius:12px;border:2px solid #86EFAC;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.1);" />
@@ -8100,6 +8100,7 @@ const I18N = {
         txn_maint_round_hint:'🔧 Link this Out transaction to a Maintenance Round if applicable. Define rounds in the <b>Maintenance Program</b> page.',
         txn_lbl_picture:     'Supporting Picture',
         txn_picture_hint:    '(Optional — photo of delivery note, DO, or site)',
+        photo_tap_hint:      'Tap to select a photo',
         btn_upload_photo:    '🖼️ Upload Photo',
         btn_take_photo:      '📷 Take Photo',
         btn_remove:          '✖ Remove',
@@ -8541,6 +8542,7 @@ const I18N = {
         txn_maint_round_hint:'🔧 Kaitkan transaksi Keluar ini dengan Pusingan Penyelenggaraan jika berkenaan. Tentukan pusingan di halaman <b>Program Penyelenggaraan</b>.',
         txn_lbl_picture:     'Gambar Sokongan',
         txn_picture_hint:    '(Pilihan — gambar nota penghantaran, DO, atau tapak)',
+        photo_tap_hint:      'Ketik untuk pilih gambar',
         btn_upload_photo:    '🖼️ Muat Naik Gambar',
         btn_take_photo:      '📷 Ambil Gambar',
         btn_remove:          '✖ Buang',
