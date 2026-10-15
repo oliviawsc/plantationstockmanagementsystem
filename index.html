@@ -9767,13 +9767,19 @@ async function attemptLogin() {
         if (rawId === SUPER_ADMIN.email) {
             const { error: authError } = await supabaseClient.auth.signInWithPassword({ email: rawId, password });
             if (authError) { showLoginError('Incorrect User ID or password.'); return; }
+            // Fetch id from opp_users so last_active tracking works
+            const saProfile = await fetchUserByEmail(SUPER_ADMIN.email);
             const session = {
+                id:          saProfile ? saProfile.id : undefined,
                 email:       SUPER_ADMIN.email,
                 name:        SUPER_ADMIN.name,
                 estate:      '',
                 role:        'superadmin',
                 permissions: ALL_SECTIONS.map(s => s.id),
             };
+            if (saProfile) {
+                supabaseClient.from(USERS_TABLE).update({ last_active: new Date().toISOString() }).eq('id', saProfile.id).then(() => {}).catch(() => {});
+            }
             saveSession(session);
             bootApp(session);
             return;
@@ -10537,23 +10543,26 @@ async function checkSessionStatus() {
 function startStatusWatcher() {
     stopStatusWatcher();
     var session = loadSession();
-    if (!session || !session.email || session.role === 'superadmin') return;
+    if (!session || !session.email) return;
 
-    // Realtime: instant logout the moment the admin flips status to inactive
-    _statusRealtimeChannel = supabaseClient
-        .channel('status-watch-' + session.email.replace(/[^a-z0-9]/gi, '_'))
-        .on('postgres_changes', {
-            event: 'UPDATE',
-            schema: 'public',
-            table: USERS_TABLE,
-            filter: 'email=eq.' + session.email
-        }, function(payload) {
-            if (payload.new && payload.new.status === 'inactive') forceLogoutInactive();
-        })
-        .subscribe();
+    // Status polling + realtime deactivation only applies to non-superadmin users
+    if (session.role !== 'superadmin') {
+        // Realtime: instant logout the moment the admin flips status to inactive
+        _statusRealtimeChannel = supabaseClient
+            .channel('status-watch-' + session.email.replace(/[^a-z0-9]/gi, '_'))
+            .on('postgres_changes', {
+                event: 'UPDATE',
+                schema: 'public',
+                table: USERS_TABLE,
+                filter: 'email=eq.' + session.email
+            }, function(payload) {
+                if (payload.new && payload.new.status === 'inactive') forceLogoutInactive();
+            })
+            .subscribe();
 
-    // Fallback: poll every 30s and check on tab focus
-    _statusWatcherInterval = setInterval(checkSessionStatus, 30000);
+        // Fallback: poll every 30s and check on tab focus
+        _statusWatcherInterval = setInterval(checkSessionStatus, 30000);
+    }
     _statusWatcherVisibility = function() {
         if (document.visibilityState === 'visible') checkSessionStatus();
     };
