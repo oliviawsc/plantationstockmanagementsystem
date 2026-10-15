@@ -9528,7 +9528,9 @@ async function fetchAuthUsers() {
     try {
         const { data, error } = await supabaseClient.rpc('get_auth_users');
         if (error) throw error;
-        return data || [];
+        // Filter out test/orphan accounts that should not appear in the UI
+        const HIDDEN_EMAILS = ['test@test.com'];
+        return (data || []).filter(function(u) { return !HIDDEN_EMAILS.includes((u.email || '').toLowerCase()); });
     } catch (err) {
         console.warn('[Supabase] get_auth_users RPC not available — run the SQL setup first', err);
         return [];
