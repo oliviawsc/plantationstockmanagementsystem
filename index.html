@@ -9799,6 +9799,7 @@ async function attemptLogin() {
         }
 
         const session = {
+            id:          user.id,
             email:       user.email,
             name:        user.name,
             estates:     user.estates || [],
@@ -10496,11 +10497,16 @@ var _ACTIVITY_THROTTLE_MS = 2 * 60 * 1000; // write at most once per 2 minutes
 
 function _flushLastActive() {
     var session = loadSession();
-    if (!session || !session.id) return;
+    if (!session || (!session.id && !session.email)) return;
     var now = Date.now();
     if (now - _lastActiveFlush < _ACTIVITY_THROTTLE_MS) return;
     _lastActiveFlush = now;
-    supabaseClient.from(USERS_TABLE).update({ last_active: new Date().toISOString() }).eq('id', session.id).then(function(){}).catch(function(){});
+    var ts = new Date().toISOString();
+    if (session.id) {
+        supabaseClient.from(USERS_TABLE).update({ last_active: ts }).eq('id', session.id).then(function(){}).catch(function(){});
+    } else {
+        supabaseClient.from(USERS_TABLE).update({ last_active: ts }).eq('email', session.email).then(function(){}).catch(function(){});
+    }
 }
 
 function stopStatusWatcher() {
