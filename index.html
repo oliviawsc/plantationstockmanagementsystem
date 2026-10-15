@@ -9469,14 +9469,15 @@ function rowToUser(row) {
         estates:      row.estates || [],
         permissions:  rawPerms,
         role,
-        status:       row.status || 'active',
+        status:      row.status || 'active',
+        lastActive:  row.last_active || null,
     };
 }
 function userToRow(u) {
     const perms = Object.assign({}, u.permissions || {});
     if (u.role && u.role !== 'user') perms.__role = u.role;
     else delete perms.__role;
-    return {
+    const row = {
         id:            u.id,
         name:          u.name,
         email:         u.email,
@@ -9485,6 +9486,8 @@ function userToRow(u) {
         permissions:   perms,
         status:        u.status || 'active',
     };
+    if (u.lastActive !== undefined) row.last_active = u.lastActive;
+    return row;
 }
 
 // ── Supabase-backed user CRUD ───────────────────────────────────────
@@ -9801,6 +9804,8 @@ async function attemptLogin() {
             role:        user.role || 'user',
             permissions: user.permissions || {},
         };
+        // Record last active time (fire-and-forget, don't block login)
+        updateUserInSupabase(Object.assign({}, user, { lastActive: new Date().toISOString() })).catch(() => {});
         saveSession(session);
         bootApp(session);
 
@@ -10921,6 +10926,12 @@ function buildExpandedUserRow(u) {
         '<div><div style="font-weight:700;font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">User ID</div><div>' + displayId + '</div></div>' +
         '<div><div style="font-weight:700;font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Estate</div><div>' + ((u.estates || []).join(', ') || '—') + '</div></div>' +
         '<div><div style="font-weight:700;font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Created At</div><div>' + createdAt + '</div></div>' +
+        '<div><div style="font-weight:700;font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Last Active</div>' +
+        '<div>' + (u.lastActive ? (function() {
+            var d = new Date(u.lastActive);
+            return d.toLocaleDateString('en-MY', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' +
+                   d.toLocaleTimeString('en-MY', { hour: '2-digit', minute: '2-digit', hour12: true });
+        })() : '—') + '</div></div>' +
         '<div><div style="font-weight:700;font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Status</div>' +
         ((u.status || 'active') === 'active'
             ? '<div style="display:flex;align-items:center;gap:5px;color:#166534;font-weight:600;"><span style="width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;"></span>Active</div>'
