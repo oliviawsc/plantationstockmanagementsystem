@@ -11344,10 +11344,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (authSession && authSession.user) {
             const email = authSession.user.email;
 
-            // Super Admin has no opp_users record — only boot if not already booted
+            // Super Admin — only boot if not already booted
             if (email === SUPER_ADMIN.email) {
                 if (!localSession) {
+                    const saProfile = await fetchUserByEmail(SUPER_ADMIN.email);
                     const session = {
+                        id:          saProfile ? saProfile.id : undefined,
                         email:       SUPER_ADMIN.email,
                         name:        SUPER_ADMIN.name,
                         estate:      '',
@@ -11363,6 +11365,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const user = await fetchUserByEmail(email);
             if (user) {
                 const freshSession = {
+                    id:          user.id,
                     email:       user.email,
                     name:        user.name,
                     estates:     user.estates || [],
