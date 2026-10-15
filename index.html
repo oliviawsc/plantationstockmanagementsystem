@@ -9805,7 +9805,7 @@ async function attemptLogin() {
             permissions: user.permissions || {},
         };
         // Record last active time (fire-and-forget, don't block login)
-        updateUserInSupabase(Object.assign({}, user, { lastActive: new Date().toISOString() })).catch(() => {});
+        supabaseClient.from(USERS_TABLE).update({ last_active: new Date().toISOString() }).eq('id', user.id).then(() => {}).catch(() => {});
         saveSession(session);
         bootApp(session);
 
