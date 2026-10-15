@@ -10722,15 +10722,7 @@ async function deleteUser(id) {
 
 function getUserAccessSummary(u) {
     if (u.role === 'superadmin') return { label: 'Full Access', bg: '#dcfce7', fg: '#166534', dot: '#16a34a' };
-    var perms = normalisePermissions(u.permissions);
-    var sections = u.role === 'estate_user' ? ESTATE_SECTIONS : ALL_SECTIONS;
-    var levels = sections.map(function(s) { return perms[s.id] || 'none'; });
-    var hasEdit = levels.some(function(l) { return l === 'edit'; });
-    var hasView = levels.some(function(l) { return l === 'view'; });
-    if (!hasEdit && !hasView) return { label: 'No Access', bg: '#f1f5f9', fg: '#64748b', dot: '#94a3b8' };
-    if (u.role === 'estate_user') return { label: 'Limited Access', bg: '#fef3c7', fg: '#92400e', dot: '#f59e0b' };
-    if (u.permissions && u.permissions.__configured) return { label: 'Custom Access', bg: '#dbeafe', fg: '#1e40af', dot: '#3b82f6' };
-    return { label: 'Limited Access', bg: '#fef3c7', fg: '#92400e', dot: '#f59e0b' };
+    return { label: 'Custom Access', bg: '#dbeafe', fg: '#1e40af', dot: '#3b82f6' };
 }
 
 function getModulePermTags(u, mod) {
