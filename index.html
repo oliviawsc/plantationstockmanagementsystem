@@ -10482,8 +10482,13 @@ function forceLogoutInactive() {
 
 var _statusWatcherInterval = null;
 var _statusWatcherVisibility = null;
+var _statusRealtimeChannel  = null;
 
 function stopStatusWatcher() {
+    if (_statusRealtimeChannel) {
+        try { supabaseClient.removeChannel(_statusRealtimeChannel); } catch (e) {}
+        _statusRealtimeChannel = null;
+    }
     if (_statusWatcherInterval) { clearInterval(_statusWatcherInterval); _statusWatcherInterval = null; }
     if (_statusWatcherVisibility) { document.removeEventListener('visibilitychange', _statusWatcherVisibility); _statusWatcherVisibility = null; }
 }
@@ -10498,13 +10503,30 @@ async function checkSessionStatus() {
             .select('status')
             .eq('email', session.email)
             .maybeSingle();
-        if (result.error) return; // network / RLS issue — keep session
+        if (result.error) return;
         if (result.data && result.data.status === 'inactive') forceLogoutInactive();
-    } catch (e) { /* network error — keep session, try again next cycle */ }
+    } catch (e) {}
 }
 
 function startStatusWatcher() {
     stopStatusWatcher();
+    var session = loadSession();
+    if (!session || !session.email || session.role === 'superadmin') return;
+
+    // Realtime: instant logout the moment the admin flips status to inactive
+    _statusRealtimeChannel = supabaseClient
+        .channel('status-watch-' + session.email.replace(/[^a-z0-9]/gi, '_'))
+        .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: USERS_TABLE,
+            filter: 'email=eq.' + session.email
+        }, function(payload) {
+            if (payload.new && payload.new.status === 'inactive') forceLogoutInactive();
+        })
+        .subscribe();
+
+    // Fallback: poll every 30s and check on tab focus
     _statusWatcherInterval = setInterval(checkSessionStatus, 30000);
     _statusWatcherVisibility = function() {
         if (document.visibilityState === 'visible') checkSessionStatus();
