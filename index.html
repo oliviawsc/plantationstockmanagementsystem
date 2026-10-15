@@ -10490,6 +10490,18 @@ function forceLogoutInactive() {
 var _statusWatcherInterval = null;
 var _statusWatcherVisibility = null;
 var _statusRealtimeChannel  = null;
+var _activityListener = null;
+var _lastActiveFlush = 0;
+var _ACTIVITY_THROTTLE_MS = 2 * 60 * 1000; // write at most once per 2 minutes
+
+function _flushLastActive() {
+    var session = loadSession();
+    if (!session || !session.id) return;
+    var now = Date.now();
+    if (now - _lastActiveFlush < _ACTIVITY_THROTTLE_MS) return;
+    _lastActiveFlush = now;
+    supabaseClient.from(USERS_TABLE).update({ last_active: new Date().toISOString() }).eq('id', session.id).then(function(){}).catch(function(){});
+}
 
 function stopStatusWatcher() {
     if (_statusRealtimeChannel) {
@@ -10498,6 +10510,7 @@ function stopStatusWatcher() {
     }
     if (_statusWatcherInterval) { clearInterval(_statusWatcherInterval); _statusWatcherInterval = null; }
     if (_statusWatcherVisibility) { document.removeEventListener('visibilitychange', _statusWatcherVisibility); _statusWatcherVisibility = null; }
+    if (_activityListener) { document.removeEventListener('click', _activityListener); _activityListener = null; }
 }
 
 async function checkSessionStatus() {
@@ -10539,6 +10552,11 @@ function startStatusWatcher() {
         if (document.visibilityState === 'visible') checkSessionStatus();
     };
     document.addEventListener('visibilitychange', _statusWatcherVisibility);
+
+    // Update last_active whenever the user clicks anywhere in the app (throttled)
+    _lastActiveFlush = 0;
+    _activityListener = function() { _flushLastActive(); };
+    document.addEventListener('click', _activityListener);
 }
 
 /**
