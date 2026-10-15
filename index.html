@@ -9469,6 +9469,7 @@ function rowToUser(row) {
         estates:      row.estates || [],
         permissions:  rawPerms,
         role,
+        status:       row.status || 'active',
     };
 }
 function userToRow(u) {
@@ -9482,6 +9483,7 @@ function userToRow(u) {
         password_hash: u.passwordHash,
         estates:       u.estates || [],
         permissions:   perms,
+        status:        u.status || 'active',
     };
 }
 
@@ -9783,6 +9785,11 @@ async function attemptLogin() {
         const inputHash = await sha256Hex(password);
         if (!user.passwordHash || user.passwordHash !== inputHash) {
             showLoginError('Incorrect User ID or password.');
+            return;
+        }
+
+        if (user.status === 'inactive') {
+            showLoginError('Your account has been deactivated. Please contact your administrator.');
             return;
         }
 
@@ -10720,6 +10727,24 @@ async function deleteUser(id) {
     }
 }
 
+async function toggleUserStatus(id) {
+    document.querySelectorAll('[id^="kmenu-"]').forEach(function(m) { m.style.display = 'none'; });
+    var users = loadUsersCache();
+    var u = users.find(function(x) { return x.id === id; });
+    if (!u) return;
+    var newStatus = (u.status || 'active') === 'active' ? 'inactive' : 'active';
+    var label = newStatus === 'inactive' ? 'Deactivate' : 'Activate';
+    if (!confirm(label + ' user "' + u.name + '"?')) return;
+    try {
+        await updateUserInSupabase(Object.assign({}, u, { status: newStatus }));
+        await fetchUsersFromSupabase();
+        await renderUsersTable();
+    } catch (err) {
+        console.error('[Supabase] toggleUserStatus failed', err);
+        alert('Could not update status — ' + (err.message || 'please try again.'));
+    }
+}
+
 function getUserAccessSummary(u) {
     if (u.role === 'superadmin') return { label: 'Full Access', bg: '#dcfce7', fg: '#166534', dot: '#16a34a' };
     return { label: 'Custom Access', bg: '#dbeafe', fg: '#1e40af', dot: '#3b82f6' };
@@ -10813,7 +10838,9 @@ function buildExpandedUserRow(u) {
         '<div><div style="font-weight:700;font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Estate</div><div>' + ((u.estates || []).join(', ') || '—') + '</div></div>' +
         '<div><div style="font-weight:700;font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Created At</div><div>' + createdAt + '</div></div>' +
         '<div><div style="font-weight:700;font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Status</div>' +
-        '<div style="display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;"></span>Active</div></div>' +
+        ((u.status || 'active') === 'active'
+            ? '<div style="display:flex;align-items:center;gap:5px;color:#166534;font-weight:600;"><span style="width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;"></span>Active</div>'
+            : '<div style="display:flex;align-items:center;gap:5px;color:#dc2626;font-weight:600;"><span style="width:7px;height:7px;border-radius:50%;background:#dc2626;display:inline-block;"></span>Inactive</div>') +
         '</div></div>' +
         '<div>' +
         '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">' +
@@ -10895,8 +10922,10 @@ function buildUserRow(u, rowNum) {
     var acc = getUserAccessSummary(u);
     var accessBadge = '<span style="background:' + acc.bg + ';color:' + acc.fg + ';font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;">' +
         '<span style="width:7px;height:7px;border-radius:50%;background:' + acc.dot + ';display:inline-block;"></span>' + acc.label + '</span>';
-    var statusHtml = '<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#166534;">' +
-        '<span style="width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;"></span>Active</span>';
+    var isActive = (u.status || 'active') === 'active';
+    var statusHtml = isActive
+        ? '<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#166534;"><span style="width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;"></span>Active</span>'
+        : '<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#dc2626;"><span style="width:7px;height:7px;border-radius:50%;background:#dc2626;display:inline-block;"></span>Inactive</span>';
     var cs = 'padding:13px 14px;vertical-align:middle;';
     return '<tr id="urow-' + u.id + '" style="border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background .1s;" onclick="toggleUserExpand(' + u.id + ')" onmouseover="if(document.getElementById(\'expand-\'+' + u.id + ').style.display===\'none\')this.style.background=\'#f8fafc\'" onmouseout="if(document.getElementById(\'expand-\'+' + u.id + ').style.display===\'none\')this.style.background=\'\'">' +
         '<td style="' + cs + 'color:#94a3b8;font-size:12px;width:44px;">' + rowNum + '</td>' +
@@ -10914,7 +10943,10 @@ function buildUserRow(u, rowNum) {
         '<button onclick="openEditUserModal(' + u.id + ')" style="display:flex;align-items:center;gap:4px;padding:6px 12px;border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;" onmouseover="this.style.background=\'#dbeafe\'" onmouseout="this.style.background=\'#eff6ff\'">✏️ Edit</button>' +
         '<div style="position:relative;">' +
         '<button onclick="toggleUserKebab(' + u.id + ',event)" style="width:30px;height:30px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;color:#64748b;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:Inter,sans-serif;" onmouseover="this.style.background=\'#f8fafc\'" onmouseout="this.style.background=\'#fff\'">⋮</button>' +
-        '<div id="kmenu-' + u.id + '" style="display:none;position:absolute;right:0;top:34px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);z-index:200;min-width:140px;overflow:hidden;">' +
+        '<div id="kmenu-' + u.id + '" style="display:none;position:absolute;right:0;top:34px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);z-index:200;min-width:160px;overflow:hidden;">' +
+        (isActive
+            ? '<button onclick="toggleUserStatus(' + u.id + ')" style="width:100%;text-align:left;padding:9px 14px;font-size:12px;font-family:Inter,sans-serif;color:#92400e;background:none;border:none;border-bottom:1px solid #f1f5f9;cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background=\'#fef3c7\'" onmouseout="this.style.background=\'\'">⏸️ Deactivate</button>'
+            : '<button onclick="toggleUserStatus(' + u.id + ')" style="width:100%;text-align:left;padding:9px 14px;font-size:12px;font-family:Inter,sans-serif;color:#166534;background:none;border:none;border-bottom:1px solid #f1f5f9;cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background=\'#f0fdf4\'" onmouseout="this.style.background=\'\'">▶️ Activate</button>') +
         '<button onclick="deleteUser(' + u.id + ')" style="width:100%;text-align:left;padding:9px 14px;font-size:12px;font-family:Inter,sans-serif;color:#dc2626;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background=\'#fef2f2\'" onmouseout="this.style.background=\'\'">🗑️ Delete User</button>' +
         '</div></div></div></td>' +
         '</tr>' +
