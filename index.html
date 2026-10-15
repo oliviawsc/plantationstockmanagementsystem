@@ -9832,6 +9832,7 @@ function toggleLoginPw() {
 
 // ── Boot the app after successful login ────────────────────────────
 function bootApp(session) {
+    startStatusWatcher();
     // Ensure estate_hub is never the active section for non-estate users,
     // and purge any leftover estate-mobile state from a previous session.
     if (!isEstateMobile(session)) {
@@ -9990,7 +9991,6 @@ function bootApp(session) {
         try { refreshAll(); } catch (_rErr) { console.error('[refreshAll mobile]', _rErr); }
         if (activeEstate) loadFromSupabase();       // then fetch fresh data from Supabase
         setLang(localStorage.getItem('opp_lang') || 'en');
-        startStatusWatcher();
         return;
     }
 
@@ -10031,7 +10031,6 @@ function bootApp(session) {
 
     setLang(localStorage.getItem('opp_lang') || 'en');
     renderUsersTable();
-    startStatusWatcher();
 }
 
 function syncEstateBackBtn() { /* no-op: back button removed, bottom nav used instead */ }
@@ -10494,8 +10493,13 @@ async function checkSessionStatus() {
     if (!session || !session.email) return;
     if (session.role === 'superadmin') return;
     try {
-        var user = await fetchUserByEmail(session.email);
-        if (user && user.status === 'inactive') forceLogoutInactive();
+        var result = await supabaseClient
+            .from(USERS_TABLE)
+            .select('status')
+            .eq('email', session.email)
+            .maybeSingle();
+        if (result.error) return; // network / RLS issue — keep session
+        if (result.data && result.data.status === 'inactive') forceLogoutInactive();
     } catch (e) { /* network error — keep session, try again next cycle */ }
 }
 
