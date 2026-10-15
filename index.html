@@ -10764,13 +10764,26 @@ function buildExpandedUserRow(u) {
     })() : '—';
     var mods = u.role === 'estate_user' ? ESTATE_MODULES : USER_MODULES;
     var SECTION_NAMES = {
-        dashboard: 'Dashboard', transactions: 'Transactions', summary: 'Stock Summary',
-        ledger: 'Ledger', roundprogress: 'Rounding Progress', maintprogress: 'Maintenance Progress',
-        chemusage: 'Chemical Usage', fertrecord: 'Fertilizer Record', chemrecord: 'Chemical Record',
-        plantrecord: 'Plant Record', rainfall: 'Rainfall Entry', rainfallreport: 'Rainfall Report',
-        rainfallsummary: 'Rainfall Summary', tools: 'Tools', toolsrecord: 'Tools Record',
-        estate_baja: 'Fertilizer', estate_racun: 'Chemical', estate_anak: 'Oil Palm Seedling',
-        mobile_rainfall: 'Rainfall', tools_mobile_cat: 'Tools'
+        dashboard:       'Dashboard',
+        transactions:    'Record Stock',
+        summary:         'Stock Transactions',
+        ledger:          'Stock Summary',
+        roundprogress:   'Fertilizer Issuance',
+        maintprogress:   'Maintenance Progress',
+        chemusage:       'Chemical Usage',
+        fertrecord:      'Fertilizer Application',
+        chemrecord:      'Chemical Application',
+        plantrecord:     'Field Planting Record',
+        rainfall:        'Rainfall Transactions',
+        rainfallreport:  'Monthly Rainfall Record',
+        rainfallsummary: 'Yearly Rainfall Record',
+        tools:           'Tools Transactions',
+        toolsrecord:     'Tools Record',
+        estate_baja:     'Fertilizer (Baja)',
+        estate_racun:    'Chemical (Racun)',
+        estate_anak:     'Oil Palm Seedling',
+        mobile_rainfall: 'Rainfall',
+        tools_mobile_cat:'Tools'
     };
     var moduleCards = mods.map(function(mod) {
         var accCount = mod.sections.filter(function(s) { return getSectionAccess(u, s) !== 'none'; }).length;
