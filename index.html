@@ -9990,6 +9990,7 @@ function bootApp(session) {
         try { refreshAll(); } catch (_rErr) { console.error('[refreshAll mobile]', _rErr); }
         if (activeEstate) loadFromSupabase();       // then fetch fresh data from Supabase
         setLang(localStorage.getItem('opp_lang') || 'en');
+        startStatusWatcher();
         return;
     }
 
@@ -10102,6 +10103,7 @@ function navToSection(sectionId) {
         if (_lp) _lp.classList.remove('hidden');
         if (typeof showToolsCatCardGrid === 'function') showToolsCatCardGrid();
     }
+    startStatusWatcher();
 }
 
 // ── Mobile bottom nav helpers ────────────────────────────────────────
@@ -10419,6 +10421,7 @@ function _applyViewOnlyLockNow(sectionId) {
 // ── Logout ─────────────────────────────────────────────────────────
 function logoutUser() {
     if (!confirm('Sign out?')) return;
+    stopStatusWatcher();
     clearSession();
     supabaseClient.auth.signOut().catch(e => console.warn('[Auth] signOut error', e));
     ['loginEmail', 'loginPassword'].forEach(id => {
@@ -10448,6 +10451,61 @@ function logoutUser() {
     // Also forget the last-viewed section so the next login starts fresh
     // instead of resuming whatever page this user was last on.
     sessionStorage.removeItem('opp_active_section');
+}
+
+// Auto-logout when an admin deactivates the currently logged-in user.
+// Called by the status watcher — no confirmation dialog.
+function forceLogoutInactive() {
+    clearSession();
+    supabaseClient.auth.signOut().catch(() => {});
+    ['loginEmail', 'loginPassword'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    var errEl = document.getElementById('loginError');
+    if (errEl) { errEl.textContent = 'Your account has been deactivated. Please contact your administrator.'; errEl.classList.remove('hidden'); }
+    document.getElementById('sidebarEstate').value = '';
+    updateAppTitle('');
+    document.body.classList.remove('estate-mobile');
+    document.getElementById('appLayout').classList.add('hidden');
+    var overlay = document.getElementById('authOverlay');
+    overlay.scrollTop = 0;
+    overlay.style.display = 'flex';
+    document.querySelectorAll('.page-section').forEach(function(sec) {
+        sec.classList.toggle('active', sec.id === 'dashboard');
+    });
+    document.querySelectorAll('.nav-item[data-target]').forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-target') === 'dashboard');
+    });
+    sessionStorage.removeItem('opp_active_section');
+    stopStatusWatcher();
+}
+
+var _statusWatcherInterval = null;
+var _statusWatcherVisibility = null;
+
+function stopStatusWatcher() {
+    if (_statusWatcherInterval) { clearInterval(_statusWatcherInterval); _statusWatcherInterval = null; }
+    if (_statusWatcherVisibility) { document.removeEventListener('visibilitychange', _statusWatcherVisibility); _statusWatcherVisibility = null; }
+}
+
+async function checkSessionStatus() {
+    var session = loadSession();
+    if (!session || !session.email) return;
+    if (session.role === 'superadmin') return;
+    try {
+        var user = await fetchUserByEmail(session.email);
+        if (user && user.status === 'inactive') forceLogoutInactive();
+    } catch (e) { /* network error — keep session, try again next cycle */ }
+}
+
+function startStatusWatcher() {
+    stopStatusWatcher();
+    _statusWatcherInterval = setInterval(checkSessionStatus, 60000);
+    _statusWatcherVisibility = function() {
+        if (document.visibilityState === 'visible') checkSessionStatus();
+    };
+    document.addEventListener('visibilitychange', _statusWatcherVisibility);
 }
 
 /**
