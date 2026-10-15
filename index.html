@@ -11062,6 +11062,7 @@ async function renderUsersTable() {
         fetchUsersFromSupabase(),
         fetchAuthUsers(),
     ]);
+    profiles.sort(function(a, b) { return (a.name || '').localeCompare(b.name || ''); });
     _cachedUsers = profiles;
 
     // Populate estate filter
