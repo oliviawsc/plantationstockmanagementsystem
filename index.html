@@ -4953,7 +4953,7 @@ function saveTransaction() {
         refreezeTxnType(); // restore Out/In type AFTER explicit show/hide resets
         clearTxnPicture();
         _txnSavedOk = true;
-        showTxnSuccessBanner(`✅ ${parsedRows.length} rekod berjaya disimpan.`);
+        showTxnSuccessBanner(`✅ ${parsedRows.length} ${_d.alert_txn_saved_multi || 'record(s) saved.'}`);
         refreshAll();
         return;
     }
@@ -4994,7 +4994,7 @@ function saveTransaction() {
     refreezeTxnType(); // restore type in case user came via openEstateCatWithType
     clearTxnPicture();
     _txnSavedOk = true;
-    showTxnSuccessBanner('✅ Rekod berjaya disimpan.');
+    showTxnSuccessBanner(`✅ ${_d.alert_txn_saved || 'Transaction recorded successfully.'}`);
     refreshAll();
 
     } finally {
