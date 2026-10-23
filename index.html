@@ -14747,6 +14747,7 @@ function renderToolsStockSummary() {
     var el = document.getElementById('toolsStockSummary');
     if (!el) return;
     var _items = (typeof items !== 'undefined' ? items : (window.items || []));
+    if (!Array.isArray(_items)) _items = [];
     var toolItems = _items.filter(function(i) { return i.category === 'Tools'; });
     if (!toolItems.length) { el.innerHTML = ''; return; }
     var d = (window.I18N && window.I18N[localStorage.getItem('opp_lang') || 'en']) || {};
@@ -14787,6 +14788,7 @@ function selectToolsTxnType(type) {
 
 function rebuildToolsItemDropdown() {
     var _items = (typeof items !== 'undefined' ? items : (window.items || []));
+    if (!Array.isArray(_items)) _items = [];
     var toolItems = _items.filter(function(i) { return i.category === 'Tools'; });
     // Rebuild filter select for transactions list
     var filterSel = document.getElementById('toolsFilterItem');
@@ -15115,7 +15117,8 @@ function renderToolsRecord() {
     try { _txns = transactions; } catch(e) {}
     if (!Array.isArray(_txns)) _txns = [];
     try { _items = items; } catch(e) {}
-    if (!_items || !_items.length) _items = window.items || [];
+    if (!Array.isArray(_items) || !_items.length) _items = Array.isArray(window.items) ? window.items : [];
+    if (!Array.isArray(_items)) _items = [];
 
     // Out Store tools transactions only (issuance records)
     var toolsTxns = _txns.filter(function(t) { return t.category === 'Tools' && t.type === 'Out Store'; });
@@ -15267,6 +15270,7 @@ function updateToolsInStoreBalance() {
     var itemName = sel ? sel.value : '';
     if (!itemName) { balEl.textContent = ''; return; }
     var _items = (typeof items !== 'undefined' ? items : (window.items || []));
+    if (!Array.isArray(_items)) _items = [];
     var item = _items.find(function(i) { return i.name === itemName; });
     var bal = calcToolsBalance(itemName);
     balEl.textContent = 'Baki: ' + bal + ' ' + (item ? (item.unit || '') : '');
