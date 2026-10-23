@@ -1857,7 +1857,7 @@
                     <!-- Bottom bar: Jumlah Keluar (left) + Save (right) -->
                     <div id="txnBottomBar" class="md:col-span-2 flex items-center justify-between gap-3" style="margin-top:4px;">
                         <div id="txnRowsTotal" style="display:none;flex:1;" class="flex flex-col">
-                            <span class="text-xs font-semibold text-gray-500" style="margin-bottom:2px;">Jumlah Keluar</span>
+                            <span class="text-xs font-semibold text-gray-500" style="margin-bottom:2px;" data-i18n="mobile_jumlah_keluar">Jumlah Keluar</span>
                             <span id="txnRowsTotalVal" class="text-lg font-bold text-green-800">—</span>
                         </div>
                         <div style="flex:none;">
@@ -3131,7 +3131,7 @@
                     </div>
                     <div id="toolsTxnBottomBar" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px;">
                         <div id="toolsTxnTotal" style="display:none;flex:1;flex-direction:column;">
-                            <span id="toolsTxnTotalLabel" style="font-size:12px;font-weight:600;color:#6B7280;margin-bottom:2px;font-family:Inter,sans-serif;">Jumlah Keluar</span>
+                            <span id="toolsTxnTotalLabel" style="font-size:12px;font-weight:600;color:#6B7280;margin-bottom:2px;font-family:Inter,sans-serif;" data-i18n="mobile_jumlah_keluar">Jumlah Keluar</span>
                             <span id="toolsTxnTotalVal" style="font-size:18px;font-weight:700;color:#166534;font-family:Inter,sans-serif;">—</span>
                         </div>
                         <button id="toolsTxnCancelBtn" onclick="cancelToolsTxnForm()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-5 py-2 rounded-lg text-sm" data-i18n="btn_cancel">Cancel</button>
@@ -15451,7 +15451,7 @@ function openToolsCatWithType(type) {
     var saveBtn    = document.getElementById('toolsTxnSaveBtn');
     if (cancelBtn)  cancelBtn.style.display  = 'none';
     if (totalWrap)  { totalWrap.style.display = 'flex'; }
-    if (totalLabel) totalLabel.textContent = type === 'In' ? (_dOT.mobile_jumlah_masuk || 'Jumlah Masuk') : (_dOT.mobile_jumlah_keluar || 'Jumlah Keluar');
+    if (totalLabel) totalLabel.textContent = type === 'In' ? (_dOT.mobile_jumlah_masuk || 'Total In') : (_dOT.mobile_jumlah_keluar || 'Total Out');
     if (totalVal)   totalVal.textContent   = '0 —';
     if (saveBtn)    saveBtn.textContent    = _dOT.btn_save_txn || 'Simpan Transaksi';
     document.body.classList.add('tools-recording');
