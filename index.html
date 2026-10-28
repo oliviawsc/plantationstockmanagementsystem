@@ -14368,15 +14368,17 @@ function renderEstateTransaksi() {
             _dispQty  = parseFloat(parseFloat(t.qty || 0).toFixed(2));
             _dispUnit = _baseUnit;
         }
+        var _locStr = (t.location && t.location !== 'None/Storage') ? t.location : '';
         return '<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1.5px solid #E2E8F0;">' +
             '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
                 '<div style="font-size:13px;font-weight:700;color:#0F172A;font-family:Inter,sans-serif;">' + (t.itemName || '') + '</div>' +
                 '<div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:' + bg + ';color:' + col + ';">' + label + '</div>' +
             '</div>' +
-            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:' + (_locStr ? '4px' : '10px') + ';">' +
                 '<div style="font-size:12px;color:#64748B;font-family:Inter,sans-serif;">' + (t.date || '') + '</div>' +
                 '<div style="font-size:13px;font-weight:600;color:#374151;font-family:Inter,sans-serif;">' + _dispQty + ' ' + _dispUnit + '</div>' +
             '</div>' +
+            (_locStr ? '<div style="font-size:12px;color:#64748B;font-family:Inter,sans-serif;margin-bottom:10px;">📍 ' + _locStr + '</div>' : '') +
             '<div style="display:flex;gap:8px;border-top:1px solid #F1F5F9;padding-top:10px;">' +
                 '<button onclick="mobileEditEstateTransaksi(' + t.id + ')" style="flex:1;padding:7px 0;border-radius:8px;border:1.5px solid #3B82F6;background:#EFF6FF;color:#1D4ED8;font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;">' + (_dET2.btn_edit || '✏️ Sunting') + '</button>' +
                 '<button onclick="mobileDeleteEstateTransaksi(' + t.id + ')" style="flex:1;padding:7px 0;border-radius:8px;border:1.5px solid #EF4444;background:#FEF2F2;color:#DC2626;font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;">' + (_dET2.btn_delete || '🗑️ Padam') + '</button>' +
@@ -15513,17 +15515,19 @@ function renderToolsCatTransaksi() {
         var col   = typeColors[t.type] || '#374151';
         var bg    = typeBg[t.type]     || '#F1F5F9';
         var label = typeLabels[t.type] || (t.type || '');
-        var qty   = parseFloat(parseFloat(t.qty || 0).toFixed(2));
-        var unit  = t.unit || '';
+        var qty     = parseFloat(parseFloat(t.qty || 0).toFixed(2));
+        var unit    = t.unit || '';
+        var _worker = (t.remarks || '').trim();
         return '<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1.5px solid #E2E8F0;">' +
             '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
                 '<div style="font-size:13px;font-weight:700;color:#0F172A;font-family:Inter,sans-serif;">' + (t.itemName || '') + '</div>' +
                 '<div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:' + bg + ';color:' + col + ';">' + label + '</div>' +
             '</div>' +
-            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:' + (_worker ? '4px' : '10px') + ';">' +
                 '<div style="font-size:12px;color:#64748B;font-family:Inter,sans-serif;">' + (t.date || '') + '</div>' +
                 '<div style="font-size:13px;font-weight:600;color:#374151;font-family:Inter,sans-serif;">' + qty + ' ' + unit + '</div>' +
             '</div>' +
+            (_worker ? '<div style="font-size:12px;color:#64748B;font-family:Inter,sans-serif;margin-bottom:10px;">👤 ' + _worker + '</div>' : '') +
             '<div style="display:flex;gap:8px;border-top:1px solid #F1F5F9;padding-top:10px;">' +
                 '<button onclick="mobileEditToolsTxn(' + t.id + ')" style="flex:1;padding:7px 0;border-radius:8px;border:1.5px solid #3B82F6;background:#EFF6FF;color:#1D4ED8;font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;">' + (_dTT2.btn_edit || '&#9999;&#65039; Sunting') + '</button>' +
                 '<button onclick="mobileDeleteToolsTxnMobile(' + t.id + ')" style="flex:1;padding:7px 0;border-radius:8px;border:1.5px solid #EF4444;background:#FEF2F2;color:#DC2626;font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;-webkit-tap-highlight-color:transparent;">' + (_dTT2.btn_delete || '&#128465;&#65039; Padam') + '</button>' +
