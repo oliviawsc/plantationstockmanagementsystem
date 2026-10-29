@@ -4804,6 +4804,11 @@ function deleteLocation(id) {
 function buildLocationOptionsHtml() {
     const d = I18N[currentLang] || I18N['en'];
     const sorted = locations.slice().sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { numeric: true, sensitivity: 'base' }));
+    // On mobile Out Store, exclude None/Storage — blocks only
+    if (document.body.classList.contains('estate-mobile')) {
+        return `<option value="">-- Select Block --</option>` +
+            sorted.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
+    }
     return `<option value="None/Storage">${d.opt_none_storage}</option>` +
         sorted.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
 }
