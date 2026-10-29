@@ -5624,6 +5624,15 @@ function populateLocationDropdowns() {
     const sel = document.getElementById('txnLocation');
     if (!sel) return;
     const d = I18N[currentLang] || I18N['en'];
+    // On mobile In Store, always restrict to None/Storage only
+    const frozenType = sel.closest('form') && document.getElementById('txnType')
+        ? (document.getElementById('txnType').dataset.frozenType || document.getElementById('txnType').value)
+        : '';
+    if (document.body.classList.contains('estate-mobile') && frozenType === 'In') {
+        sel.innerHTML = `<option value="None/Storage">${d.opt_none_storage || 'None/Storage'}</option>`;
+        sel.value = 'None/Storage';
+        return;
+    }
     const sorted = locations.slice().sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { numeric: true, sensitivity: 'base' }));
     sel.innerHTML = `<option value="None/Storage">${d.opt_none_storage}</option>` +
         sorted.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
