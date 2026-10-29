@@ -14275,6 +14275,15 @@ function openEstateCatWithType(type) {
     var txnTypeSel = document.getElementById('txnType');
     if (txnTypeSel) txnTypeSel.dataset.frozenType = type;
     selectTxnType(type);
+    // For In Store on mobile: restrict location to None/Storage only
+    if (type === 'In' && document.body.classList.contains('estate-mobile')) {
+        var _locSel = document.getElementById('txnLocation');
+        if (_locSel) {
+            var _d = I18N[currentLang] || I18N['en'];
+            _locSel.innerHTML = '<option value="None/Storage">' + (_d.opt_none_storage || 'None/Storage') + '</option>';
+            _locSel.value = 'None/Storage';
+        }
+    }
     // Update sticky mobile header
     var backEl = document.getElementById('txnMobileBack');
     if (backEl) { var h2 = backEl.querySelector('h2'); if (h2) h2.textContent = fullTitle; }
