@@ -7717,6 +7717,9 @@ document.getElementById('txnType').addEventListener('change', updateTxnQtyLabel)
 // When item changes, clear existing breakdown rows so new rows pick up the correct default unit
 document.getElementById('txnItem').addEventListener('change', () => {
     document.getElementById('txnRowsBody').innerHTML = '';
+    // Re-seed one row immediately so the block dropdown reappears for Out Store
+    const _typeSel = document.getElementById('txnType');
+    if (_typeSel && _typeSel.value === 'Out') addTxnRow();
 });
 
 
