@@ -14368,7 +14368,9 @@ function renderEstateTransaksi() {
             _dispQty  = parseFloat(parseFloat(t.qty || 0).toFixed(2));
             _dispUnit = _baseUnit;
         }
-        var _locStr = (t.location && t.location !== 'None/Storage') ? t.location : '';
+        var _locStr = t.type === 'In'
+            ? (t.location || 'None/Storage')
+            : (t.location && t.location !== 'None/Storage' ? t.location : '');
         return '<div style="background:#fff;border-radius:14px;padding:14px 16px;border:1.5px solid #E2E8F0;">' +
             '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
                 '<div style="font-size:13px;font-weight:700;color:#0F172A;font-family:Inter,sans-serif;">' + (t.itemName || '') + '</div>' +
