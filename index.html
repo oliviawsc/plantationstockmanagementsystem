@@ -491,6 +491,28 @@
             margin-bottom: 10px;
         }
         body.estate-mobile #txnMultiWrap td:last-child { margin-bottom: 0; }
+        /* Mobile card: show inline field labels, hide desktop remove td */
+        #txnMultiWrap .txn-mob-hdr  { display: none; }
+        #txnMultiWrap .txn-mob-lbl  { display: none; }
+        #txnMultiWrap .txn-desk-rm  { display: table-cell; }
+        body.estate-mobile #txnMultiWrap .txn-mob-hdr {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        body.estate-mobile #txnMultiWrap .txn-mob-lbl {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            font-family: Inter, sans-serif;
+            margin-bottom: 8px;
+        }
+        body.estate-mobile #txnMultiWrap .txn-desk-rm { display: none; }
         body.estate-mobile .em-row-label {
             display: block;
             font-size: 12px;
@@ -4837,15 +4859,23 @@ function addTxnRow() {
     const tr = document.createElement('tr');
     tr.className = 'txn-row-card';
     tr.style.cssText = 'border-bottom:1px solid #F1F5F9;';
-    /* Wrap select in a clipping div so the browser cannot inflate it beyond 38px */
+    const rmOnclick = `this.closest('.txn-row-card').remove();updateTxnRowTotal();`;
     tr.innerHTML = `
         <td style="padding:6px 8px 6px 0;vertical-align:middle;min-width:140px;">
+            <!-- mobile card header: BLOCK label + Remove button on same line -->
+            <div class="txn-mob-hdr">
+                <span style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.05em;font-family:Inter,sans-serif;">${_dRow.mp_lbl_block || 'Block'}</span>
+                <button type="button" onclick="${rmOnclick}" style="font-size:12px;font-weight:700;color:#DC2626;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;padding:0;-webkit-tap-highlight-color:transparent;">${_dRow.btn_remove_row || '✕ Remove'}</button>
+            </div>
+            <!-- Block / Location select wrapped in clipping div for consistent height on desktop -->
             <div style="position:relative;height:38px;border:1px solid #D1D5DB;border-radius:8px;background:#fff;overflow:hidden;box-sizing:border-box;">
                 <select class="txn-row-loc" style="position:absolute;inset:0;width:100%;height:100%;border:none;background:transparent;padding:0 28px 0 10px;font-size:14px;color:#0F172A;font-family:Inter,sans-serif;-webkit-appearance:none;-moz-appearance:none;appearance:none;cursor:pointer;box-sizing:border-box;">${buildLocationOptionsHtml()}</select>
                 <div style="pointer-events:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid #6B7280;"></div>
             </div>
         </td>
         <td style="padding:6px 8px;vertical-align:middle;min-width:140px;">
+            <!-- mobile quantity label -->
+            <div class="txn-mob-lbl">${_dRow.lbl_quantity || 'Quantity'}</div>
             <div style="display:flex;flex-direction:row;align-items:center;gap:8px;">
                 <input type="number" min="0" step="0.001" placeholder="0" class="txn-row-qty"
                     style="flex:1;min-width:0;height:38px;box-sizing:border-box;border:1.5px solid #86EFAC;border-radius:8px;padding:0 10px;background:#fff;font-size:15px;font-weight:600;color:#0F172A;font-family:Inter,sans-serif;"
@@ -4855,8 +4885,9 @@ function addTxnRow() {
             </div>
             <p class="txn-row-conv" style="font-size:11px;color:#16a34a;margin:3px 0 0;font-style:italic;min-height:14px;line-height:normal;"></p>
         </td>
-        <td style="padding:6px 8px;vertical-align:middle;text-align:center;">
-            <button type="button" onclick="this.closest('.txn-row-card').remove();updateTxnRowTotal();"
+        <!-- desktop-only remove button column -->
+        <td class="txn-desk-rm" style="padding:6px 8px;vertical-align:middle;text-align:center;">
+            <button type="button" onclick="${rmOnclick}"
                 style="font-size:12px;font-weight:700;color:#DC2626;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;padding:4px 8px;-webkit-tap-highlight-color:transparent;">${_dRow.btn_remove_row || '✕'}</button>
         </td>`;
     container.appendChild(tr);
