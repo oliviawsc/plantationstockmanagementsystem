@@ -4883,7 +4883,7 @@ function addTxnRow() {
                 <span class="txn-row-unit-label" style="flex-shrink:0;display:inline-flex;align-items:center;height:38px;padding:0 12px;background:#DCFCE7;color:#166534;font-size:13px;font-weight:700;border-radius:8px;border:1px solid #86EFAC;box-sizing:border-box;white-space:nowrap;">${unitLabel}</span>
                 <input type="hidden" class="txn-row-unit" value="${defUnit}" />
             </div>
-            <p class="txn-row-conv" style="font-size:11px;color:#16a34a;margin:3px 0 0;font-style:italic;min-height:14px;line-height:normal;"></p>
+            <p class="txn-row-conv" style="display:none;font-size:11px;color:#16a34a;margin:3px 0 0;font-style:italic;line-height:normal;"></p>
         </td>
         <!-- desktop-only remove button column -->
         <td class="txn-desk-rm" style="padding:6px 8px;vertical-align:middle;text-align:center;">
@@ -7742,11 +7742,12 @@ function updateRowConversion(qtyInput) {
     // No conversion needed if no package unit or no factor defined
     if (!item || !item.packageUnit || !item.qtyPerUnit) {
         convEl.textContent = '';
+        convEl.style.display = 'none';
         return;
     }
 
     const rawQty   = parseFloat(qtyInput.value) || 0;
-    if (rawQty <= 0) { convEl.textContent = ''; return; }
+    if (rawQty <= 0) { convEl.textContent = ''; convEl.style.display = 'none'; return; }
 
     const unitEl   = row.querySelector('.txn-row-unit');
     const unitType = unitEl ? unitEl.value : 'base';
@@ -7763,6 +7764,7 @@ function updateRowConversion(qtyInput) {
         const pkgQty = factor > 0 ? rawQty / factor : 0;
         convEl.textContent = `= ${pkgQty.toFixed(2)} ${pkgUnit}`;
     }
+    convEl.style.display = 'block';
 }
 
 /* -----------------------------------------------------------------
