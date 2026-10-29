@@ -1801,7 +1801,7 @@
                         <div class="flex items-center gap-2 mb-3">
                             <span class="text-sm font-semibold text-gray-700" data-i18n="txn_lbl_issuance_by_block">Pengeluaran Mengikut Blok</span>
                         </div>
-                        <div id="txnRowsBody" class="flex flex-col gap-3" style="width:100%;"></div>
+                        <div id="txnRowsBody" style="width:100%;display:flex;flex-direction:column;gap:12px;"></div>
                         <!-- Add block button -->
                         <button type="button" id="txnAddRowBtn"
                             class="mt-3 w-full py-2.5 rounded-xl border-2 border-dashed border-green-400 text-green-700 font-semibold text-sm hover:bg-green-50 transition-colors"
@@ -4825,25 +4825,24 @@ function addTxnRow() {
     var _dRow = I18N[currentLang] || I18N['en'];
     const card = document.createElement('div');
     card.className = 'txn-row-card';
-    card.style.cssText = 'background:#fff;border:1.5px solid #E2E8F0;border-radius:12px;padding:14px 16px;width:100%;box-sizing:border-box;';
+    card.style.cssText = 'background:#fff;border:1.5px solid #E2E8F0;border-radius:12px;padding:14px 16px;display:block;width:100%;box-sizing:border-box;';
+    const selHtml  = `<select class="txn-row-loc" style="display:block;width:100%;box-sizing:border-box;border:1px solid #D1D5DB;border-radius:8px;padding:8px 10px;background:#fff;font-size:14px;color:#0F172A;font-family:Inter,sans-serif;margin-bottom:12px;">${buildLocationOptionsHtml()}</select>`;
+    const qtyLabel = `<div style="display:block;font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.05em;font-family:Inter,sans-serif;margin-bottom:8px;">${_dRow.lbl_quantity || 'Quantity'}</div>`;
+    const qtyRow   = `<div style="display:flex;flex-direction:row;gap:8px;align-items:center;width:100%;box-sizing:border-box;">
+            <input type="number" min="0" step="0.001" placeholder="0" class="txn-row-qty"
+                style="flex:1;min-width:0;display:block;border:1.5px solid #86EFAC;border-radius:8px;padding:8px 10px;background:#fff;font-size:15px;font-weight:600;color:#0F172A;font-family:Inter,sans-serif;box-sizing:border-box;"
+                oninput="updateRowConversion(this);updateTxnRowTotal();" />
+            <span class="txn-row-unit-label" style="background:#DCFCE7;color:#166534;font-size:13px;font-weight:700;padding:8px 12px;border-radius:8px;border:1px solid #86EFAC;white-space:nowrap;font-family:Inter,sans-serif;flex-shrink:0;">${unitLabel}</span>
+            <input type="hidden" class="txn-row-unit" value="${defUnit}" />
+        </div>`;
     card.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="display:flex;flex-direction:row;justify-content:space-between;align-items:center;margin-bottom:10px;">
             <span style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.05em;font-family:Inter,sans-serif;">${_dRow.mp_lbl_block || 'Block'}</span>
             <button type="button" onclick="this.closest('.txn-row-card').remove();updateTxnRowTotal();"
                 style="font-size:12px;font-weight:700;color:#DC2626;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;padding:0;-webkit-tap-highlight-color:transparent;">${_dRow.btn_remove_row || '✕ Remove'}</button>
         </div>
-        <select class="txn-row-loc" style="width:100%;box-sizing:border-box;border:1px solid #D1D5DB;border-radius:8px;padding:8px 10px;background:#fff;font-size:14px;color:#0F172A;font-family:Inter,sans-serif;margin-bottom:12px;display:block;">${buildLocationOptionsHtml()}</select>
-        <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.05em;font-family:Inter,sans-serif;margin-bottom:8px;">${_dRow.lbl_quantity || 'Quantity'}</div>
-        <div style="display:flex;gap:8px;align-items:center;">
-            <input type="number" min="0" step="0.001" placeholder="0"
-                class="txn-row-qty"
-                style="flex:1;min-width:0;border:1.5px solid #86EFAC;border-radius:8px;padding:8px 10px;background:#fff;font-size:15px;font-weight:600;color:#0F172A;font-family:Inter,sans-serif;box-sizing:border-box;"
-                oninput="updateRowConversion(this);updateTxnRowTotal();" />
-            <span class="txn-row-unit-label"
-                style="background:#DCFCE7;color:#166534;font-size:13px;font-weight:700;padding:8px 12px;border-radius:8px;border:1px solid #86EFAC;white-space:nowrap;font-family:Inter,sans-serif;flex-shrink:0;">${unitLabel}</span>
-            <input type="hidden" class="txn-row-unit" value="${defUnit}" />
-        </div>
-        <p class="txn-row-conv" style="font-size:11px;color:#16a34a;margin-top:6px;font-style:italic;min-height:16px;"></p>`;
+        ${selHtml}${qtyLabel}${qtyRow}
+        <p class="txn-row-conv" style="display:block;font-size:11px;color:#16a34a;margin-top:6px;font-style:italic;min-height:16px;"></p>`;
     container.appendChild(card);
     updateTxnRowTotal();
 }
