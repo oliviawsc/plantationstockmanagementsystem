@@ -8170,6 +8170,7 @@ const I18N = {
         items_existing_title:'Existing Items',
         btn_save_item:       'Save Item',
         /* Categories / options */
+        lbl_balance:         'Available stock:',
         select_category:     '-- Select Category --',
         select_item:         '-- Select Item --',
         select_type:         '-- Select Type --',
@@ -8642,6 +8643,7 @@ const I18N = {
         items_existing_title:'Item Sedia Ada',
         btn_save_item:       'Simpan Item',
         /* Categories / options */
+        lbl_balance:         'Baki tersedia:',
         select_category:     '-- Pilih Kategori --',
         select_item:         '-- Pilih Item --',
         select_type:         '-- Pilih Jenis --',
@@ -9397,7 +9399,8 @@ function updateTxnItemBalance() {
         dispQty  = parseFloat(baseBalance.toFixed(2));
         dispUnit = item.baseUnit || item.unit || '';
     }
-    balEl.textContent = 'Baki tersedia: ' + dispQty + ' ' + dispUnit;
+    var _d = I18N[currentLang] || I18N['en'];
+    balEl.textContent = (_d.lbl_balance || 'Available stock:') + ' ' + dispQty + ' ' + dispUnit;
     balEl.style.color = dispQty < 0 ? '#DC2626' : '#16a34a';
 }
 
