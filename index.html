@@ -9141,6 +9141,10 @@ function setLang(lang) {
     if (typeof filterTxnItemsByCategory === 'function') filterTxnItemsByCategory();
     if (typeof updateManuringVisibility === 'function') updateManuringVisibility();
 
+    // Re-render stock balance charts so the "Balance as at:" / "Stok setakat:"
+    // footer label updates immediately when the language changes.
+    if (typeof renderLiveStockChart === 'function') renderLiveStockChart();
+
     // Re-render dashboard tracker cards — month labels, card header text, and
     // chart tooltips are built from the i18n dict at render time, so they need
     // a full rebuild when the language changes.
