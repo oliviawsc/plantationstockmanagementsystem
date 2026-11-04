@@ -1268,6 +1268,8 @@
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;" data-i18n="sb_section_tools">Tools</p>
             <button data-target="tools" class="nav-item" onclick="navigateToSection('tools')">                  <span class="nav-icon">&#128295;</span><span class="sb-label" data-i18n="sb_lbl_tools">Tools / Peralatan</span></button>
             <button data-target="toolsrecord" class="nav-item" onclick="navigateToSection('toolsrecord')">            <span class="nav-icon">&#128203;</span><span class="sb-label" data-i18n="sb_lbl_toolsrecord">Tools Record</span></button>
+            <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;" data-i18n="sb_section_mgmtreport">Management Report</p>
+            <button data-target="mgmtreport" class="nav-item" onclick="navigateToSection('mgmtreport')">            <span class="nav-icon">&#128202;</span><span class="sb-label" data-i18n="sb_lbl_mgmtreport">Management Report</span></button>
             <p class="sb-section" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.42);padding:8px 8px 3px;">Admin</p>
             <button data-target="settings" id="navSettings" class="nav-item hidden">
                 <span class="nav-icon">&#9881;&#65039;</span><span class="sb-label" data-i18n="sb_lbl_settings">Settings</span>
@@ -1518,6 +1520,15 @@
                             </svg>
                         </div>
                         <span class="home-card-title" data-i18n="home_card_tools">Tools</span>
+                    </button>
+                    <!-- Management Report -->
+                    <button class="home-card" id="homeCardMgmtReport" onclick="navigateToSection('mgmtreport')">
+                        <div class="home-card-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>
+                            </svg>
+                        </div>
+                        <span class="home-card-title" data-i18n="home_card_mgmtreport">Management Report</span>
                     </button>
                     <!-- Settings (superadmin only) -->
                     <button class="home-card hidden" id="homeCardSettings" onclick="navigateToSection('settings')">
@@ -3197,6 +3208,21 @@
             <p class="text-sm text-green-700 mb-6" data-i18n="page_toolsrecord_sub">View tools issuance records grouped by worker.</p>
             <div class="bg-white p-6 rounded-xl shadow">
                 <p class="text-sm text-gray-500">Go to <strong>Tools / Peralatan</strong> and click the <strong>📊 Rekod Peralatan</strong> tab.</p>
+            </div>
+        </section>
+
+        <!-- ============ MANAGEMENT REPORT (central place for all operation reports) ============ -->
+        <section id="mgmtreport" class="page-section">
+            <h2 class="text-3xl font-bold mb-2" data-i18n="page_mgmtreport">📊 Management Report</h2>
+            <p class="text-sm text-green-700 mb-6" data-i18n="page_mgmtreport_sub">One place for every operation report.</p>
+            <div class="bg-white p-6 rounded-xl shadow mb-6">
+                <h3 class="text-lg font-bold text-green-900 mb-1" data-i18n="mgmtreport_src_this">Plantation Stock &amp; Field Operations</h3>
+                <p class="text-xs text-gray-500 mb-4" data-i18n="mgmtreport_src_this_sub">Reports from this system.</p>
+                <div id="mgmtReportLinks" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;"></div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow">
+                <h3 class="text-lg font-bold text-green-900 mb-1" data-i18n="mgmtreport_src_other">Other systems</h3>
+                <p class="text-sm text-gray-500" data-i18n="mgmtreport_src_other_sub">Reports from other operation systems will appear here once they are connected.</p>
             </div>
         </section>
 
@@ -8534,6 +8560,15 @@ const I18N = {
         sb_lbl_tools:             'Tools / Peralatan',
         sb_lbl_toolsrecord:       'Tools Record',
         home_card_tools:          'Tools',
+        sb_section_mgmtreport:    'Management Report',
+        sb_lbl_mgmtreport:        'Management Report',
+        home_card_mgmtreport:     'Management Report',
+        page_mgmtreport:          '📊 Management Report',
+        page_mgmtreport_sub:      'One place for every operation report.',
+        mgmtreport_src_this:      'Plantation Stock & Field Operations',
+        mgmtreport_src_this_sub:  'Reports from this system.',
+        mgmtreport_src_other:     'Other systems',
+        mgmtreport_src_other_sub: 'Reports from other operation systems will appear here once they are connected.',
         page_tools:               '🔧 Tools Transactions',
         page_tools_sub:           'Record tools issued and received at the store.',
         page_toolsrecord:         '📋 Tools Record',
@@ -9009,6 +9044,15 @@ const I18N = {
         sb_lbl_tools:             'Transaksi Peralatan',
         sb_lbl_toolsrecord:       'Rekod Peralatan',
         home_card_tools:          'Peralatan',
+        sb_section_mgmtreport:    'Laporan Pengurusan',
+        sb_lbl_mgmtreport:        'Laporan Pengurusan',
+        home_card_mgmtreport:     'Laporan Pengurusan',
+        page_mgmtreport:          '📊 Laporan Pengurusan',
+        page_mgmtreport_sub:      'Satu tempat untuk semua laporan operasi.',
+        mgmtreport_src_this:      'Stok Ladang & Operasi Lapangan',
+        mgmtreport_src_this_sub:  'Laporan daripada sistem ini.',
+        mgmtreport_src_other:     'Sistem lain',
+        mgmtreport_src_other_sub: 'Laporan daripada sistem operasi lain akan dipaparkan di sini selepas disambungkan.',
         page_tools:               '🔧 Transaksi Peralatan',
         page_tools_sub:           'Rekod peralatan yang dikeluarkan dan diterima di stor.',
         page_toolsrecord:         '📋 Rekod Peralatan',
@@ -9215,6 +9259,8 @@ const ALL_SECTIONS = [
     // Tools
     { id: 'tools',           label: '🔧 Tools Transactions',         group: 'Tools' },
     { id: 'toolsrecord',     label: '📋 Tools Record',               group: 'Tools' },
+    // Management Report
+    { id: 'mgmtreport',      label: '📊 Management Report',          group: 'Management Report' },
 ];
 
 // Sections shown in user management for Estate Users (mobile interface)
@@ -9234,6 +9280,7 @@ const USER_MODULES = [
     { name: 'Reports',          icon: '📄', iconBg: '#3b82f6', sections: ['fertrecord', 'chemrecord', 'plantrecord'] },
     { name: 'Rainfall',         icon: '🌧️', iconBg: '#f59e0b', sections: ['rainfall', 'rainfallreport', 'rainfallsummary'] },
     { name: 'Tools',            icon: '🔧', iconBg: '#f97316', sections: ['tools', 'toolsrecord'] },
+    { name: 'Management Report', icon: '📊', iconBg: '#0f766e', sections: ['mgmtreport'] },
 ];
 // Module groupings for estate users (mobile)
 const ESTATE_MODULES = [
@@ -9926,8 +9973,20 @@ function toggleLoginPw() {
 }
 
 
+// ── Worker Portal ──────────────────────────────────────────────────
+// Estate workers (estate_user) now use the standalone Worker Portal
+// (MJMElon/Mantap). When one signs in here they are sent there instead.
+// Set to '' to fall back to the old built-in mobile view.
+const WORKER_PORTAL_URL = 'https://mjmelon.github.io/Mantap/';
+
 // ── Boot the app after successful login ────────────────────────────
 function bootApp(session) {
+    if (isEstateMobile(session) && WORKER_PORTAL_URL) {
+        clearSession();
+        supabaseClient.auth.signOut().catch(() => {});
+        window.location.replace(WORKER_PORTAL_URL);
+        return;
+    }
     startStatusWatcher();
     // Ensure estate_hub is never the active section for non-estate users,
     // and purge any leftover estate-mobile state from a previous session.
@@ -10127,6 +10186,18 @@ function bootApp(session) {
 
     setLang(localStorage.getItem('opp_lang') || 'en');
     renderUsersTable();
+
+    // Deep link from MJM Intranet: ?module=stock opens Home, ?module=report
+    // opens Management Report. The parameter is removed after use so a
+    // later reload resumes the last page as before.
+    const _module = new URLSearchParams(window.location.search).get('module');
+    if (_module) {
+        if (_module === 'report') navigateToSection('mgmtreport');
+        else if (_module === 'stock') navigateToSection('home');
+        const _url = new URL(window.location.href);
+        _url.searchParams.delete('module');
+        history.replaceState(null, '', _url.pathname + _url.search + _url.hash);
+    }
 }
 
 function syncEstateBackBtn() { /* no-op: back button removed, bottom nav used instead */ }
@@ -10286,6 +10357,12 @@ function applyNavPermissions(session) {
     if (homeCardTools && !isSuperAdmin) {
         const anyTools = ['tools', 'toolsrecord'].some(s => getSectionAccess(session, s) !== 'none');
         homeCardTools.classList.toggle('hidden', !anyTools);
+    }
+
+    // Management Report home card
+    const homeCardMgmtReport = document.getElementById('homeCardMgmtReport');
+    if (homeCardMgmtReport && !isSuperAdmin) {
+        homeCardMgmtReport.classList.toggle('hidden', getSectionAccess(session, 'mgmtreport') === 'none');
     }
 
     // Show/hide each nav button based on permissions
@@ -15768,6 +15845,32 @@ function navigateToFirstToolsSection() {
     }
 }
 
+// ── Management Report ────────────────────────────────────────────────
+// Central place for all operation reports. For now it links to the
+// reports inside this system; reports from other systems are added later.
+const MGMT_REPORT_SOURCES = [
+    { id: 'dashboard',      key: 'sb_lbl_dashboard',       label: 'Dashboard',               icon: '📊' },
+    { id: 'ledger',         key: 'sb_lbl_ledger',          label: 'Stock Summary',           icon: '📒' },
+    { id: 'fertrecord',     key: 'sb_lbl_fertrecord',      label: 'Fertilizer Application',  icon: '📋' },
+    { id: 'chemrecord',     key: 'sb_lbl_chemrecord',      label: 'Chemical Application',    icon: '⚗️' },
+    { id: 'plantrecord',    key: 'sb_lbl_plantrecord',     label: 'Field Planting Record',   icon: '🌱' },
+    { id: 'rainfallreport', key: 'sb_lbl_rainfallreport',  label: 'Monthly Rainfall Record', icon: '🌧️' },
+    { id: 'toolsrecord',    key: 'sb_lbl_toolsrecord',     label: 'Tools Record',            icon: '🔧' },
+];
+
+function renderMgmtReport() {
+    const box = document.getElementById('mgmtReportLinks');
+    if (!box) return;
+    const session = loadSession();
+    const d = (typeof I18N !== 'undefined' && I18N[currentLang]) || {};
+    const items = MGMT_REPORT_SOURCES.filter(r =>
+        !session || session.role === 'superadmin' || getSectionAccess(session, r.id) !== 'none');
+    box.innerHTML = items.length ? items.map(r =>
+        '<button onclick="navigateToSection(\'' + r.id + '\')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #BBF7D0;border-radius:10px;background:#F0FDF4;color:#14532D;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;text-align:left;">' +
+        '<span style="font-size:18px;">' + r.icon + '</span><span data-i18n="' + r.key + '">' + (d[r.key] || r.label) + '</span></button>'
+    ).join('') : '<p class="text-sm text-gray-400 italic">—</p>';
+}
+
 function navigateToSection(target) {
     if (target === 'toolsrecord') {
         const _trSession = loadSession();
@@ -15839,6 +15942,7 @@ function navigateToSection(target) {
     if (target === 'rainfallsummary') renderRainfallSummary();
     if (target === 'tools') renderToolsPage();
     if (target === 'toolsrecord') renderToolsRecord();
+    if (target === 'mgmtreport') renderMgmtReport();
     if (target === 'mobile_rainfall') {
         const el = document.getElementById('mobileRfDate');
         if (el && !el.value) el.valueAsDate = new Date();
