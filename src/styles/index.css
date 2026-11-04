@@ -1,0 +1,16 @@
+@import "tailwindcss";
+/* Legacy custom CSS sits in the components layer, so Tailwind utilities on
+   the same element still win (as they did with the legacy Tailwind CDN). */
+@import "./base.css" layer(components);
+@import "./sections.css" layer(components);
+@import "./login.css" layer(components);
+@import "./app.css" layer(components);
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --color-primary: #2E7D32;
+  --color-primary-light: #E8F5E9;
+  --color-primary-dark: #1B5E20;
+  --color-canvas: #F8FAFC;
+  --color-surface: #FFFFFF;
+}

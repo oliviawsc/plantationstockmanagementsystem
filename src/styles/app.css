@@ -1,0 +1,43 @@
+/* Adjustments for the React layout (not in the legacy CSS). */
+
+/* The legacy CSS keeps the sidebar hidden; the React layout shows it except
+   on Home ("home-mode", as the legacy code intended) or when disabled. */
+#appLayout.home-mode #sidebar,
+#appLayout.no-sidebar #sidebar { display: none !important; }
+
+@media (min-width: 768px) {
+  #appLayout.home-mode,
+  #appLayout.no-sidebar { --sb-w: 0px; }
+  #topHeaderBar { left: var(--sb-w); transition: left .22s cubic-bezier(.4,0,.2,1); }
+  #mobileMenuBtn { display: none !important; }
+}
+@media (max-width: 767px) {
+  #appLayout.home-mode #mobileMenuBtn,
+  #appLayout.no-sidebar #mobileMenuBtn { display: none !important; }
+  #avatarBtn .avatar-text { display: none; }
+}
+
+#mobileMenuBtn {
+  width: 32px; height: 32px; flex-shrink: 0; border-radius: 7px;
+  border: 1px solid #D1FAE5; background: #F0FDF4; color: #2E7D32;
+  font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+
+.view-only-banner {
+  background: #FEF3C7; border: 1px solid #FCD34D; color: #92400E;
+  padding: 10px 16px; border-radius: 8px; margin-bottom: 16px;
+  font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px;
+}
+
+.avatar-menu-item {
+  width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+  border-radius: 8px; border: none; background: transparent; font-size: 13px;
+  font-weight: 500; color: #374151; cursor: pointer; text-align: left;
+}
+.avatar-menu-item:hover { background: #F3F4F6; }
+
+.modal-input {
+  width: 100%; padding: 9px 12px; border: 1px solid #E2E8F0; border-radius: 8px;
+  font-size: 13.5px; outline: none;
+}
+.modal-input:focus { border-color: #2E7D32; }

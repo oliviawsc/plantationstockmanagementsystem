@@ -1,0 +1,12 @@
+{
+  "name": "Plantation Stock Management",
+  "short_name": "PlantStock",
+  "description": "Oil palm plantation stock and inventory management system",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#166534",
+  "icons": [
+    { "src": "palm-logo.png", "sizes": "97x100", "type": "image/png" }
+  ]
+}

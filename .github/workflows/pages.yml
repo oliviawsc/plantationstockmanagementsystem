@@ -1,32 +1,41 @@
-name: Deploy to GitHub Pages
+# Build the React app (plus the classic app at /legacy/) and publish it to
+# GitHub Pages. Repo Settings → Pages → Source: "GitHub Actions".
+#
+# Manual only for now: the React app is still Phase A (most sections are
+# placeholders) and the live site is still the classic app on the gh-pages
+# branch. At cutover, add `push: branches: [main]` below and switch the
+# Pages source to "GitHub Actions".
+name: Publish to GitHub Pages
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './'
-
-    deploy:
-    needs: build
+  deploy:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    permissions:
-      id-token: write
-      pages: write
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx vitest run
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
         uses: actions/deploy-pages@v4
