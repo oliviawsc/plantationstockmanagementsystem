@@ -11,7 +11,7 @@ export const SUPER_ADMIN_EMAIL = 'hqadmin.puigroups@gmail.com';
 export const SUPER_ADMIN_NAME = 'HQ Admin';
 
 /** Estate workers use the separate Worker Portal (MJMElon/Mantap). */
-export const WORKER_PORTAL_URL = 'https://mjmelon.github.io/Mantap/';
+export const WORKER_PORTAL_URL = 'https://mjmelon.github.io/Mantap/#/m';
 
 /** Edge Function that checks HQ user passwords on the server. */
 export const AUTH_FUNCTION = 'stock-auth';
