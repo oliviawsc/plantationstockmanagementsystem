@@ -1,27 +1,32 @@
-import { cpSync, existsSync } from 'node:fs';
+import { copyFileSync, mkdirSync, renameSync } from 'node:fs';
 import { resolve } from 'node:path';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, type Plugin } from 'vitest/config';
 
-/** Ships the classic single-file app at /legacy/ next to the React app,
- *  so it keeps working (and stays linkable) until every section is ported. */
-function copyLegacy(): Plugin {
+/** Until the React app has every section, the live site (GitHub Pages
+ *  "deploy from branch" = main root) serves the CLASSIC app from the root
+ *  index.html. The React entry is app.html. In the build output the React
+ *  app becomes dist/index.html and the classic app is shipped at /legacy/.
+ *  Cutover: swap the two (see docs/security-cutover.md). */
+function arrangeOutput(): Plugin {
   return {
-    name: 'copy-legacy-app',
+    name: 'arrange-output',
     apply: 'build',
     closeBundle() {
-      const src = resolve(__dirname, 'legacy');
-      if (existsSync(src)) cpSync(src, resolve(__dirname, 'dist/legacy'), { recursive: true });
+      const dist = resolve(__dirname, 'dist');
+      renameSync(resolve(dist, 'app.html'), resolve(dist, 'index.html'));
+      mkdirSync(resolve(dist, 'legacy'), { recursive: true });
+      for (const f of ['index.html', 'sw.js', 'manifest.json']) copyFileSync(resolve(__dirname, f), resolve(dist, 'legacy', f));
     },
   };
 }
 
-// Published at https://mjmelon.github.io/plantationstockmanagementsystem/
+// Published at https://oliviawsc.github.io/plantationstockmanagementsystem/
 export default defineConfig({
   base: '/plantationstockmanagementsystem/',
-  plugins: [react(), tailwindcss(), copyLegacy()],
-  build: { sourcemap: false },
+  plugins: [react(), tailwindcss(), arrangeOutput()],
+  build: { sourcemap: false, rollupOptions: { input: resolve(__dirname, 'app.html') } },
   test: {
     environment: 'jsdom',
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],

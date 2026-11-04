@@ -74,3 +74,15 @@ Helper functions (`security definer`, fixed `search_path`):
 View-only access is enforced in the app, not in the database (section
 permissions do not map 1:1 to tables). If needed, write policies can later
 check `permissions` per table.
+
+## Switching the live site to the React app
+
+Until then, GitHub Pages publishes **from the `main` branch root**, so the live
+site is the classic app in the root `index.html` (+ `sw.js`, `manifest.json`).
+The React app's entry is `app.html`; `npm run build` turns it into
+`dist/index.html` and ships the classic app at `dist/legacy/`.
+
+At cutover:
+1. Add `push: branches: [main]` to `.github/workflows/pages.yml`.
+2. Repo Settings → Pages → Source: **GitHub Actions**.
+3. Apply the `*_cutover_rls.sql` migration (above).
