@@ -1,0 +1,9 @@
+# Plantation Stock Edge Functions (Supabase project eukvdlyzhyjohkjqbqjb).
+# supabase link --project-ref eukvdlyzhyjohkjqbqjb
+# supabase functions deploy stock-auth
+project_id = "PlantationStock"
+
+[functions.stock-auth]
+# sign_in is called before the user has a session (the anon key is still
+# sent); me / change_password check the caller's JWT inside the function.
+verify_jwt = false
