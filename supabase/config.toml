@@ -7,3 +7,7 @@ project_id = "PlantationStock"
 # sign_in is called before the user has a session (the anon key is still
 # sent); me / change_password check the caller's JWT inside the function.
 verify_jwt = false
+
+[functions.stock-sso]
+# Called right after the Intranet redirect (?gw_token=…), before there is a session.
+verify_jwt = false

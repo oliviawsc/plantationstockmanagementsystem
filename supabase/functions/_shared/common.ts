@@ -3,7 +3,7 @@
 import { createClient, type SupabaseClient } from 'jsr:@supabase/supabase-js@2';
 
 const ALLOWED_ORIGINS = (Deno.env.get('STOCK_ALLOWED_ORIGINS') ??
-  'https://mjmelon.github.io,http://localhost:5173,http://localhost:4173').split(',');
+  'https://oliviawsc.github.io,https://mjmelon.github.io,http://localhost:5173,http://localhost:4173,http://localhost:8000').split(',');
 
 export const SUPER_ADMIN_EMAIL = Deno.env.get('SUPER_ADMIN_EMAIL') ?? 'hqadmin.puigroups@gmail.com';
 export const USERS_TABLE = 'opp_users';

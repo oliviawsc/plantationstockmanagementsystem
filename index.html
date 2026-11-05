@@ -1042,11 +1042,22 @@
 (function () {
     try {
         var raw = localStorage.getItem('opp_auth_session');
-        if (raw && JSON.parse(raw)) {
+        // Arriving from MJM Intranet (?gw_token=…): the token is redeemed by
+        // the stock-sso Edge Function on load, so the login form must never
+        // flash either. A tiny splash is shown until bootApp() takes over.
+        var fromIntranet = /[?&]gw_token=/.test(window.location.search);
+        if ((raw && JSON.parse(raw)) || fromIntranet) {
             var st = document.createElement('style');
             st.id = 'pre-auth-hide';
             st.textContent = '#authOverlay{display:none!important}';
             document.head.appendChild(st);
+        }
+        if (fromIntranet) {
+            var sp = document.createElement('div');
+            sp.id = 'ssoSplash';
+            sp.setAttribute('style', 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:#F8FAFC;color:#166534;font:500 15px/1.4 Inter,system-ui,sans-serif;');
+            sp.textContent = 'Signing in from MJM Intranet\u2026';
+            document.body.appendChild(sp);
         }
     } catch (e) {}
 })();
@@ -9962,6 +9973,76 @@ function showLoginError(msg) {
     errEl.classList.remove('hidden');
 }
 
+// ── Sign-in from MJM Intranet ──────────────────────────────────────
+// The Intranet opens ?module=stock|report&gw_token=<60-second single-use
+// token>. The stock-sso Edge Function redeems it with the Intranet and
+// returns the same session object attemptLogin() builds (plus a Supabase
+// Auth session). ?module is kept so bootApp() opens Home / Management Report.
+const SSO_ERRORS = {
+    err_forbidden:       'you do not have access to this module in the Intranet',
+    err_inactive:        'your account has been deactivated',
+    err_sso_invalid:     'the link has expired or was already used — please open it from the Intranet again',
+    err_sso_not_set_up:  'the Intranet connection is not set up yet (missing API key)',
+    err_network:         'network error',
+};
+
+function stripGwToken() {
+    try {
+        const u = new URL(window.location.href);
+        u.searchParams.delete('gw_token');
+        history.replaceState(null, '', u.pathname + u.search + u.hash);
+    } catch (e) {}
+}
+
+async function signInFromIntranet(token, module) {
+    let code = 'err_network';
+    try {
+        const res = await fetch(SUPABASE_URL + '/functions/v1/stock-sso', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                apikey: SUPABASE_PUBLISHABLE_KEY,
+                Authorization: 'Bearer ' + SUPABASE_PUBLISHABLE_KEY,
+            },
+            body: JSON.stringify({ token, module }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data && data.session && data.session.email) {
+            saveSession(data.session);
+            if (data.auth && data.auth.access_token) {
+                try { await supabaseClient.auth.setSession(data.auth); } catch (e) {}
+            }
+            stripGwToken();
+            const splash = document.getElementById('ssoSplash');
+            if (splash) splash.remove();
+            // A cached estate_user session may have hidden #appLayout at load
+            if (!isEstateMobile(data.session)) {
+                const pm = document.getElementById('pre-mobile-hide');
+                if (pm) pm.remove();
+                document.body.classList.remove('estate-mobile');
+            }
+            bootApp(data.session);
+            return true;
+        }
+        code = (data && data.error) || ('http_' + res.status);
+    } catch (e) {
+        console.warn('[SSO] sign-in from Intranet failed', e);
+    }
+
+    // Failed: back to the normal login form, with the reason.
+    stripGwToken();
+    clearSession();
+    supabaseClient.auth.signOut().catch(() => {});
+    const splash = document.getElementById('ssoSplash');
+    if (splash) splash.remove();
+    const preAuthHide = document.getElementById('pre-auth-hide');
+    if (preAuthHide) preAuthHide.remove();
+    const overlay = document.getElementById('authOverlay');
+    if (overlay) { overlay.scrollTop = 0; overlay.style.display = 'flex'; }
+    showLoginError('Sign-in from MJM Intranet failed: ' + (SSO_ERRORS[code] || code) + '. Please sign in below.');
+    return false;
+}
+
 function toggleLoginPw() {
     const pw  = document.getElementById('loginPassword');
     const on  = document.getElementById('eyeIconShow');
@@ -11486,6 +11567,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderPermissionCheckboxes();
     // Apply saved language preference regardless of login state
     setLang(localStorage.getItem('opp_lang') || 'en');
+
+    // Sign-in from MJM Intranet: ?gw_token=… wins over any cached session
+    // (so switching Intranet users works). See signInFromIntranet().
+    const _gwParams = new URLSearchParams(window.location.search);
+    if (_gwParams.get('gw_token')) {
+        await signInFromIntranet(_gwParams.get('gw_token'), _gwParams.get('module') === 'report' ? 'report' : 'stock');
+        if (navigator.onLine) drainSyncQueue();
+        return;
+    }
 
     // Quick resume from sessionStorage so the app appears instantly on refresh.
     const localSession = loadSession();
