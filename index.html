@@ -8570,9 +8570,7 @@ const I18N = {
         sb_lbl_tools:             'Tools / Peralatan',
         sb_lbl_toolsrecord:       'Tools Record',
         home_card_tools:          'Tools',
-<<<<<<< HEAD
         home_card_mobile:         'Mobile Interface',
-=======
         sb_section_mgmtreport:    'Management Report',
         sb_lbl_mgmtreport:        'Management Report',
         home_card_mgmtreport:     'Management Report',
@@ -8582,7 +8580,6 @@ const I18N = {
         mgmtreport_src_this_sub:  'Reports from this system.',
         mgmtreport_src_other:     'Other systems',
         mgmtreport_src_other_sub: 'Reports from other operation systems will appear here once they are connected.',
->>>>>>> origin/main
         page_tools:               '🔧 Tools Transactions',
         page_tools_sub:           'Record tools issued and received at the store.',
         page_toolsrecord:         '📋 Tools Record',
@@ -9058,9 +9055,7 @@ const I18N = {
         sb_lbl_tools:             'Transaksi Peralatan',
         sb_lbl_toolsrecord:       'Rekod Peralatan',
         home_card_tools:          'Peralatan',
-<<<<<<< HEAD
         home_card_mobile:         'Antara Muka Mudah Alih',
-=======
         sb_section_mgmtreport:    'Laporan Pengurusan',
         sb_lbl_mgmtreport:        'Laporan Pengurusan',
         home_card_mgmtreport:     'Laporan Pengurusan',
@@ -9070,7 +9065,6 @@ const I18N = {
         mgmtreport_src_this_sub:  'Laporan daripada sistem ini.',
         mgmtreport_src_other:     'Sistem lain',
         mgmtreport_src_other_sub: 'Laporan daripada sistem operasi lain akan dipaparkan di sini selepas disambungkan.',
->>>>>>> origin/main
         page_tools:               '🔧 Transaksi Peralatan',
         page_tools_sub:           'Rekod peralatan yang dikeluarkan dan diterima di stor.',
         page_toolsrecord:         '📋 Rekod Peralatan',
@@ -15863,11 +15857,11 @@ function navigateToFirstToolsSection() {
     }
 }
 
-<<<<<<< HEAD
 function previewMobileInterface() {
     document.body.classList.add('estate-mobile');
     navToSection('estate_hub');
-=======
+}
+
 // ── Management Report ────────────────────────────────────────────────
 // Central place for all operation reports. For now it links to the
 // reports inside this system; reports from other systems are added later.
@@ -15892,7 +15886,6 @@ function renderMgmtReport() {
         '<button onclick="navigateToSection(\'' + r.id + '\')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #BBF7D0;border-radius:10px;background:#F0FDF4;color:#14532D;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;text-align:left;">' +
         '<span style="font-size:18px;">' + r.icon + '</span><span data-i18n="' + r.key + '">' + (d[r.key] || r.label) + '</span></button>'
     ).join('') : '<p class="text-sm text-gray-400 italic">—</p>';
->>>>>>> origin/main
 }
 
 function navigateToSection(target) {
