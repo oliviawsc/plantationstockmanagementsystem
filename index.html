@@ -1714,6 +1714,24 @@
                     <canvas id="rainfallChartCanvas"></canvas>
                 </div>
             </div>
+
+            <!-- Seedling Planting Mixed Chart -->
+            <div class="bg-white rounded-xl shadow mt-6" style="overflow:hidden;">
+                <div style="background:linear-gradient(135deg,#064E3B 0%,#059669 100%);padding:20px 24px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                    <div>
+                        <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 2px;" data-i18n="dash_seedling_plant_title">🌱 Seedling Planting</h3>
+                        <p style="color:#A7F3D0;font-size:11.5px;margin:0;" data-i18n="dash_seedling_plant_sub">Monthly planting vs cumulative — Oil Palm Seedling Out transactions</p>
+                    </div>
+                    <select id="seedlingPlantYear" onchange="renderSeedlingPlantingChart()"
+                        style="background:rgba(255,255,255,.18);color:#fff;border:1.5px solid rgba(255,255,255,.35);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;font-family:Inter,sans-serif;cursor:pointer;outline:none;">
+                    </select>
+                </div>
+                <p id="seedlingPlantEmpty" class="hidden" style="text-align:center;color:#94A3B8;padding:40px 0;font-size:13px;" data-i18n="dash_seedling_plant_empty">No seedling planting records yet.</p>
+                <div id="seedlingPlantWrap" style="padding:16px 24px 24px;position:relative;height:300px;">
+                    <canvas id="seedlingPlantCanvas"></canvas>
+                </div>
+            </div>
+
             </div><!-- /dashMainContent -->
 
             <!-- ══ COMMENT PANEL ══════════════════════════════════════════════ -->
@@ -6496,6 +6514,7 @@ function renderDashboard() {
     renderMaintPctTracker();
     renderChemUsageTracker();
     renderRainfallChart();
+    renderSeedlingPlantingChart();
 }
 
 
@@ -7327,6 +7346,193 @@ function renderRainfallChart() {
 }
 
 /* -----------------------------------------------------------------
+   DASHBOARD — SEEDLING PLANTING MIXED CHART (bar + line)
+   ----------------------------------------------------------------- */
+var seedlingPlantChartInstance = null;
+
+function renderSeedlingPlantingChart() {
+    var empty  = document.getElementById('seedlingPlantEmpty');
+    var wrap   = document.getElementById('seedlingPlantWrap');
+    var canvas = document.getElementById('seedlingPlantCanvas');
+    var yearSel = document.getElementById('seedlingPlantYear');
+    if (!empty || !wrap || !canvas || !yearSel) return;
+
+    if (seedlingPlantChartInstance) { seedlingPlantChartInstance.destroy(); seedlingPlantChartInstance = null; }
+
+    var d = I18N[currentLang] || I18N['en'];
+    var monthsShort = d.months_short || ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    // Collect all years from Oil Palm Seedling Out transactions
+    var seedlingIds = new Set(items.filter(function(i){ return i.category === 'Oil Palm Seedling'; }).map(function(i){ return String(i.id); }));
+    var plantTxns = transactions.filter(function(t){ return t.type === 'Out' && seedlingIds.has(String(t.itemId)) && t.date; });
+
+    var allYears = Array.from(new Set(plantTxns.map(function(t){ return t.date.slice(0,4); }))).sort();
+    var nowYear  = String(new Date().getFullYear());
+
+    // Populate year selector
+    var prevYear = yearSel.value;
+    yearSel.innerHTML = '';
+    if (allYears.length === 0) allYears = [nowYear];
+    if (!allYears.includes(nowYear)) allYears.push(nowYear);
+    allYears.sort().forEach(function(yr) {
+        var opt = document.createElement('option');
+        opt.value = yr; opt.textContent = yr;
+        if (yr === (prevYear || nowYear)) opt.selected = true;
+        yearSel.appendChild(opt);
+    });
+    var selYear = yearSel.value;
+
+    // Monthly totals for selected year
+    var monthly = new Array(12).fill(0);
+    plantTxns.forEach(function(t){
+        if (t.date.slice(0,4) !== selYear) return;
+        var mo = parseInt(t.date.slice(5,7), 10) - 1;
+        if (mo >= 0 && mo < 12) monthly[mo] += parseFloat(t.qty) || 0;
+    });
+
+    var hasData = monthly.some(function(v){ return v > 0; });
+    if (!hasData) {
+        empty.classList.remove('hidden');
+        wrap.style.display = 'none';
+        return;
+    }
+    empty.classList.add('hidden');
+    wrap.style.display = '';
+
+    // Cumulative
+    var cumulative = [];
+    var runSum = 0;
+    monthly.forEach(function(v){ runSum += v; cumulative.push(runSum || null); });
+
+    // Replace trailing nulls (months with no data yet) so line doesn't extend flat
+    for (var i = 11; i >= 0; i--) {
+        if (monthly[i] > 0) break;
+        cumulative[i] = null;
+    }
+
+    // Data-label plugin for both bar and line
+    var mixedLabelPlugin = {
+        id: 'seedlingPlantLabels',
+        afterDatasetsDraw: function(chart) {
+            var ctx = chart.ctx;
+            chart.data.datasets.forEach(function(dataset, di) {
+                var meta = chart.getDatasetMeta(di);
+                if (meta.hidden) return;
+                ctx.save();
+                ctx.font = 'bold 10px Inter,sans-serif';
+                ctx.textAlign = 'center';
+                if (di === 0) {
+                    // Bar labels — above each bar, gold text
+                    ctx.fillStyle = '#92400E';
+                    ctx.textBaseline = 'bottom';
+                    meta.data.forEach(function(bar, i) {
+                        var val = dataset.data[i];
+                        if (!val || val <= 0) return;
+                        ctx.fillText(Math.round(val), bar.x, bar.y - 3);
+                    });
+                } else {
+                    // Line labels — above each point, blue text
+                    ctx.fillStyle = '#1D4ED8';
+                    ctx.textBaseline = 'bottom';
+                    meta.data.forEach(function(pt, i) {
+                        var val = dataset.data[i];
+                        if (val == null || val <= 0) return;
+                        ctx.fillText(Math.round(val), pt.x, pt.y - 7);
+                    });
+                }
+                ctx.restore();
+            });
+        }
+    };
+
+    var labelMonthly    = d.dash_seedling_monthly    || 'Monthly';
+    var labelCumulative = d.dash_seedling_cumulative || 'Cumulative';
+
+    seedlingPlantChartInstance = new Chart(canvas, {
+        type: 'bar',
+        plugins: [mixedLabelPlugin],
+        data: {
+            labels: monthsShort,
+            datasets: [
+                {
+                    type: 'bar',
+                    label: labelMonthly,
+                    data: monthly,
+                    backgroundColor: 'rgba(234,179,8,0.75)',
+                    borderColor: 'rgba(161,120,0,0.9)',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    order: 2,
+                },
+                {
+                    type: 'line',
+                    label: labelCumulative,
+                    data: cumulative,
+                    borderColor: '#2563EB',
+                    backgroundColor: 'rgba(37,99,235,0.08)',
+                    borderWidth: 2.5,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#2563EB',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    tension: 0.3,
+                    fill: false,
+                    spanGaps: false,
+                    order: 1,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: { top: 24 } },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { size: 11 }, boxWidth: 14, padding: 14,
+                        generateLabels: function(chart) {
+                            return chart.data.datasets.map(function(ds, i) {
+                                var isLine = ds.type === 'line';
+                                return {
+                                    text: ds.label,
+                                    fillStyle:   isLine ? ds.borderColor : ds.backgroundColor,
+                                    strokeStyle: isLine ? ds.borderColor : ds.borderColor,
+                                    lineWidth:   isLine ? 2.5 : 0,
+                                    hidden: chart.getDatasetMeta(i).hidden,
+                                    datasetIndex: i,
+                                    pointStyle: isLine ? 'circle' : 'rect',
+                                };
+                            });
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            if (ctx.parsed.y == null) return null;
+                            return ctx.dataset.label + ': ' + Math.round(ctx.parsed.y);
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                y: {
+                    beginAtZero: true,
+                    ticks: { font: { size: 10 }, stepSize: 1,
+                        callback: function(v){ return Number.isInteger(v) ? v : ''; }
+                    },
+                    grid: { color: 'rgba(0,0,0,0.06)' },
+                    title: { display: true, text: d.dash_seedling_yaxis || 'Seedlings', font: { size: 10 }, color: '#6B7280' }
+                }
+            }
+        }
+    });
+}
+
+/* -----------------------------------------------------------------
    DASHBOARD PRINT
    ----------------------------------------------------------------- */
 function printDashboard() {
@@ -7719,6 +7925,7 @@ function renderDashboardFilters() {
     renderMaintPctTracker();
     renderChemUsageTracker();
     renderRainfallChart();
+    renderSeedlingPlantingChart();
 }
 
 /** Open the native date picker for an input by id — works on desktop and iOS. */
@@ -8877,6 +9084,13 @@ const I18N = {
         tools_lbl_items_hint:     'Please tick the tools to be taken',
         toolsrecord_col_worker:   'Worker Name',
         toolsrecord_table_title:  'TOOLS RECORD',
+        /* Dashboard — Seedling Planting Chart */
+        dash_seedling_plant_title:  '🌱 Seedling Planting',
+        dash_seedling_plant_sub:    'Monthly planting vs cumulative — Oil Palm Seedling Out transactions',
+        dash_seedling_plant_empty:  'No seedling planting records yet.',
+        dash_seedling_monthly:      'Monthly',
+        dash_seedling_cumulative:   'Cumulative',
+        dash_seedling_yaxis:        'Seedlings',
         /* Dashboard — Email & Comments */
         dash_email_btn:           'Email',
         dash_comment_btn:         'Comments',
@@ -9376,6 +9590,13 @@ const I18N = {
         tools_lbl_items_hint:     'Sila tandakan peralatan yang ingin diambil',
         toolsrecord_col_worker:   'Nama Pengguna Pekerja',
         toolsrecord_table_title:  'REKOD PERALATAN',
+        /* Dashboard — Seedling Planting Chart */
+        dash_seedling_plant_title:  '🌱 Penanaman Anak Sawit',
+        dash_seedling_plant_sub:    'Penanaman bulanan vs kumulatif — transaksi Keluar Anak Sawit',
+        dash_seedling_plant_empty:  'Tiada rekod penanaman anak sawit lagi.',
+        dash_seedling_monthly:      'Pencapaian',
+        dash_seedling_cumulative:   'Pencapaian (Kumulatif)',
+        dash_seedling_yaxis:        'Bibit',
         /* Dashboard — Email & Comments */
         dash_email_btn:           'E-mel',
         dash_comment_btn:         'Ulasan',
@@ -9506,6 +9727,7 @@ function setLang(lang) {
     if (typeof renderMaintPctTracker === 'function') renderMaintPctTracker();
     if (typeof renderChemUsageTracker === 'function') renderChemUsageTracker();
     if (typeof renderRainfallChart  === 'function') renderRainfallChart();
+    if (typeof renderSeedlingPlantingChart === 'function') renderSeedlingPlantingChart();
     if (typeof renderRainfallReport  === 'function') renderRainfallReport();
     if (typeof renderRainfallSummary === 'function') renderRainfallSummary();
     if (typeof renderFertRecord === 'function') renderFertRecord();
