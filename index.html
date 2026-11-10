@@ -223,6 +223,34 @@
         /* Green theme — Tailwind green classes now use natural green values */
         .focus\:ring-green-600:focus,.focus\:ring-green-500:focus{--tw-ring-color:rgba(46,125,50,.2)!important}
 
+        /* ── Management Report (Penilaian Prestasi Ladang) ── */
+        .mr-toolbar { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+        .mr-print-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:10px; border:1px solid #CBD5E1; background:#fff; color:#0F172A; font-size:13px; font-weight:600; cursor:pointer; }
+        .mr-print-btn:hover { background:#F1F5F9; }
+        .mr-sheet { background:#fff; border:1px solid #E2E8F0; border-radius:14px; padding:22px 22px 18px; box-shadow:0 1px 3px rgba(0,0,0,.06); font-family:"Times New Roman", Times, serif; color:#111; }
+        .mr-head { text-align:center; }
+        .mr-head .mr-company { font-size:22px; font-weight:700; letter-spacing:.02em; }
+        .mr-head .mr-title { font-size:14px; font-weight:700; text-decoration:underline; margin-top:2px; }
+        .mr-meta { display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:6px 16px; font-size:12.5px; font-weight:700; margin:12px 0 6px; }
+        .mr-section { text-align:center; font-size:13px; font-weight:700; text-decoration:underline; margin:4px 0 10px; }
+        .mr-grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; }
+        @media (max-width: 900px) { .mr-grid { grid-template-columns:1fr; } }
+        .mr-card { border:1px solid #CBD5E1; border-radius:4px; padding:10px 10px 6px; background:#fff; break-inside:avoid; page-break-inside:avoid; }
+        .mr-card h4 { text-align:center; font-size:17px; font-weight:400; color:#555; margin:0; font-family:"Times New Roman", Times, serif; }
+        .mr-card .mr-sub { text-align:center; font-size:12px; color:#888; margin:2px 0 0; }
+        .mr-card .mr-canvas { position:relative; height:240px; margin-top:6px; }
+        .mr-notes { display:flex; flex-wrap:wrap; gap:4px 40px; font-size:11.5px; margin-top:10px; }
+        .mr-empty { padding:30px; text-align:center; color:#64748B; font-family:Inter, sans-serif; }
+        @media print {
+            body.mr-printing #dashboard { display:none !important; }
+            body.mr-printing #mgmtreport.page-section { display:block !important; }
+            body.mr-printing .mr-toolbar { display:none !important; }
+            body.mr-printing .mr-sheet { border:0; box-shadow:none; padding:0; }
+            body.mr-printing .mr-grid { grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
+            body.mr-printing .mr-card .mr-canvas { height:200px; }
+            body.mr-printing { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+        }
+
         /* ── Print styles ── */
         @media print {
             /* Hide all chrome — sidebar, top bar, other page sections */
@@ -3240,19 +3268,16 @@
             </div>
         </section>
 
-        <!-- ============ MANAGEMENT REPORT (central place for all operation reports) ============ -->
+        <!-- ============ MANAGEMENT REPORT (Penilaian Prestasi Ladang dashboard) ============ -->
         <section id="mgmtreport" class="page-section">
-            <h2 class="text-3xl font-bold mb-2" data-i18n="page_mgmtreport">📊 Management Report</h2>
-            <p class="text-sm text-green-700 mb-6" data-i18n="page_mgmtreport_sub">One place for every operation report.</p>
-            <div class="bg-white p-6 rounded-xl shadow mb-6">
-                <h3 class="text-lg font-bold text-green-900 mb-1" data-i18n="mgmtreport_src_this">Plantation Stock &amp; Field Operations</h3>
-                <p class="text-xs text-gray-500 mb-4" data-i18n="mgmtreport_src_this_sub">Reports from this system.</p>
-                <div id="mgmtReportLinks" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;"></div>
+            <div class="mr-toolbar">
+                <div>
+                    <h2 class="text-3xl font-bold" data-i18n="page_mgmtreport">📊 Management Report</h2>
+                    <p class="text-sm text-green-700" data-i18n="page_mgmtreport_sub">Estate performance evaluation, month by month.</p>
+                </div>
+                <button type="button" class="mr-print-btn" onclick="printMgmtReport()">&#128424; <span data-i18n="mgmtreport_print">Print / PDF</span></button>
             </div>
-            <div class="bg-white p-6 rounded-xl shadow">
-                <h3 class="text-lg font-bold text-green-900 mb-1" data-i18n="mgmtreport_src_other">Other systems</h3>
-                <p class="text-sm text-gray-500" data-i18n="mgmtreport_src_other_sub">Reports from other operation systems will appear here once they are connected.</p>
-            </div>
+            <div id="mgmtReportSheet" class="mr-sheet"></div>
         </section>
 
         <!-- ============ PAGE 12: USER MANAGEMENT (Super Admin only) ============ -->
@@ -8595,11 +8620,8 @@ const I18N = {
         sb_lbl_mgmtreport:        'Management Report',
         home_card_mgmtreport:     'Management Report',
         page_mgmtreport:          '📊 Management Report',
-        page_mgmtreport_sub:      'One place for every operation report.',
-        mgmtreport_src_this:      'Plantation Stock & Field Operations',
-        mgmtreport_src_this_sub:  'Reports from this system.',
-        mgmtreport_src_other:     'Other systems',
-        mgmtreport_src_other_sub: 'Reports from other operation systems will appear here once they are connected.',
+        page_mgmtreport_sub:      'Estate performance evaluation, month by month.',
+        mgmtreport_print:         'Print / PDF',
         page_tools:               '🔧 Tools Transactions',
         page_tools_sub:           'Record tools issued and received at the store.',
         page_toolsrecord:         '📋 Tools Record',
@@ -9081,11 +9103,8 @@ const I18N = {
         sb_lbl_mgmtreport:        'Laporan Pengurusan',
         home_card_mgmtreport:     'Laporan Pengurusan',
         page_mgmtreport:          '📊 Laporan Pengurusan',
-        page_mgmtreport_sub:      'Satu tempat untuk semua laporan operasi.',
-        mgmtreport_src_this:      'Stok Ladang & Operasi Lapangan',
-        mgmtreport_src_this_sub:  'Laporan daripada sistem ini.',
-        mgmtreport_src_other:     'Sistem lain',
-        mgmtreport_src_other_sub: 'Laporan daripada sistem operasi lain akan dipaparkan di sini selepas disambungkan.',
+        page_mgmtreport_sub:      'Penilaian prestasi ladang, bulan demi bulan.',
+        mgmtreport_print:         'Cetak / PDF',
         page_tools:               '🔧 Transaksi Peralatan',
         page_tools_sub:           'Rekod peralatan yang dikeluarkan dan diterima di stor.',
         page_toolsrecord:         '📋 Rekod Peralatan',
@@ -15972,29 +15991,232 @@ function exitMobilePreview() {
 }
 
 // ── Management Report ────────────────────────────────────────────────
-// Central place for all operation reports. For now it links to the
-// reports inside this system; reports from other systems are added later.
-const MGMT_REPORT_SOURCES = [
-    { id: 'dashboard',      key: 'sb_lbl_dashboard',       label: 'Dashboard',               icon: '📊' },
-    { id: 'ledger',         key: 'sb_lbl_ledger',          label: 'Stock Summary',           icon: '📒' },
-    { id: 'fertrecord',     key: 'sb_lbl_fertrecord',      label: 'Fertilizer Application',  icon: '📋' },
-    { id: 'chemrecord',     key: 'sb_lbl_chemrecord',      label: 'Chemical Application',    icon: '⚗️' },
-    { id: 'plantrecord',    key: 'sb_lbl_plantrecord',     label: 'Field Planting Record',   icon: '🌱' },
-    { id: 'rainfallreport', key: 'sb_lbl_rainfallreport',  label: 'Monthly Rainfall Record', icon: '🌧️' },
-    { id: 'toolsrecord',    key: 'sb_lbl_toolsrecord',     label: 'Tools Record',            icon: '🔧' },
-];
+// ===================================================================
+// MANAGEMENT REPORT — "Penilaian Prestasi Ladang" dashboard
+// One sheet per estate and report month: header, 13 monthly charts in two
+// columns, footnotes. Everything on the sheet comes from MGMT_REPORT_DATA.
+// For now the numbers are the October 2026 Sungai Mak figures; later this
+// object is filled from the Mantap / Stock data instead of being typed here.
+// ===================================================================
+const MR_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MR_COLORS = {
+    y25blue: '#C9DAF8', y26yellow: '#FFD966', target: '#FF0000', pink25: '#F4CCCC',
+    rain25: '#3C78D8', round2: '#FCE5CD', open: '#FF0000', closed: '#B6D7A8', pending: '#FFD966', blue: '#3C78D8',
+};
+const _ = null; // month with no figure yet
+
+const MGMT_REPORT_DATA = {
+    company: 'SUNGAI MAK PLANTATION SDN BHD',
+    title: 'PENILAIAN PRESTASI LADANG (OKTOBER 2026)',
+    totalArea: 'Total Area: 118.28 Ha (based on Drone Nov 2025)',
+    section: 'OPERASI LADANG',
+    year: 2026,
+    notes: ['* Pusingan extra untuk blok 4 sahaja', '* Infilling - 46 Kes', '* Ganoderma - 11 Kes',
+            "Mar'26: 38 unsatisfactory bunches penalty waived as per management instruction."],
+    charts: [
+        { title: 'Jumlah Baja Ditabur', yLabel: 'kg / pokok', yMax: 10, step: 2,
+          series: [
+            { type: 'line', label: 'Sasaran', color: MR_COLORS.target, dashed: true, labelPos: 'above',
+              data: [0, 2, 2, 2, 2, 4, 4, 6, 6, 8, 8, 8] },
+            { type: 'line', label: 'Pencapaian', color: '#E6B400', fill: 'rgba(255,217,102,.45)', labelPos: 'above', labelColor: '#E69138',
+              data: [0, 0, 0, 2, 2, 4, 4, 4, 6, 8, _, _] },
+          ] },
+        { title: 'Jumlah Penombak', yLabel: 'Orang', yMax: 15, step: 5,
+          series: [
+            { type: 'bar', label: '2025', color: MR_COLORS.y25blue, data: [6, 6, 6, 6, 7, 6, 6, 8, 6, 6, 7, 15] },
+            { type: 'bar', label: '2026', color: MR_COLORS.y26yellow, data: [10, 8, 10, 10, 10, 9, 9, 9, 9, 9, _, _] },
+            { type: 'line', label: 'Sasaran', color: MR_COLORS.target, dashed: true, labelPos: 'above', data: [6,6,6,6,6,6,6,6,6,6,6,6] },
+          ] },
+        { title: 'Produktiviti Penombak (MT/Hari)', yLabel: 'MT / Hari', yMax: 3, step: 1, decimals: 2,
+          series: [
+            { type: 'bar', label: 'Pencapaian', color: MR_COLORS.y26yellow, data: [1.22, 1.06, 0.79, 1.16, 1.09, 1.10, 1.19, 1.12, 1.72, 1.37, _, _] },
+            { type: 'line', label: 'Sasaran', color: MR_COLORS.target, dashed: true, labelPos: 'above', decimals: 1, data: [2.3,2.3,2.3,2.3,2.3,2.3,2.3,2.3,2.3,2.3,2.3,2.3] },
+          ] },
+        { title: 'Hasil FFB Bulanan', yLabel: 'MT', yMax: 450, step: 50,
+          series: [
+            { type: 'bar', label: '2025', color: MR_COLORS.pink25, data: [223, 263, 333, 351, 306, 263, 199, 276, 333, 363, 361, 419] },
+            { type: 'bar', label: '2026', color: MR_COLORS.y26yellow, labelPos: 'middle', data: [316, 221, 206, 301, 282, 256, 280, 263, 403, 320, _, _] },
+          ] },
+        { title: 'Kumulatif Hasil FFB', yLabel: 'MT', yMax: 4500, step: 750,
+          series: [
+            { type: 'bar', label: '2025', color: MR_COLORS.y25blue, data: [223, 486, 819, 1170, 1475, 1738, 1937, 2213, 2546, 2909, 3270, 3688] },
+            { type: 'bar', label: '2026', color: MR_COLORS.y26yellow, labelPos: 'middle', data: [316, 537, 743, 1044, 1326, 1583, 1862, 2126, 2528, 2848, _, _] },
+            { type: 'line', label: 'Sasaran', color: MR_COLORS.target, dashed: true, stepped: true, fill: 'rgba(255,0,0,.22)', noPoints: true, labelPos: 'above',
+              data: [229, 499, 841, 1201, 1515, 1785, 1989, 2272, 2614, 2986, 3356, 3786] },
+          ] },
+        { title: 'Grading Buah (%)', yLabel: '%', yMax: 100, step: 25, percent: true, decimals: 2,
+          series: [
+            { type: 'bar', label: '2025', color: MR_COLORS.pink25, data: [100, 100, 99.77, 99.54, 99.74, 99.82, 99.83, 99.78, 99.68, 99.91, 99.92, 99.96] },
+            { type: 'bar', label: '2026', color: MR_COLORS.y26yellow, labelPos: 'middle', data: [99.98, 99.92, 99.69, 99.95, 99.96, 99.89, 99.90, 99.85, 99.86, 99.83, _, _] },
+          ] },
+        { title: 'Kumulatif Hasil Sehektar (MT/Ha)', yLabel: 'MT / Ha', yMax: 40, step: 5, decimals: 2,
+          series: [
+            { type: 'bar', label: '2025', color: MR_COLORS.y25blue, data: [1.88, 4.14, 6.93, 9.89, 12.47, 14.70, 16.38, 18.71, 21.53, 24.59, 27.64, 31.18] },
+            { type: 'bar', label: '2026', color: MR_COLORS.y26yellow, labelPos: 'middle', data: [2.67, 4.54, 6.28, 8.83, 11.21, 13.38, 15.75, 17.97, 21.37, 24.08, _, _] },
+            { type: 'line', label: 'Sasaran', color: MR_COLORS.target, dashed: true, stepped: true, fill: 'rgba(255,0,0,.22)', noPoints: true, labelPos: 'above',
+              data: [1.94, 4.22, 7.11, 10.15, 12.81, 15.09, 16.82, 19.21, 22.10, 25.25, 28.37, 32.01] },
+          ] },
+        { title: 'Penanaman Anak Sawit', yLabel: 'Bibit', yMax: 1000, step: 250,
+          series: [
+            { type: 'bar', label: 'Pencapaian', color: MR_COLORS.y26yellow, data: [50, 0, 26, 1, 73, 90, 236, 74, 120, 180, _, _] },
+            { type: 'line', label: 'Pencapaian (Kumulative)', color: MR_COLORS.blue, labelPos: 'above', data: [50, 50, 76, 77, 150, 240, 476, 550, 670, 850, _, _] },
+          ] },
+        { title: 'Hujan', yLabel: 'mm', yMax: 800, step: 200,
+          series: [
+            { type: 'bar', label: '2025', color: MR_COLORS.rain25, labelColor: '#fff', data: [635, 266, 230, 218, 105, 241, 89, 333, 281, 333, 190, 234] },
+            { type: 'bar', label: '2026', color: MR_COLORS.y26yellow, data: [593, 200, 41, 74, 284, 272, 305, 163, 277, 248, _, _] },
+          ] },
+        { title: 'Penyelenggaraan Ladang', subtitle: 'Pusingan 1-3 (Blanket Spray)', yLabel: '%', yMax: 100, step: 25, percent: true,
+          series: [
+            { type: 'bar', label: 'Pusingan 1, 3', color: MR_COLORS.y26yellow, data: [27, 93, 100, _, 33, _, _, 33, 100, _, _, _] },
+            { type: 'bar', label: 'Pusingan 2, Extra', color: MR_COLORS.round2, data: [_, _, _, _, _, 69, 100, _, _, 7, _, _] },
+            { type: 'bar', label: 'Sasaran (%)', color: 'rgba(255,0,0,.3)', border: MR_COLORS.target, dashedBar: true, labelColor: MR_COLORS.target, labelPos: 'top', wide: true,
+              data: [100, _, _, _, 100, _, _, _, 100, _, _, _] },
+          ] },
+        { title: 'Penyelenggaraan Ladang', subtitle: 'Pusingan 1-2 (Selective Slashing)', yLabel: '%', yMax: 100, step: 25, percent: true,
+          series: [
+            { type: 'bar', label: 'Pusingan 1', color: MR_COLORS.y26yellow, data: [_, _, 7, 64, 100, _, _, _, _, _, _, _] },
+            { type: 'bar', label: 'Pusingan 2', color: MR_COLORS.round2, data: [_, _, _, _, _, _, 31, 64, _, _, _, _] },
+            { type: 'bar', label: 'Sasaran (%)', color: 'rgba(255,0,0,.3)', border: MR_COLORS.target, dashedBar: true, labelColor: MR_COLORS.target, labelPos: 'top', wide: true,
+              data: [_, _, 100, _, _, _, 100, _, _, _, _, _] },
+          ] },
+        { title: 'Kes CARLOS', yLabel: 'Jumlah Kes', yMax: 400, step: 100,
+          series: [
+            { type: 'bar', label: 'Buka', color: MR_COLORS.open, labelColor: MR_COLORS.target, labelPos: 'top', data: [51, 10, 32, 19, 73, 137, 259, 150, 85, 171, _, _] },
+            { type: 'bar', label: 'Tutup', color: MR_COLORS.closed, labelPos: 'middle', data: [49, 5, 28, 8, 76, 87, 318, 99, 124, 132, _, _] },
+            { type: 'bar', label: 'Belum', color: MR_COLORS.pending, data: [5, 10, 14, 25, 22, 72, 13, 64, 25, 64, _, _] },
+          ] },
+        { title: 'Penalti Isu kepada Penombak (2026)', yLabel: 'RM', yMax: 1000, step: 250,
+          series: [
+            { type: 'bar', label: 'Jumlah Penalti', color: MR_COLORS.y26yellow, labelPos: 'top', data: [50, 250, 0, 250, 225, 300, 375, 550, 750, 925, _, _] },
+            { type: 'line', label: 'Jumlah Downgraded FFB (Bunch)', color: MR_COLORS.blue, labelPos: 'above', data: [2, 10, 0, 10, 9, 12, 15, 22, 30, 37, _, _] },
+          ] },
+    ],
+};
+
+// Draws the figure on every bar / point, like the printed report.
+const mrValueLabels = {
+    id: 'mrValueLabels',
+    afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        chart.data.datasets.forEach((ds, di) => {
+            const meta = chart.getDatasetMeta(di);
+            if (meta.hidden) return;
+            const cfg = ds._mr || {};
+            const fmt = (v) => {
+                const n = cfg.decimals != null ? Number(v).toFixed(cfg.decimals) : Number(v).toLocaleString('en-US');
+                return cfg.percent ? n + '%' : n;
+            };
+            ctx.save();
+            ctx.font = (cfg.isLine ? 'bold 11px' : 'bold 10.5px') + ' "Times New Roman", serif';
+            ctx.textAlign = 'center';
+            meta.data.forEach((el, i) => {
+                const v = ds.data[i];
+                if (v == null) return;
+                const text = fmt(v);
+                let x = el.x, y;
+                if (cfg.isLine) {
+                    if (cfg.noPoints && i > 0 && ds.data[i - 1] === v) return; // stepped target: label once per level
+                    y = el.y - 6; ctx.textBaseline = 'bottom';
+                } else if (cfg.labelPos === 'top') {
+                    y = el.y - 4; ctx.textBaseline = 'bottom';
+                } else if (cfg.labelPos === 'middle') {
+                    y = (el.y + el.base) / 2; ctx.textBaseline = 'middle';
+                } else {
+                    y = el.base - 6; ctx.textBaseline = 'bottom';
+                    if (el.base - el.y < 18) { y = el.y - 4; }
+                }
+                if (!cfg.isLine && cfg.labelPos !== 'top') {
+                    const w = ctx.measureText(text).width + 8;
+                    ctx.fillStyle = cfg.labelColor === '#fff' ? 'rgba(0,0,0,0)' : 'rgba(255,255,255,.85)';
+                    const by = ctx.textBaseline === 'middle' ? y - 8 : y - 14;
+                    ctx.beginPath(); ctx.roundRect(x - w / 2, by, w, 16, 4); ctx.fill();
+                }
+                ctx.fillStyle = cfg.labelColor || (cfg.isLine ? ds.borderColor : '#111');
+                ctx.fillText(text, x, y);
+            });
+            ctx.restore();
+        });
+    },
+};
+
+let _mrCharts = [];
+
+function mgmtReportData() {
+    // Later: build this from the Mantap / Stock figures for the chosen estate and month.
+    return MGMT_REPORT_DATA;
+}
 
 function renderMgmtReport() {
-    const box = document.getElementById('mgmtReportLinks');
-    if (!box) return;
-    const session = loadSession();
-    const d = (typeof I18N !== 'undefined' && I18N[currentLang]) || {};
-    const items = MGMT_REPORT_SOURCES.filter(r =>
-        !session || session.role === 'superadmin' || getSectionAccess(session, r.id) !== 'none');
-    box.innerHTML = items.length ? items.map(r =>
-        '<button onclick="navigateToSection(\'' + r.id + '\')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #BBF7D0;border-radius:10px;background:#F0FDF4;color:#14532D;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;text-align:left;">' +
-        '<span style="font-size:18px;">' + r.icon + '</span><span data-i18n="' + r.key + '">' + (d[r.key] || r.label) + '</span></button>'
-    ).join('') : '<p class="text-sm text-gray-400 italic">—</p>';
+    const sheet = document.getElementById('mgmtReportSheet');
+    if (!sheet) return;
+    _mrCharts.forEach((c) => { try { c.destroy(); } catch (e) {} });
+    _mrCharts = [];
+    const R = mgmtReportData();
+    if (!R || !R.charts || !R.charts.length) {
+        sheet.innerHTML = '<p class="mr-empty">No report data yet.</p>';
+        return;
+    }
+    const esc = (t) => String(t == null ? '' : t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    sheet.innerHTML =
+        '<div class="mr-head"><div class="mr-company">' + esc(R.company) + '</div><div class="mr-title">' + esc(R.title) + '</div></div>' +
+        '<div class="mr-meta"><span>' + esc(R.totalArea) + '</span></div>' +
+        (R.section ? '<div class="mr-section">' + esc(R.section) + '</div>' : '') +
+        '<div class="mr-grid">' + R.charts.map((c, i) =>
+            '<div class="mr-card"><h4>' + esc(c.title) + '</h4>' + (c.subtitle ? '<p class="mr-sub">' + esc(c.subtitle) + '</p>' : '') +
+            '<div class="mr-canvas"><canvas id="mrChart' + i + '"></canvas></div></div>').join('') + '</div>' +
+        (R.notes && R.notes.length ? '<div class="mr-notes">' + R.notes.map((n) => '<span>' + esc(n) + '</span>').join('') + '</div>' : '');
+    if (typeof Chart === 'undefined') return;
+    R.charts.forEach((c, i) => {
+        const canvas = document.getElementById('mrChart' + i);
+        if (!canvas) return;
+        const datasets = c.series.map((sr) => {
+            const isLine = sr.type === 'line';
+            const base = {
+                label: sr.label, data: sr.data, order: isLine ? 0 : 1,
+                _mr: { isLine, decimals: sr.decimals != null ? sr.decimals : c.decimals, percent: !!c.percent, labelPos: sr.labelPos, labelColor: sr.labelColor, noPoints: sr.noPoints },
+            };
+            if (isLine) return Object.assign(base, {
+                type: 'line', borderColor: sr.color, borderWidth: 2, borderDash: sr.dashed ? [6, 4] : [],
+                pointRadius: sr.noPoints ? 0 : 4, pointHoverRadius: 5, pointBackgroundColor: sr.color, pointBorderColor: sr.color,
+                stepped: sr.stepped ? 'middle' : false, tension: 0, spanGaps: false,
+                fill: sr.fill ? 'origin' : false, backgroundColor: sr.fill || sr.color,
+            });
+            return Object.assign(base, {
+                type: 'bar', backgroundColor: sr.color, borderColor: sr.border || 'rgba(0,0,0,.35)', borderWidth: sr.dashedBar ? 0 : 1,
+                borderRadius: 3, borderSkipped: 'bottom', categoryPercentage: 0.78, barPercentage: sr.wide ? 1.9 : 0.9, grouped: !sr.wide,
+            });
+        });
+        _mrCharts.push(new Chart(canvas, {
+            type: 'bar',
+            data: { labels: MR_MONTHS, datasets },
+            plugins: [mrValueLabels],
+            options: {
+                responsive: true, maintainAspectRatio: false, animation: false,
+                layout: { padding: { top: 14 } },
+                interaction: { mode: 'index', intersect: false },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { family: '"Times New Roman", serif', size: 11 }, color: '#111' } },
+                    y: { beginAtZero: true, max: c.yMax, ticks: { stepSize: c.step, font: { family: '"Times New Roman", serif', size: 11 }, color: '#111',
+                         callback: (v) => c.percent ? v + '%' : (c.decimals === 2 && c.yMax <= 40 ? Number(v).toFixed(2) : Number(v).toLocaleString('en-US')) },
+                         title: { display: !!c.yLabel, text: c.yLabel, font: { family: '"Times New Roman", serif', size: 12 }, color: '#111' },
+                         grid: { color: '#D9D9D9' } },
+                },
+                plugins: {
+                    legend: { position: 'bottom', labels: { sort: (a, b) => a.datasetIndex - b.datasetIndex, boxWidth: 12, boxHeight: 12, font: { family: '"Times New Roman", serif', size: 12 }, color: '#111',
+                              usePointStyle: false }, onClick: null },
+                    tooltip: { callbacks: { label: (t) => ' ' + t.dataset.label + ': ' + (t.raw == null ? '-' : t.raw) + (c.percent ? '%' : '') } },
+                },
+            },
+        }));
+    });
+}
+
+function printMgmtReport() {
+    document.body.classList.add('mr-printing');
+    const done = () => document.body.classList.remove('mr-printing');
+    window.addEventListener('afterprint', done, { once: true });
+    setTimeout(() => { window.print(); setTimeout(done, 1500); }, 50);
 }
 
 function navigateToSection(target) {
