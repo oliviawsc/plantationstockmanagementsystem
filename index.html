@@ -1113,7 +1113,7 @@
 <!-- ================================================================
      AUTH OVERLAY
      ================================================================ -->
-<div id="authOverlay" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;overflow-y:auto;background:linear-gradient(160deg,#F0FDF4 0%,#F8FAFC 45%,#EFF6FF 75%,#F8FAFC 100%);">
+<div id="authOverlay" style="position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;overflow-y:auto;background:linear-gradient(160deg,#F0FDF4 0%,#F8FAFC 45%,#EFF6FF 75%,#F8FAFC 100%);">
 
     <!-- Faint palm leaf silhouettes in corners -->
     <div class="palm-corner" style="top:0;left:0;width:260px;height:260px;">
@@ -1609,15 +1609,36 @@
         <section id="dashboard" class="page-section">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
                 <h2 class="text-3xl font-bold" data-i18n="nav_dashboard">Dashboard</h2>
-                <button id="dashPrintBtn" onclick="printDashboard()"
-                    style="display:flex;align-items:center;gap:7px;padding:8px 18px;background:linear-gradient(135deg,#2E7D32,#43A047);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(46,125,50,.25);transition:filter .13s;"
-                    onmouseover="this.style.filter='brightness(1.07)'" onmouseout="this.style.filter='none'">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
-                    </svg>
-                    Print
-                </button>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                    <button id="dashEmailBtn" onclick="openEmailDashModal()"
+                        style="display:flex;align-items:center;gap:7px;padding:8px 18px;background:linear-gradient(135deg,#1D4ED8,#2563EB);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(29,78,216,.25);transition:filter .13s;"
+                        onmouseover="this.style.filter='brightness(1.07)'" onmouseout="this.style.filter='none'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                        <span data-i18n="dash_email_btn">Email</span>
+                    </button>
+                    <button id="dashCommentBtn" onclick="toggleDashComments()"
+                        style="display:flex;align-items:center;gap:7px;padding:8px 18px;background:linear-gradient(135deg,#7C3AED,#9333EA);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(124,58,237,.25);transition:filter .13s;"
+                        onmouseover="this.style.filter='brightness(1.07)'" onmouseout="this.style.filter='none'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        <span data-i18n="dash_comment_btn">Comments</span>
+                    </button>
+                    <button id="dashPrintBtn" onclick="printDashboard()"
+                        style="display:flex;align-items:center;gap:7px;padding:8px 18px;background:linear-gradient(135deg,#2E7D32,#43A047);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(46,125,50,.25);transition:filter .13s;"
+                        onmouseover="this.style.filter='brightness(1.07)'" onmouseout="this.style.filter='none'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+                        </svg>
+                        Print
+                    </button>
+                </div>
             </div>
+            <!-- flex wrapper: main content + comment panel -->
+            <div id="dashContentWrap" style="display:flex;gap:20px;align-items:flex-start;">
+            <div id="dashMainContent" style="flex:1;min-width:0;">
 
 
             <!-- Dashboard As at Date Filter -->
@@ -1721,6 +1742,96 @@
                     <canvas id="rainfallChartCanvas"></canvas>
                 </div>
             </div>
+
+            <!-- Seedling Planting Mixed Chart -->
+            <div class="bg-white rounded-xl shadow mt-6" style="overflow:hidden;">
+                <div style="background:linear-gradient(135deg,#064E3B 0%,#059669 100%);padding:20px 24px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                    <div>
+                        <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 2px;" data-i18n="dash_seedling_plant_title">🌱 Field Planting</h3>
+                        <p style="color:#A7F3D0;font-size:11.5px;margin:0;" data-i18n="dash_seedling_plant_sub">Monthly planting vs cumulative — Oil Palm Seedling Out transactions</p>
+                    </div>
+                    <select id="seedlingPlantYear" onchange="renderSeedlingPlantingChart()"
+                        style="background:rgba(255,255,255,.18);color:#fff;border:1.5px solid rgba(255,255,255,.35);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;font-family:Inter,sans-serif;cursor:pointer;outline:none;">
+                    </select>
+                </div>
+                <p id="seedlingPlantEmpty" class="hidden" style="text-align:center;color:#94A3B8;padding:40px 0;font-size:13px;" data-i18n="dash_seedling_plant_empty">No seedling planting records yet.</p>
+                <div id="seedlingPlantWrap" style="padding:16px 24px 24px;position:relative;height:300px;">
+                    <canvas id="seedlingPlantCanvas"></canvas>
+                </div>
+            </div>
+
+            </div><!-- /dashMainContent -->
+
+            <!-- ══ COMMENT PANEL ══════════════════════════════════════════════ -->
+            <div id="dashCommentPanel" style="display:none;width:320px;flex-shrink:0;background:#fff;border-radius:14px;box-shadow:0 4px 24px rgba(124,58,237,.12);border:1.5px solid #EDE9FE;overflow:hidden;font-family:Inter,sans-serif;">
+                <div style="background:linear-gradient(135deg,#7C3AED,#9333EA);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span style="color:#fff;font-size:14px;font-weight:700;" data-i18n="dash_comment_title">Comments</span>
+                        <span id="dashCommentCount" style="background:rgba(255,255,255,.25);color:#fff;border-radius:99px;padding:1px 8px;font-size:11px;font-weight:700;"></span>
+                    </div>
+                    <button onclick="toggleDashComments()" style="background:rgba(255,255,255,.18);border:none;border-radius:6px;padding:4px 7px;cursor:pointer;color:#fff;font-size:14px;line-height:1;" title="Close">✕</button>
+                </div>
+                <!-- Comment list -->
+                <div id="dashCommentList" style="max-height:420px;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;">
+                    <p id="dashCommentEmpty" style="text-align:center;color:#9CA3AF;font-size:13px;padding:24px 0;" data-i18n="dash_comment_empty">No comments yet.</p>
+                </div>
+                <!-- Add comment -->
+                <div style="padding:12px 14px;border-top:1px solid #EDE9FE;">
+                    <textarea id="dashCommentInput" placeholder="Write a comment…" rows="3"
+                        style="width:100%;box-sizing:border-box;border:1.5px solid #DDD6FE;border-radius:8px;padding:9px 11px;font-size:13px;font-family:Inter,sans-serif;resize:vertical;outline:none;transition:border-color .15s;"
+                        onfocus="this.style.borderColor='#7C3AED'" onblur="this.style.borderColor='#DDD6FE'"
+                        data-i18n-placeholder="dash_comment_placeholder"></textarea>
+                    <button onclick="submitDashComment()"
+                        style="margin-top:8px;width:100%;padding:9px;background:linear-gradient(135deg,#7C3AED,#9333EA);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;font-family:Inter,sans-serif;cursor:pointer;transition:filter .13s;"
+                        onmouseover="this.style.filter='brightness(1.08)'" onmouseout="this.style.filter='none'">
+                        <span data-i18n="dash_comment_submit">Post Comment</span>
+                    </button>
+                </div>
+            </div>
+            <!-- /comment panel -->
+
+            </div><!-- /dashContentWrap -->
+
+            <!-- ══ EMAIL MODAL ════════════════════════════════════════════════ -->
+            <div id="dashEmailModal" style="display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:16px;" onclick="if(event.target===this)closeEmailDashModal()">
+                <div style="background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.18);width:100%;max-width:480px;max-height:90vh;overflow-y:auto;font-family:Inter,sans-serif;">
+                    <div style="background:linear-gradient(135deg,#1D4ED8,#2563EB);padding:20px 24px;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between;">
+                        <div style="display:flex;align-items:center;gap:9px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            <span style="color:#fff;font-size:15px;font-weight:700;" data-i18n="dash_email_modal_title">Email Dashboard</span>
+                        </div>
+                        <button onclick="closeEmailDashModal()" style="background:rgba(255,255,255,.18);border:none;border-radius:6px;padding:4px 9px;cursor:pointer;color:#fff;font-size:15px;line-height:1;">✕</button>
+                    </div>
+                    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:16px;">
+                        <!-- Recipients -->
+                        <div>
+                            <label style="font-size:12px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.04em;" data-i18n="dash_email_to_label">Send To (Managers)</label>
+                            <div id="dashEmailRecipientList" style="margin-top:8px;display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto;border:1.5px solid #E5E7EB;border-radius:8px;padding:8px 10px;">
+                                <p style="color:#9CA3AF;font-size:13px;" id="dashEmailRecipientsLoading">Loading managers…</p>
+                            </div>
+                        </div>
+                        <!-- Custom message -->
+                        <div>
+                            <label style="font-size:12px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.04em;" data-i18n="dash_email_msg_label">Message (optional)</label>
+                            <textarea id="dashEmailMsg" rows="3" placeholder="Add a note to the email…"
+                                style="margin-top:6px;width:100%;box-sizing:border-box;border:1.5px solid #E5E7EB;border-radius:8px;padding:9px 11px;font-size:13px;font-family:Inter,sans-serif;resize:vertical;outline:none;transition:border-color .15s;"
+                                onfocus="this.style.borderColor='#2563EB'" onblur="this.style.borderColor='#E5E7EB'"></textarea>
+                        </div>
+                        <p style="font-size:11.5px;color:#6B7280;" data-i18n="dash_email_note">This will open your email app with the dashboard link pre-filled.</p>
+                        <div style="display:flex;gap:10px;justify-content:flex-end;">
+                            <button onclick="closeEmailDashModal()"
+                                style="padding:9px 20px;background:#F3F4F6;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;color:#374151;"
+                                data-i18n="dash_email_cancel">Cancel</button>
+                            <button onclick="sendDashboardEmail()"
+                                style="padding:9px 20px;background:linear-gradient(135deg,#1D4ED8,#2563EB);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;font-family:Inter,sans-serif;cursor:pointer;transition:filter .13s;"
+                                onmouseover="this.style.filter='brightness(1.08)'" onmouseout="this.style.filter='none'"
+                                data-i18n="dash_email_send">Send Email</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /email modal -->
 
         </section>
 
@@ -6428,6 +6539,7 @@ function renderDashboard() {
     renderMaintPctTracker();
     renderChemUsageTracker();
     renderRainfallChart();
+    renderSeedlingPlantingChart();
 }
 
 
@@ -7259,11 +7371,356 @@ function renderRainfallChart() {
 }
 
 /* -----------------------------------------------------------------
+   DASHBOARD — SEEDLING PLANTING MIXED CHART (bar + line)
+   ----------------------------------------------------------------- */
+var seedlingPlantChartInstance = null;
+
+function renderSeedlingPlantingChart() {
+    var empty  = document.getElementById('seedlingPlantEmpty');
+    var wrap   = document.getElementById('seedlingPlantWrap');
+    var canvas = document.getElementById('seedlingPlantCanvas');
+    var yearSel = document.getElementById('seedlingPlantYear');
+    if (!empty || !wrap || !canvas || !yearSel) return;
+
+    if (seedlingPlantChartInstance) { seedlingPlantChartInstance.destroy(); seedlingPlantChartInstance = null; }
+
+    var d = I18N[currentLang] || I18N['en'];
+    var monthsShort = d.months_short || ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    // Collect all years from Oil Palm Seedling Out transactions
+    var seedlingIds = new Set(items.filter(function(i){ return i.category === 'Oil Palm Seedling'; }).map(function(i){ return String(i.id); }));
+    var plantTxns = transactions.filter(function(t){ return t.type === 'Out' && seedlingIds.has(String(t.itemId)) && t.date; });
+
+    var allYears = Array.from(new Set(plantTxns.map(function(t){ return t.date.slice(0,4); }))).sort();
+    var nowYear  = String(new Date().getFullYear());
+
+    // Populate year selector
+    var prevYear = yearSel.value;
+    yearSel.innerHTML = '';
+    if (allYears.length === 0) allYears = [nowYear];
+    if (!allYears.includes(nowYear)) allYears.push(nowYear);
+    allYears.sort().forEach(function(yr) {
+        var opt = document.createElement('option');
+        opt.value = yr; opt.textContent = yr;
+        if (yr === (prevYear || nowYear)) opt.selected = true;
+        yearSel.appendChild(opt);
+    });
+    var selYear = yearSel.value;
+
+    // Monthly totals for selected year
+    var monthly = new Array(12).fill(0);
+    plantTxns.forEach(function(t){
+        if (t.date.slice(0,4) !== selYear) return;
+        var mo = parseInt(t.date.slice(5,7), 10) - 1;
+        if (mo >= 0 && mo < 12) monthly[mo] += parseFloat(t.qty) || 0;
+    });
+
+    var hasData = monthly.some(function(v){ return v > 0; });
+    if (!hasData) {
+        empty.classList.remove('hidden');
+        wrap.style.display = 'none';
+        return;
+    }
+    empty.classList.add('hidden');
+    wrap.style.display = '';
+
+    // Cumulative
+    var cumulative = [];
+    var runSum = 0;
+    monthly.forEach(function(v){ runSum += v; cumulative.push(runSum || null); });
+
+    // Replace trailing nulls (months with no data yet) so line doesn't extend flat
+    for (var i = 11; i >= 0; i--) {
+        if (monthly[i] > 0) break;
+        cumulative[i] = null;
+    }
+
+    // Data-label plugin for both bar and line
+    var mixedLabelPlugin = {
+        id: 'seedlingPlantLabels',
+        afterDatasetsDraw: function(chart) {
+            var ctx = chart.ctx;
+            chart.data.datasets.forEach(function(dataset, di) {
+                var meta = chart.getDatasetMeta(di);
+                if (meta.hidden) return;
+                ctx.save();
+                ctx.font = 'bold 10px Inter,sans-serif';
+                ctx.textAlign = 'center';
+                if (di === 0) {
+                    // Bar labels — above each bar, gold text
+                    ctx.fillStyle = '#92400E';
+                    ctx.textBaseline = 'bottom';
+                    meta.data.forEach(function(bar, i) {
+                        var val = dataset.data[i];
+                        if (!val || val <= 0) return;
+                        ctx.fillText(Math.round(val), bar.x, bar.y - 3);
+                    });
+                } else {
+                    // Line labels — above each point, blue text
+                    ctx.fillStyle = '#1D4ED8';
+                    ctx.textBaseline = 'bottom';
+                    meta.data.forEach(function(pt, i) {
+                        var val = dataset.data[i];
+                        if (val == null || val <= 0) return;
+                        ctx.fillText(Math.round(val), pt.x, pt.y - 7);
+                    });
+                }
+                ctx.restore();
+            });
+        }
+    };
+
+    var labelMonthly    = d.dash_seedling_monthly    || 'Monthly';
+    var labelCumulative = d.dash_seedling_cumulative || 'Cumulative';
+
+    seedlingPlantChartInstance = new Chart(canvas, {
+        type: 'bar',
+        plugins: [mixedLabelPlugin],
+        data: {
+            labels: monthsShort,
+            datasets: [
+                {
+                    type: 'bar',
+                    label: labelMonthly,
+                    data: monthly,
+                    backgroundColor: 'rgba(234,179,8,0.75)',
+                    borderColor: 'rgba(161,120,0,0.9)',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    order: 2,
+                },
+                {
+                    type: 'line',
+                    label: labelCumulative,
+                    data: cumulative,
+                    borderColor: '#2563EB',
+                    backgroundColor: 'rgba(37,99,235,0.08)',
+                    borderWidth: 2.5,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#2563EB',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    tension: 0.3,
+                    fill: false,
+                    spanGaps: false,
+                    order: 1,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: { top: 24 } },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { size: 11 }, boxWidth: 14, padding: 14,
+                        generateLabels: function(chart) {
+                            return chart.data.datasets.map(function(ds, i) {
+                                var isLine = ds.type === 'line';
+                                return {
+                                    text: ds.label,
+                                    fillStyle:   isLine ? ds.borderColor : ds.backgroundColor,
+                                    strokeStyle: isLine ? ds.borderColor : ds.borderColor,
+                                    lineWidth:   isLine ? 2.5 : 0,
+                                    hidden: chart.getDatasetMeta(i).hidden,
+                                    datasetIndex: i,
+                                    pointStyle: isLine ? 'circle' : 'rect',
+                                };
+                            });
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            if (ctx.parsed.y == null) return null;
+                            return ctx.dataset.label + ': ' + Math.round(ctx.parsed.y);
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                y: {
+                    beginAtZero: true,
+                    ticks: { font: { size: 10 }, stepSize: 1,
+                        callback: function(v){ return Number.isInteger(v) ? v : ''; }
+                    },
+                    grid: { color: 'rgba(0,0,0,0.06)' },
+                    title: { display: true, text: d.dash_seedling_yaxis || 'Seedlings', font: { size: 10 }, color: '#6B7280' }
+                }
+            }
+        }
+    });
+}
+
+/* -----------------------------------------------------------------
    DASHBOARD PRINT
    ----------------------------------------------------------------- */
 function printDashboard() {
     // Give charts a moment to finish rendering before printing
     setTimeout(function() { window.print(); }, 150);
+}
+
+/* -----------------------------------------------------------------
+   DASHBOARD — EMAIL FUNCTION
+   ----------------------------------------------------------------- */
+function openEmailDashModal() {
+    var modal = document.getElementById('dashEmailModal');
+    modal.style.display = 'flex';
+    document.getElementById('dashEmailMsg').value = '';
+    // Load managers from opp_users (hq_user + superadmin roles)
+    var list = document.getElementById('dashEmailRecipientList');
+    list.innerHTML = '<p style="color:#9CA3AF;font-size:13px;">Loading managers…</p>';
+    supabaseClient.from('opp_users').select('name,email,role').in('role', ['superadmin','hq_user'])
+        .then(function(res) {
+            var users = (res.data || []);
+            if (users.length === 0) {
+                list.innerHTML = '<p style="color:#9CA3AF;font-size:13px;">No managers found in the system.</p>';
+                return;
+            }
+            list.innerHTML = users.map(function(u) {
+                var roleLabel = u.role === 'superadmin' ? 'Super Admin' : 'HQ User';
+                return '<label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:4px 2px;">'
+                    + '<input type="checkbox" class="dash-email-chk" value="' + u.email + '" checked '
+                    + 'style="width:15px;height:15px;accent-color:#2563EB;cursor:pointer;">'
+                    + '<span style="font-size:13px;font-weight:600;color:#1F2937;">' + (u.name || u.email) + '</span>'
+                    + '<span style="font-size:11px;color:#6B7280;margin-left:auto;">' + roleLabel + '</span>'
+                    + '</label>';
+            }).join('');
+        }).catch(function() {
+            list.innerHTML = '<p style="color:#EF4444;font-size:13px;">Failed to load managers.</p>';
+        });
+}
+
+function closeEmailDashModal() {
+    document.getElementById('dashEmailModal').style.display = 'none';
+}
+
+function sendDashboardEmail() {
+    var checked = Array.from(document.querySelectorAll('.dash-email-chk:checked')).map(function(c) { return c.value; });
+    if (checked.length === 0) { alert('Please select at least one recipient.'); return; }
+    var msg   = document.getElementById('dashEmailMsg').value.trim();
+    var sess  = loadSession();
+    var estate = (sess && sess.estate) ? sess.estate : 'Plantation';
+    var today = new Date().toLocaleDateString('en-MY', { day:'2-digit', month:'short', year:'numeric' });
+    var appUrl = window.location.href.split('?')[0];
+    var subject = encodeURIComponent('Dashboard Report — ' + estate + ' (' + today + ')');
+    var body = 'Dear Manager,\n\n' + (msg ? msg + '\n\n' : '')
+        + 'Please find the latest Dashboard for ' + estate + ' as at ' + today + '.\n\n'
+        + 'View dashboard: ' + appUrl + '\n\n'
+        + 'This email was sent via the Plantation Stock Management System.';
+    window.location.href = 'mailto:' + checked.join(',') + '?subject=' + subject + '&body=' + encodeURIComponent(body);
+    closeEmailDashModal();
+}
+
+/* -----------------------------------------------------------------
+   DASHBOARD — COMMENTS PANEL
+   ----------------------------------------------------------------- */
+var _dashCommentsOpen = false;
+
+function toggleDashComments() {
+    _dashCommentsOpen = !_dashCommentsOpen;
+    var panel = document.getElementById('dashCommentPanel');
+    var btn   = document.getElementById('dashCommentBtn');
+    panel.style.display = _dashCommentsOpen ? 'block' : 'none';
+    if (btn) {
+        btn.style.background = _dashCommentsOpen
+            ? 'linear-gradient(135deg,#5B21B6,#7C3AED)'
+            : 'linear-gradient(135deg,#7C3AED,#9333EA)';
+    }
+    if (_dashCommentsOpen) loadDashComments();
+}
+
+async function loadDashComments() {
+    var sess   = loadSession();
+    var estate = (sess && sess.estate) ? sess.estate : '';
+    var list   = document.getElementById('dashCommentList');
+    list.innerHTML = '<p style="text-align:center;color:#9CA3AF;font-size:13px;padding:20px 0;">Loading…</p>';
+    try {
+        var res = await supabaseClient.from('opp_dashboard_comments')
+            .select('*').eq('estate', estate).order('created_at', { ascending: false });
+        if (res.error) throw res.error;
+        renderDashComments(res.data || []);
+    } catch(e) {
+        list.innerHTML = '<p style="text-align:center;color:#EF4444;font-size:13px;padding:16px 0;">Failed to load comments.</p>';
+    }
+}
+
+function renderDashComments(comments) {
+    var empty = document.getElementById('dashCommentEmpty');
+    var count = document.getElementById('dashCommentCount');
+    var list  = document.getElementById('dashCommentList');
+    if (count) count.textContent = comments.length > 0 ? comments.length : '';
+    if (comments.length === 0) {
+        list.innerHTML = '';
+        if (empty) { empty.style.display = 'block'; list.appendChild(empty); }
+        return;
+    }
+    if (empty) empty.style.display = 'none';
+    var roleBadge = { superadmin: '#7C3AED', hq_user: '#2563EB', estate_user: '#059669' };
+    list.innerHTML = comments.map(function(c) {
+        var dt   = new Date(c.created_at);
+        var dtStr = dt.toLocaleDateString('en-MY', { day:'2-digit', month:'short', year:'numeric' })
+                  + ' ' + dt.toLocaleTimeString('en-MY', { hour:'2-digit', minute:'2-digit' });
+        var color = roleBadge[c.author_role] || '#6B7280';
+        var roleLabel = c.author_role === 'superadmin' ? 'Super Admin'
+                      : c.author_role === 'hq_user'    ? 'HQ User'
+                      : 'Estate User';
+        var sess = loadSession();
+        var canDelete = sess && (sess.role === 'superadmin' || sess.email === c.author_name);
+        return '<div style="background:#F9F5FF;border:1px solid #EDE9FE;border-radius:10px;padding:10px 12px;">'
+            + '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:5px;">'
+            + '<div style="display:flex;align-items:center;gap:6px;min-width:0;">'
+            + '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'
+            + '<span style="font-size:12.5px;font-weight:700;color:#1F2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (c.author_name || 'Unknown') + '</span>'
+            + '<span style="font-size:10.5px;padding:1px 7px;border-radius:99px;background:' + color + '22;color:' + color + ';font-weight:700;white-space:nowrap;">' + roleLabel + '</span>'
+            + '</div>'
+            + (canDelete ? '<button onclick="deleteDashComment(\'' + c.id + '\')" style="background:none;border:none;cursor:pointer;color:#9CA3AF;font-size:13px;flex-shrink:0;padding:0 2px;" title="Delete">✕</button>' : '')
+            + '</div>'
+            + '<p style="margin:0 0 5px;font-size:13px;color:#374151;line-height:1.5;white-space:pre-wrap;">' + c.comment.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</p>'
+            + '<p style="margin:0;font-size:10.5px;color:#9CA3AF;">' + dtStr + '</p>'
+            + '</div>';
+    }).join('');
+}
+
+async function submitDashComment() {
+    var input = document.getElementById('dashCommentInput');
+    var text  = input.value.trim();
+    if (!text) { input.focus(); return; }
+    var sess  = loadSession();
+    var row   = {
+        estate:      (sess && sess.estate) ? sess.estate : '',
+        author_name: (sess && sess.name)   ? sess.name  : 'Manager',
+        author_role: (sess && sess.role)   ? sess.role  : 'hq_user',
+        comment:     text,
+    };
+    var btn = input.nextElementSibling;
+    if (btn) { btn.disabled = true; btn.textContent = 'Posting…'; }
+    try {
+        var res = await supabaseClient.from('opp_dashboard_comments').insert(row);
+        if (res.error) throw res.error;
+        input.value = '';
+        await loadDashComments();
+    } catch(e) {
+        alert('Failed to post comment. Please try again.');
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<span data-i18n="dash_comment_submit">Post Comment</span>'; setLang(currentLang); }
+    }
+}
+
+async function deleteDashComment(id) {
+    if (!confirm('Delete this comment?')) return;
+    try {
+        var res = await supabaseClient.from('opp_dashboard_comments').delete().eq('id', id);
+        if (res.error) throw res.error;
+        await loadDashComments();
+    } catch(e) {
+        alert('Failed to delete comment.');
+    }
 }
 
 /* -----------------------------------------------------------------
@@ -7493,6 +7950,7 @@ function renderDashboardFilters() {
     renderMaintPctTracker();
     renderChemUsageTracker();
     renderRainfallChart();
+    renderSeedlingPlantingChart();
 }
 
 /** Open the native date picker for an input by id — works on desktop and iOS. */
@@ -8648,6 +9106,26 @@ const I18N = {
         tools_lbl_items_hint:     'Please tick the tools to be taken',
         toolsrecord_col_worker:   'Worker Name',
         toolsrecord_table_title:  'TOOLS RECORD',
+        /* Dashboard — Seedling Planting Chart */
+        dash_seedling_plant_title:  '🌱 Field Planting',
+        dash_seedling_plant_sub:    'Monthly planting vs cumulative — Oil Palm Seedling Out transactions',
+        dash_seedling_plant_empty:  'No seedling planting records yet.',
+        dash_seedling_monthly:      'Monthly',
+        dash_seedling_cumulative:   'Cumulative',
+        dash_seedling_yaxis:        'Seedlings',
+        /* Dashboard — Email & Comments */
+        dash_email_btn:           'Email',
+        dash_comment_btn:         'Comments',
+        dash_email_modal_title:   'Email Dashboard',
+        dash_email_to_label:      'Send To (Managers)',
+        dash_email_msg_label:     'Message (optional)',
+        dash_email_note:          'This will open your email app with the dashboard link pre-filled.',
+        dash_email_cancel:        'Cancel',
+        dash_email_send:          'Send Email',
+        dash_comment_title:       'Comments',
+        dash_comment_empty:       'No comments yet.',
+        dash_comment_submit:      'Post Comment',
+        dash_comment_placeholder: 'Write a comment…',
     },
 
     ms: {
@@ -9131,6 +9609,26 @@ const I18N = {
         tools_lbl_items_hint:     'Sila tandakan peralatan yang ingin diambil',
         toolsrecord_col_worker:   'Nama Pengguna Pekerja',
         toolsrecord_table_title:  'REKOD PERALATAN',
+        /* Dashboard — Seedling Planting Chart */
+        dash_seedling_plant_title:  '🌱 Penanaman Anak Sawit',
+        dash_seedling_plant_sub:    'Penanaman bulanan vs kumulatif — transaksi Keluar Anak Sawit',
+        dash_seedling_plant_empty:  'Tiada rekod penanaman anak sawit lagi.',
+        dash_seedling_monthly:      'Pencapaian',
+        dash_seedling_cumulative:   'Pencapaian (Kumulatif)',
+        dash_seedling_yaxis:        'Bibit',
+        /* Dashboard — Email & Comments */
+        dash_email_btn:           'E-mel',
+        dash_comment_btn:         'Ulasan',
+        dash_email_modal_title:   'E-mel Papan Pemuka',
+        dash_email_to_label:      'Hantar Kepada (Pengurus)',
+        dash_email_msg_label:     'Mesej (pilihan)',
+        dash_email_note:          'Ini akan membuka aplikasi e-mel anda dengan pautan papan pemuka tersedia.',
+        dash_email_cancel:        'Batal',
+        dash_email_send:          'Hantar E-mel',
+        dash_comment_title:       'Ulasan',
+        dash_comment_empty:       'Tiada ulasan lagi.',
+        dash_comment_submit:      'Hantar Ulasan',
+        dash_comment_placeholder: 'Tulis ulasan…',
     }
 };
 
@@ -9248,6 +9746,7 @@ function setLang(lang) {
     if (typeof renderMaintPctTracker === 'function') renderMaintPctTracker();
     if (typeof renderChemUsageTracker === 'function') renderChemUsageTracker();
     if (typeof renderRainfallChart  === 'function') renderRainfallChart();
+    if (typeof renderSeedlingPlantingChart === 'function') renderSeedlingPlantingChart();
     if (typeof renderRainfallReport  === 'function') renderRainfallReport();
     if (typeof renderRainfallSummary === 'function') renderRainfallSummary();
     if (typeof renderFertRecord === 'function') renderFertRecord();
@@ -10718,18 +11217,20 @@ function logoutUser() {
     stopStatusWatcher();
     clearSession();
     supabaseClient.auth.signOut().catch(e => console.warn('[Auth] signOut error', e));
-    ['loginEmail', 'loginPassword'].forEach(id => {
-        document.getElementById(id).value = '';
-    });
-    document.getElementById('loginError').classList.add('hidden');
     document.getElementById('sidebarEstate').value = '';
     // Reset app title back to default
     updateAppTitle('');
     document.body.classList.remove('estate-mobile');
-    document.getElementById('appLayout').classList.add('hidden');
-    const _overlay = document.getElementById('authOverlay');
-    _overlay.scrollTop = 0;
-    _overlay.style.display = 'flex';
+    // Re-boot as Super Admin instead of showing login screen
+    const autoSession = {
+        email:       SUPER_ADMIN.email,
+        name:        SUPER_ADMIN.name,
+        estate:      '',
+        role:        'superadmin',
+        permissions: ALL_SECTIONS.map(s => s.id),
+    };
+    saveSession(autoSession);
+    bootApp(autoSession);
 
     // Reset which page section is "active" back to the Dashboard so the
     // next person to log in on this device — who may have far fewer
@@ -11616,6 +12117,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         await signInFromIntranet(_gwParams.get('gw_token'), _gwParams.get('module') === 'report' ? 'report' : 'stock');
         if (navigator.onLine) drainSyncQueue();
         return;
+    }
+
+    // Auto-boot as Super Admin — no login required
+    if (!loadSession()) {
+        const autoSession = {
+            email:       SUPER_ADMIN.email,
+            name:        SUPER_ADMIN.name,
+            estate:      '',
+            role:        'superadmin',
+            permissions: ALL_SECTIONS.map(s => s.id),
+        };
+        saveSession(autoSession);
+        bootApp(autoSession);
     }
 
     // Quick resume from sessionStorage so the app appears instantly on refresh.
