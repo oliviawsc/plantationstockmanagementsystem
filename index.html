@@ -225,6 +225,10 @@
 
         /* ── Management Report (Penilaian Prestasi Ladang) ── */
         .mr-toolbar { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+        .mr-controls { display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap; font-family:Inter, sans-serif; }
+        .mr-controls label { display:flex; flex-direction:column; gap:3px; font-size:11px; font-weight:600; color:#475569; }
+        .mr-controls input[type=month] { height:36px; padding:0 10px; border:1px solid #CBD5E1; border-radius:10px; background:#fff; font-size:13px; color:#0F172A; }
+        .mr-notice { margin:-6px 0 12px; padding:8px 12px; border-radius:10px; background:#FFFBEB; border:1px solid #FDE68A; color:#92400E; font-size:12.5px; }
         .mr-print-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:10px; border:1px solid #CBD5E1; background:#fff; color:#0F172A; font-size:13px; font-weight:600; cursor:pointer; }
         .mr-print-btn:hover { background:#F1F5F9; }
         .mr-sheet { background:#fff; border:1px solid #E2E8F0; border-radius:14px; padding:22px 22px 18px; box-shadow:0 1px 3px rgba(0,0,0,.06); font-family:"Times New Roman", Times, serif; color:#111; }
@@ -244,7 +248,7 @@
         @media print {
             body.mr-printing #dashboard { display:none !important; }
             body.mr-printing #mgmtreport.page-section { display:block !important; }
-            body.mr-printing .mr-toolbar { display:none !important; }
+            body.mr-printing .mr-toolbar, body.mr-printing .mr-notice { display:none !important; }
             body.mr-printing .mr-sheet { border:0; box-shadow:none; padding:0; }
             body.mr-printing .mr-grid { grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
             body.mr-printing .mr-card .mr-canvas { height:200px; }
@@ -3386,8 +3390,13 @@
                     <h2 class="text-3xl font-bold" data-i18n="page_mgmtreport">📊 Management Report</h2>
                     <p class="text-sm text-green-700" data-i18n="page_mgmtreport_sub">Estate performance evaluation, month by month.</p>
                 </div>
-                <button type="button" class="mr-print-btn" onclick="printMgmtReport()">&#128424; <span data-i18n="mgmtreport_print">Print / PDF</span></button>
+                <div class="mr-controls">
+                    <label><span data-i18n="mgmtreport_month">Report month</span>
+                        <input type="month" id="mrMonth" onchange="renderMgmtReport()"></label>
+                    <button type="button" class="mr-print-btn" onclick="printMgmtReport()">&#128424; <span data-i18n="mgmtreport_print">Print / PDF</span></button>
+                </div>
             </div>
+            <p id="mrNotice" class="mr-notice" style="display:none;"></p>
             <div id="mgmtReportSheet" class="mr-sheet"></div>
         </section>
 
@@ -9080,6 +9089,10 @@ const I18N = {
         page_mgmtreport:          '📊 Management Report',
         page_mgmtreport_sub:      'Estate performance evaluation, month by month.',
         mgmtreport_print:         'Print / PDF',
+        mgmtreport_month:         'Report month',
+        mgmtreport_pick_estate:   'Choose an estate at the top of the page first.',
+        mgmtreport_sample:        'Figures on this sheet are typed in from the printed report. They will come from the database once each chart is connected.',
+        mgmtreport_nodata:        'No figures for this estate and month yet. The charts stay empty until they are connected to the database.',
         page_tools:               '🔧 Tools Transactions',
         page_tools_sub:           'Record tools issued and received at the store.',
         page_toolsrecord:         '📋 Tools Record',
@@ -9583,6 +9596,10 @@ const I18N = {
         page_mgmtreport:          '📊 Laporan Pengurusan',
         page_mgmtreport_sub:      'Penilaian prestasi ladang, bulan demi bulan.',
         mgmtreport_print:         'Cetak / PDF',
+        mgmtreport_month:         'Bulan laporan',
+        mgmtreport_pick_estate:   'Pilih ladang di bahagian atas dahulu.',
+        mgmtreport_sample:        'Angka pada helaian ini ditaip daripada laporan bercetak. Ia akan diambil daripada pangkalan data selepas setiap carta disambungkan.',
+        mgmtreport_nodata:        'Belum ada angka untuk ladang dan bulan ini. Carta kekal kosong sehingga disambungkan ke pangkalan data.',
         page_tools:               '🔧 Transaksi Peralatan',
         page_tools_sub:           'Rekod peralatan yang dikeluarkan dan diterima di stor.',
         page_toolsrecord:         '📋 Rekod Peralatan',
@@ -11395,6 +11412,8 @@ function onSidebarEstateChange() {
     // Load cached data for new estate immediately, then fetch fresh from Supabase
     loadEstateData(newEstate);
     refreshAll();
+    const _mrSec = document.getElementById('mgmtreport');
+    if (_mrSec && _mrSec.classList.contains('active')) renderMgmtReport();
     // Explicitly render sections with cached data right away
     renderManuringRounds();
     renderManuringHistory();
@@ -16508,9 +16527,9 @@ function exitMobilePreview() {
 // ===================================================================
 // MANAGEMENT REPORT — "Penilaian Prestasi Ladang" dashboard
 // One sheet per estate and report month: header, 13 monthly charts in two
-// columns, footnotes. Everything on the sheet comes from MGMT_REPORT_DATA.
-// For now the numbers are the October 2026 Sungai Mak figures; later this
-// object is filled from the Mantap / Stock data instead of being typed here.
+// columns, footnotes. Everything on the sheet comes from mgmtReportData().
+// The header follows the estate chosen at the top of the app and the report
+// month picked on the page; the figures come from mgmtReportFigures().
 // ===================================================================
 const MR_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const MR_COLORS = {
@@ -16519,94 +16538,176 @@ const MR_COLORS = {
 };
 const _ = null; // month with no figure yet
 
-const MGMT_REPORT_DATA = {
-    company: 'SUNGAI MAK PLANTATION SDN BHD',
-    title: 'PENILAIAN PRESTASI LADANG (OKTOBER 2026)',
-    totalArea: 'Total Area: 118.28 Ha (based on Drone Nov 2025)',
-    section: 'OPERASI LADANG',
-    year: 2026,
-    notes: ['* Pusingan extra untuk blok 4 sahaja', '* Infilling - 46 Kes', '* Ganoderma - 11 Kes',
-            "Mar'26: 38 unsatisfactory bunches penalty waived as per management instruction."],
-    charts: [
+const MR_MONTHS_MS = ['JANUARI','FEBRUARI','MAC','APRIL','MEI','JUN','JULAI','OGOS','SEPTEMBER','OKTOBER','NOVEMBER','DISEMBER'];
+
+// Figures typed in from the printed October 2026 report, kept only for
+// Sungai Mak Plantation until every chart is fed from the database.
+// Keyed by estate name (as in opp_estates) and year; months after the report month are blanked.
+const MR_SAMPLE_FIGURES = {
+    'Sungai Mak Plantation': { '2026': {
+        notes: ['* Pusingan extra untuk blok 4 sahaja', '* Infilling - 46 Kes', '* Ganoderma - 11 Kes',
+                "Mar'26: 38 unsatisfactory bunches penalty waived as per management instruction."],
+        series: {
+            baja_sasaran: [0, 2, 2, 2, 2, 4, 4, 6, 6, 8, 8, 8],
+            baja_pencapaian: [0, 0, 0, 2, 2, 4, 4, 4, 6, 8, _, _],
+            penombak_prev: [6, 6, 6, 6, 7, 6, 6, 8, 6, 6, 7, 15],
+            penombak: [10, 8, 10, 10, 10, 9, 9, 9, 9, 9, _, _],
+            penombak_sasaran: [6,6,6,6,6,6,6,6,6,6,6,6],
+            produktiviti: [1.22, 1.06, 0.79, 1.16, 1.09, 1.10, 1.19, 1.12, 1.72, 1.37, _, _],
+            produktiviti_sasaran: [2.3,2.3,2.3,2.3,2.3,2.3,2.3,2.3,2.3,2.3,2.3,2.3],
+            ffb_prev: [223, 263, 333, 351, 306, 263, 199, 276, 333, 363, 361, 419],
+            ffb: [316, 221, 206, 301, 282, 256, 280, 263, 403, 320, _, _],
+            ffb_kum_prev: [223, 486, 819, 1170, 1475, 1738, 1937, 2213, 2546, 2909, 3270, 3688],
+            ffb_kum: [316, 537, 743, 1044, 1326, 1583, 1862, 2126, 2528, 2848, _, _],
+            ffb_kum_sasaran: [229, 499, 841, 1201, 1515, 1785, 1989, 2272, 2614, 2986, 3356, 3786],
+            grading_prev: [100, 100, 99.77, 99.54, 99.74, 99.82, 99.83, 99.78, 99.68, 99.91, 99.92, 99.96],
+            grading: [99.98, 99.92, 99.69, 99.95, 99.96, 99.89, 99.90, 99.85, 99.86, 99.83, _, _],
+            ha_kum_prev: [1.88, 4.14, 6.93, 9.89, 12.47, 14.70, 16.38, 18.71, 21.53, 24.59, 27.64, 31.18],
+            ha_kum: [2.67, 4.54, 6.28, 8.83, 11.21, 13.38, 15.75, 17.97, 21.37, 24.08, _, _],
+            ha_kum_sasaran: [1.94, 4.22, 7.11, 10.15, 12.81, 15.09, 16.82, 19.21, 22.10, 25.25, 28.37, 32.01],
+            tanam: [50, 0, 26, 1, 73, 90, 236, 74, 120, 180, _, _],
+            tanam_kum: [50, 50, 76, 77, 150, 240, 476, 550, 670, 850, _, _],
+            hujan_prev: [635, 266, 230, 218, 105, 241, 89, 333, 281, 333, 190, 234],
+            hujan: [593, 200, 41, 74, 284, 272, 305, 163, 277, 248, _, _],
+            spray_r13: [27, 93, 100, _, 33, _, _, 33, 100, _, _, _],
+            spray_r2x: [_, _, _, _, _, 69, 100, _, _, 7, _, _],
+            spray_sasaran: [100, _, _, _, 100, _, _, _, 100, _, _, _],
+            slash_r1: [_, _, 7, 64, 100, _, _, _, _, _, _, _],
+            slash_r2: [_, _, _, _, _, _, 31, 64, _, _, _, _],
+            slash_sasaran: [_, _, 100, _, _, _, 100, _, _, _, _, _],
+            carlos_buka: [51, 10, 32, 19, 73, 137, 259, 150, 85, 171, _, _],
+            carlos_tutup: [49, 5, 28, 8, 76, 87, 318, 99, 124, 132, _, _],
+            carlos_belum: [5, 10, 14, 25, 22, 72, 13, 64, 25, 64, _, _],
+            penalti: [50, 250, 0, 250, 225, 300, 375, 550, 750, 925, _, _],
+            downgraded: [2, 10, 0, 10, 9, 12, 15, 22, 30, 37, _, _],
+        },
+    } },
+};
+
+// The 13 charts of the report. `key` names the figure series that fills each
+// line / bar; the figures come from mgmtReportFigures() per estate and month.
+function mrChartSpecs(year) {
+    const prev = String(year - 1), cur = String(year);
+    return [
         { title: 'Jumlah Baja Ditabur', yLabel: 'kg / pokok', yMax: 10, step: 2,
           series: [
-            { type: 'line', label: 'Sasaran', color: MR_COLORS.target, dashed: true, labelPos: 'above',
-              data: [0, 2, 2, 2, 2, 4, 4, 6, 6, 8, 8, 8] },
-            { type: 'line', label: 'Pencapaian', color: '#E6B400', fill: 'rgba(255,217,102,.45)', labelPos: 'above', labelColor: '#E69138',
-              data: [0, 0, 0, 2, 2, 4, 4, 4, 6, 8, _, _] },
+            { key: 'baja_sasaran', type: 'line', label: 'Sasaran', color: MR_COLORS.target, dashed: true, labelPos: 'above' },
+            { key: 'baja_pencapaian', type: 'line', label: 'Pencapaian', color: '#E6B400', fill: 'rgba(255,217,102,.45)', labelPos: 'above', labelColor: '#E69138' },
           ] },
         { title: 'Jumlah Penombak', yLabel: 'Orang', yMax: 15, step: 5,
           series: [
-            { type: 'bar', label: '2025', color: MR_COLORS.y25blue, data: [6, 6, 6, 6, 7, 6, 6, 8, 6, 6, 7, 15] },
-            { type: 'bar', label: '2026', color: MR_COLORS.y26yellow, data: [10, 8, 10, 10, 10, 9, 9, 9, 9, 9, _, _] },
-            { type: 'line', label: 'Sasaran', color: MR_COLORS.target, dashed: true, labelPos: 'above', data: [6,6,6,6,6,6,6,6,6,6,6,6] },
+            { key: 'penombak_prev', type: 'bar', label: prev, color: MR_COLORS.y25blue },
+            { key: 'penombak', type: 'bar', label: cur, color: MR_COLORS.y26yellow },
+            { key: 'penombak_sasaran', type: 'line', label: 'Sasaran', color: MR_COLORS.target, dashed: true, labelPos: 'above' },
           ] },
         { title: 'Produktiviti Penombak (MT/Hari)', yLabel: 'MT / Hari', yMax: 3, step: 1, decimals: 2,
           series: [
-            { type: 'bar', label: 'Pencapaian', color: MR_COLORS.y26yellow, data: [1.22, 1.06, 0.79, 1.16, 1.09, 1.10, 1.19, 1.12, 1.72, 1.37, _, _] },
-            { type: 'line', label: 'Sasaran', color: MR_COLORS.target, dashed: true, labelPos: 'above', decimals: 1, data: [2.3,2.3,2.3,2.3,2.3,2.3,2.3,2.3,2.3,2.3,2.3,2.3] },
+            { key: 'produktiviti', type: 'bar', label: 'Pencapaian', color: MR_COLORS.y26yellow },
+            { key: 'produktiviti_sasaran', type: 'line', label: 'Sasaran', color: MR_COLORS.target, dashed: true, labelPos: 'above', decimals: 1 },
           ] },
         { title: 'Hasil FFB Bulanan', yLabel: 'MT', yMax: 450, step: 50,
           series: [
-            { type: 'bar', label: '2025', color: MR_COLORS.pink25, data: [223, 263, 333, 351, 306, 263, 199, 276, 333, 363, 361, 419] },
-            { type: 'bar', label: '2026', color: MR_COLORS.y26yellow, labelPos: 'middle', data: [316, 221, 206, 301, 282, 256, 280, 263, 403, 320, _, _] },
+            { key: 'ffb_prev', type: 'bar', label: prev, color: MR_COLORS.pink25 },
+            { key: 'ffb', type: 'bar', label: cur, color: MR_COLORS.y26yellow, labelPos: 'middle' },
           ] },
         { title: 'Kumulatif Hasil FFB', yLabel: 'MT', yMax: 4500, step: 750,
           series: [
-            { type: 'bar', label: '2025', color: MR_COLORS.y25blue, data: [223, 486, 819, 1170, 1475, 1738, 1937, 2213, 2546, 2909, 3270, 3688] },
-            { type: 'bar', label: '2026', color: MR_COLORS.y26yellow, labelPos: 'middle', data: [316, 537, 743, 1044, 1326, 1583, 1862, 2126, 2528, 2848, _, _] },
-            { type: 'line', label: 'Sasaran', color: MR_COLORS.target, dashed: true, stepped: true, fill: 'rgba(255,0,0,.22)', noPoints: true, labelPos: 'above',
-              data: [229, 499, 841, 1201, 1515, 1785, 1989, 2272, 2614, 2986, 3356, 3786] },
+            { key: 'ffb_kum_prev', type: 'bar', label: prev, color: MR_COLORS.y25blue },
+            { key: 'ffb_kum', type: 'bar', label: cur, color: MR_COLORS.y26yellow, labelPos: 'middle' },
+            { key: 'ffb_kum_sasaran', type: 'line', label: 'Sasaran', color: MR_COLORS.target, dashed: true, stepped: true, fill: 'rgba(255,0,0,.22)', noPoints: true, labelPos: 'above' },
           ] },
         { title: 'Grading Buah (%)', yLabel: '%', yMax: 100, step: 25, percent: true, decimals: 2,
           series: [
-            { type: 'bar', label: '2025', color: MR_COLORS.pink25, data: [100, 100, 99.77, 99.54, 99.74, 99.82, 99.83, 99.78, 99.68, 99.91, 99.92, 99.96] },
-            { type: 'bar', label: '2026', color: MR_COLORS.y26yellow, labelPos: 'middle', data: [99.98, 99.92, 99.69, 99.95, 99.96, 99.89, 99.90, 99.85, 99.86, 99.83, _, _] },
+            { key: 'grading_prev', type: 'bar', label: prev, color: MR_COLORS.pink25 },
+            { key: 'grading', type: 'bar', label: cur, color: MR_COLORS.y26yellow, labelPos: 'middle' },
           ] },
         { title: 'Kumulatif Hasil Sehektar (MT/Ha)', yLabel: 'MT / Ha', yMax: 40, step: 5, decimals: 2,
           series: [
-            { type: 'bar', label: '2025', color: MR_COLORS.y25blue, data: [1.88, 4.14, 6.93, 9.89, 12.47, 14.70, 16.38, 18.71, 21.53, 24.59, 27.64, 31.18] },
-            { type: 'bar', label: '2026', color: MR_COLORS.y26yellow, labelPos: 'middle', data: [2.67, 4.54, 6.28, 8.83, 11.21, 13.38, 15.75, 17.97, 21.37, 24.08, _, _] },
-            { type: 'line', label: 'Sasaran', color: MR_COLORS.target, dashed: true, stepped: true, fill: 'rgba(255,0,0,.22)', noPoints: true, labelPos: 'above',
-              data: [1.94, 4.22, 7.11, 10.15, 12.81, 15.09, 16.82, 19.21, 22.10, 25.25, 28.37, 32.01] },
+            { key: 'ha_kum_prev', type: 'bar', label: prev, color: MR_COLORS.y25blue },
+            { key: 'ha_kum', type: 'bar', label: cur, color: MR_COLORS.y26yellow, labelPos: 'middle' },
+            { key: 'ha_kum_sasaran', type: 'line', label: 'Sasaran', color: MR_COLORS.target, dashed: true, stepped: true, fill: 'rgba(255,0,0,.22)', noPoints: true, labelPos: 'above' },
           ] },
         { title: 'Penanaman Anak Sawit', yLabel: 'Bibit', yMax: 1000, step: 250,
           series: [
-            { type: 'bar', label: 'Pencapaian', color: MR_COLORS.y26yellow, data: [50, 0, 26, 1, 73, 90, 236, 74, 120, 180, _, _] },
-            { type: 'line', label: 'Pencapaian (Kumulative)', color: MR_COLORS.blue, labelPos: 'above', data: [50, 50, 76, 77, 150, 240, 476, 550, 670, 850, _, _] },
+            { key: 'tanam', type: 'bar', label: 'Pencapaian', color: MR_COLORS.y26yellow },
+            { key: 'tanam_kum', type: 'line', label: 'Pencapaian (Kumulative)', color: MR_COLORS.blue, labelPos: 'above' },
           ] },
         { title: 'Hujan', yLabel: 'mm', yMax: 800, step: 200,
           series: [
-            { type: 'bar', label: '2025', color: MR_COLORS.rain25, labelColor: '#fff', data: [635, 266, 230, 218, 105, 241, 89, 333, 281, 333, 190, 234] },
-            { type: 'bar', label: '2026', color: MR_COLORS.y26yellow, data: [593, 200, 41, 74, 284, 272, 305, 163, 277, 248, _, _] },
+            { key: 'hujan_prev', type: 'bar', label: prev, color: MR_COLORS.rain25, labelColor: '#fff' },
+            { key: 'hujan', type: 'bar', label: cur, color: MR_COLORS.y26yellow },
           ] },
         { title: 'Penyelenggaraan Ladang', subtitle: 'Pusingan 1-3 (Blanket Spray)', yLabel: '%', yMax: 100, step: 25, percent: true,
           series: [
-            { type: 'bar', label: 'Pusingan 1, 3', color: MR_COLORS.y26yellow, data: [27, 93, 100, _, 33, _, _, 33, 100, _, _, _] },
-            { type: 'bar', label: 'Pusingan 2, Extra', color: MR_COLORS.round2, data: [_, _, _, _, _, 69, 100, _, _, 7, _, _] },
-            { type: 'bar', label: 'Sasaran (%)', color: 'rgba(255,0,0,.3)', border: MR_COLORS.target, dashedBar: true, labelColor: MR_COLORS.target, labelPos: 'top', wide: true,
-              data: [100, _, _, _, 100, _, _, _, 100, _, _, _] },
+            { key: 'spray_r13', type: 'bar', label: 'Pusingan 1, 3', color: MR_COLORS.y26yellow },
+            { key: 'spray_r2x', type: 'bar', label: 'Pusingan 2, Extra', color: MR_COLORS.round2 },
+            { key: 'spray_sasaran', type: 'bar', label: 'Sasaran (%)', color: 'rgba(255,0,0,.3)', border: MR_COLORS.target, dashedBar: true, labelColor: MR_COLORS.target, labelPos: 'top', wide: true },
           ] },
         { title: 'Penyelenggaraan Ladang', subtitle: 'Pusingan 1-2 (Selective Slashing)', yLabel: '%', yMax: 100, step: 25, percent: true,
           series: [
-            { type: 'bar', label: 'Pusingan 1', color: MR_COLORS.y26yellow, data: [_, _, 7, 64, 100, _, _, _, _, _, _, _] },
-            { type: 'bar', label: 'Pusingan 2', color: MR_COLORS.round2, data: [_, _, _, _, _, _, 31, 64, _, _, _, _] },
-            { type: 'bar', label: 'Sasaran (%)', color: 'rgba(255,0,0,.3)', border: MR_COLORS.target, dashedBar: true, labelColor: MR_COLORS.target, labelPos: 'top', wide: true,
-              data: [_, _, 100, _, _, _, 100, _, _, _, _, _] },
+            { key: 'slash_r1', type: 'bar', label: 'Pusingan 1', color: MR_COLORS.y26yellow },
+            { key: 'slash_r2', type: 'bar', label: 'Pusingan 2', color: MR_COLORS.round2 },
+            { key: 'slash_sasaran', type: 'bar', label: 'Sasaran (%)', color: 'rgba(255,0,0,.3)', border: MR_COLORS.target, dashedBar: true, labelColor: MR_COLORS.target, labelPos: 'top', wide: true },
           ] },
         { title: 'Kes CARLOS', yLabel: 'Jumlah Kes', yMax: 400, step: 100,
           series: [
-            { type: 'bar', label: 'Buka', color: MR_COLORS.open, labelColor: MR_COLORS.target, labelPos: 'top', data: [51, 10, 32, 19, 73, 137, 259, 150, 85, 171, _, _] },
-            { type: 'bar', label: 'Tutup', color: MR_COLORS.closed, labelPos: 'middle', data: [49, 5, 28, 8, 76, 87, 318, 99, 124, 132, _, _] },
-            { type: 'bar', label: 'Belum', color: MR_COLORS.pending, data: [5, 10, 14, 25, 22, 72, 13, 64, 25, 64, _, _] },
+            { key: 'carlos_buka', type: 'bar', label: 'Buka', color: MR_COLORS.open, labelColor: MR_COLORS.target, labelPos: 'top' },
+            { key: 'carlos_tutup', type: 'bar', label: 'Tutup', color: MR_COLORS.closed, labelPos: 'middle' },
+            { key: 'carlos_belum', type: 'bar', label: 'Belum', color: MR_COLORS.pending },
           ] },
-        { title: 'Penalti Isu kepada Penombak (2026)', yLabel: 'RM', yMax: 1000, step: 250,
+        { title: 'Penalti Isu kepada Penombak (' + cur + ')', yLabel: 'RM', yMax: 1000, step: 250,
           series: [
-            { type: 'bar', label: 'Jumlah Penalti', color: MR_COLORS.y26yellow, labelPos: 'top', data: [50, 250, 0, 250, 225, 300, 375, 550, 750, 925, _, _] },
-            { type: 'line', label: 'Jumlah Downgraded FFB (Bunch)', color: MR_COLORS.blue, labelPos: 'above', data: [2, 10, 0, 10, 9, 12, 15, 22, 30, 37, _, _] },
+            { key: 'penalti', type: 'bar', label: 'Jumlah Penalti', color: MR_COLORS.y26yellow, labelPos: 'top' },
+            { key: 'downgraded', type: 'line', label: 'Jumlah Downgraded FFB (Bunch)', color: MR_COLORS.blue, labelPos: 'above' },
           ] },
-    ],
-};
+    ];
+}
+
+// Figures for one estate and report month: { series: {key: [12 numbers]}, notes, sample }.
+// Later this reads the Mantap / Stock tables; today only the typed-in sample exists.
+function mgmtReportFigures(estate, ym) {
+    const hit = MR_SAMPLE_FIGURES[estate] && MR_SAMPLE_FIGURES[estate][ym.slice(0, 4)];
+    if (hit) return { series: hit.series, notes: hit.notes || [], sample: true };
+    return { series: {}, notes: [], sample: false };
+}
+
+// Report month chosen on the page (YYYY-MM); defaults to the current month.
+function mrReportMonth() {
+    const el = document.getElementById('mrMonth');
+    const now = new Date();
+    const cur = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+    if (el && !el.value) el.value = cur;
+    return (el && el.value) || cur;
+}
+
+// Total planted area of the estate = sum of its registered block (location) areas.
+function mrTotalArea() {
+    const list = (typeof locations !== 'undefined' && Array.isArray(locations)) ? locations : [];
+    const ha = list.reduce((t, l) => t + (parseFloat(l.area) || 0), 0);
+    return ha > 0 ? ha.toFixed(2) + ' Ha' : '—';
+}
+
+function mgmtReportData() {
+    const estate = (typeof activeEstate !== 'undefined' && activeEstate) || '';
+    const ym = mrReportMonth();
+    const year = parseInt(ym.slice(0, 4), 10), mi = parseInt(ym.slice(5, 7), 10) - 1;
+    const fig = mgmtReportFigures(estate, ym);
+    const upTo = (arr) => MR_MONTHS.map((m, i) => (arr && i <= mi && arr[i] != null) ? arr[i] : null);
+    const prevYear = (arr) => MR_MONTHS.map((m, i) => (arr && arr[i] != null) ? arr[i] : null);
+    const charts = mrChartSpecs(year).map((c) => Object.assign({}, c, {
+        series: c.series.map((sr) => Object.assign({}, sr, {
+            data: /_prev$/.test(sr.key) ? prevYear(fig.series[sr.key]) : upTo(fig.series[sr.key]),
+        })),
+    }));
+    return {
+        estate, ym, sample: fig.sample,
+        company: estate ? estate.toUpperCase() : '—',
+        title: 'PENILAIAN PRESTASI LADANG (' + MR_MONTHS_MS[mi] + ' ' + year + ')',
+        totalArea: 'Total Area: ' + mrTotalArea(),
+        section: 'OPERASI LADANG',
+        year, notes: fig.notes, charts,
+    };
+}
 
 // Draws the figure on every bar / point, like the printed report.
 const mrValueLabels = {
@@ -16656,20 +16757,24 @@ const mrValueLabels = {
 
 let _mrCharts = [];
 
-function mgmtReportData() {
-    // Later: build this from the Mantap / Stock figures for the chosen estate and month.
-    return MGMT_REPORT_DATA;
-}
-
 function renderMgmtReport() {
     const sheet = document.getElementById('mgmtReportSheet');
     if (!sheet) return;
     _mrCharts.forEach((c) => { try { c.destroy(); } catch (e) {} });
     _mrCharts = [];
     const R = mgmtReportData();
-    if (!R || !R.charts || !R.charts.length) {
-        sheet.innerHTML = '<p class="mr-empty">No report data yet.</p>';
+    const d = (typeof I18N !== 'undefined' && I18N[currentLang]) || {};
+    const notice = document.getElementById('mrNotice');
+    if (!R.estate) {
+        sheet.innerHTML = '<p class="mr-empty">' + (d.mgmtreport_pick_estate || 'Choose an estate at the top of the page first.') + '</p>';
+        if (notice) notice.style.display = 'none';
         return;
+    }
+    if (notice) {
+        notice.style.display = '';
+        notice.textContent = R.sample
+            ? (d.mgmtreport_sample || 'Figures on this sheet are typed in from the printed report. They will come from the database once each chart is connected.')
+            : (d.mgmtreport_nodata || 'No figures for this estate and month yet. The charts are empty until they are connected to the database.');
     }
     const esc = (t) => String(t == null ? '' : t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     sheet.innerHTML =
