@@ -229,6 +229,17 @@
         .mr-controls label { display:flex; flex-direction:column; gap:3px; font-size:11px; font-weight:600; color:#475569; }
         .mr-controls input[type=month] { height:36px; padding:0 10px; border:1px solid #CBD5E1; border-radius:10px; background:#fff; font-size:13px; color:#0F172A; }
         .mr-notice { margin:-6px 0 12px; padding:8px 12px; border-radius:10px; background:#FFFBEB; border:1px solid #FDE68A; color:#92400E; font-size:12.5px; }
+        .mr-modal { position:fixed; inset:0; z-index:9000; background:rgba(15,23,42,.45); display:flex; align-items:center; justify-content:center; padding:16px; font-family:Inter, sans-serif; }
+        .mr-modal-box { background:#fff; border-radius:16px; padding:20px 22px; width:100%; max-width:520px; box-shadow:0 20px 50px rgba(0,0,0,.25); }
+        .mr-form { display:grid; grid-template-columns:1fr 1fr; gap:10px 14px; }
+        .mr-form label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:#334155; }
+        .mr-form input { height:38px; padding:0 10px; border:1px solid #CBD5E1; border-radius:10px; font-size:14px; color:#0F172A; }
+        .mr-form .mr-form-wide { grid-column:1 / -1; }
+        @media (max-width: 520px) { .mr-form { grid-template-columns:1fr; } }
+        .mr-modal-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:16px; }
+        .mr-save-btn { display:inline-flex; align-items:center; padding:8px 16px; border-radius:10px; border:0; background:#166534; color:#fff; font-size:13px; font-weight:600; cursor:pointer; }
+        .mr-save-btn[disabled] { opacity:.6; cursor:default; }
+        .mr-card .mr-pending { text-align:center; font-size:11.5px; color:#B45309; font-style:italic; margin:2px 0 0; }
         .mr-print-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:10px; border:1px solid #CBD5E1; background:#fff; color:#0F172A; font-size:13px; font-weight:600; cursor:pointer; }
         .mr-print-btn:hover { background:#F1F5F9; }
         .mr-sheet { background:#fff; border:1px solid #E2E8F0; border-radius:14px; padding:22px 22px 18px; box-shadow:0 1px 3px rgba(0,0,0,.06); font-family:"Times New Roman", Times, serif; color:#111; }
@@ -3393,10 +3404,30 @@
                 <div class="mr-controls">
                     <label><span data-i18n="mgmtreport_month">Report month</span>
                         <input type="month" id="mrMonth" onchange="renderMgmtReport()"></label>
+                    <button type="button" id="mrInputBtn" class="mr-print-btn" onclick="openMgmtInput()" style="display:none;">&#9998; <span data-i18n="mgmtreport_input">Input figures</span></button>
                     <button type="button" class="mr-print-btn" onclick="printMgmtReport()">&#128424; <span data-i18n="mgmtreport_print">Print / PDF</span></button>
                 </div>
             </div>
             <p id="mrNotice" class="mr-notice" style="display:none;"></p>
+            <!-- Monthly figures input (FFB, grading, harvesters) -->
+            <div id="mrInputModal" class="mr-modal" style="display:none;">
+                <div class="mr-modal-box">
+                    <h3 class="text-lg font-bold text-green-900" data-i18n="mgmtreport_input_title">Monthly figures</h3>
+                    <p id="mrInputEstate" class="text-xs text-gray-500 mb-3"></p>
+                    <div class="mr-form">
+                        <label><span data-i18n="mgmtreport_month">Report month</span><input type="month" id="mrInMonth" onchange="fillMgmtInput()"></label>
+                        <label><span data-i18n="mgmtreport_f_ffb">Hasil FFB (MT)</span><input type="number" id="mrInFfb" min="0" step="0.001" placeholder="0.000"></label>
+                        <label><span data-i18n="mgmtreport_f_grading">Grading Buah (%)</span><input type="number" id="mrInGrading" min="0" max="100" step="0.01" placeholder="0.00"></label>
+                        <label><span data-i18n="mgmtreport_f_harvesters">Jumlah Penombak (orang)</span><input type="number" id="mrInHarvesters" min="0" step="1" placeholder="0"></label>
+                        <label class="mr-form-wide"><span data-i18n="mgmtreport_f_notes">Notes</span><input type="text" id="mrInNotes" maxlength="500"></label>
+                    </div>
+                    <p id="mrInputErr" class="text-sm text-red-600 mt-2" style="display:none;"></p>
+                    <div class="mr-modal-actions">
+                        <button type="button" class="mr-print-btn" onclick="closeMgmtInput()" data-i18n="mgmtreport_cancel">Cancel</button>
+                        <button type="button" id="mrInSave" class="mr-save-btn" onclick="saveMgmtInput()" data-i18n="mgmtreport_save">Save</button>
+                    </div>
+                </div>
+            </div>
             <div id="mgmtReportSheet" class="mr-sheet"></div>
         </section>
 
@@ -9090,9 +9121,21 @@ const I18N = {
         page_mgmtreport_sub:      'Estate performance evaluation, month by month.',
         mgmtreport_print:         'Print / PDF',
         mgmtreport_month:         'Report month',
+        mgmtreport_input:         'Input figures',
+        mgmtreport_input_title:   'Monthly figures',
+        mgmtreport_f_ffb:         'Hasil FFB (MT)',
+        mgmtreport_f_grading:     'Grading Buah (%)',
+        mgmtreport_f_harvesters:  'Jumlah Penombak (orang)',
+        mgmtreport_f_notes:       'Notes',
+        mgmtreport_cancel:        'Cancel',
+        mgmtreport_save:          'Save',
+        mgmtreport_pending:       'Pending input',
+        mgmtreport_month_required:'Choose the month first.',
+        mgmtreport_bad_number:    'Please check the numbers.',
+        mgmtreport_save_failed:   'Could not save. Has the opp_mgmt_monthly table been created?',
         mgmtreport_pick_estate:   'Choose an estate at the top of the page first.',
-        mgmtreport_sample:        'Figures on this sheet are typed in from the printed report. They will come from the database once each chart is connected.',
-        mgmtreport_nodata:        'No figures for this estate and month yet. The charts stay empty until they are connected to the database.',
+        mgmtreport_sample:        'Figures on this sheet are typed in from the printed report. Use "Input figures" to key in the real monthly figures.',
+        mgmtreport_nodata:        'No figures for this estate and month yet. Use "Input figures" to key in the monthly figures.',
         page_tools:               '🔧 Tools Transactions',
         page_tools_sub:           'Record tools issued and received at the store.',
         page_toolsrecord:         '📋 Tools Record',
@@ -9597,9 +9640,21 @@ const I18N = {
         page_mgmtreport_sub:      'Penilaian prestasi ladang, bulan demi bulan.',
         mgmtreport_print:         'Cetak / PDF',
         mgmtreport_month:         'Bulan laporan',
+        mgmtreport_input:         'Masukkan angka',
+        mgmtreport_input_title:   'Angka bulanan',
+        mgmtreport_f_ffb:         'Hasil FFB (MT)',
+        mgmtreport_f_grading:     'Grading Buah (%)',
+        mgmtreport_f_harvesters:  'Jumlah Penombak (orang)',
+        mgmtreport_f_notes:       'Catatan',
+        mgmtreport_cancel:        'Batal',
+        mgmtreport_save:          'Simpan',
+        mgmtreport_pending:       'Menunggu input',
+        mgmtreport_month_required:'Pilih bulan dahulu.',
+        mgmtreport_bad_number:    'Sila semak angka.',
+        mgmtreport_save_failed:   'Tidak dapat simpan. Jadual opp_mgmt_monthly sudah dibuat?',
         mgmtreport_pick_estate:   'Pilih ladang di bahagian atas dahulu.',
-        mgmtreport_sample:        'Angka pada helaian ini ditaip daripada laporan bercetak. Ia akan diambil daripada pangkalan data selepas setiap carta disambungkan.',
-        mgmtreport_nodata:        'Belum ada angka untuk ladang dan bulan ini. Carta kekal kosong sehingga disambungkan ke pangkalan data.',
+        mgmtreport_sample:        'Angka pada helaian ini ditaip daripada laporan bercetak. Guna "Masukkan angka" untuk mengisi angka bulanan sebenar.',
+        mgmtreport_nodata:        'Belum ada angka untuk ladang dan bulan ini. Guna "Masukkan angka" untuk mengisi angka bulanan.',
         page_tools:               '🔧 Transaksi Peralatan',
         page_tools_sub:           'Rekod peralatan yang dikeluarkan dan diterima di stor.',
         page_toolsrecord:         '📋 Rekod Peralatan',
@@ -16715,12 +16770,50 @@ function mrChartSpecs(year) {
     ];
 }
 
-// Figures for one estate and report month: { series: {key: [12 numbers]}, notes, sample }.
-// Later this reads the Mantap / Stock tables; today only the typed-in sample exists.
+// Monthly figures typed in on this page (table opp_mgmt_monthly), cached per
+// estate + report year: rows of that year and the year before.
+let _mrRows = { key: '', rows: [], loaded: false };
+async function mrLoadRows(estate, year) {
+    const key = estate + '|' + year;
+    if (_mrRows.key === key && _mrRows.loaded) return _mrRows.rows;
+    _mrRows = { key, rows: [], loaded: false };
+    if (typeof supabaseClient === 'undefined' || !estate) { _mrRows.loaded = true; return []; }
+    try {
+        const { data, error } = await supabaseClient.from('opp_mgmt_monthly').select('*')
+            .eq('estate', estate).in('year', [year, year - 1]);
+        if (error) console.warn('[Management Report] load figures', error);
+        if (_mrRows.key !== key) return _mrRows.rows; // the user moved on meanwhile
+        _mrRows.rows = data || [];
+    } catch (e) { console.warn('[Management Report] load figures', e); }
+    _mrRows.loaded = true;
+    return _mrRows.rows;
+}
+function mrRow(year, month) { // month 1-12
+    return _mrRows.rows.find((r) => r.year === year && r.month === month) || null;
+}
+
+// Figures for one estate and report month: { series: {key: [12 numbers]}, notes, sample, fromDb }.
+// Database rows win; the typed-in sample fills what the database does not have.
 function mgmtReportFigures(estate, ym) {
-    const hit = MR_SAMPLE_FIGURES[estate] && MR_SAMPLE_FIGURES[estate][ym.slice(0, 4)];
-    if (hit) return { series: hit.series, notes: hit.notes || [], sample: true };
-    return { series: {}, notes: [], sample: false };
+    const year = parseInt(ym.slice(0, 4), 10);
+    const hit = MR_SAMPLE_FIGURES[estate] && MR_SAMPLE_FIGURES[estate][String(year)];
+    const series = Object.assign({}, hit ? hit.series : {});
+    const rows = _mrRows.key === estate + '|' + year ? _mrRows.rows : [];
+    const got = (y, field) => MR_MONTHS.map((m, i) => { const r = rows.find((x) => x.year === y && x.month === i + 1); return r && r[field] != null ? Number(r[field]) : null; });
+    const cum = (arr) => { let t = 0; return arr.map((v) => { if (v == null) return null; t += v; return Math.round(t * 1000) / 1000; }); };
+    const area = mrTotalAreaHa();
+    const perHa = (arr) => arr.map((v) => (v == null || !area) ? null : Math.round((v / area) * 100) / 100);
+    const put = (key, arr) => { if (arr.some((v) => v != null)) series[key] = arr; };
+    const fromDb = rows.length > 0;
+    if (fromDb) {
+        const ffb = got(year, 'ffb_mt'), ffbPrev = got(year - 1, 'ffb_mt');
+        put('ffb', ffb); put('ffb_prev', ffbPrev);
+        put('ffb_kum', cum(ffb)); put('ffb_kum_prev', cum(ffbPrev));
+        put('ha_kum', perHa(cum(ffb))); put('ha_kum_prev', perHa(cum(ffbPrev)));
+        put('grading', got(year, 'grading_pct')); put('grading_prev', got(year - 1, 'grading_pct'));
+        put('penombak', got(year, 'harvesters')); put('penombak_prev', got(year - 1, 'harvesters'));
+    }
+    return { series, notes: hit ? hit.notes || [] : [], sample: !!hit && !fromDb, fromDb };
 }
 
 // Report month chosen on the page (YYYY-MM); defaults to the current month.
@@ -16733,9 +16826,12 @@ function mrReportMonth() {
 }
 
 // Total planted area of the estate = sum of its registered block (location) areas.
-function mrTotalArea() {
+function mrTotalAreaHa() {
     const list = (typeof locations !== 'undefined' && Array.isArray(locations)) ? locations : [];
-    const ha = list.reduce((t, l) => t + (parseFloat(l.area) || 0), 0);
+    return list.reduce((t, l) => t + (parseFloat(l.area) || 0), 0);
+}
+function mrTotalArea() {
+    const ha = mrTotalAreaHa();
     return ha > 0 ? ha.toFixed(2) + ' Ha' : '—';
 }
 
@@ -16746,13 +16842,15 @@ function mgmtReportData() {
     const fig = mgmtReportFigures(estate, ym);
     const upTo = (arr) => MR_MONTHS.map((m, i) => (arr && i <= mi && arr[i] != null) ? arr[i] : null);
     const prevYear = (arr) => MR_MONTHS.map((m, i) => (arr && arr[i] != null) ? arr[i] : null);
-    const charts = mrChartSpecs(year).map((c) => Object.assign({}, c, {
-        series: c.series.map((sr) => Object.assign({}, sr, {
+    const charts = mrChartSpecs(year).map((c) => {
+        const series = c.series.map((sr) => Object.assign({}, sr, {
             data: /_prev$/.test(sr.key) ? prevYear(fig.series[sr.key]) : upTo(fig.series[sr.key]),
-        })),
-    }));
+        }));
+        const pending = !series.some((sr) => !/_prev$|_sasaran$/.test(sr.key) && sr.data.some((v) => v != null));
+        return Object.assign({}, c, { series, pending });
+    });
     return {
-        estate, ym, sample: fig.sample,
+        estate, ym, sample: fig.sample, fromDb: fig.fromDb,
         company: estate ? estate.toUpperCase() : '—',
         title: 'PENILAIAN PRESTASI LADANG (' + MR_MONTHS_MS[mi] + ' ' + year + ')',
         totalArea: 'Total Area: ' + mrTotalArea(),
@@ -16810,6 +16908,20 @@ const mrValueLabels = {
 let _mrCharts = [];
 
 function renderMgmtReport() {
+    const estate = (typeof activeEstate !== 'undefined' && activeEstate) || '';
+    const year = parseInt(mrReportMonth().slice(0, 4), 10);
+    const btn = document.getElementById('mrInputBtn');
+    if (btn) btn.style.display = estate && getSectionAccess(loadSession(), 'mgmtreport') === 'edit' ? '' : 'none';
+    drawMgmtReport();
+    if (estate && !(_mrRows.key === estate + '|' + year && _mrRows.loaded)) {
+        mrLoadRows(estate, year).then(() => {
+            const sec = document.getElementById('mgmtreport');
+            if (sec && sec.classList.contains('active')) drawMgmtReport();
+        });
+    }
+}
+
+function drawMgmtReport() {
     const sheet = document.getElementById('mgmtReportSheet');
     if (!sheet) return;
     _mrCharts.forEach((c) => { try { c.destroy(); } catch (e) {} });
@@ -16823,10 +16935,10 @@ function renderMgmtReport() {
         return;
     }
     if (notice) {
-        notice.style.display = '';
+        notice.style.display = R.fromDb ? 'none' : '';
         notice.textContent = R.sample
-            ? (d.mgmtreport_sample || 'Figures on this sheet are typed in from the printed report. They will come from the database once each chart is connected.')
-            : (d.mgmtreport_nodata || 'No figures for this estate and month yet. The charts are empty until they are connected to the database.');
+            ? (d.mgmtreport_sample || 'Figures on this sheet are typed in from the printed report. Use "Input figures" to key in the real monthly figures.')
+            : (d.mgmtreport_nodata || 'No figures for this estate and month yet. Use "Input figures" to key in the monthly figures.');
     }
     const esc = (t) => String(t == null ? '' : t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     sheet.innerHTML =
@@ -16835,6 +16947,7 @@ function renderMgmtReport() {
         (R.section ? '<div class="mr-section">' + esc(R.section) + '</div>' : '') +
         '<div class="mr-grid">' + R.charts.map((c, i) =>
             '<div class="mr-card"><h4>' + esc(c.title) + '</h4>' + (c.subtitle ? '<p class="mr-sub">' + esc(c.subtitle) + '</p>' : '') +
+            (c.pending ? '<p class="mr-pending">' + esc(d.mgmtreport_pending || 'Pending input') + '</p>' : '') +
             '<div class="mr-canvas"><canvas id="mrChart' + i + '"></canvas></div></div>').join('') + '</div>' +
         (R.notes && R.notes.length ? '<div class="mr-notes">' + R.notes.map((n) => '<span>' + esc(n) + '</span>').join('') + '</div>' : '');
     if (typeof Chart === 'undefined') return;
@@ -16881,6 +16994,69 @@ function renderMgmtReport() {
             },
         }));
     });
+}
+
+// ── "Input figures": one row per estate + month in opp_mgmt_monthly ──
+function openMgmtInput() {
+    const estate = (typeof activeEstate !== 'undefined' && activeEstate) || '';
+    if (!estate) return;
+    const d = (typeof I18N !== 'undefined' && I18N[currentLang]) || {};
+    document.getElementById('mrInputEstate').textContent = estate;
+    document.getElementById('mrInMonth').value = mrReportMonth();
+    document.getElementById('mrInputErr').style.display = 'none';
+    document.getElementById('mrInputModal').style.display = '';
+    const year = parseInt(mrReportMonth().slice(0, 4), 10);
+    mrLoadRows(estate, year).then(fillMgmtInput);
+    fillMgmtInput();
+}
+function closeMgmtInput() { document.getElementById('mrInputModal').style.display = 'none'; }
+function fillMgmtInput() {
+    const ym = document.getElementById('mrInMonth').value || mrReportMonth();
+    const year = parseInt(ym.slice(0, 4), 10), month = parseInt(ym.slice(5, 7), 10);
+    const estate = (typeof activeEstate !== 'undefined' && activeEstate) || '';
+    const go = () => {
+        const r = mrRow(year, month) || {};
+        const set = (id, v) => { document.getElementById(id).value = v == null ? '' : v; };
+        set('mrInFfb', r.ffb_mt); set('mrInGrading', r.grading_pct); set('mrInHarvesters', r.harvesters); set('mrInNotes', r.notes);
+    };
+    if (_mrRows.key === estate + '|' + year && _mrRows.loaded) go();
+    else mrLoadRows(estate, year).then(go);
+}
+async function saveMgmtInput() {
+    const d = (typeof I18N !== 'undefined' && I18N[currentLang]) || {};
+    const estate = (typeof activeEstate !== 'undefined' && activeEstate) || '';
+    const ym = document.getElementById('mrInMonth').value;
+    const err = document.getElementById('mrInputErr');
+    if (!estate || !/^\d{4}-\d{2}$/.test(ym)) { err.textContent = d.mgmtreport_month_required || 'Choose the month first.'; err.style.display = ''; return; }
+    const num = (id) => { const v = document.getElementById(id).value.trim(); return v === '' ? null : Number(v); };
+    const row = {
+        estate, year: parseInt(ym.slice(0, 4), 10), month: parseInt(ym.slice(5, 7), 10),
+        ffb_mt: num('mrInFfb'), grading_pct: num('mrInGrading'), harvesters: num('mrInHarvesters'),
+        notes: document.getElementById('mrInNotes').value.trim() || null,
+        source: 'manual', updated_by: (loadSession() || {}).name || null, updated_at: new Date().toISOString(),
+    };
+    if ([row.ffb_mt, row.grading_pct, row.harvesters].some((v) => v != null && !(v >= 0)) || (row.grading_pct != null && row.grading_pct > 100)) {
+        err.textContent = d.mgmtreport_bad_number || 'Please check the numbers.'; err.style.display = ''; return;
+    }
+    const btn = document.getElementById('mrInSave');
+    btn.disabled = true; err.style.display = 'none';
+    try {
+        const { data, error } = await supabaseClient.from('opp_mgmt_monthly').upsert(row, { onConflict: 'estate,year,month' }).select();
+        if (error) throw error;
+        const saved = (data && data[0]) || row;
+        if (_mrRows.key === estate + '|' + row.year) {
+            _mrRows.rows = _mrRows.rows.filter((r) => !(r.year === row.year && r.month === row.month)).concat([saved]);
+        } else {
+            _mrRows = { key: estate + '|' + row.year, rows: [saved], loaded: false };
+        }
+        closeMgmtInput();
+        renderMgmtReport();
+    } catch (e) {
+        console.error('[Management Report] save figures', e);
+        err.textContent = (d.mgmtreport_save_failed || 'Could not save. Has the opp_mgmt_monthly table been created?') + (e && e.message ? ' (' + e.message + ')' : '');
+        err.style.display = '';
+    }
+    btn.disabled = false;
 }
 
 function printMgmtReport() {

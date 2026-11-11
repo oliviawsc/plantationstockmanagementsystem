@@ -77,7 +77,8 @@ declare t text;
 begin
   foreach t in array array[
     'opp_items', 'opp_locations', 'opp_transactions', 'opp_manuring_rounds',
-    'opp_fieldmaint_rounds', 'opp_maint_claims', 'opp_chem_ingredients', 'opp_rainfall_txns'
+    'opp_fieldmaint_rounds', 'opp_maint_claims', 'opp_chem_ingredients', 'opp_rainfall_txns',
+    'opp_mgmt_monthly'
   ] loop
     execute format('alter table public.%I enable row level security', t);
     execute format('revoke all on public.%I from anon', t);
