@@ -9121,6 +9121,8 @@ const I18N = {
         page_mgmtreport_sub:      'Estate performance evaluation, month by month.',
         mgmtreport_print:         'Print / PDF',
         mgmtreport_month:         'Report month',
+        gw_company_nomatch:       'No estate here matches Intranet company "{c}". Choose the estate above, or set the exact estate name in Intranet Admin, Master Manage, Connector.',
+        gw_company_ambiguous:     'Intranet company "{c}" could match several estates ({e}). Choose the estate above, or set the exact estate name in Intranet Admin, Master Manage, Connector.',
         mgmtreport_input:         'Input figures',
         mgmtreport_input_title:   'Monthly figures',
         mgmtreport_f_ffb:         'Hasil FFB (MT)',
@@ -9640,6 +9642,8 @@ const I18N = {
         page_mgmtreport_sub:      'Penilaian prestasi ladang, bulan demi bulan.',
         mgmtreport_print:         'Cetak / PDF',
         mgmtreport_month:         'Bulan laporan',
+        gw_company_nomatch:       'Tiada ladang di sini sepadan dengan syarikat Intranet "{c}". Pilih ladang di atas, atau tetapkan nama ladang yang tepat di Intranet Admin, Master Manage, Connector.',
+        gw_company_ambiguous:     'Syarikat Intranet "{c}" boleh sepadan dengan beberapa ladang ({e}). Pilih ladang di atas, atau tetapkan nama ladang yang tepat di Intranet Admin, Master Manage, Connector.',
         mgmtreport_input:         'Masukkan angka',
         mgmtreport_input_title:   'Angka bulanan',
         mgmtreport_f_ffb:         'Hasil FFB (MT)',
@@ -10617,26 +10621,48 @@ function gwCompanyHints(params) {
     return ['gw_company', 'gw_company_name', 'gw_company_short'].map((k) => (p.get(k) || '').trim()).filter(Boolean);
 }
 function matchEstateForCompany(hints, estates) {
-    const norm = (x) => String(x || '').toLowerCase()
-        .replace(/\b(sdn\.?\s*bhd\.?|berhad|plantations?|estates?|estet|ladang)\b/g, ' ')
-        .replace(/[^a-z0-9]+/g, ' ').trim();
+    const GENERIC = /^(sdn|bhd|berhad|sb|plantation|plantations|estate|estates|estet|ladang|the)$/;
+    const toks = (x) => String(x || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').split(' ').filter((w) => w && !GENERIC.test(w));
+    const compact = (x) => toks(x).join('');
+    // 1. exact name (ignoring case)
     for (const h of hints) {
         const exact = estates.find((e) => e.toLowerCase() === h.toLowerCase());
-        if (exact) return exact;
+        if (exact) return { estate: exact };
     }
+    // 2. same words once generic words are removed, or the short form is the start of the estate name
+    //    ("MJMP" -> "MJM Plantation ..."); several candidates = cannot tell
+    let best = [], bestScore = 0;
     for (const h of hints) {
-        const n = norm(h);
-        if (!n) continue;
-        const same = estates.find((e) => norm(e) === n);
-        if (same) return same;
+        const ht = toks(h), hc = compact(h);
+        if (!ht.length) continue;
+        estates.forEach((e) => {
+            const et = toks(e), ec = compact(e), ea = String(e).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(' ');
+            let score = 0;
+            if (ht.join(' ') === et.join(' ')) score = 3;
+            else if (hc.length >= 4 && (ec.startsWith(hc) || hc.startsWith(ec))) score = 2;
+            else if (hc.length >= 2 && (hc === ea.map((w) => w[0]).join('') || hc === ea[0] + ea.slice(1).map((w) => w[0]).join(''))) score = 2; // ESM, MJMP2
+            else {
+                const common = ht.filter((w) => et.includes(w)).length;
+                if (common && common === Math.min(ht.length, et.length)) score = 1;
+            }
+            if (!score) return;
+            if (score > bestScore) { bestScore = score; best = [e]; }
+            else if (score === bestScore && !best.includes(e)) best.push(e);
+        });
+        if (best.length === 1) return { estate: best[0] };
     }
-    for (const h of hints) {
-        const n = norm(h);
-        if (n.length < 4) continue;
-        const part = estates.find((e) => norm(e).includes(n) || n.includes(norm(e)));
-        if (part) return part;
+    if (best.length === 1) return { estate: best[0] };
+    return { estate: '', ambiguous: best };
+}
+function mrToast(text) {
+    let el = document.getElementById('gwCompanyToast');
+    if (!el) {
+        el = document.createElement('div'); el.id = 'gwCompanyToast';
+        el.style.cssText = 'position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:9999;max-width:92vw;background:#7C2D12;color:#fff;padding:10px 16px;border-radius:12px;font:600 13px Inter,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.25);';
+        document.body.appendChild(el);
     }
-    return '';
+    el.textContent = text; el.style.display = '';
+    clearTimeout(el._t); el._t = setTimeout(() => { el.style.display = 'none'; }, 9000);
 }
 // After boot: switch the estate selector to the company the Intranet sent us.
 function applyIntranetCompany(hints) {
@@ -10644,8 +10670,16 @@ function applyIntranetCompany(hints) {
     const sel = document.getElementById('sidebarEstate');
     if (!sel) return;
     const estates = [...sel.options].map((o) => o.value).filter(Boolean);
-    const estate = matchEstateForCompany(hints, estates);
-    if (!estate) { console.warn('[SSO] no estate matches the Intranet company', hints); return; }
+    const m = matchEstateForCompany(hints, estates);
+    const estate = m.estate;
+    if (!estate) {
+        console.warn('[SSO] no estate matches the Intranet company', hints, m.ambiguous);
+        const d = (typeof I18N !== 'undefined' && I18N[currentLang]) || {};
+        mrToast((m.ambiguous && m.ambiguous.length > 1
+            ? (d.gw_company_ambiguous || 'Intranet company "{c}" could match several estates ({e}). Choose the estate above, or set the exact estate name in Intranet Admin, Master Manage, Connector.').replace('{e}', m.ambiguous.join(', '))
+            : (d.gw_company_nomatch || 'No estate here matches Intranet company "{c}". Choose the estate above, or set the exact estate name in Intranet Admin, Master Manage, Connector.')).replace('{c}', hints[0]));
+        return;
+    }
     if (estate === activeEstate) return;
     sel.value = estate;
     const vis = document.getElementById('sidebarEstateVisible');
