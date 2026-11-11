@@ -10605,7 +10605,7 @@ const SSO_ERRORS = {
 function stripGwToken() {
     try {
         const u = new URL(window.location.href);
-        ['gw_token', 'gw_company', 'gw_company_name', 'gw_company_short'].forEach((k) => u.searchParams.delete(k));
+        ['gw_token', 'gw_estate', 'gw_estate_short', 'gw_company', 'gw_company_name', 'gw_company_short'].forEach((k) => u.searchParams.delete(k));
         history.replaceState(null, '', u.pathname + u.search + u.hash);
     } catch (e) {}
 }
@@ -10618,7 +10618,8 @@ function stripGwToken() {
 // then one name containing the other.
 function gwCompanyHints(params) {
     const p = params || new URLSearchParams(window.location.search);
-    return ['gw_company', 'gw_company_name', 'gw_company_short'].map((k) => (p.get(k) || '').trim()).filter(Boolean);
+    // The estate (when the Intranet company has several) comes first, then the company itself.
+    return ['gw_estate', 'gw_estate_short', 'gw_company', 'gw_company_name', 'gw_company_short'].map((k) => (p.get(k) || '').trim()).filter(Boolean);
 }
 function matchEstateForCompany(hints, estates) {
     const GENERIC = /^(sdn|bhd|berhad|sb|plantation|plantations|estate|estates|estet|ladang|the)$/;
@@ -10639,7 +10640,7 @@ function matchEstateForCompany(hints, estates) {
             const et = toks(e), ec = compact(e), ea = String(e).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(' ');
             let score = 0;
             if (ht.join(' ') === et.join(' ')) score = 3;
-            else if (hc.length >= 4 && (ec.startsWith(hc) || hc.startsWith(ec))) score = 2;
+            else if (hc.length >= 4 && (ec.startsWith(hc) || hc.startsWith(ec) || ea.join('').startsWith(hc))) score = 2;
             else if (hc.length >= 2 && (hc === ea.map((w) => w[0]).join('') || hc === ea[0] + ea.slice(1).map((w) => w[0]).join(''))) score = 2; // ESM, MJMP2
             else {
                 const common = ht.filter((w) => et.includes(w)).length;
@@ -10974,7 +10975,7 @@ function bootApp(session) {
         if (_module === 'report') navigateToSection('mgmtreport');
         else if (_module === 'stock') navigateToSection('home');
         const _url = new URL(window.location.href);
-        ['module', 'gw_company', 'gw_company_name', 'gw_company_short'].forEach((k) => _url.searchParams.delete(k));
+        ['module', 'gw_estate', 'gw_estate_short', 'gw_company', 'gw_company_name', 'gw_company_short'].forEach((k) => _url.searchParams.delete(k));
         history.replaceState(null, '', _url.pathname + _url.search + _url.hash);
     }
 }
