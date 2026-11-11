@@ -10546,12 +10546,61 @@ const SSO_ERRORS = {
 function stripGwToken() {
     try {
         const u = new URL(window.location.href);
-        u.searchParams.delete('gw_token');
+        ['gw_token', 'gw_company', 'gw_company_name', 'gw_company_short'].forEach((k) => u.searchParams.delete(k));
         history.replaceState(null, '', u.pathname + u.search + u.hash);
     } catch (e) {}
 }
 
-async function signInFromIntranet(token, module) {
+// ── Which estate did the Intranet mean? ───────────────────────────
+// The Intranet opens us with ?gw_company=<estate name or the code set in its
+// Connector tab>&gw_company_name=<company name>&gw_company_short=<short name>.
+// Match against the estates this user may open: exact name first, then the
+// same name ignoring case / "Sdn Bhd" / "Plantation" / "Estate" / punctuation,
+// then one name containing the other.
+function gwCompanyHints(params) {
+    const p = params || new URLSearchParams(window.location.search);
+    return ['gw_company', 'gw_company_name', 'gw_company_short'].map((k) => (p.get(k) || '').trim()).filter(Boolean);
+}
+function matchEstateForCompany(hints, estates) {
+    const norm = (x) => String(x || '').toLowerCase()
+        .replace(/\b(sdn\.?\s*bhd\.?|berhad|plantations?|estates?|estet|ladang)\b/g, ' ')
+        .replace(/[^a-z0-9]+/g, ' ').trim();
+    for (const h of hints) {
+        const exact = estates.find((e) => e.toLowerCase() === h.toLowerCase());
+        if (exact) return exact;
+    }
+    for (const h of hints) {
+        const n = norm(h);
+        if (!n) continue;
+        const same = estates.find((e) => norm(e) === n);
+        if (same) return same;
+    }
+    for (const h of hints) {
+        const n = norm(h);
+        if (n.length < 4) continue;
+        const part = estates.find((e) => norm(e).includes(n) || n.includes(norm(e)));
+        if (part) return part;
+    }
+    return '';
+}
+// After boot: switch the estate selector to the company the Intranet sent us.
+function applyIntranetCompany(hints) {
+    if (!hints || !hints.length) return;
+    const sel = document.getElementById('sidebarEstate');
+    if (!sel) return;
+    const estates = [...sel.options].map((o) => o.value).filter(Boolean);
+    const estate = matchEstateForCompany(hints, estates);
+    if (!estate) { console.warn('[SSO] no estate matches the Intranet company', hints); return; }
+    if (estate === activeEstate) return;
+    sel.value = estate;
+    const vis = document.getElementById('sidebarEstateVisible');
+    if (vis) vis.value = estate;
+    const top = document.getElementById('topEstateLabel');
+    if (top && top.tagName === 'SELECT') { top.value = estate; if (typeof resizeTopEstateSelect === 'function') resizeTopEstateSelect(top); }
+    onSidebarEstateChange();
+}
+
+async function signInFromIntranet(token, module, companyHints) {
     let code = 'err_network';
     try {
         const res = await fetch(SUPABASE_URL + '/functions/v1/stock-sso', {
@@ -10579,6 +10628,7 @@ async function signInFromIntranet(token, module) {
                 document.body.classList.remove('estate-mobile');
             }
             bootApp(data.session);
+            applyIntranetCompany(companyHints);
             return true;
         }
         code = (data && data.error) || ('http_' + res.status);
@@ -10828,12 +10878,14 @@ function bootApp(session) {
     // Deep link from MJM Intranet: ?module=stock opens Home, ?module=report
     // opens Management Report. The parameter is removed after use so a
     // later reload resumes the last page as before.
-    const _module = new URLSearchParams(window.location.search).get('module');
+    const _params = new URLSearchParams(window.location.search);
+    applyIntranetCompany(gwCompanyHints(_params));
+    const _module = _params.get('module');
     if (_module) {
         if (_module === 'report') navigateToSection('mgmtreport');
         else if (_module === 'stock') navigateToSection('home');
         const _url = new URL(window.location.href);
-        _url.searchParams.delete('module');
+        ['module', 'gw_company', 'gw_company_name', 'gw_company_short'].forEach((k) => _url.searchParams.delete(k));
         history.replaceState(null, '', _url.pathname + _url.search + _url.hash);
     }
 }
@@ -12133,7 +12185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // (so switching Intranet users works). See signInFromIntranet().
     const _gwParams = new URLSearchParams(window.location.search);
     if (_gwParams.get('gw_token')) {
-        await signInFromIntranet(_gwParams.get('gw_token'), _gwParams.get('module') === 'report' ? 'report' : 'stock');
+        await signInFromIntranet(_gwParams.get('gw_token'), _gwParams.get('module') === 'report' ? 'report' : 'stock', gwCompanyHints(_gwParams));
         if (navigator.onLine) drainSyncQueue();
         return;
     }
